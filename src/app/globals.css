@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-light: #EFF6FF;
+
+  --color-surface: #F8FAFC;
+
+  --color-text: #0F172A;
+  --color-text-secondary: #64748B;
+  --color-text-tertiary: #94A3B8;
+
+  --color-border: #E2E8F0;
+  --color-border-light: #F1F5F9;
+
+  --color-success: #059669;
+  --color-success-light: #ECFDF5;
+
+  --color-accent: #F59E0B;
+  --color-accent-light: #FFFBEB;
+
+  --color-danger: #EF4444;
+  --color-danger-light: #FEF2F2;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+/* Card hover */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* Nav links */
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 0.375rem 0.75rem;
+  border-radius: 10px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  text-decoration: none;
+}
+.nav-link:hover {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 0.75rem 0.5rem;
+  border-radius: 10px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  text-decoration: none;
+}
+.mobile-nav-link:hover {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+/* Mobile touch targets */
+@media (max-width: 640px) {
+  button, a {
+    min-height: 44px;
+  }
+  select, input {
+    min-height: 44px;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
