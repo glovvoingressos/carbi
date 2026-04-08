@@ -54,7 +54,7 @@ export default function QualCarroPage() {
     if (answers.tipo && answers.tipo !== 'Qualquer') {
       const mapTipo: Record<string, string> = { 'Hatch': 'hatch', 'Sedan': 'sedan', 'SUV': 'suv' }
       if (mapTipo[answers.tipo]) {
-        filtered = filtered.filter((c) => c.segment === mapTipo[answers.tipo])
+        filtered = filtered.filter((c) => c.segment === mapTipo[answers.tipo!])
       }
     }
 

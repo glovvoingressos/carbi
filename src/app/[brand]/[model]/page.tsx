@@ -1,25 +1,21 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { cars, getCarsBySegment, formatBRL } from '@/data/cars'
+import { getCarsBySegment, formatBRL } from '@/data/cars'
+import { getCarDetail } from '@/lib/data-fetcher'
 import CarCard from '@/components/car/CarCard'
 import Badge from '@/components/ui/Badge'
 import {
   Fuel, Zap, Gauge, Shield, Package, Timer, ChevronRight, ArrowLeftRight,
 } from 'lucide-react'
 
-export function generateStaticParams() {
-  return cars.map((car) => ({
-    brand: car.brand.toLowerCase().replace(/\s+/g, '-'),
-    model: car.slug,
-  }))
-}
+// Remove generateStaticParams for large database to avoid slow builds
+// export function generateStaticParams() { ... }
 
 export async function generateMetadata({ params }: { params: Promise<{ brand: string; model: string }> }): Promise<Metadata> {
   const resolved = await params
-  const car = cars.find(
-    (c) => c.slug === resolved.model && c.brand.toLowerCase().replace(/\s+/g, '-') === resolved.brand
-  )
+  const car = await getCarDetail(resolved.brand, resolved.model)
+  
   if (!car) return { title: 'Carro não encontrado' }
   return {
     title: `${car.brand} ${car.model} ${car.version} (${car.year}) — Preço e Especificações`,
@@ -29,9 +25,8 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
 
 export default async function CarDetailPage({ params }: { params: Promise<{ brand: string; model: string }> }) {
   const resolved = await params
-  const car = cars.find(
-    (c) => c.slug === resolved.model && c.brand.toLowerCase().replace(/\s+/g, '-') === resolved.brand
-  )
+  const car = await getCarDetail(resolved.brand, resolved.model)
+
   if (!car) notFound()
 
   const brandSlug = car.brand.toLowerCase().replace(/\s+/g, '-')
@@ -66,8 +61,8 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
           <div className="p-6 sm:p-8 flex flex-col justify-center">
             <div className="flex flex-wrap gap-1.5 mb-3">
               <Badge>{car.segment.charAt(0).toUpperCase() + car.segment.slice(1)}</Badge>
-              {car.year === 2024 && <Badge variant="success">Novo</Badge>}
-              {car.turbo && <Badge variant="accent">Turbo</Badge>}
+              {car.year === 2024 && <Badge variant="green">Novo</Badge>}
+              {car.turbo && <Badge variant="highlight">Turbo</Badge>}
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-text">{car.brand} {car.model}</h1>
             <p className="text-sm text-text-secondary mt-1">{car.version}</p>
@@ -229,3 +224,4 @@ function SpecRow({ label, value, isGood, isWinner }: { label: string; value: str
     </div>
   )
 }
+

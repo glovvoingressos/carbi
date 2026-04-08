@@ -1,7 +1,10 @@
 import Link from 'next/link'
-import { brands, cars } from '@/data/cars'
+import { getAllCars } from '@/lib/data-fetcher'
 
-export default function MarcasPage() {
+export default async function MarcasPage() {
+  const cars = await getAllCars()
+  const brands = [...new Set(cars.map(c => c.brand))].sort()
+
   return (
     <div>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
@@ -32,3 +35,4 @@ export default function MarcasPage() {
     </div>
   )
 }
+

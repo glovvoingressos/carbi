@@ -10,9 +10,10 @@ export default function RankingsPage({ searchParams }: { searchParams: { [key: s
   let ranked = [...cars]
 
   if (sortByProfile) {
-    ranked = ranked
+    const scored = ranked
       .map((c) => ({ car: c, score: matchCarToProfile(c, sortByProfile) }))
       .sort((a, b) => b.score - a.score)
+    ranked = scored.map((s) => s.car)
   } else if (sortByPrice === 'ate-70') {
     ranked = ranked.filter((c) => c.priceBrl <= 70000).sort((a, b) => a.priceBrl - b.priceBrl)
   } else if (sortByPrice === '70-100') {
@@ -24,8 +25,10 @@ export default function RankingsPage({ searchParams }: { searchParams: { [key: s
   }
 
   const activeProfile = profiles.find((p) => p.id === sortByProfile)
-  const rankedCars = ranked.map((item) => 'car' in item ? item.car : item)
-  const rankedScores = ranked.map((item) => 'car' in item ? item.score : null)
+  const rankedCars = ranked
+  const rankedScores = sortByProfile
+    ? rankedCars.map((c) => matchCarToProfile(c, sortByProfile))
+    : rankedCars.map(() => null as number | null)
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
@@ -91,10 +94,10 @@ export default function RankingsPage({ searchParams }: { searchParams: { [key: s
                   <div className="bg-primary-light rounded-b-xl border border-t-0 border-primary/20 px-4 py-3 -mt-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-bold text-text">Destaque do ranking</span>
-                      <span className="text-xs text-primary font-medium">Score: {Math.round(score)}</span>
+                      <span className="text-xs text-primary font-medium">Score: {Math.round(score ?? 0)}</span>
                     </div>
                     <div className="w-full bg-border rounded-full h-1.5 mt-1.5">
-                      <div className="bg-primary h-1.5 rounded-full" style={{ width: `${Math.round(score)}%` }} />
+                      <div className="bg-primary h-1.5 rounded-full" style={{ width: `${Math.round(score ?? 0)}%` }} />
                     </div>
                   </div>
                 )}

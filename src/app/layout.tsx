@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
+import ClientShell from '@/components/layout/ClientShell'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+})
 
 export const metadata: Metadata = {
   title: 'CarDecision.br — Descubra o carro certo para você',
@@ -18,10 +20,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+      <body className={inter.className} style={{ background: 'var(--color-bg)' }}>
+        <ClientShell>{children}</ClientShell>
       </body>
     </html>
   )

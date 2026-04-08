@@ -1,22 +1,21 @@
 import Link from 'next/link'
-import { cars } from '@/data/cars'
+import { getAllCars } from '@/lib/data-fetcher'
 import CarCard from '@/components/car/CarCard'
 import { ChevronRight } from 'lucide-react'
 
-export function generateStaticParams() {
-  const brandSlugs = [
-    ...new Set(cars.map((c) => c.brand.toLowerCase().replace(/\s+/g, '-'))),
-  ]
-  return brandSlugs.map((brand) => ({ brand }))
-}
+// Remove generateStaticParams for large database
+// export function generateStaticParams() { ... }
 
 export default async function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
   const resolved = await params
-  const brandName = resolved.brand.replace(/-/g, ' ')
-  const brandCars = cars.filter(
-    (c) => c.brand.toLowerCase().replace(/\s+/g, '-') === resolved.brand
+  const brandSlug = resolved.brand
+  
+  const allCars = await getAllCars()
+  const brandCars = allCars.filter(
+    (c) => c.brand.toLowerCase().replace(/\s+/g, '-') === brandSlug
   )
-  const realBrandName = brandCars[0]?.brand || brandName
+  
+  const realBrandName = brandCars[0]?.brand || brandSlug.replace(/-/g, ' ')
 
   if (brandCars.length === 0) {
     return (
@@ -49,3 +48,4 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
     </div>
   )
 }
+

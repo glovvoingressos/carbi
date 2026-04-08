@@ -1,23 +1,20 @@
 import type { ReactNode } from 'react'
 
+type BadgeVariant = 'dark' | 'green' | 'highlight' | 'subtle'
+
 interface BadgeProps {
   children: ReactNode
-  variant?: 'default' | 'success' | 'accent' | 'subtle' | 'danger'
+  variant?: BadgeVariant
   className?: string
 }
 
 export default function Badge({ children, variant = 'subtle', className = '' }: BadgeProps) {
-  const variants: Record<string, string> = {
-    default: 'bg-primary-light text-primary',
-    success: 'bg-success-light text-success',
-    accent: 'bg-accent-light text-amber-700',
-    subtle: 'bg-gray-100 text-text-secondary',
-    danger: 'bg-danger-light text-danger',
+  const cls: Record<BadgeVariant, string> = {
+    dark: 'badge-dark',
+    green: 'badge-green',
+    highlight: 'tag-highlight',
+    subtle: 'badge-subtle',
   }
 
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variants[variant]} ${className}`}>
-      {children}
-    </span>
-  )
+  return <span className={`${cls[variant]} ${className}`}>{children}</span>
 }
