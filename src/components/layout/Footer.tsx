@@ -1,70 +1,131 @@
 import Link from 'next/link'
-import { CarFront } from 'lucide-react'
+import { CarFront, ArrowUpRight } from 'lucide-react'
+
+const NAV_LINKS = [
+  { group: 'Plataforma', links: [
+    { href: '/',         label: 'Início' },
+    { href: '/marcas',   label: 'Marcas' },
+    { href: '/rankings', label: 'Rankings' },
+  ]},
+  { group: 'Ferramentas', links: [
+    { href: '/qual-carro', label: 'Qual Carro?' },
+    { href: '/comparar',   label: 'Comparador' },
+  ]},
+]
 
 export default function Footer() {
+  const year = new Date().getFullYear()
+
   return (
-    <footer className="hidden md:block py-10" style={{ background: 'var(--color-bg)' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <footer style={{ background: 'var(--color-bg)', borderTop: '1px solid var(--color-border)' }}>
+      <div className="container" style={{ paddingBlock: 'clamp(48px, 6vh, 72px)' }}>
+
+        {/* Grid 4 colunas */}
         <div
-          className="p-8 flex flex-col md:flex-row md:items-start md:justify-between gap-8"
-          style={{ background: 'var(--color-card)', borderRadius: 'var(--radius-2xl)', border: '1px solid var(--color-border)' }}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+            gap: 'clamp(32px, 5vw, 64px)',
+            marginBottom: 48,
+          }}
         >
-          <div className="max-w-xs">
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'var(--color-dark)' }}>
-                <CarFront className="w-4 h-4 text-white" />
+          {/* Coluna: marca */}
+          <div style={{ gridColumn: 'span 2' }} className="footer-brand-col">
+            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <div
+                style={{
+                  width: 36, height: 36,
+                  borderRadius: 10,
+                  background: 'var(--color-dark)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <CarFront style={{ width: 18, height: 18, color: '#fff' }} />
               </div>
-              <span className="text-[15px] font-bold">
+              <span style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em' }}>
                 Car<span style={{ color: 'var(--color-accent)' }}>Decision</span>
               </span>
-            </div>
-            <p className="text-[13px] leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
-              Compare carros, descubra o melhor para seu perfil e tome a melhor decisão de compra com dados reais.
+            </Link>
+            <p style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--color-text-2)', maxWidth: 280 }}>
+              O guia automotivo mais completo do Brasil. Compare carros, descubra seu perfil e tome a melhor decisão de compra com dados reais.
             </p>
+
+            {/* Selos / trust */}
+            <div style={{ display: 'flex', gap: 8, marginTop: 20, flexWrap: 'wrap' }}>
+              {['Dados reais', 'Atualizado hoje', 'Sem anúncios'].map((label) => (
+                <span
+                  key={label}
+                  style={{
+                    fontSize: 11, fontWeight: 600,
+                    padding: '3px 10px',
+                    borderRadius: 'var(--radius-pill)',
+                    background: 'var(--color-card)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-text-2)',
+                  }}
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
           </div>
 
-          <div className="flex gap-14">
-            <div>
-              <h4 className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-3)' }}>
-                Navegação
-              </h4>
-              <ul className="space-y-2">
-                {[
-                  { href: '/', label: 'Início' },
-                  { href: '/marcas', label: 'Marcas' },
-                  { href: '/rankings', label: 'Rankings' },
-                ].map((l) => (
-                  <li key={l.href}>
-                    <Link href={l.href} className="text-[13px] font-medium hover:opacity-60 transition-opacity" style={{ color: 'var(--color-text-2)' }}>
-                      {l.label}
+          {/* Colunas de links */}
+          {NAV_LINKS.map(({ group, links }) => (
+            <div key={group}>
+              <p
+                style={{
+                  fontSize: 11, fontWeight: 700,
+                  letterSpacing: '0.07em', textTransform: 'uppercase',
+                  color: 'var(--color-text-3)', marginBottom: 16,
+                }}
+              >
+                {group}
+              </p>
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {links.map(({ href, label }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      style={{
+                        fontSize: 14, fontWeight: 500,
+                        color: 'var(--color-text-2)',
+                        transition: 'color 150ms ease',
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-text)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-2)' }}
+                    >
+                      {label}
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
-            <div>
-              <h4 className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-3)' }}>
-                Ferramentas
-              </h4>
-              <ul className="space-y-2">
-                {[
-                  { href: '/qual-carro', label: 'Qual Carro?' },
-                  { href: '/comparar', label: 'Comparador' },
-                ].map((l) => (
-                  <li key={l.href}>
-                    <Link href={l.href} className="text-[13px] font-medium hover:opacity-60 transition-opacity" style={{ color: 'var(--color-text-2)' }}>
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          ))}
         </div>
 
-        <p className="text-center text-[11px] mt-6" style={{ color: 'var(--color-text-3)' }}>
-          © {new Date().getFullYear()} CarDecision.br — Dados baseados em especificações oficiais dos fabricantes.
-        </p>
+        {/* Linha final */}
+        <div
+          style={{
+            paddingTop: 24,
+            borderTop: '1px solid var(--color-border)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap',
+          }}
+        >
+          <p style={{ fontSize: 12, color: 'var(--color-text-3)' }}>
+            © {year} CarDecision.br — Dados baseados em especificações oficiais dos fabricantes.
+          </p>
+          <p style={{ fontSize: 12, color: 'var(--color-text-3)' }}>
+            Feito com ❤️ no Brasil
+          </p>
+        </div>
+
       </div>
     </footer>
   )

@@ -47,7 +47,7 @@ export const sedans: CarSpec[] = [
     cons: ["Desempenho modesto", "Multimídia pequena para o custo"],
     shortDesc: "O Corolla é o sedan mais amado do Brasil, agora com a eficiência máxima do motor híbrido.",
     idealFor: "Pessoas que buscam o máximo em conforto e tranquilidade de pós-venda.",
-    image: "https://images.unsplash.com/photo-1620025983803-097eccd94cf2?w=800&auto=format&fit=crop"
+    image: "/assets/cars/toyota-corolla-2024.png"
   },
   {
     id: "chevrolet-onix-plus-2024",
@@ -95,7 +95,7 @@ export const sedans: CarSpec[] = [
     cons: ["Interior simples", "Banco traseiro justo em largura"],
     shortDesc: "O Onix Plus é a escolha inteligente para famílias que precisam de economia e segurança.",
     idealFor: "Casais com filhos que buscam o melhor custo-benefício em um sedan.",
-    image: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800&auto=format&fit=crop"
+    image: "/assets/cars/chevrolet-onix-plus-2024.png"
   },
   {
     id: "vw-virtus-2024",
@@ -143,7 +143,7 @@ export const sedans: CarSpec[] = [
     cons: ["Preço elevado", "Sentado baixo incomoda alguns"],
     shortDesc: "O Virtus Exclusive oferece porte de sedan médio com a agilidade de um motor turbo 250 TSI.",
     idealFor: "Quem quer performance e muito espaço sem o tamanho de um sedan gigante.",
-    image: "/Users/antonioaugusto/.gemini/antigravity/brain/ab5e1ea6-0474-4342-a0a0-fc1d3691e43a/vw_polo_2024_studio_silver_1775613040029.png"
+    image: "/assets/cars/vw-virtus-2024.png"
   },
   {
     id: "nissan-sentra-2024",
@@ -191,7 +191,7 @@ export const sedans: CarSpec[] = [
     cons: ["Motor aspirado consome mais", "Altura do solo baixa"],
     shortDesc: "O Sentra é o sedan médio para quem valoriza conforto interno e um design agressivo.",
     idealFor: "Pessoas que querem luxo e silêncio a bordo por um preço competitivo.",
-    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop"
+    image: "/assets/cars/nissan-sentra-2024.png"
   },
   {
     id: "bmw-series-3-2024",
@@ -239,7 +239,7 @@ export const sedans: CarSpec[] = [
     cons: ["Preço muito elevado", "Manutenção premium cara"],
     shortDesc: "A Série 3 é o Sedan de luxo mais vendido do país, sendo a referência absoluta em prazer de dirigir.",
     idealFor: "Pessoas que buscam status, tecnologia de ponta e uma direção purista.",
-    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop"
+    image: "/assets/cars/bmw-series-3-2024.png"
   },
   {
     id: "honda-city-sedan-2024",
@@ -287,7 +287,7 @@ export const sedans: CarSpec[] = [
     cons: ["Falta motor turbo para performance", "Preço elevado"],
     shortDesc: "O City Sedan é a opção para quem busca tecnologia e o maior porta-malas da categoria com a confiança Honda.",
     idealFor: "Famílias que viajam e buscam um carro tecnológico e muito econômico.",
-    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop"
+    image: "/assets/cars/honda-city-sedan-2024.png"
   },
   {
     id: "fiat-cronos-2024",
@@ -335,7 +335,7 @@ export const sedans: CarSpec[] = [
     cons: ["Apenas 2 airbags", "Segurança Latin NCAP ruim"],
     shortDesc: "O Cronos é o sedan compacto que oferece o maior porta-malas da categoria com excelente economia.",
     idealFor: "Pessoas que precisam de muito espaço para bagagem e baixo custo de uso.",
-    image: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800&auto=format&fit=crop"
+    image: "/assets/cars/fiat-cronos-2024.png"
   },
   {
     id: "audi-a3-sedan-2024",
@@ -383,7 +383,7 @@ export const sedans: CarSpec[] = [
     cons: ["Manutenção cara", "Porta-malas justo"],
     shortDesc: "O Audi A3 Sedan é a porta de entrada para o luxo alemão com performance de sobra.",
     idealFor: "Pessoas que buscam status e uma direção refinada.",
-    image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&auto=format&fit=crop"
+    image: "/assets/cars/audi-a3-sedan-2024.png"
   },
   {
     id: "nissan-versa-2024",
@@ -430,8 +430,8 @@ export const sedans: CarSpec[] = [
     pros: ["Melhor isolamento acústico", "Bancos Zero Gravity", "Câmera 360", "Segurança nota máxima"],
     cons: ["Multimídia antiga", "Motor falta força em subidas carregado"],
     shortDesc: "O Versa é o sedan que foca no bem-estar a bordo e na segurança de toda a família.",
-    idealFor: "Pessoas que buscam um sedan refinado e seguro sem o custo de um premium.",
-    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop"
+    idealFor: "Pessoas que buscam un sedan refinado e seguro sem o custo de um premium.",
+    image: "/assets/cars/nissan-versa-2024.png"
   },
   {
     id: "hyundai-hb20s-2024",
@@ -479,6 +479,102 @@ export const sedans: CarSpec[] = [
     cons: ["Espaço traseiro limitado", "Visual polêmico para alguns"],
     shortDesc: "O HB20S une o fôlego do motor turbo com um pacote de equipamentos digno de carros maiores.",
     idealFor: "Pessoas que buscam agilidade no trânsito e mimos tecnológicos.",
-    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop"
+    image: "/assets/cars/hyundai-hb20s-2024.png"
+  },
+  {
+    id: "honda-civic-2024",
+    brand: "Honda",
+    model: "Civic",
+    version: "Advanced e:HEV",
+    year: 2024,
+    slug: "civic",
+    segment: "sedan",
+    category: "médio",
+    priceBrl: 265900,
+    engineType: "Híbrido",
+    displacement: "2.0",
+    cylinderCount: 4,
+    turbo: false,
+    horsepower: 184,
+    torque: 315,
+    transmission: "e-CVT",
+    drive: "Dianteira",
+    lengthMm: 4679,
+    widthMm: 1802,
+    heightMm: 1432,
+    wheelbaseMm: 2735,
+    weightKg: 1449,
+    trunkCapacity: 495,
+    seats: 5,
+    fuelEconomyCityGas: 18.3,
+    fuelEconomyRoadGas: 15.9,
+    topSpeed: 180,
+    acceleration0100: 7.8,
+    airbagsCount: 8,
+    absBrakes: true,
+    esc: true,
+    hasCarplay: true,
+    hasAndroidAuto: true,
+    hasAc: true,
+    hasRearCamera: true,
+    hasMultimedia: true,
+    hasCruiseCtrl: true,
+    latinNcap: 5,
+    isofix: true,
+    tags: ["hibrido", "tecnologia", "desempenho"],
+    isPopular: true,
+    pros: ["Consumo impressionante na cidade", "Potência quase de esportivo", "Interior sofisticado", "Honda Sensing de última geração"],
+    cons: ["Preço que invade zona de carros premium alemães", "Apenas cota importada"],
+    shortDesc: "O Civic voltou importado e híbrido, subindo o sarrafo da categoria média.",
+    idealFor: "Fãs inveterados do Civic que agora buscam ecologia alinhada à performance.",
+    image: "/assets/cars/honda-civic-2024.png"
+  },
+  {
+    id: "mercedes-c-class-2024",
+    brand: "Mercedes-Benz",
+    model: "Classe C",
+    version: "C 200 AMG Line",
+    year: 2024,
+    slug: "c-class",
+    segment: "sedan",
+    category: "luxo",
+    priceBrl: 359900,
+    engineType: "Híbrido Leve",
+    displacement: "1.5 Turbo",
+    cylinderCount: 4,
+    turbo: true,
+    horsepower: 204,
+    torque: 300,
+    transmission: "9G-TRONIC",
+    drive: "Traseira",
+    lengthMm: 4751,
+    widthMm: 1820,
+    heightMm: 1438,
+    wheelbaseMm: 2865,
+    weightKg: 1650,
+    trunkCapacity: 455,
+    seats: 5,
+    fuelEconomyCityGas: 10.9,
+    fuelEconomyRoadGas: 13.9,
+    topSpeed: 246,
+    acceleration0100: 7.3,
+    airbagsCount: 7,
+    absBrakes: true,
+    esc: true,
+    hasCarplay: true,
+    hasAndroidAuto: true,
+    hasAc: true,
+    hasRearCamera: true,
+    hasMultimedia: true,
+    hasCruiseCtrl: true,
+    latinNcap: 5,
+    isofix: true,
+    tags: ["luxo", "status", "tecnologia"],
+    isPopular: true,
+    pros: ["Interior de Mini Classe S", "MBUX de última geração", "Conforto de rodagem insuperável", "Design elegante"],
+    cons: ["Preço elevado dos opcionais", "Manutenção premium"],
+    shortDesc: "O Classe C é a referência mundial em sedans de luxo, trazendo tecnologias do topo de linha Classe S.",
+    idealFor: "Executivos e entusiastas que buscam o máximo em status e tecnologia alemã.",
+    image: "/assets/cars/mercedes-c-class-2024.png"
   }
 ]

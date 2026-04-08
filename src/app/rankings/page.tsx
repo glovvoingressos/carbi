@@ -1,33 +1,31 @@
 import Link from 'next/link'
-import { cars, formatBRL, profiles, priceRanges, matchCarToProfile } from '@/data/cars'
+import { cars, formatBRL, profiles, priceRanges, matchCarToProfile, getCarScoreByProfile } from '@/data/cars'
 import CarCard from '@/components/car/CarCard'
 import { Trophy, Filter } from 'lucide-react'
 
-export default function RankingsPage({ searchParams }: { searchParams: { [key: string]: string } }) {
-  const sortByProfile = searchParams.profile || null
-  const sortByPrice = searchParams.priceRange || null
+export default async function RankingsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string }> }) {
+  const sp = await searchParams
+  const sortByProfile = sp.profile || null
+  const sortByPrice = sp.priceRange || null
 
   let ranked = [...cars]
 
   if (sortByProfile) {
     const scored = ranked
-      .map((c) => ({ car: c, score: matchCarToProfile(c, sortByProfile) }))
-      .sort((a, b) => b.score - a.score)
+      .map((c) => ({ car: c, score: getCarScoreByProfile(c, sortByProfile) }))
+      .sort((a, b) => (b.score as number) - (a.score as number))
     ranked = scored.map((s) => s.car)
-  } else if (sortByPrice === 'ate-70') {
-    ranked = ranked.filter((c) => c.priceBrl <= 70000).sort((a, b) => a.priceBrl - b.priceBrl)
-  } else if (sortByPrice === '70-100') {
-    ranked = ranked.filter((c) => c.priceBrl >= 70000 && c.priceBrl <= 100000).sort((a, b) => a.priceBrl - b.priceBrl)
-  } else if (sortByPrice === '100-150') {
-    ranked = ranked.filter((c) => c.priceBrl >= 100000 && c.priceBrl <= 150000).sort((a, b) => a.priceBrl - b.priceBrl)
-  } else if (sortByPrice === '150+') {
-    ranked = ranked.filter((c) => c.priceBrl >= 150000).sort((a, b) => a.priceBrl - b.priceBrl)
+  } else if (sortByPrice) {
+    const range = priceRanges.find(r => r.id === sortByPrice)
+    if (range) {
+      ranked = ranked.filter((c) => c.priceBrl >= range.min && c.priceBrl <= range.max).sort((a, b) => a.priceBrl - b.priceBrl)
+    }
   }
 
   const activeProfile = profiles.find((p) => p.id === sortByProfile)
   const rankedCars = ranked
   const rankedScores = sortByProfile
-    ? rankedCars.map((c) => matchCarToProfile(c, sortByProfile))
+    ? rankedCars.map((c) => getCarScoreByProfile(c, sortByProfile))
     : rankedCars.map(() => null as number | null)
 
   return (
@@ -63,20 +61,17 @@ export default function RankingsPage({ searchParams }: { searchParams: { [key: s
           <span className="text-xs font-medium text-text-tertiary uppercase tracking-wider">Pre&ccedil;o</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {sortByProfile === null && priceRanges.map((r, i) => {
-            const key = ['ate-70', '70-100', '100-150', '150+'][i]
-            return (
-              <Link key={key} href={`/rankings?priceRange=${key}`}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  sortByPrice === key
-                    ? 'bg-primary text-white'
-                    : 'bg-white border border-border text-text-secondary hover:border-primary/30 hover:text-primary'
-                }`}
-              >
-                {r.label}
-              </Link>
-            )
-          })}
+          {sortByProfile === null && priceRanges.map((r) => (
+            <Link key={r.id} href={`/rankings?priceRange=${r.id}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                sortByPrice === r.id
+                  ? 'bg-primary text-white'
+                  : 'bg-white border border-border text-text-secondary hover:border-primary/30 hover:text-primary'
+              }`}
+            >
+              {r.label}
+            </Link>
+          ))}
         </div>
       </div>
 

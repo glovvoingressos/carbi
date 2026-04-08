@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Bricolage_Grotesque } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
 
-const inter = Inter({
+const font = Bricolage_Grotesque({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
 })
@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className} style={{ background: 'var(--color-bg)' }}>
+      <body className={font.className} style={{ background: 'var(--color-bg)' }}>
         <ClientShell>{children}</ClientShell>
       </body>
     </html>

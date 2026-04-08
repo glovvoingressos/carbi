@@ -9,38 +9,63 @@ export const formatBRL = (value: number) => {
   }).format(value)
 }
 
-export const matchCarToProfile = (profile: {
-  budget: number,
-  useCase: string,
-  familySize: number,
-  priorities: string[]
-}) => {
-  return cars
-    .filter(car => car.priceBrl <= profile.budget * 1.1) // 10% tolerance
-    .sort((a, b) => {
-      let scoreA = 0
-      let scoreB = 0
+export const getCarScoreByProfile = (car: CarSpec, profileId: string): number => {
+  let score = 50 // Base score
 
-      // Match family size
-      if (profile.familySize > 4 && a.seats >= 5) scoreA += 2
-      if (profile.familySize > 4 && b.seats >= 5) scoreB += 2
+  // Price factor (lower price is generally better for 'economico')
+  if (profileId === 'economico') {
+    if (car.priceBrl < 80000) score += 30
+    else if (car.priceBrl < 120000) score += 15
+    if (car.tags.includes('eficiente')) score += 20
+  }
 
-      // Match use case topics
-      if (profile.useCase === 'trabalho' && a.segment === 'pickup') scoreA += 5
-      if (profile.useCase === 'trabalho' && b.segment === 'pickup') scoreB += 5
-      
-      if (profile.useCase === 'familia' && a.segment === 'suv') scoreA += 5
-      if (profile.useCase === 'familia' && b.segment === 'suv') scoreB += 5
+  if (profileId === 'familia') {
+    if (car.seats >= 5) score += 15
+    if (car.trunkCapacity >= 400) score += 15
+    if (car.segment === 'suv' || car.segment === 'sedan') score += 15
+  }
 
-      // Match tags
-      profile.priorities.forEach(p => {
-        if (a.tags.includes(p.toLowerCase())) scoreA += 3
-        if (b.tags.includes(p.toLowerCase())) scoreB += 3
+  if (profileId === 'seguranca') {
+    if (car.airbagsCount >= 6) score += 20
+    if (car.latinNcap && car.latinNcap >= 4) score += 20
+    if (car.absBrakes && car.esc) score += 10
+  }
+
+  if (profileId === 'tecnologia') {
+    if (car.hasCarplay || car.hasAndroidAuto) score += 15
+    if (car.hasMultimedia) score += 15
+    if (car.tags.includes('tecnologia')) score += 20
+  }
+
+  if (profileId === 'potencia') {
+    if (car.horsepower >= 150) score += 20
+    if (car.turbo) score += 15
+    if (car.acceleration0100 && car.acceleration0100 < 9) score += 15
+  }
+
+  if (profileId === 'custo-beneficio') {
+    if (car.priceBrl < 130000 && (car.hasCarplay || car.hasMultimedia)) score += 20
+    if (car.isPopular) score += 20
+  }
+
+  return Math.min(100, score)
+}
+
+export const matchCarToProfile = (profile: any, profileId?: string) => {
+  if (typeof profile === 'object' && !profileId) {
+    // Legacy support for profile object search
+    return cars
+      .filter(car => car.priceBrl <= profile.budget * 1.1)
+      .sort((a, b) => {
+        const scoreA = getCarScoreByProfile(a, profile.priorities[0] || 'custo-beneficio')
+        const scoreB = getCarScoreByProfile(b, profile.priorities[0] || 'custo-beneficio')
+        return scoreB - scoreA
       })
-
-      return scoreB - scoreA
-    })
-    .slice(0, 3)
+      .slice(0, 3)
+  }
+  
+  // Scoring mode: matchCarToProfile(car, profileId)
+  return getCarScoreByProfile(profile as CarSpec, profileId || 'custo-beneficio')
 }
 
 export const getCarsBySegment = (segment: string) => {
@@ -56,11 +81,11 @@ export const getCarBySlug = (slug: string) => {
 }
 
 export const priceRanges = [
-  { label: 'Até R$ 80k', min: 0, max: 80000 },
-  { label: 'R$ 80k - R$ 120k', min: 80000, max: 120000 },
-  { label: 'R$ 120k - R$ 180k', min: 120000, max: 180000 },
-  { label: 'R$ 180k - R$ 300k', min: 180000, max: 300000 },
-  { label: 'Acima de R$ 300k', min: 300000, max: Infinity },
+  { id: 'ate-80', label: 'Até R$ 80k', min: 0, max: 80000 },
+  { id: '80-120', label: 'R$ 80k - R$ 120k', min: 80000, max: 120000 },
+  { id: '120-180', label: 'R$ 120k - R$ 180k', min: 120000, max: 180000 },
+  { id: '180-300', label: 'R$ 180k - R$ 300k', min: 180000, max: 300000 },
+  { id: '300-plus', label: 'Acima de R$ 300k', min: 300000, max: Infinity },
 ]
 
 export const profiles = [

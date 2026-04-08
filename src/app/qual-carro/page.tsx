@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { cars, matchCarToProfile, formatBRL } from '@/data/cars'
+import { cars, matchCarToProfile, getCarScoreByProfile, formatBRL } from '@/data/cars'
 import { ArrowRight, ArrowLeft, RotateCcw } from 'lucide-react'
 
 const steps = ['Orçamento', 'Uso', 'Passageiros', 'Prioridade', 'Tipo']
@@ -64,7 +64,7 @@ export default function QualCarroPage() {
     const scored = filtered
       .map((car) => ({
         car,
-        score: matchCarToProfile(car, profileId),
+        score: getCarScoreByProfile(car, profileId),
       }))
       .sort((a, b) => b.score - a.score)
 
@@ -157,7 +157,7 @@ export default function QualCarroPage() {
           <button onClick={reset} className="flex items-center justify-center gap-2 text-sm font-medium text-text-secondary hover:text-text px-4 py-2.5 border border-border rounded-lg hover:bg-white transition-colors">
             <RotateCcw className="w-4 h-4" /> Refazer teste
           </button>
-          <Link href="/comparar" className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors">
+          <Link href="/comparar" className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-dark text-sm font-bold px-5 py-2.5 rounded-lg transition-colors">
             Comparar carros &rarr;
           </Link>
         </div>
@@ -299,7 +299,7 @@ export default function QualCarroPage() {
           </button>
           <button
             onClick={next}
-            className="flex items-center gap-1.5 bg-primary hover:bg-primary-hover text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="flex items-center gap-1.5 bg-primary hover:bg-primary-hover text-dark px-5 py-2 rounded-lg text-sm font-bold transition-colors"
           >
             {step === steps.length - 1 ? 'Ver resultado' : 'Avançar'} <ArrowRight className="w-4 h-4" />
           </button>

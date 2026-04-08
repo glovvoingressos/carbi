@@ -95,7 +95,7 @@ export const pickups: CarSpec[] = [
     cons: ["Preço elevado", "Vão de carga justo comparado a médias convencionais"],
     shortDesc: "A Toro criou um nicho próprio e continua líder, unindo o porte de carga com dirigibilidade de carro de passeio.",
     idealFor: "Quem quer uma picape robusta mas não quer abrir mão do conforto na cidade.",
-    image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&auto=format&fit=crop"
+    image: "/assets/cars/fiat-toro-2024.png"
   },
   {
     id: "toyota-hilux-2024",
@@ -143,7 +143,7 @@ export const pickups: CarSpec[] = [
     cons: ["Pula demais em asfaltos ruins", "Preço acima da média da concorrência"],
     shortDesc: "A Hilux é a favorita do agronegócio pela sua resistência reconhecida mundialmente.",
     idealFor: "Produtores rurais e quem precisa de uma máquina para o trabalho pesado.",
-    image: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&auto=format&fit=crop"
+    image: "/assets/cars/toyota-hilux-2024.png"
   },
   {
     id: "ford-ranger-2024",
@@ -191,7 +191,7 @@ export const pickups: CarSpec[] = [
     cons: ["Eletrônica complexa", "Custo das primeiras revisões alto"],
     shortDesc: "A nova Ranger redefiniu o que uma picape média pode oferecer em termos de luxo e potência.",
     idealFor: "Quem quer o máximo em tecnologia e força em uma picape média.",
-    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop"
+    image: "/assets/cars/ford-ranger-2024.png"
   },
   {
     id: "chevrolet-montana-2024",
@@ -239,7 +239,7 @@ export const pickups: CarSpec[] = [
     cons: ["Espaço traseiro limitado", "Capacidade de carga inferior à Oroch/Toro"],
     shortDesc: "A Montana virou uma picape de lazer perfeita para a cidade, com foco em conforto e conveniência.",
     idealFor: "Pessoas que querem uma picape para lazer urbano e esportes de final de semana.",
-    image: "https://images.unsplash.com/photo-1620025983803-097eccd94cf2?w=800&auto=format&fit=crop"
+    image: "/assets/cars/chevrolet-montana-2024.png"
   },
   {
     id: "chevrolet-s10-2024",
@@ -287,7 +287,7 @@ export const pickups: CarSpec[] = [
     cons: ["Interior datado", "Direção pesada comparada às rivais"],
     shortDesc: "A S10 é uma das picapes mais tradicionais do país, reconhecida pela força do seu motor Duramax.",
     idealFor: "Quem precisa de torque para o trabalho pesado e reboques.",
-    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop"
+    image: "/assets/cars/chevrolet-s10-2024.png"
   },
   {
     id: "nissan-frontier-2024",
@@ -335,6 +335,102 @@ export const pickups: CarSpec[] = [
     cons: ["Câmbio de 7 marchas um pouco lento", "Porta-objetos pequenos"],
     shortDesc: "A Frontier é a picape mais confortável da categoria, graças à sua suspensão exclusiva.",
     idealFor: "Pessoas que viajam longas distâncias com carga e querem conforto de carro.",
-    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop"
+    image: "/assets/cars/nissan-frontier-2024.png"
+  },
+  {
+    id: "ford-maverick-2024",
+    brand: "Ford",
+    model: "Maverick",
+    version: "Lariat FX4 2.0 Turbo",
+    year: 2024,
+    slug: "maverick",
+    segment: "pickup",
+    category: "intermediária",
+    priceBrl: 224890,
+    engineType: "Gasolina",
+    displacement: "2.0",
+    cylinderCount: 4,
+    turbo: true,
+    horsepower: 253,
+    torque: 380,
+    transmission: "Automático 8",
+    drive: "AWD",
+    lengthMm: 5073,
+    widthMm: 1844,
+    heightMm: 1733,
+    wheelbaseMm: 3076,
+    weightKg: 1744,
+    trunkCapacity: 943,
+    seats: 5,
+    fuelEconomyCityGas: 8.8,
+    fuelEconomyRoadGas: 11.1,
+    topSpeed: 175,
+    acceleration0100: 7.2,
+    airbagsCount: 7,
+    absBrakes: true,
+    esc: true,
+    hasCarplay: true,
+    hasAndroidAuto: true,
+    hasAc: true,
+    hasRearCamera: true,
+    hasMultimedia: true,
+    hasCruiseCtrl: true,
+    latinNcap: 0,
+    isofix: true,
+    tags: ["esportiva", "americana", "urbana"],
+    isPopular: true,
+    pros: ["Performance incrível (0-100 em 7.2s)", "Conforto idêntico ao de um sedan médio", "Tração integral", "Menos peso inercial"],
+    cons: ["Versão gasolina gasta bem na cidade", "Preço elevado para o segmento intermediário"],
+    shortDesc: "A Maverick é para quem acha a Toro comum, focando numa tocada muito agressiva e esportiva.",
+    idealFor: "Quem quer o desempenho de um SUV forte na cidade em formato de picape.",
+    image: "/assets/cars/ford-maverick-2024.png"
+  },
+  {
+    id: "ram-1500-2024",
+    brand: "Ram",
+    model: "1500",
+    version: "Limited V8",
+    year: 2024,
+    slug: "ram-1500",
+    segment: "pickup",
+    category: "grande",
+    priceBrl: 529990,
+    engineType: "Gasolina",
+    displacement: "5.7 V8",
+    cylinderCount: 8,
+    turbo: false,
+    horsepower: 400,
+    torque: 556,
+    transmission: "Automático 8",
+    drive: "4x4",
+    lengthMm: 5916,
+    widthMm: 2084,
+    heightMm: 1971,
+    wheelbaseMm: 3672,
+    weightKg: 2610,
+    trunkCapacity: 1200,
+    seats: 5,
+    fuelEconomyCityGas: 5.5,
+    fuelEconomyRoadGas: 7.2,
+    topSpeed: 175,
+    acceleration0100: 6.4,
+    airbagsCount: 6,
+    absBrakes: true,
+    esc: true,
+    hasCarplay: true,
+    hasAndroidAuto: true,
+    hasAc: true,
+    hasRearCamera: true,
+    hasMultimedia: true,
+    hasCruiseCtrl: true,
+    latinNcap: 0,
+    isofix: true,
+    tags: ["luxo", "v8", "gigante"],
+    isPopular: true,
+    pros: ["Motor Hemi V8 com ronco inconfundível", "Interior mais luxuoso de todas as picapes", "Suspensão a ar ajustável", "Espaço interno de limusine"],
+    cons: ["Consumo altíssimo", "Dificuldade extrema de estacionar em cidades"],
+    shortDesc: "A Ram 1500 é a picape de luxo definitiva, unindo a força bruta do V8 com um acabamento digno de carros alemães.",
+    idealFor: "Quem busca o máximo em imponência e conforto e não se preocupa com o gasto de combustível.",
+    image: "/assets/cars/ram-1500-2024.png"
   }
 ]
