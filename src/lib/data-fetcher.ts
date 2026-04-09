@@ -2,6 +2,8 @@ import { supabase } from './supabase'
 import { CarSpec, cars as staticCars } from '@/data/cars'
 
 export async function getDBCars(): Promise<CarSpec[]> {
+  if (!supabase) return []
+  
   const { data, error } = await supabase
     .from('external_car_catalog')
     .select('*')
@@ -64,6 +66,8 @@ export async function getDBCars(): Promise<CarSpec[]> {
 }
 
 export async function getCarsByBrand(brand: string): Promise<CarSpec[]> {
+  if (!supabase) return []
+
   const { data, error } = await supabase
     .from('external_car_catalog')
     .select('*')
