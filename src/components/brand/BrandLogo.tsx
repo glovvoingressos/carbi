@@ -34,7 +34,7 @@ const LOGO_MAP: Record<string, string> = {
   gwm: 'https://www.carlogos.org/logo/Great-Wall-logo.png',
   mitsubishi: 'https://www.carlogos.org/car-logos/mitsubishi-logo.png',
   volvo: 'https://www.carlogos.org/car-logos/volvo-logo.png',
-  land-rover: 'https://www.carlogos.org/car-logos/land-rover-logo.png',
+  'land-rover': 'https://www.carlogos.org/car-logos/land-rover-logo.png',
   'land rover': 'https://www.carlogos.org/car-logos/land-rover-logo.png',
   mercedes: 'https://www.carlogos.org/car-logos/mercedes-benz-logo.png',
   'mercedes-benz': 'https://www.carlogos.org/car-logos/mercedes-benz-logo.png'
