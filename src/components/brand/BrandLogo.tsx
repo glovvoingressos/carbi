@@ -30,31 +30,38 @@ const LOGO_MAP: Record<string, string> = {
   mini: 'https://www.carlogos.org/car-logos/mini-logo.png',
   ram: 'https://www.carlogos.org/car-logos/ram-logo.png',
   'caoa chery': 'https://www.carlogos.org/car-logos/chery-logo.png',
-  gwm: 'https://www.carlogos.org/logo/Great-Wall-logo.png'
+  'caoa-chery': 'https://www.carlogos.org/car-logos/chery-logo.png',
+  gwm: 'https://www.carlogos.org/logo/Great-Wall-logo.png',
+  mitsubishi: 'https://www.carlogos.org/car-logos/mitsubishi-logo.png',
+  volvo: 'https://www.carlogos.org/car-logos/volvo-logo.png',
+  land-rover: 'https://www.carlogos.org/car-logos/land-rover-logo.png',
+  'land rover': 'https://www.carlogos.org/car-logos/land-rover-logo.png',
+  mercedes: 'https://www.carlogos.org/car-logos/mercedes-benz-logo.png',
+  'mercedes-benz': 'https://www.carlogos.org/car-logos/mercedes-benz-logo.png'
 }
 
 export default function BrandLogo({ brandName, domain, className }: BrandLogoProps) {
   const [error, setError] = useState(false)
 
-  // 1. Check known high-res carlogos directory
-  // 2. If not in the map, try Google's global favicon service for the domain
   const normalizedName = brandName.toLowerCase().trim()
   const imageSrc = LOGO_MAP[normalizedName] || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
 
-  if (error) {
-    return (
-      <span className="font-black text-xl text-dark uppercase tracking-tight">
-        {brandName.charAt(0)}
-      </span>
-    )
-  }
-
   return (
-    <img 
-      src={imageSrc} 
-      alt={brandName} 
-      className={className}
-      onError={() => setError(true)}
-    />
+    <div className="relative w-full h-full flex items-center justify-center">
+      {!error ? (
+        <img 
+          src={imageSrc} 
+          alt={brandName} 
+          className={className}
+          onError={() => setError(true)}
+        />
+      ) : (
+        <div className="flex items-center justify-center w-full h-full bg-white rounded-lg shadow-inner">
+           <span className="font-black text-xl text-dark uppercase tracking-tighter opacity-80 scale-110">
+            {brandName.charAt(0)}
+          </span>
+        </div>
+      )}
+    </div>
   )
 }

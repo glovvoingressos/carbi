@@ -31,6 +31,30 @@ const INTENTS: Record<string, { title: string, desc: string, h1: string, filter:
     desc: 'Para viajar com conforto e levar tudo. Veja os carros com maiores porta-malas e melhor espaço interno para a família.',
     h1: 'Melhores Carros para Família',
     filter: (c) => c.trunkCapacity >= 400 || c.segment === 'SUV'
+  },
+  '7-lugares': {
+    title: 'Carros de 7 Lugares | Melhores Opções para Grupos Grandes',
+    desc: 'Precisa de mais espaço? Confira nossa seleção de veículos com 7 lugares, ideais para famílias grandes e viagens com conforto.',
+    h1: 'Melhore Carros de 7 Lugares',
+    filter: (c) => (c.seats && c.seats >= 7)
+  },
+  'hibridos': {
+    title: 'Carros Híbridos e Sustentáveis | Tecnologia e Economia',
+    desc: 'O futuro chegou. Conheça as melhores opções de carros híbridos no Brasil, unindo desempenho e baixíssimo consumo.',
+    h1: 'Melhores Carros Híbridos',
+    filter: (c) => (c.engineType && (c.engineType.toLowerCase().includes('híbrido') || c.engineType.toLowerCase().includes('hybrid')))
+  },
+  'off-road': {
+    title: 'Melhores Carros Off-Road | Tração 4x4 e Aventura',
+    desc: 'Para quem não tem medo de lama. Veja os melhores carros com tração 4x4 e excelente capacidade fora de estrada.',
+    h1: 'Carros Selecionados para Off-Road',
+    filter: (c) => (c.drive && (c.drive.toLowerCase().includes('4x4') || c.drive.toLowerCase().includes('4wd') || c.drive.toLowerCase().includes('awd')))
+  },
+  'esportivos': {
+    title: 'Carros Esportivos de Alta Performance | Velocidade e Design',
+    desc: 'Paixão por dirigir. Confira os modelos com melhor aceleração, potência acima de 200cv e design agressivo do nosso catálogo.',
+    h1: 'Carros Esportivos e de Performance',
+    filter: (c) => (c.horsepower >= 200 || c.acceleration0100 <= 6.5)
   }
 }
 
