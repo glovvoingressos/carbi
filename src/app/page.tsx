@@ -4,10 +4,11 @@ import CarCard from '@/components/car/CarCard'
 import HeroSearchBar from '@/components/ui/HeroSearchBar'
 import {
   ArrowRight, ArrowUpRight, Star,
-  ChevronRight, CheckCircle2, Zap, Fuel, Users
+  ChevronRight, CheckCircle2, Zap, Fuel, Users, Plus
 } from 'lucide-react'
 import { getAllCars } from '@/lib/data-fetcher'
 import FAQSection from '@/components/layout/FAQSection'
+import HomeComparison from '@/components/home/HomeComparison'
 import BrandLogo from '@/components/brand/BrandLogo'
 
 // ── Dados estáticos ─────────────────────────────────────────────────────────
@@ -227,8 +228,8 @@ export default async function HomePage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(min(240px, 100%), 1fr))',
-              gap: 'clamp(12px, 2vw, 16px)',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(160px, 100%), 1fr))',
+              gap: 'clamp(8px, 1vw, 16px)',
             }}
           >
             {popular.map((car, i) => (
@@ -419,77 +420,9 @@ export default async function HomePage() {
       </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          § 7 — COMPARATIVO CTA DARK
+          § 7 — COMPARATIVO INTERATIVO carbi
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section style={{ paddingBlock: 'clamp(32px, 5vh, 64px)', background: 'var(--color-bg)' }}>
-        <div className="container">
-          <div
-            className="bento-card-dark scroll-reveal"
-            style={{
-              borderRadius: 'var(--radius-2xl)',
-              padding: 'clamp(32px, 5vw, 56px)',
-              display: 'flex',
-              flexDirection: 'column' as const,
-              gap: 24,
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Decoração de fundo */}
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                right: -60,
-                top: -60,
-                width: 320,
-                height: 320,
-                borderRadius: '50%',
-                background: 'radial-gradient(ellipse, rgba(34,197,94,0.12) 0%, transparent 60%)',
-                pointerEvents: 'none',
-              }}
-            />
-
-            <div style={{ maxWidth: 540 }}>
-              <p className="text-eyebrow" style={{ color: 'rgba(255,255,255,0.4)', marginBottom: 12 }}>
-                Ferramenta de comparação
-              </p>
-              <h2
-                className="font-heading"
-                style={{
-                  fontSize: 'clamp(28px, 4vw, 44px)',
-                  fontWeight: 400,
-                  color: '#fff',
-                  lineHeight: 1.05,
-                  letterSpacing: '-0.01em',
-                  marginBottom: 16,
-                }}
-              >
-                Em dúvida entre<br />dois carros?
-              </h2>
-              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, maxWidth: 400 }}>
-                Compare lado a lado com destaque visual de quem vence em cada critério. Motor, segurança, consumo e mais.
-              </p>
-            </div>
-
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' as const }}>
-              <Link
-                href="/comparar"
-                className="cta-dark-primary"
-              >
-                Comparar agora
-                <ArrowRight style={{ width: 16, height: 16 }} />
-              </Link>
-              <Link
-                href="/qual-carro"
-                className="cta-dark-secondary"
-              >
-                Qual carro é pra mim?
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HomeComparison />
 
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

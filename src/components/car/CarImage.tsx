@@ -14,17 +14,41 @@ interface CarImageProps {
   style?: React.CSSProperties
 }
 
-const FALLBACK_STUDIO = 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=800&auto=format&fit=crop'
-
 export default function CarImage({ id, brand, model, year, src, priority = false, className, style }: CarImageProps) {
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
 
-  const imageSrc = error ? FALLBACK_STUDIO : (src || `/assets/cars/${id}.png`)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const imageSrc = src || `/assets/cars/${id}.png`
+
+  // Durante SSR e primeira hidratação, renderizamos apenas o container e o skeleton básico
+  // que deve ser IDÊNTICO ao que o servidor enviou para evitar o erro de hidratação.
+  if (!mounted) {
+    return (
+      <div 
+        className={`relative overflow-hidden bg-[#eef2f5] dark:bg-neutral-900 ${className}`}
+        style={{
+          ...style,
+          aspectRatio: '16/10',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <div className="absolute inset-0 bg-[#eef2f5] flex items-center justify-center">
+            <div className="w-12 h-1.5 bg-dark/10 rounded-full animate-bounce" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div 
-      className={`relative overflow-hidden bg-neutral-100 dark:bg-neutral-900 ${className}`}
+      className={`relative overflow-hidden bg-[#eef2f5] dark:bg-neutral-900 ${className}`}
       style={{
         ...style,
         aspectRatio: '16/10',
@@ -35,11 +59,11 @@ export default function CarImage({ id, brand, model, year, src, priority = false
     >
       {/* Loading Shimmer */}
       {loading && (
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" 
-             style={{ backgroundSize: '200% 100%', zIndex: 1 }} />
+        <div className="absolute inset-0 bg-neutral-200 animate-pulse z-10" />
       )}
 
-      {!error ? (
+      {/* Main Image - Only render if no error */}
+      {!error && (
         <img
           src={imageSrc}
           alt={`${brand} ${model} ${year}`}
@@ -48,25 +72,44 @@ export default function CarImage({ id, brand, model, year, src, priority = false
             setError(true)
             setLoading(false)
           }}
+          className={`w-full h-full object-contain transition-all duration-700 ${loading ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}
           style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            transform: `scale(1.6) translateY(2%)`,
-            transition: 'transform 0.3s ease',
+            transform: 'scale(1.05)',
             pointerEvents: 'none'
           }}
           loading={priority ? 'eager' : 'lazy'}
         />
-      ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#f4f6f8] border-2 border-dark/5 rounded-[24px]">
-           <div className="w-16 h-16 bg-white border-2 border-dark shadow-[4px_4px_0_#0A0A0A] rounded-2xl flex items-center justify-center mb-3 text-dark rotate-[2deg]">
-              <span className="font-black text-2xl uppercase tracking-tight">{brand?.charAt(0)}</span>
+      )}
+
+      {/* Premium CSS-Only Fallback */}
+      {error && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-[#eef2f5] to-[#dde4e9]">
+           {/* Decorative Stencil Icon */}
+           <div className="relative mb-3 flex items-center justify-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/50 backdrop-blur-md border border-dark/5 rounded-full absolute animate-pulse" />
+              <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white border-2 border-dark shadow-[4px_4px_0_#0A0A0A] rounded-xl flex items-center justify-center text-dark rotate-[2deg] z-10">
+                 <span className="font-black text-xl sm:text-2xl uppercase tracking-tight">{brand?.charAt(0)}</span>
+              </div>
            </div>
-           <span className="text-[12px] font-bold text-dark/40 uppercase tracking-widest text-center px-4 leading-tight">
-             FOTO<br/>INDISPONÍVEL
-           </span>
+           
+           <div className="flex flex-col items-center gap-1.5 z-10">
+              <p className="text-[10px] sm:text-[11px] font-black text-dark uppercase tracking-[0.15em] text-center leading-tight bg-[var(--color-bento-yellow)] px-3 py-1.5 rounded rotate-[-1deg] border border-dark shadow-[2px_2px_0_#0A0A0A]">
+                Preview 2026
+              </p>
+              <p className="text-[9px] font-bold text-dark/30 uppercase tracking-widest text-center mt-1">
+                 Asset em processamento
+              </p>
+           </div>
+           
+           <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-24 bg-dark/5 blur-3xl rounded-full skew-x-12 pointer-events-none" />
         </div>
+      )}
+
+      {/* Skeleton state if loading */}
+      {loading && !error && (
+         <div className="absolute inset-0 bg-[#eef2f5] flex items-center justify-center">
+            <div className="w-12 h-1.5 bg-dark/10 rounded-full animate-bounce" />
+         </div>
       )}
     </div>
   )

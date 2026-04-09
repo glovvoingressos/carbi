@@ -143,7 +143,7 @@ export async function getCarsByBrand(brand: string): Promise<CarSpec[]> {
 export async function getCarDetail(brandSlug: string, modelSlug: string): Promise<CarSpec | null> {
   const cars = await getAllCars()
   const car = cars.find(c => 
-    c.slug === modelSlug && 
+    (c.slug === modelSlug || c.id === modelSlug) && 
     c.brand.toLowerCase().replace(/\s+/g, '-') === brandSlug
   )
   return car || null
@@ -153,15 +153,28 @@ export async function getAllCars(): Promise<CarSpec[]> {
   try {
     const dbCars = await getDBCars()
     
+    // Fetch overrides from car_assets table if it exists
+    let assetOverrides: Record<string, string> = {}
+    if (supabase) {
+      const { data: assetData } = await supabase
+        .from('car_assets')
+        .select('car_id, image_url')
+      
+      if (assetData) {
+        assetOverrides = Object.fromEntries(assetData.map(a => [a.car_id, a.image_url]))
+      }
+    }
+    
     // Merge static cars with DB cars
-    // Filter out static cars that might be duplicated in DB if needed
     const dbSlugs = new Set(dbCars.map(c => c.slug))
-    const filteredStatic = staticCars.filter(c => !dbSlugs.has(c.slug))
+    const filteredStatic = staticCars.map(car => ({
+      ...car,
+      // Priority: DB Override > Static Path
+      image: assetOverrides[car.id] || car.image
+    })).filter(c => !dbSlugs.has(c.slug))
 
-    // Always keep popular static cars at the top if they exist
     const finalCars = [...dbCars, ...filteredStatic]
     
-    // Safety check: if DB has junk, we might want to sort by popularity or year
     return finalCars.sort((a, b) => (b.isPopular ? 1 : 0) - (a.isPopular ? 1 : 0))
   } catch (err) {
     console.error('Failed to merge cars:', err)

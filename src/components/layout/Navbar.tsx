@@ -60,13 +60,12 @@ export default function Navbar() {
               : 'w-full max-w-[1200px] h-16 px-8 bg-transparent'
           } rounded-full`}
         >
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-8 h-8 bg-dark rounded-xl flex items-center justify-center transition-transform group-hover:scale-110">
               <CarFront className="w-4 h-4 text-white" />
             </div>
-            <span className="font-heading text-[18px] tracking-widest text-dark uppercase">
-              Car<span className="text-[var(--color-accent)]">bi</span>
+            <span className="font-heading text-[20px] tracking-tighter text-dark lowercase">
+              carbi
             </span>
           </Link>
 
@@ -140,8 +139,8 @@ export default function Navbar() {
                 <div className="w-8 h-8 bg-dark rounded-xl flex items-center justify-center">
                   <CarFront className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-heading text-2xl tracking-tight text-dark">
-                  Car<span className="text-[var(--color-accent)]">bi</span>
+                <span className="font-heading text-2xl tracking-tighter text-dark lowercase">
+                  carbi
                 </span>
               </Link>
               <button 
@@ -193,7 +192,7 @@ export default function Navbar() {
                 </div>
               </Link>
               <p className="text-center text-[12px] font-bold text-dark/20 uppercase tracking-[0.2em] pt-8">
-                Carbi © 2026 — Inteligência Automotiva
+                carbi © 2026 — Inteligência Automotiva
               </p>
             </div>
           </aside>

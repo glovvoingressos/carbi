@@ -4,20 +4,20 @@
  */
 
 export interface FipeItem {
-  nome: string;
-  codigo: string;
+  name: string;
+  code: string;
 }
 
 export interface FipeResult {
-  TipoVeiculo: number;
-  Valor: string;
-  Marca: string;
-  Modelo: string;
-  AnoModelo: number;
-  Combustivel: string;
-  CodigoFipe: string;
-  MesReferencia: string;
-  SiglaCombustivel: string;
+  vehicleType: number;
+  price: string;
+  brand: string;
+  model: string;
+  modelYear: number;
+  fuel: string;
+  codeFipe: string;
+  referenceMonth: string;
+  fuelAcronym: string;
 }
 
 const BASE_URL = process.env.NEXT_PUBLIC_FIPE_API_BASE_URL || 'https://fipe.parallelum.com.br/api/v2';
@@ -68,19 +68,19 @@ async function fetchFipe<T>(endpoint: string): Promise<T | null> {
  * Public metadata fetchers
  */
 export async function getFipeBrands(): Promise<FipeItem[]> {
-  return (await fetchFipe<FipeItem[]>('/carros/marcas')) || [];
+  return (await fetchFipe<FipeItem[]>('/cars/brands')) || [];
 }
 
 export async function getFipeModels(brandCode: string): Promise<FipeItem[]> {
-  return (await fetchFipe<FipeItem[]>(`/carros/marcas/${brandCode}/modelos`)) || [];
+  return (await fetchFipe<FipeItem[]>(`/cars/brands/${brandCode}/models`)) || [];
 }
 
 export async function getFipeYears(brandCode: string, modelCode: string): Promise<FipeItem[]> {
-  return (await fetchFipe<FipeItem[]>(`/carros/marcas/${brandCode}/modelos/${modelCode}/anos`)) || [];
+  return (await fetchFipe<FipeItem[]>(`/cars/brands/${brandCode}/models/${modelCode}/years`)) || [];
 }
 
 export async function getFipeDetailByCode(brandCode: string, modelCode: string, yearCode: string): Promise<FipeResult | null> {
-  return await fetchFipe<FipeResult>(`/carros/marcas/${brandCode}/modelos/${modelCode}/anos/${yearCode}`);
+  return await fetchFipe<FipeResult>(`/cars/brands/${brandCode}/models/${modelCode}/years/${yearCode}`);
 }
 
 /**
@@ -89,28 +89,30 @@ export async function getFipeDetailByCode(brandCode: string, modelCode: string, 
 export async function getFipePrice(brandName: string, modelName: string, year: number | string): Promise<FipeResult | null> {
   // 1. Find Brand
   const brands = await getFipeBrands();
-  const brand = brands.find(b => normalize(b.nome) === normalize(brandName)) 
-               || brands.find(b => normalize(b.nome).includes(normalize(brandName)));
+  const normalizedBrand = normalize(brandName);
+  const brand = brands.find(b => normalize(b.name) === normalizedBrand) 
+               || brands.find(b => normalize(b.name).includes(normalizedBrand));
   
   if (!brand) return null;
 
   // 2. Find Model
-  const models = await getFipeModels(brand.codigo);
-  let model = models.find(m => normalize(m.nome) === normalize(modelName));
+  const models = await getFipeModels(brand.code);
+  const normalizedModel = normalize(modelName);
+  let model = models.find(m => normalize(m.name) === normalizedModel);
   if (!model) {
-     model = models.find(m => normalize(m.nome).includes(normalize(modelName)))
-          || models.find(m => normalize(modelName).includes(normalize(m.nome)));
+     model = models.find(m => normalize(m.name).includes(normalizedModel))
+          || models.find(m => normalizedModel.includes(normalize(m.name)));
   }
 
   if (!model) return null;
 
   // 3. Find Year
-  const years = await getFipeYears(brand.codigo, model.codigo);
+  const years = await getFipeYears(brand.code, model.code);
   const yearStr = year.toString();
-  const yearMatch = years.find(y => y.nome.includes(yearStr)) || years[0];
+  const yearMatch = years.find(y => y.name.includes(yearStr)) || years[0];
 
   if (!yearMatch) return null;
 
   // 4. Get Final Result
-  return await getFipeDetailByCode(brand.codigo, model.codigo, yearMatch.codigo);
+  return await getFipeDetailByCode(brand.code, model.code, yearMatch.code);
 }

@@ -36,10 +36,10 @@ export default function FipeCalculator({
 
       // Find initial brand
       const b = data.find((b: FipeItem) => 
-        b.nome.toLowerCase() === initialBrandName.toLowerCase() ||
-        b.nome.toLowerCase().includes(initialBrandName.toLowerCase())
+        b.name.toLowerCase() === initialBrandName.toLowerCase() ||
+        b.name.toLowerCase().includes(initialBrandName.toLowerCase())
       )
-      if (b) setSelectedBrand(b.codigo)
+      if (b) setSelectedBrand(b.code)
     }
     init()
   }, [initialBrandName])
@@ -54,11 +54,12 @@ export default function FipeCalculator({
       setModels(data)
       
       // Auto-select initial model if it matches
-      const m = data.find((m: FipeItem) => 
-        m.nome.toLowerCase().includes(initialModelName.toLowerCase()) ||
-        initialModelName.toLowerCase().includes(m.nome.toLowerCase())
-      )
-      if (m && !selectedModel) setSelectedModel(m.codigo)
+      const m = data.find((m: FipeItem) => {
+        const name = m.name.toLowerCase()
+        const search = initialModelName.toLowerCase()
+        return name === search || name.startsWith(search + ' ')
+      })
+      if (m && !selectedModel) setSelectedModel(m.code)
       
       setLoading(false)
     }
@@ -71,13 +72,23 @@ export default function FipeCalculator({
     async function fetchYears() {
       setLoading(true)
       const response = await fetch(`/api/fipe/years?brandCode=${selectedBrand}&modelCode=${selectedModel}`)
-      const data = await response.json()
-      setYears(data)
+      const data: FipeItem[] = await response.json()
+      
+      // Sort descending (latest years first)
+      const sorted = [...data].sort((a, b) => {
+        const ya = parseInt(a.name) || 0
+        const yb = parseInt(b.name) || 0
+        return yb - ya
+      })
+      
+      setYears(sorted)
       
       // Auto-select initial year if matches
-      const y = data.find((y: FipeItem) => y.nome.includes(initialYear.toString()))
-      if (y && !selectedYear) setSelectedYear(y.codigo)
-      else if (data.length > 0 && !selectedYear) setSelectedYear(data[0].codigo)
+      const y = sorted.find((y: FipeItem) => y.name.includes(initialYear.toString())) 
+             || sorted.find((y: FipeItem) => y.name.toLowerCase().includes('zero km'))
+             || sorted[0]
+
+      if (y && !selectedYear) setSelectedYear(y.code)
       
       setLoading(false)
     }
@@ -98,7 +109,7 @@ export default function FipeCalculator({
   }, [selectedBrand, selectedModel, selectedYear])
 
   const parseFipeValue = (val: string) => parseFloat(val.replace(/[^\d,]/g, '').replace(',', '.'));
-  const fipePrice = result ? parseFipeValue(result.Valor) : 0;
+  const fipePrice = result ? parseFipeValue(result.price) : 0;
 
   return (
     <div className="bg-white border-2 border-dark rounded-[32px] overflow-hidden shadow-[8px_8px_0_#000] p-6 sm:p-8">
@@ -119,7 +130,7 @@ export default function FipeCalculator({
             className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer"
           >
             <option value="">Selecione a Marca</option>
-            {brands.map(b => <option key={b.codigo} value={b.codigo}>{b.nome}</option>)}
+            {brands.map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
           </select>
         </div>
 
@@ -133,7 +144,7 @@ export default function FipeCalculator({
             className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer disabled:opacity-50"
           >
             <option value="">Selecione a Versão</option>
-            {models.map(m => <option key={m.codigo} value={m.codigo}>{m.nome}</option>)}
+            {models.map(m => <option key={m.code} value={m.code}>{m.name}</option>)}
           </select>
         </div>
 
@@ -147,7 +158,7 @@ export default function FipeCalculator({
             className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer disabled:opacity-50"
           >
             <option value="">Selecione o Ano</option>
-            {years.map(y => <option key={y.codigo} value={y.codigo}>{y.nome}</option>)}
+            {years.map(y => <option key={y.code} value={y.code}>{y.name}</option>)}
           </select>
         </div>
       </div>
@@ -156,7 +167,7 @@ export default function FipeCalculator({
         <div className="space-y-6 pt-6 border-t-2 border-dark border-dashed">
           <div>
             <p className="text-[11px] text-text-tertiary uppercase font-black tracking-widest mb-1.5">FIPE Atualizada</p>
-            <p className="text-4xl font-black text-dark tracking-[-0.05em]">{result.Valor}</p>
+            <p className="text-4xl font-black text-dark tracking-[-0.05em]">{result.price}</p>
           </div>
 
           {/* Projeção */}
@@ -173,7 +184,7 @@ export default function FipeCalculator({
 
           <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary bg-surface/50 p-3 rounded-xl border border-dashed border-dark/20">
              <Zap className="w-3 h-3 text-[var(--color-bento-yellow)] fill-current" />
-             Dados extraídos em tempo real • Ref: {result.MesReferencia}
+             Dados extraídos em tempo real • Ref: {result.referenceMonth}
           </div>
         </div>
       ) : (

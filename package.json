@@ -19,6 +19,7 @@
     "@types/node": "^25.5.2",
     "@types/react": "^19.2.14",
     "autoprefixer": "^10.4.27",
+    "car-query": "^1.0.12",
     "lucide-react": "^1.7.0",
     "next": "^16.2.2",
     "next-sitemap": "^4.2.3",

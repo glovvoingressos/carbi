@@ -8,9 +8,10 @@ import FipeCalculator from '@/components/car/FipeCalculator'
 import CarCard from '@/components/car/CarCard'
 import Badge from '@/components/ui/Badge'
 import {
-  Fuel, Zap, Gauge, Shield, Package, Timer, ChevronRight, ArrowLeftRight, TrendingDown
+  Fuel, Zap, Gauge, Shield, Package, Timer, ChevronRight, ArrowLeftRight, TrendingDown, ArrowRight
 } from 'lucide-react'
 import { VehicleSchema } from '@/components/seo/JsonLd'
+import ReviewSection from '@/components/car/ReviewSection'
 
 // Remove generateStaticParams for large database to avoid slow builds
 // export function generateStaticParams() { ... }
@@ -49,8 +50,8 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
   const parseFipeValue = (val: string) => parseFloat(val.replace(/[^\d,]/g, '').replace(',', '.'));
   
   const fipePrice = fipeData 
-    ? parseFipeValue(fipeData.Valor) 
-    : (car.year === 2024 ? car.priceBrl * 0.98 : car.priceBrl * 1.05);
+    ? parseFipeValue(fipeData.price) 
+    : (car.year === 2026 ? car.priceBrl : car.priceBrl * 0.95);
 
   // Projeção VIP de Desvalorização (Estimativa baseada na FIPE Real se disponível)
   const yr0 = fipePrice;
@@ -59,7 +60,7 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
   const yr3 = fipePrice * 0.74;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 pt-24 pb-8">
       <VehicleSchema car={car} />
 
       {/* Breadcrumb */}
@@ -81,7 +82,7 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
           {/* Hero */}
           <div className="w-full">
             <div className="grid md:grid-cols-2 bg-white border-2 border-dark rounded-[40px] overflow-hidden shadow-[6px_6px_0_#000]">
-              <div className="aspect-[4/3] md:aspect-auto bg-[#b4d2ff] flex items-center justify-center p-8 relative">
+              <div className="aspect-[16/10] md:aspect-auto bg-[#b4d2ff] flex items-center justify-center p-6 sm:p-8 relative">
                  {/* Estrela / Decorativo Cash App style (opcional) */}
                  <div className="absolute top-4 left-4 w-12 h-12 rounded-full border border-dark flex items-center justify-center text-dark font-black bg-[var(--color-bento-yellow)] rotate-[-10deg]">✨</div>
                  
@@ -264,6 +265,9 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
                 </div>
              </div>
           </section>
+
+          {/* Avaliações de Proprietários */}
+          <ReviewSection carId={car.id} />
         </div>
 
         {/* COLUNA LATERAL (DIREITA) - Stick on Desktop */}

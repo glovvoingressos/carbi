@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { cars, formatBRL, compareCars } from '@/data/cars'
 import { Check, X, ArrowLeftRight } from 'lucide-react'
@@ -10,9 +11,19 @@ const segments = [...new Set(cars.map((c) => c.segment))]
 const brands = [...new Set(cars.map((c) => c.brand))]
 
 export default function ComparePage() {
-  const [selected, setSelected] = useState<string[]>([])
+  const searchParams = useSearchParams()
+  const initialIds = searchParams.get('ids')?.split(',').filter(Boolean) || []
+  
+  const [selected, setSelected] = useState<string[]>(initialIds)
   const [filterSegment, setFilterSegment] = useState('')
   const [filterBrand, setFilterBrand] = useState('')
+
+  // Sincroniza parâmetros iniciais se mudarem (opcional)
+  useEffect(() => {
+    if (initialIds.length > 0 && selected.length === 0) {
+      setSelected(initialIds)
+    }
+  }, [searchParams])
 
   const filtered = useMemo(() => cars.filter((c) => {
     if (filterSegment && c.segment !== filterSegment) return false
