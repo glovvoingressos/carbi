@@ -155,8 +155,7 @@ export default async function HomePage() {
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <div
         style={{
-          position: 'sticky',
-          top: 64,
+          position: 'relative',
           zIndex: 90,
           background: 'var(--color-bg)',
           borderBottom: '1px solid var(--color-border)',
