@@ -14,7 +14,7 @@ export default function Navbar() {
 
   // ── Scroll detector ──────────────────────────────────
   useEffect(() => {
-    const handle = () => setScrolled(window.scrollY > 60)
+    const handle = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handle, { passive: true })
     handle()
     return () => window.removeEventListener('scroll', handle)
@@ -31,13 +31,6 @@ export default function Navbar() {
     if (searchOpen) setTimeout(() => searchRef.current?.focus(), 80)
   }, [searchOpen])
 
-  // ── Fecha drawer ao pressionar Escape ─────────────────
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') { setDrawerOpen(false); setSearchOpen(false) } }
-    document.addEventListener('keydown', h)
-    return () => document.removeEventListener('keydown', h)
-  }, [])
-
   const navLinks = [
     { href: '/',         label: 'Início',    icon: Home },
     { href: '/marcas',   label: 'Marcas',    icon: CarFront },
@@ -51,215 +44,160 @@ export default function Navbar() {
   return (
     <>
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          NAVBAR
-          Estado inicial: transparente
-          Ao rolar 60px: blur + branco + border
+          FLOATING NAVBAR (CARBI STYLE)
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <nav
-        className={`navbar${scrolled ? ' scrolled' : ''}`}
-        role="navigation"
-        aria-label="Navegação principal"
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ease-out flex justify-center pointer-events-none ${
+          scrolled ? 'pt-4' : 'pt-6'
+        }`}
       >
-        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '100%' }}>
-
-          {/* ── Logo ─────────────────────────── */}
-          <Link href="/" className="flex items-center gap-2.5" aria-label="CarDecision — Página inicial">
-            <div
-              style={{
-                width: 34,
-                height: 34,
-                borderRadius: 10,
-                background: 'var(--color-dark)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <CarFront className="w-4 h-4" style={{ color: '#fff' }} />
+        <div 
+          className={`flex items-center justify-between pointer-events-auto transition-all duration-500 ease-spring ${
+            scrolled 
+              ? 'w-[92%] md:w-[600px] h-14 px-5 bg-white/80 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_rgba(0,0,0,0.08)]' 
+              : 'w-full max-w-[1200px] h-16 px-8 bg-transparent'
+          } rounded-full`}
+        >
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 bg-dark rounded-xl flex items-center justify-center transition-transform group-hover:scale-110">
+              <CarFront className="w-4 h-4 text-white" />
             </div>
-            <span style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--color-text)' }}>
-              Car<span style={{ color: 'var(--color-accent)' }}>Decision</span>
+            <span className="font-heading text-[18px] tracking-widest text-dark uppercase">
+              Car<span className="text-[var(--color-accent)]">bi</span>
             </span>
           </Link>
 
-          {/* ── Desktop Links (centrados) ──────── */}
-          <div className="hidden md:flex items-center gap-1" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`nav-link${isActive(link.href) ? ' active' : ''}`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* ── Direita: Search + CTA ─────────── */}
-          <div className="flex items-center gap-2">
-
-            {/* Inline search (desktop) */}
-            <div className="hidden md:flex items-center" style={{ position: 'relative' }}>
-              {searchOpen ? (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    background: 'var(--color-card)',
-                    borderRadius: 'var(--radius-pill)',
-                    padding: '6px 6px 6px 16px',
-                    border: '1px solid var(--color-border-solid)',
-                    width: 260,
-                    boxShadow: '0 0 0 3px var(--color-accent-glow)',
-                    animation: 'fadeIn 150ms ease',
-                  }}
-                >
-                  <Search style={{ width: 15, height: 15, color: 'var(--color-text-3)', flexShrink: 0 }} />
-                  <input
-                    ref={searchRef}
-                    type="search"
-                    placeholder="Buscar modelo ou marca..."
-                    style={{
-                      flex: 1,
-                      border: 'none',
-                      outline: 'none',
-                      background: 'transparent',
-                      fontSize: 13,
-                      color: 'var(--color-text)',
-                    }}
-                    onBlur={() => setSearchOpen(false)}
-                  />
-                  <button onClick={() => setSearchOpen(false)} style={{ flexShrink: 0, color: 'var(--color-text-3)', cursor: 'pointer', background: 'none', border: 'none' }}>
-                    <X style={{ width: 14, height: 14 }} />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setSearchOpen(true)}
-                  className="btn-icon"
-                  aria-label="Buscar"
-                  style={{ border: 'none' }}
-                >
-                  <Search style={{ width: 17, height: 17, color: 'var(--color-text-2)' }} />
-                </button>
-              )}
-            </div>
-
-            {/* CTA pill — desktop */}
-            <Link
-              href="/rankings"
-              className="btn btn-primary hidden md:inline-flex"
-              style={{ height: 40, fontSize: 13, padding: '0 18px' }}
+          {/* Actions */}
+          <div className="flex items-center gap-1">
+            <button 
+              onClick={() => setSearchOpen(true)}
+              className="p-2 hover:bg-black/5 rounded-full transition-colors text-dark/60 hover:text-dark"
+              aria-label="Buscar"
             >
-              Ver carros
-              <ChevronRight style={{ width: 14, height: 14 }} />
-            </Link>
+              <Search className="w-5 h-5" />
+            </button>
 
-            {/* Hamburger — mobile */}
             <button
               onClick={() => setDrawerOpen(true)}
-              className="btn-icon md:hidden"
-              aria-label="Abrir menu"
-              style={{ border: 'none' }}
+              className="flex items-center gap-2 pl-3 pr-1 py-1 bg-dark text-white rounded-full transition-transform hover:scale-105 active:scale-95 shadow-sm"
             >
-              <Menu style={{ width: 20, height: 20, color: 'var(--color-text)' }} />
+              <span className="text-[12px] font-bold uppercase tracking-widest pl-2 hidden md:inline">Menu</span>
+              <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center">
+                <Menu className="w-4 h-4" />
+              </div>
             </button>
           </div>
         </div>
       </nav>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          MOBILE DRAWER (slide from right)
+          FULLSCREEN SEARCH OVERLAY
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {searchOpen && (
+        <div className="fixed inset-0 z-[1000] bg-white animate-in fade-in duration-300 flex flex-col items-center pt-32 px-6">
+          <button 
+            onClick={() => setSearchOpen(false)}
+            className="absolute top-8 right-8 p-4 bg-[#f4f6f8] rounded-full hover:bg-black/5 transition-colors"
+          >
+            <X className="w-6 h-6 text-dark" />
+          </button>
+          <div className="w-full max-w-2xl">
+            <h2 className="text-4xl font-heading mb-8 text-center">O que você procura?</h2>
+            <div className="relative group">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-dark/20 group-focus-within:text-[var(--color-accent)] transition-colors" />
+              <input 
+                ref={searchRef}
+                type="text"
+                placeholder="Marca, modelo ou categoria..."
+                className="w-full h-20 bg-[#f4f6f8] rounded-[32px] pl-16 pr-8 text-2xl font-medium outline-none border-2 border-transparent focus:border-[var(--color-accent)] transition-all shadow-sm"
+              />
+            </div>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <p className="w-full text-center text-sm text-dark/40 font-medium mb-2 uppercase tracking-widest">Sugestões</p>
+              {['SUV', 'Elétrico', 'Hatch', 'Polo', 'T-Cross'].map(s => (
+                <button key={s} className="px-6 py-3 bg-[#f4f6f8] rounded-full text-sm font-bold hover:bg-dark hover:text-white transition-all">{s}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          MODERN MENU DRAWER
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       {drawerOpen && (
-        <>
-          <div className="drawer-overlay" onClick={() => setDrawerOpen(false)} aria-hidden />
-          <aside className="drawer-panel" role="dialog" aria-label="Menu de navegação">
-            {/* Cabeçalho do drawer */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
-              <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--color-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <CarFront style={{ width: 16, height: 16, color: '#fff' }} />
+        <div className="fixed inset-0 z-[1000] flex justify-end">
+          <div 
+            className="absolute inset-0 bg-dark/20 backdrop-blur-sm animate-in fade-in duration-500" 
+            onClick={() => setDrawerOpen(false)}
+          />
+          <aside className="relative w-full md:w-[480px] h-full bg-white shadow-[-20px_0_60px_rgba(0,0,0,0.1)] p-8 md:p-12 flex flex-col animate-in slide-in-from-right duration-500 ease-spring">
+            <div className="flex items-center justify-between mb-16">
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-dark rounded-xl flex items-center justify-center">
+                  <CarFront className="w-4 h-4 text-white" />
                 </div>
-                <span style={{ fontSize: 15, fontWeight: 800 }}>
-                  Car<span style={{ color: 'var(--color-accent)' }}>Decision</span>
+                <span className="font-heading text-2xl tracking-tight text-dark">
+                  Car<span className="text-[var(--color-accent)]">bi</span>
                 </span>
               </Link>
-              <button
+              <button 
                 onClick={() => setDrawerOpen(false)}
-                className="btn-icon"
+                className="p-3 bg-[#f4f6f8] rounded-full hover:bg-black/5 transition-colors"
                 aria-label="Fechar menu"
-                style={{ border: 'none', width: 36, height: 36, borderRadius: 'var(--radius-sm)' }}
               >
-                <X style={{ width: 16, height: 16 }} />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            {/* Links */}
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {navLinks.map((link) => {
+            <nav className="flex flex-col gap-4">
+              {navLinks.map((link, i) => {
                 const Icon = link.icon
                 const active = isActive(link.href)
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`drawer-link${active ? ' active' : ''}`}
-                    onClick={() => setDrawerOpen(false)}
+                    className={`group flex items-center justify-between p-6 rounded-[32px] transition-all hover:translate-x-2 ${
+                      active ? 'bg-dark text-white' : 'hover:bg-[#f4f6f8] text-dark'
+                    }`}
+                    style={{ animationDelay: `${i * 100}ms` }}
                   >
-                    <Icon style={{ width: 18, height: 18, opacity: 0.7, flexShrink: 0 }} />
-                    {link.label}
+                    <div className="flex items-center gap-6">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${active ? 'bg-white/10' : 'bg-white group-hover:bg-dark group-hover:text-white'}`}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <span className="text-2xl font-heading tracking-wide">{link.label}</span>
+                    </div>
+                    <ChevronRight className={`w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity ${active ? 'text-white' : 'text-dark'}`} />
                   </Link>
                 )
               })}
             </nav>
 
-            {/* Divisor */}
-            <div style={{ height: 1, background: 'var(--color-border)', margin: '20px 0' }} />
-
-            {/* CTA mobile */}
-            <Link
-              href="/qual-carro"
-              className="btn btn-primary"
-              style={{ width: '100%', justifyContent: 'center', gap: 8 }}
-              onClick={() => setDrawerOpen(false)}
-            >
-              <Sparkles style={{ width: 15, height: 15 }} />
-              Qual carro é para mim?
-            </Link>
-
-            {/* Search mobile */}
-            <div
-              style={{
-                marginTop: 12,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                background: 'var(--color-card-2)',
-                borderRadius: 'var(--radius-md)',
-                padding: '12px 14px',
-                border: '1px solid var(--color-border)',
-              }}
-            >
-              <Search style={{ width: 16, height: 16, color: 'var(--color-text-3)', flexShrink: 0 }} />
-              <input
-                type="search"
-                placeholder="Buscar modelo ou marca..."
-                style={{
-                  flex: 1,
-                  border: 'none',
-                  outline: 'none',
-                  background: 'transparent',
-                  fontSize: 14,
-                  color: 'var(--color-text)',
-                }}
-              />
+            <div className="mt-auto space-y-4">
+              <div className="h-px bg-black/5 mb-8" />
+              <Link 
+                href="/qual-carro"
+                className="w-full flex items-center justify-between p-8 bg-[var(--color-bento-blue)] text-white rounded-[32px] hover:scale-[1.02] transition-transform group"
+              >
+                <div className="flex items-center gap-4">
+                  <Sparkles className="w-6 h-6" />
+                  <span className="text-xl font-heading">Qual carro é pra mim?</span>
+                </div>
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white animate-pulse group-hover:animate-none">
+                   <ChevronRight className="w-5 h-5 group-hover:text-[var(--color-bento-blue)]" />
+                </div>
+              </Link>
+              <p className="text-center text-[12px] font-bold text-dark/20 uppercase tracking-[0.2em] pt-8">
+                Carbi © 2026 — Inteligência Automotiva
+              </p>
             </div>
           </aside>
-        </>
+        </div>
       )}
     </>
   )
 }
+

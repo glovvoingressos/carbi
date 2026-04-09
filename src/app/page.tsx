@@ -67,40 +67,22 @@ export default async function HomePage() {
     <main>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          § 1 — NEW HERO SECTION (Light Mode / UXPlay Style)
-          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section style={{ background: 'var(--color-bg)', paddingTop: 'clamp(64px, 10vh, 120px)', paddingBottom: 'clamp(48px, 8vh, 80px)', textAlign: 'center' }}>
-        <div className="container" style={{ maxWidth: 1080 }}>
-          {/* H1 */}
-          <h1 className="text-hero" style={{ 
-            marginBottom: 48,
-            textWrap: 'balance'
-          }}>
-            A ferramenta que ajuda 👥 você a descobrir 🚗 o carro ideal, consultar a 💸 tabela FIPE e fazer a 🎯 melhor escolha 📝
-          </h1>
-          
-          {/* SEARCH & FEATURES */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 max-w-3xl mx-auto">
-             <div className="flex-1 w-full flex items-center gap-4">
-                 <HeroSearchBar />
-                 <span className="hidden sm:inline-block text-sm font-bold text-text-secondary whitespace-nowrap">
-                    {cars.length}+ veículos listados
-                 </span>
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           § 1.5 — BENTO GRID FEATURES
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section style={{ background: 'var(--color-bg)', paddingBottom: 'clamp(64px, 10vh, 120px)' }}>
+      <section style={{ background: 'var(--color-bg)', paddingBottom: 'clamp(48px, 6vh, 80px)' }}>
         <div className="container max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 auto-rows-[minmax(320px,auto)]">
              
-             {/* BENTO 1: White Large Card (FIPE) */}
+             {/* BENTO 1: FEATURED HERO PHRASE (Lime/Yellow) */}
+             <div className="md:col-span-12 bg-[var(--color-bento-yellow)] rounded-[32px] p-10 md:p-16 flex flex-col items-center justify-center shadow-sm relative overflow-hidden text-center min-h-[400px]">
+                  <h1 className="text-hero mx-auto" style={{ maxWidth: '100%', marginBottom: 0 }}>
+                    A ferramenta que ajuda <span className="inline-block translate-y-[2px] mx-1">👥</span> você a descobrir <span className="inline-block translate-y-[2px] mx-1">🚗</span> o carro ideal, consultar a <span className="inline-block translate-y-[2px] mx-1">💸</span> tabela FIPE e fazer a <span className="inline-block translate-y-[2px] mx-1">🎯</span> melhor escolha <span className="inline-block translate-y-[2px] mx-1">📝</span>
+                  </h1>
+             </div>
+
+             {/* BENTO 2: White Large Card (FIPE) */}
              <div className="md:col-span-12 lg:col-span-8 bg-white border border-border rounded-[32px] p-8 lg:p-12 flex flex-col items-start justify-between shadow-sm relative overflow-hidden">
-                <span className="w-10 h-10 rounded-full border border-border flex items-center justify-center font-bold text-sm bg-surface z-10">1</span>
+                <span className="w-10 h-10 rounded-full border border-border flex items-center justify-center font-bold text-sm bg-surface z-10">2</span>
                 
                 {/* Abstract Visual representation of a toggle/chart */}
                 <div className="absolute right-8 top-8 lg:right-16 lg:top-16 opacity-20 lg:opacity-100 pointer-events-none">
@@ -113,7 +95,7 @@ export default async function HomePage() {
                 </div>
 
                 <div className="mt-16 lg:mt-32 max-w-md z-10">
-                    <h3 className="text-3xl lg:text-4xl font-extrabold text-dark mb-4 leading-tight tracking-tight">Planeje a compra com a Tabela FIPE atualizada</h3>
+                    <h3 className="text-3xl lg:text-4xl font-extrabold text-dark mb-4">Planeje a compra com a Tabela FIPE atualizada</h3>
                     <div className="flex flex-col gap-2 items-start">
                         <span className="text-xs font-bold uppercase tracking-widest min-w-[48px] bg-[var(--color-bento-yellow)] px-3 py-1 rounded-[12px] text-dark">Lançamento</span>
                         <p className="text-text-secondary font-medium text-lg leading-relaxed">Avalie o histórico de desvalorização e tome a decisão financeira correta instantaneamente.</p>
@@ -121,45 +103,50 @@ export default async function HomePage() {
                 </div>
              </div>
 
-             {/* BENTO 2: Abstract Image Card (Red) */}
-             <div className="md:col-span-6 lg:col-span-4 bg-[var(--color-bento-red)] rounded-[32px] p-8 lg:p-12 flex flex-col justify-between overflow-hidden relative text-white">
-                 <h3 className="text-2xl lg:text-3xl font-extrabold leading-tight tracking-tight mb-8 z-10 relative">
-                     Compare qualquer carro do mercado lado a lado, em todos os quesitos.
-                 </h3>
-                 <div className="mt-8 z-10 relative">
-                    <p className="text-white/80 font-medium leading-relaxed max-w-[280px]">Faça as melhores escolhas com base científica e sem achismos durante a pesquisa.</p>
-                 </div>
-                 {/* Decorative wave */}
-                 <svg className="absolute bottom-[-10%] right-[-10%] w-[120%] opacity-20 pointer-events-none" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="#000000" d="M42.7,-73.4C55.9,-67.8,67.6,-58.2,76.6,-46.3C85.5,-34.4,91.8,-20.3,92.5,-6.1C93.2,8.2,88.4,22.6,80.7,35C73,47.5,62.3,58.1,50.1,65.6C37.8,73.1,23.9,77.5,10.2,78.2C-3.6,78.8,-17.1,75.8,-29.4,69.5C-41.6,63.1,-52.6,53.5,-61.2,42.1C-69.8,30.6,-76.1,17.4,-77.9,3.7C-79.7,-10,-77,-24.2,-70.6,-36.5C-64.2,-48.8,-54.1,-59,-42.2,-64.7C-30.3,-70.5,-16.7,-71.8,-1.9,-68.8C12.9,-65.8,29.5,-79.1,42.7,-73.4Z" transform="translate(100 100)" />
-                 </svg>
-             </div>
-
-             {/* BENTO 3: Decorative Block (Yellow Abstract) */}
-             <div className="md:col-span-6 lg:col-span-5 bg-[var(--color-bento-yellow)] rounded-[32px] p-8 overflow-hidden flex items-center justify-center min-h-[280px]">
-                 <svg className="w-full h-full opacity-40 mix-blend-multiply" viewBox="0 0 400 200" preserveAspectRatio="none">
-                    <path d="M 0,100 C 100,-50 300,250 400,100" fill="none" stroke="currentColor" strokeWidth="60" strokeLinecap="round"/>
-                 </svg>
+             {/* BENTO 3: Abstract Image Card (Red) */}
+             <div className="md:col-span-12 lg:col-span-4 bg-[var(--color-bento-red)] rounded-[32px] p-8 lg:p-12 flex flex-col justify-between overflow-hidden relative text-white text-center md:text-left">
+                  <h3 className="text-2xl lg:text-3xl font-extrabold mb-8 z-10 relative">
+                      Compare qualquer carro lado a lado
+                  </h3>
+                  <div className="mt-8 z-10 relative">
+                     <p className="text-white/80 font-medium leading-relaxed max-w-[280px] mx-auto md:mx-0">Faça as melhores escolhas com base científica e sem achismos durante a pesquisa.</p>
+                  </div>
+                  {/* Decorative wave */}
+                  <svg className="absolute bottom-[-10%] right-[-10%] w-[120%] opacity-20 pointer-events-none" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                     <path fill="#000000" d="M42.7,-73.4C55.9,-67.8,67.6,-58.2,76.6,-46.3C85.5,-34.4,91.8,-20.3,92.5,-6.1C93.2,8.2,88.4,22.6,80.7,35C73,47.5,62.3,58.1,50.1,65.6C37.8,73.1,23.9,77.5,10.2,78.2C-3.6,78.8,-17.1,75.8,-29.4,69.5C-41.6,63.1,-52.6,53.5,-61.2,42.1C-69.8,30.6,-76.1,17.4,-77.9,3.7C-79.7,-10,-77,-24.2,-70.6,-36.5C-64.2,-48.8,-54.1,-59,-42.2,-64.7C-30.3,-70.5,-16.7,-71.8,-1.9,-68.8C12.9,-65.8,29.5,-79.1,42.7,-73.4Z" transform="translate(100 100)" />
+                  </svg>
              </div>
 
              {/* BENTO 4: White Small Card (Templates/Catalogue) */}
              <div className="md:col-span-6 lg:col-span-3 bg-white border border-border rounded-[32px] p-8 flex flex-col justify-between shadow-sm">
                 <span className="w-8 h-8 rounded-full border border-border flex items-center justify-center font-bold text-sm bg-surface mb-8">4</span>
-                <h3 className="text-xl font-extrabold text-dark mb-4 leading-tight">Catálogo completo de modelos atualizados</h3>
+                <h3 className="text-xl font-extrabold text-dark mb-4">Catálogo completo de modelos atualizados</h3>
                 <p className="text-text-secondary font-medium text-sm">Do popular zero km ao sedã premium, todas as informações em um só lugar.</p>
              </div>
 
              {/* BENTO 5: Abstract Graphic (Blue) */}
-             <div className="md:col-span-6 lg:col-span-4 bg-[var(--color-bento-blue)] rounded-[32px] overflow-hidden flex flex-col justify-end min-h-[320px] relative">
-                 <div className="absolute inset-0 flex items-center justify-center opacity-30">
-                     <div className="w-full h-[150%] bg-white/20 rotate-12 blur-3xl"></div>
-                 </div>
-                 <div className="p-8 z-10">
-                    <h3 className="text-2xl font-extrabold text-white mb-2 leading-tight tracking-tight">Estatísticas Reais</h3>
-                    <p className="text-white/80 font-medium text-sm">Foque nos dados concretos esquecendo as métricas de vaidade.</p>
-                 </div>
+             <div className="md:col-span-6 lg:col-span-4 bg-[var(--color-bento-blue)] rounded-[32px] overflow-hidden flex flex-col justify-end min-h-[320px] relative text-white">
+                  <div className="absolute inset-0 flex items-center justify-center opacity-30">
+                      <div className="w-full h-[150%] bg-white/20 rotate-12 blur-3xl"></div>
+                  </div>
+                  <div className="p-8 z-10">
+                     <h3 className="text-2xl font-extrabold mb-2 text-white">Estatísticas Reais</h3>
+                     <p className="text-white/80 font-medium text-sm">Foque nos dados concretos esquecendo as métricas de vaidade.</p>
+                  </div>
              </div>
           </div>
+        </div>
+      </section>
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          § 1.7 — SEARCH BAR (Relocated Below Grid)
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section className="pb-16 pt-8">
+        <div className="container max-w-3xl mx-auto px-4 text-center">
+           <HeroSearchBar />
+           <p className="text-sm font-bold text-text-secondary mt-4">
+              {cars.length}+ veículos listados em tempo real na Carbi
+           </p>
         </div>
       </section>
 
@@ -435,12 +422,13 @@ export default async function HomePage() {
                 Ferramenta de comparação
               </p>
               <h2
+                className="font-heading"
                 style={{
                   fontSize: 'clamp(28px, 4vw, 44px)',
-                  fontWeight: 900,
+                  fontWeight: 400,
                   color: '#fff',
                   lineHeight: 1.05,
-                  letterSpacing: '-0.03em',
+                  letterSpacing: '-0.01em',
                   marginBottom: 16,
                 }}
               >

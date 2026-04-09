@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ArrowDown } from 'lucide-react'
 
 const faqs = [
-  { q: "O Que é o CarDecision?", a: "Somos a ferramenta definitiva para você comparar carros, ler avaliações reais e encontrar o preço exato da tabela FIPE antes de comprar." },
+  { q: "O Que é o Carbi?", a: "Somos a ferramenta definitiva para você comparar carros, ler avaliações reais e encontrar o preço exato da tabela FIPE antes de comprar." },
   { q: "A Tabela FIPE é atualizada automaticamente?", a: "Sim! Puxamos os dados em tempo real da API oficial para garantir o melhor preço para você." },
   { q: "Posso comparar modelos elétricos e a combustão?", a: "Com certeza, nossa plataforma tem os cálculos exatos para avaliar custo de energia versus combustível fóssil." },
   { q: "Não encontrei o que procurava? Cheque os Rankings.", a: "Temos uma página inteira dedicada a listar os melhores carros por categoria." }
@@ -33,7 +33,7 @@ export default function FAQSection() {
                   onClick={() => setOpenIndex(isOpen ? null : i)}
                   className={`w-full flex items-center justify-between px-8 py-5 md:py-6 rounded-full text-left transition-all hover:scale-[1.01] active:scale-[0.99] ${baseBg} shadow-sm border border-dark`}
                 >
-                  <span className="text-dark font-black text-lg md:text-xl tracking-tight">{faq.q}</span>
+                  <span className="text-dark font-black text-lg md:text-xl tracking-widest uppercase">{faq.q}</span>
                   <div className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
                     <ArrowDown className="w-8 h-8 md:w-10 md:h-10 text-dark stroke-[3px]" />
                   </div>

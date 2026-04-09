@@ -43,8 +43,8 @@ export default function Footer() {
               >
                 <CarFront style={{ width: 18, height: 18, color: '#fff' }} />
               </div>
-              <span style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em' }}>
-                Car<span style={{ color: 'var(--color-accent)' }}>Decision</span>
+              <span style={{ fontSize: 17, fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                Car<span style={{ color: 'var(--color-accent)' }}>bi</span>
               </span>
             </Link>
             <p style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--color-text-2)', maxWidth: 280 }}>
@@ -119,7 +119,7 @@ export default function Footer() {
           }}
         >
           <p style={{ fontSize: 12, color: 'var(--color-text-3)' }}>
-            © {year} CarDecision.br — Dados baseados em especificações oficiais dos fabricantes.
+            © {year} Carbi — Dados oficiais e comparativos inteligentes.
           </p>
           <p style={{ fontSize: 12, color: 'var(--color-text-3)' }}>
             Feito com ❤️ no Brasil

@@ -90,10 +90,10 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
                      </span>
                   )}
                 </div>
-                <h1 className="text-3xl sm:text-5xl font-black text-text tracking-[-0.04em] leading-none mb-1">{car.brand} {car.model}</h1>
+                <h1 className="text-3xl sm:text-5xl font-normal font-heading text-text tracking-[-0.01em] leading-none mb-1">{car.brand} {car.model}</h1>
                 <p className="text-sm text-text-secondary mt-1">{car.version}</p>
                 <p className="text-sm text-text-tertiary mt-1 mb-3">Preço médio</p>
-                <p className="text-4xl sm:text-5xl font-black text-primary tracking-[-0.05em]">{formatBRL(car.priceBrl)}</p>
+                <p className="text-4xl sm:text-5xl font-normal font-sans text-primary tracking-[-0.02em]">{formatBRL(car.priceBrl)}</p>
                 <p className="text-sm text-text-secondary mt-4 leading-relaxed">{car.shortDesc}</p>
                 <p className="text-sm text-text mt-3">
                   <span className="font-medium">Ideal para:</span> {car.idealFor}
