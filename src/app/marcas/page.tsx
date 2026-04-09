@@ -14,26 +14,78 @@ export default async function MarcasPage() {
           <p className="text-base text-[#0A0A0A]/60 font-semibold max-w-lg mx-auto">Explore nosso catálogo Premium com projeção FIPE e dados detalhados para cada montadora.</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {brands.map((brand) => {
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {brands.map((brand, i) => {
             const brandCars = cars.filter((c) => c.brand === brand)
             const slug = brand.toLowerCase().replace(/\s+/g, '-')
+            
+            // Basic domain mapping for Clearbit Logo API
+            const getDomain = (b: string) => {
+              const map: Record<string, string> = {
+                'bmw': 'bmw.com',
+                'toyota': 'toyota.com',
+                'honda': 'honda.com',
+                'fiat': 'fiat.com.br',
+                'chevrolet': 'chevrolet.com',
+                'volkswagen': 'vw.com',
+                'vw': 'vw.com',
+                'peugeot': 'peugeot.com',
+                'renault': 'renault.com.br',
+                'nissan': 'nissan.com',
+                'hyundai': 'hyundai.com',
+                'caoa chery': 'caoachery.com.br',
+                'jeep': 'jeep.com',
+                'ford': 'ford.com',
+                'audi': 'audi.com',
+                'porsche': 'porsche.com',
+                'mini': 'mini.com',
+                'byd': 'byd.com',
+                'gwm': 'gwmbrasil.com.br',
+                'ram': 'ram.com',
+                'citroen': 'citroen.com',
+              }
+              return map[b.toLowerCase()] || `${b.toLowerCase().replace(/\s+/g, '')}.com`
+            }
+
+            // Alternate colors for variety
+            const colors = ['#b4d2ff', '#E8D4FF', '#fff9d4', '#ffccd5']
+            const bgColor = colors[i % colors.length]
+
             return (
               <Link
                 key={brand}
                 href={`/marcas/${slug}`}
-                className="group relative bg-white border border-black/5 rounded-[32px] p-6 pt-8 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl flex flex-col items-center justify-center overflow-hidden"
+                className="group relative bg-white border-2 border-dark rounded-[32px] p-6 text-center shadow-[4px_4px_0_#0A0A0A] transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0_#0A0A0A] flex flex-col items-center justify-center overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#00D632] opacity-0 group-hover:opacity-5 transition-opacity rounded-bl-full"></div>
-                
-                <div className="w-14 h-14 bg-[#f4f6f8] rounded-full flex items-center justify-center mb-5 group-hover:bg-[#00D632] group-hover:text-white transition-colors relative z-10">
-                  <span className="font-bold text-xl uppercase tracking-tight">{brand.charAt(0)}</span>
+                <div 
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 border-2 border-dark shadow-sm bg-white p-2 relative z-10"
+                  style={{ backgroundColor: bgColor }}
+                >
+                  <img 
+                    src={`https://logo.clearbit.com/${getDomain(brand)}`} 
+                    alt={brand}
+                    className="w-full h-full object-contain filter drop-shadow-sm mix-blend-multiply"
+                    onError={(e) => {
+                      // Fallback to text if clearbit fails
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      const parent = (e.target as HTMLImageElement).parentElement;
+                      if (parent && !parent.querySelector('span')) {
+                        const span = document.createElement('span');
+                        span.className = 'font-black text-xl uppercase tracking-tight text-dark';
+                        span.innerText = brand.charAt(0);
+                        parent.appendChild(span);
+                        parent.style.backgroundColor = 'white'; // override mixed bg
+                      }
+                    }}
+                  />
                 </div>
 
-                <p className="text-xl font-normal font-heading text-[#0A0A0A] tracking-wide relative z-10">{brand}</p>
-                <p className="text-[12px] font-semibold text-[#0A0A0A]/40 mt-1.5 uppercase tracking-widest relative z-10">
-                  {brandCars.length} modelo{brandCars.length !== 1 ? 's' : ''}
-                </p>
+                <p className="text-xl font-black text-dark tracking-tight relative z-10 uppercase">{brand}</p>
+                <div className="mt-3">
+                   <span className="bg-surface text-text-secondary border border-border font-bold text-[11px] px-3 py-1 rounded-full uppercase tracking-widest relative z-10 group-hover:bg-dark group-hover:text-white transition-colors">
+                     {brandCars.length} modelo{brandCars.length !== 1 ? 's' : ''}
+                   </span>
+                </div>
               </Link>
             )
           })}

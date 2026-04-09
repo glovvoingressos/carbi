@@ -39,31 +39,33 @@ export default function CarImage({ id, brand, model, year, src, priority = false
              style={{ backgroundSize: '200% 100%', zIndex: 1 }} />
       )}
 
-      <img
-        src={imageSrc}
-        alt={`${brand} ${model} ${year}`}
-        onLoad={() => setLoading(false)}
-        onError={() => {
-          setError(true)
-          setLoading(false)
-        }}
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          transform: `scale(1.6) translateY(2%)`,
-          transition: 'transform 0.3s ease',
-          pointerEvents: 'none'
-        }}
-        loading={priority ? 'eager' : 'lazy'}
-      />
-
-      {/* Subtle Studio Label for Placeholders */}
-      {error && (
-        <div className="absolute bottom-2 right-3 opacity-30 select-none">
-          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text)' }}>
-            Studio Preview
-          </span>
+      {!error ? (
+        <img
+          src={imageSrc}
+          alt={`${brand} ${model} ${year}`}
+          onLoad={() => setLoading(false)}
+          onError={() => {
+            setError(true)
+            setLoading(false)
+          }}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transform: `scale(1.6) translateY(2%)`,
+            transition: 'transform 0.3s ease',
+            pointerEvents: 'none'
+          }}
+          loading={priority ? 'eager' : 'lazy'}
+        />
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#f4f6f8] border-2 border-dark/5 rounded-[24px]">
+           <div className="w-16 h-16 bg-white border-2 border-dark shadow-[4px_4px_0_#0A0A0A] rounded-2xl flex items-center justify-center mb-3 text-dark rotate-[2deg]">
+              <span className="font-black text-2xl uppercase tracking-tight">{brand?.charAt(0)}</span>
+           </div>
+           <span className="text-[12px] font-bold text-dark/40 uppercase tracking-widest text-center px-4 leading-tight">
+             FOTO<br/>INDISPONÍVEL
+           </span>
         </div>
       )}
     </div>

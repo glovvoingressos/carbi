@@ -15,54 +15,67 @@ export async function getDBCars(): Promise<CarSpec[]> {
     return []
   }
 
-  return data.map((dbCar: any) => ({
-    id: dbCar.id,
-    brand: dbCar.brand_name,
-    model: dbCar.model_name,
-    version: dbCar.version_name,
-    year: dbCar.year_model,
-    slug: dbCar.model_name.toLowerCase().replace(/\s+/g, '-'),
-    segment: dbCar.vehicle_type === 'carros' ? 'hatch' : 'suv', // Basic mapping
-    category: 'compacto',
-    priceBrl: parseFloat(dbCar.price_brl),
-    engineType: dbCar.fuel_type,
-    displacement: '1.0', // Default
-    cylinderCount: 3,
-    turbo: false,
-    horsepower: 0,
-    torque: 0,
-    transmission: 'Manual',
-    drive: 'Dianteira',
-    lengthMm: 0,
-    widthMm: 0,
-    heightMm: 0,
-    wheelbaseMm: 0,
-    weightKg: 0,
-    trunkCapacity: 0,
-    seats: 5,
-    fuelEconomyCityGas: 0,
-    fuelEconomyRoadGas: 0,
-    topSpeed: 0,
-    acceleration0100: 0,
-    airbagsCount: 2,
-    absBrakes: true,
-    esc: true,
-    hasCarplay: false,
-    hasAndroidAuto: false,
-    hasAc: true,
-    hasRearCamera: false,
-    hasMultimedia: false,
-    hasCruiseCtrl: false,
-    latinNcap: 0,
-    isofix: true,
-    tags: [dbCar.brand_name.toLowerCase(), dbCar.fuel_type.toLowerCase()],
-    isPopular: false,
-    pros: ['Preço atualizado'],
-    cons: ['Sem ficha técnica completa'],
-    shortDesc: `${dbCar.model_name} em sua versão ${dbCar.version_name}. Dados extraídos da FIPE.`,
-    idealFor: 'Quem busca um carro com preço atualizado pela FIPE',
-    image: staticCars.find(sc => sc.slug === dbCar.model_name.toLowerCase().replace(/\s+/g, '-'))?.image || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=1000&auto=format&fit=crop',
-  }))
+  return data.map((dbCar: any) => {
+    const brandSlug = dbCar.brand_name.toLowerCase().trim().replace(/\s+/g, '-')
+    let modelSlug = dbCar.model_name.toLowerCase().trim().replace(/\s+/g, '-')
+    
+    // Normalizations for common mismatch
+    if (modelSlug === 'hr-v') modelSlug = 'hrv'
+    if (brandSlug === 'caoa-chery') modelSlug = 'tiggo-5x' // hardcoded example fix from earlier inventory
+    
+    // Check if we have an image in the static mapping first, otherwise build local path
+    const staticImg = staticCars.find(sc => sc.slug === modelSlug)?.image
+    const assetPath = staticImg || `/assets/cars/${brandSlug}-${modelSlug}-2024.png`
+
+    return {
+      id: dbCar.id,
+      brand: dbCar.brand_name,
+      model: dbCar.model_name,
+      version: dbCar.version_name,
+      year: dbCar.year_model,
+      slug: modelSlug,
+      segment: dbCar.vehicle_type === 'carros' ? 'hatch' : 'suv', // Basic mapping
+      category: 'compacto',
+      priceBrl: parseFloat(dbCar.price_brl),
+      engineType: dbCar.fuel_type,
+      displacement: '1.0', // Default
+      cylinderCount: 3,
+      turbo: false,
+      horsepower: 0,
+      torque: 0,
+      transmission: 'Manual',
+      drive: 'Dianteira',
+      lengthMm: 0,
+      widthMm: 0,
+      heightMm: 0,
+      wheelbaseMm: 0,
+      weightKg: 0,
+      trunkCapacity: 0,
+      seats: 5,
+      fuelEconomyCityGas: 0,
+      fuelEconomyRoadGas: 0,
+      topSpeed: 0,
+      acceleration0100: 0,
+      airbagsCount: 2,
+      absBrakes: true,
+      esc: true,
+      hasCarplay: false,
+      hasAndroidAuto: false,
+      hasAc: true,
+      hasRearCamera: false,
+      hasMultimedia: false,
+      hasCruiseCtrl: false,
+      latinNcap: 0,
+      isofix: true,
+      tags: [dbCar.brand_name.toLowerCase(), dbCar.fuel_type.toLowerCase()],
+      isPopular: false,
+      pros: ['Preço atualizado', 'Dados em tempo real'],
+      cons: ['Sem ficha técnica completa'],
+      shortDesc: `${dbCar.model_name} em sua versão ${dbCar.version_name}. Dados extraídos da FIPE.`,
+      idealFor: 'Quem busca um carro com preço atualizado pela FIPE',
+      image: assetPath,
+    }
+  })
 }
 
 export async function getCarsByBrand(brand: string): Promise<CarSpec[]> {
