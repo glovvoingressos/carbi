@@ -3,6 +3,8 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getCarsBySegment, formatBRL } from '@/data/cars'
 import { getCarDetail } from '@/lib/data-fetcher'
+import { getFipePrice } from '@/lib/fipe-api'
+import FipeCalculator from '@/components/car/FipeCalculator'
 import CarCard from '@/components/car/CarCard'
 import Badge from '@/components/ui/Badge'
 import {
@@ -39,9 +41,17 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
   const bestTorque = Math.max(...segmentCars.map((c) => c.torque))
   const bestTrunk = Math.max(...segmentCars.map((c) => c.trunkCapacity))
 
-  // Lógica da Tabela FIPE (Estimativa base)
-  const fipePrice = car.year === 2024 ? car.priceBrl * 0.98 : car.priceBrl * 1.05;
-  // Projeção VIP de Desvalorização (Estimativa)
+  // Lógica da Tabela FIPE Real
+  const fipeData = await getFipePrice(car.brand, car.model, car.year);
+  
+  // Converte a string "R$ 150.000" em número para cálculos
+  const parseFipeValue = (val: string) => parseFloat(val.replace(/[^\d,]/g, '').replace(',', '.'));
+  
+  const fipePrice = fipeData 
+    ? parseFipeValue(fipeData.Valor) 
+    : (car.year === 2024 ? car.priceBrl * 0.98 : car.priceBrl * 1.05);
+
+  // Projeção VIP de Desvalorização (Estimativa baseada na FIPE Real se disponível)
   const yr0 = fipePrice;
   const yr1 = fipePrice * 0.88;
   const yr2 = fipePrice * 0.81;
@@ -197,77 +207,13 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
             </div>
           </div>
 
-          {/* Informações de Mercado (VIP & FIPE) */}
-          <div className="bg-[#E8D4FF] text-[#0A0A0A] border-2 border-[#0A0A0A] rounded-[40px] p-8 sm:p-12 shadow-[6px_6px_0_#000] mt-12 mb-8 relative">
-            {/* Elemento flutuante decorativo */}
-            <div className="absolute -top-4 -right-2 bg-[var(--color-bento-red)] text-white font-black tracking-widest text-[11px] px-4 py-2 rounded-lg rotate-[3deg] shadow-[2px_2px_0_#0A0A0A] uppercase border-2 border-[#0A0A0A]">
-               Hot Deal
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12 gap-6 border-b-2 border-[#0A0A0A]/10 pb-6">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-black text-[#0A0A0A] flex items-center gap-3 tracking-[-0.02em] uppercase">
-                  <TrendingDown className="w-7 h-7 text-[#0A0A0A]" /> Tabela Fipe e Mercado
-                </h2>
-                <p className="text-[15px] font-bold text-[#0A0A0A]/60 mt-2">Estimativa de desvalorização (Projeção VIP)</p>
-              </div>
-              <div className="text-left sm:text-right bg-white/40 px-5 py-3 rounded-2xl border-2 border-[#0A0A0A]">
-                <p className="text-[11px] text-[#0A0A0A] uppercase font-black tracking-widest mb-1.5">FIPE Atual</p>
-                <p className="text-4xl font-black text-[#0A0A0A] tracking-[-0.05em]">{formatBRL(fipePrice)}</p>
-              </div>
-            </div>
-
-            <div className="relative w-full h-[220px] mt-8">
-              {/* Horizontal Grid Lines */}
-              <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                <div className="w-full border-t-2 border-dashed border-[#0A0A0A]/15 mt-[10%]"></div>
-                <div className="w-full border-t-2 border-dashed border-[#0A0A0A]/15 mt-auto mb-[50%]"></div>
-                <div className="w-full border-t-2 border-solid border-[#0A0A0A]/20 mb-[10%]"></div>
-              </div>
-
-              {/* The SVG Line (Only the stretched line) */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="lineFadeDark" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#0A0A0A" stopOpacity="0.15" />
-                    <stop offset="100%" stopColor="#0A0A0A" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <polyline 
-                  fill="none" 
-                  stroke="#0A0A0A" 
-                  strokeWidth="0.8" 
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  points={`8,10 36,45 64,75 92,90`}
-                />
-                <polygon 
-                  fill="url(#lineFadeDark)" 
-                  points={`8,100 8,10 36,45 64,75 92,90 92,100`}
-                />
-              </svg>
-
-              {/* Data Points (HTML/CSS perfectly round and crisp) */}
-              {[
-                { x: 8, y: 10, val: yr0, label: 'Hoje' },
-                { x: 36, y: 45, val: yr1, label: '1 Ano' },
-                { x: 64, y: 75, val: yr2, label: '2 Anos' },
-                { x: 92, y: 90, val: yr3, label: '3 Anos' }
-              ].map((pt, idx) => (
-                <div key={idx} className="absolute flex flex-col items-center justify-center w-0 h-0" style={{ left: `${pt.x}%`, top: `${pt.y}%` }}>
-                  {/* Pílula de Valor (Acima do Ponto) */}
-                  <div className="absolute bottom-3 text-[13px] font-black text-[#0A0A0A] bg-white px-3 py-1 rounded-full shadow-[2px_2px_0_#0A0A0A] border-2 border-[#0A0A0A] whitespace-nowrap tracking-tight">
-                    {formatBRL(pt.val)}
-                  </div>
-                  {/* Ponto / Nó Exato no Gráfico */}
-                  <div className="absolute w-3.5 h-3.5 bg-[#0A0A0A] border-2 border-white rounded-full shadow-sm transform -translate-x-1/2 -translate-y-1/2"></div>
-                  {/* Rótulo de Tempo (Abaixo do Ponto) */}
-                  <div className="absolute top-4 text-[12px] font-black text-[#0A0A0A]/60 uppercase tracking-wider whitespace-nowrap">
-                    {pt.label}
-                  </div>
-                </div>
-              ))}
-            </div>
+          {/* Calculadora FIPE Interativa com Seletores de Versão e Ano */}
+          <div className="mt-12 mb-8">
+            <FipeCalculator 
+              initialBrandName={car.brand}
+              initialModelName={car.model}
+              initialYear={car.year}
+            />
           </div>
         </div>
 
