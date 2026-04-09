@@ -36,6 +36,8 @@ export default function Navbar() {
     { href: '/marcas',   label: 'Marcas',    icon: CarFront },
     { href: '/comparar', label: 'Comparar',  icon: GitCompare },
     { href: '/rankings', label: 'Rankings',  icon: BarChart3 },
+    { href: '/anunciar-carro-bh', label: 'Vender em BH', icon: Sparkles },
+    { href: '/carros-usados-bh', label: 'Comprar em BH', icon: Sparkles },
   ]
 
   const isActive = (href: string) =>

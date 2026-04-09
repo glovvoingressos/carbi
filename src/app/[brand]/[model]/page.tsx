@@ -10,6 +10,7 @@ import Badge from '@/components/ui/Badge'
 import {
   Fuel, Zap, Gauge, Shield, Package, Timer, ChevronRight, ArrowLeftRight, TrendingDown
 } from 'lucide-react'
+import { VehicleSchema } from '@/components/seo/JsonLd'
 
 // Remove generateStaticParams for large database to avoid slow builds
 // export function generateStaticParams() { ... }
@@ -59,6 +60,8 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <VehicleSchema car={car} />
+
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1 text-sm text-text-tertiary mb-6">
         <Link href="/" className="hover:text-text transition-colors">Home</Link>
@@ -208,13 +211,59 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
           </div>
 
           {/* Calculadora FIPE Interativa com Seletores de Versão e Ano */}
-          <div className="mt-12 mb-8">
+          <div className="mt-12 mb-8" id="fipe">
             <FipeCalculator 
               initialBrandName={car.brand}
               initialModelName={car.model}
               initialYear={car.year}
             />
           </div>
+
+          {/* Seção SEO Programático: Vale a Pena Comprar? */}
+          <section className="bg-white rounded-[40px] p-8 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mt-12 mb-8">
+            <h2 className="text-2xl sm:text-3xl font-black text-dark tracking-tight mb-6">
+              Vale a pena comprar o {car.brand} {car.model} em 2026?
+            </h2>
+            <div className="prose prose-lg text-text-secondary">
+              <p>
+                O <strong>{car.brand} {car.model} {car.year}</strong> consolida-se como uma opção de {car.segment} que atende bem ao mercado atual. 
+                Com motorização {car.engineType} e desempenho focado na eficiência, ele faz cerca de {car.fuelEconomyCityGas} km/l na cidade, o que representa um custo competitivo.
+              </p>
+              <p>
+                Levando em conta o desgaste natural e a projeção da Tabela FIPE (veja a nossa calculadora acima), a revenda
+                tende a ser em linha com os concorrentes diretos. Se você busca {car.pros[0].toLowerCase()} com a segurança
+                de ter {car.trunkCapacity}L de porta-malas, vale sim a pena incluí-lo no seu radar.
+              </p>
+            </div>
+            
+            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 border-t border-border pt-6">
+               <Link href="/carros-usados-bh" className="w-full sm:w-auto bg-dark text-white font-black px-6 py-3 rounded-full flex items-center justify-center gap-2 hover:bg-[var(--color-bento-red)] hover:-translate-y-1 transition-all">
+                  Ver ofertas perto de mim <ArrowRight className="w-4 h-4" />
+               </Link>
+               <Link href="/comparar" className="w-full sm:w-auto bg-surface text-dark border-2 border-border font-bold px-6 py-3 rounded-full flex items-center justify-center hover:-translate-y-1 transition-all">
+                  Comparar concorrentes
+               </Link>
+            </div>
+          </section>
+
+          {/* Otimização de FAQ Schema */}
+          <section className="bg-surface rounded-3xl p-8 mt-12 mb-8 border border-border">
+             <h3 className="text-xl font-black text-dark mb-6">Perguntas Frequentes (FAQ)</h3>
+             <div className="space-y-6">
+                <div>
+                  <h4 className="font-bold text-dark mb-1">Qual o consumo real do {car.model}?</h4>
+                  <p className="text-sm text-text-secondary">Nos nossos dados técnicos, a média do {car.brand} {car.model} é de {car.fuelEconomyCityGas} km/litro em percurso urbano (gasolina).</p>
+                </div>
+                <div>
+                  <h4 className="font-bold text-dark mb-1">Qual o tamanho do porta-malas do {car.model}?</h4>
+                  <p className="text-sm text-text-secondary">A capacidade exata do compartimento de bagagem é de {car.trunkCapacity} litros, excelente para um {car.segment}.</p>
+                </div>
+                <div>
+                  <h4 className="font-bold text-dark mb-1">Como saber o preço de mercado atualizado?</h4>
+                  <p className="text-sm text-text-secondary">Utilize nossa Calculadora FIPE dinâmica nesta mesma página para ver o valor exato no mês vigente com base nos registros online oficiais.</p>
+                </div>
+             </div>
+          </section>
         </div>
 
         {/* COLUNA LATERAL (DIREITA) - Stick on Desktop */}

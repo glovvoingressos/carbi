@@ -16,8 +16,41 @@ const fontBoldonse = Boldonse({
 })
 
 export const metadata: Metadata = {
-  title: 'Carbi — Descubra o carro certo para você',
-  description: 'Compare carros, descubra o melhor para seu perfil e tome a melhor decisão de compra com o Carbi. Dados reais de consumo, preço e segurança.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'),
+  title: {
+    default: 'Carbi — Descubra e pesquise o carro certo para você',
+    template: '%s | Carbi',
+  },
+  description: 'A ferramenta definitiva para você explorar, comparar dados técnicos e conferir a tabela FIPE do seu próximo carro. Dados em tempo real para as melhores decisões de compra.',
+  keywords: ['comprar carro', 'tabela fipe', 'comparar carros', 'ficha técnica', 'carros usados', 'carros novos'],
+  authors: [{ name: 'Equipe Carbi' }],
+  creator: 'Carbi',
+  publisher: 'Carbi Inc.',
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    url: '/',
+    siteName: 'Carbi',
+    title: 'Carbi — O motor de busca da sua próxima garagem',
+    description: 'Tabela FIPE oficial, comparador de veículos lado a lado, e as melhores fichas técnicas do mercado. Tome decisões baseadas em dados.',
+    // images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Carbi — Informações Automotivas e Preços',
+    description: 'Encontre tudo sobre seu modelo de carro favorito na Carbi.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 }
 
 export default function RootLayout({
