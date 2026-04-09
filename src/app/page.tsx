@@ -351,32 +351,77 @@ export default async function HomePage() {
           <div
             style={{
               display: 'flex',
-              gap: 12,
+              gap: 16,
               overflowX: 'auto',
-              paddingBottom: 4,
-              scrollbarWidth: 'none' as const,
+              paddingBottom: 16,
+              scrollbarWidth: 'none',
+              paddingLeft: 4, // prevent clipping
             }}
           >
-            {brands.slice(0, 12).map((brand) => {
+            {brands.slice(0, 12).map((brand, i) => {
               const count = cars.filter((c) => c.brand === brand).length
-              const logo = LOGO_MAP[brand]
+              const slug = brand.toLowerCase().replace(/\s+/g, '-')
+              const colors = ['#b4d2ff', '#E8D4FF', '#fff9d4', '#ffccd5']
+              const bgColor = colors[i % colors.length]
+
+              // Domain mapping function inline
+              const getDomain = (b: string) => {
+                const map: Record<string, string> = {
+                  'bmw': 'bmw.com',
+                  'toyota': 'toyota.com',
+                  'honda': 'honda.com',
+                  'fiat': 'fiat.com.br',
+                  'chevrolet': 'chevrolet.com',
+                  'volkswagen': 'vw.com',
+                  'vw': 'vw.com',
+                  'peugeot': 'peugeot.com',
+                  'renault': 'renault.com.br',
+                  'nissan': 'nissan.com',
+                  'hyundai': 'hyundai.com',
+                  'caoa chery': 'caoachery.com.br',
+                  'jeep': 'jeep.com',
+                  'ford': 'ford.com',
+                  'audi': 'audi.com',
+                  'porsche': 'porsche.com',
+                  'mini': 'mini.com',
+                  'byd': 'byd.com',
+                  'gwm': 'gwmbrasil.com.br',
+                  'ram': 'ram.com',
+                  'citroen': 'citroen.com',
+                }
+                return map[b.toLowerCase()] || `${b.toLowerCase().replace(/\s+/g, '')}.com`
+              }
+
               return (
                 <Link
                   key={brand}
-                  href={`/marcas/${brand.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="brand-chip"
+                  href={`/marcas/${slug}`}
+                  className="flex-shrink-0 group relative bg-white border-2 border-dark rounded-3xl p-5 shadow-[4px_4px_0_#0A0A0A] hover:bg-[#fafafa] hover:-translate-y-1 hover:shadow-[6px_6px_0_#0A0A0A] transition-all flex flex-col items-center justify-center min-w-[140px] select-none"
                 >
-                  <div className="brand-chip-logo">
-                    {logo ? (
-                      <img src={logo} alt={brand} style={{ width: 24, height: 24, objectFit: 'contain', filter: 'grayscale(1)', opacity: 0.7 }} />
-                    ) : (
-                      <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--color-text-2)' }}>{brand[0]}</span>
-                    )}
+                  <div 
+                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 border-2 border-dark shadow-sm p-1.5"
+                     style={{ backgroundColor: bgColor }}
+                  >
+                     <img 
+                       src={`https://logo.clearbit.com/${getDomain(brand)}`} 
+                       alt={brand} 
+                       className="w-full h-full object-contain filter mix-blend-multiply" 
+                       onError={(e) => {
+                         const target = e.target as HTMLImageElement;
+                         target.style.display = 'none';
+                         const parent = target.parentElement;
+                         if (parent && !parent.querySelector('span')) {
+                           const span = document.createElement('span');
+                           span.className = 'font-black text-xl text-dark';
+                           span.innerText = brand[0];
+                           parent.appendChild(span);
+                           parent.style.backgroundColor = 'white';
+                         }
+                       }}
+                     />
                   </div>
-                  <div>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text)' }}>{brand}</p>
-                    <p style={{ fontSize: 10, color: 'var(--color-text-3)', fontWeight: 500 }}>{count} modelo{count !== 1 ? 's' : ''}</p>
-                  </div>
+                  <p className="text-[13px] font-black text-dark tracking-tight uppercase text-center w-full truncate">{brand}</p>
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-dark/40 mt-1">{count} modelo{count !== 1 ? 's' : ''}</p>
                 </Link>
               )
             })}
