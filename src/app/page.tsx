@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { getAllCars } from '@/lib/data-fetcher'
 import FAQSection from '@/components/layout/FAQSection'
+import BrandLogo from '@/components/brand/BrandLogo'
 
 // ── Dados estáticos ─────────────────────────────────────────────────────────
 
@@ -402,22 +403,10 @@ export default async function HomePage() {
                      className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 border-2 border-dark shadow-sm p-1.5"
                      style={{ backgroundColor: bgColor }}
                   >
-                     <img 
-                       src={`https://logo.clearbit.com/${getDomain(brand)}`} 
-                       alt={brand} 
+                     <BrandLogo 
+                       brandName={brand} 
+                       domain={getDomain(brand)} 
                        className="w-full h-full object-contain filter mix-blend-multiply" 
-                       onError={(e) => {
-                         const target = e.target as HTMLImageElement;
-                         target.style.display = 'none';
-                         const parent = target.parentElement;
-                         if (parent && !parent.querySelector('span')) {
-                           const span = document.createElement('span');
-                           span.className = 'font-black text-xl text-dark';
-                           span.innerText = brand[0];
-                           parent.appendChild(span);
-                           parent.style.backgroundColor = 'white';
-                         }
-                       }}
                      />
                   </div>
                   <p className="text-[13px] font-black text-dark tracking-tight uppercase text-center w-full truncate">{brand}</p>

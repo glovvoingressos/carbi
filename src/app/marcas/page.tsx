@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getAllCars } from '@/lib/data-fetcher'
+import BrandLogo from '@/components/brand/BrandLogo'
 
 export default async function MarcasPage() {
   const cars = await getAllCars()
@@ -61,22 +62,10 @@ export default async function MarcasPage() {
                   className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 border-2 border-dark shadow-sm bg-white p-2 relative z-10"
                   style={{ backgroundColor: bgColor }}
                 >
-                  <img 
-                    src={`https://logo.clearbit.com/${getDomain(brand)}`} 
-                    alt={brand}
-                    className="w-full h-full object-contain filter drop-shadow-sm mix-blend-multiply"
-                    onError={(e) => {
-                      // Fallback to text if clearbit fails
-                      (e.target as HTMLImageElement).style.display = 'none';
-                      const parent = (e.target as HTMLImageElement).parentElement;
-                      if (parent && !parent.querySelector('span')) {
-                        const span = document.createElement('span');
-                        span.className = 'font-black text-xl uppercase tracking-tight text-dark';
-                        span.innerText = brand.charAt(0);
-                        parent.appendChild(span);
-                        parent.style.backgroundColor = 'white'; // override mixed bg
-                      }
-                    }}
+                  <BrandLogo 
+                    brandName={brand} 
+                    domain={getDomain(brand)} 
+                    className="w-full h-full object-contain filter drop-shadow-sm mix-blend-multiply" 
                   />
                 </div>
 
