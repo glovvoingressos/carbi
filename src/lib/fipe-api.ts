@@ -266,21 +266,28 @@ async function resolveBrandByName(brandName: string): Promise<FipeItem | null> {
 async function resolveModelByName(brandCode: string, modelName: string, versionName?: string): Promise<FipeItem | null> {
   const models = await getFipeModels(brandCode)
   const target = normalize(modelName)
+  const targetTokens = target.split(' ').filter((t) => t.length >= 2)
   const versionTokens = normalize(versionName || '')
     .split(' ')
     .filter((t) => t.length >= 2)
 
-  const candidates = models
+  const baseCandidates = models
     .filter((m) => {
       const n = normalize(m.name)
-      return n === target || n.startsWith(target + ' ') || n.includes(` ${target}`) || n.includes(target)
+      const hasTarget = n === target || n.startsWith(target + ' ') || n.includes(` ${target}`) || n.includes(target)
+      const hasTokens = targetTokens.every((token) => n.includes(token))
+      return hasTarget || hasTokens
     })
     .map((m) => {
       const n = normalize(m.name)
       let score = 0
       if (n === target) score += 100
       if (n.startsWith(target + ' ')) score += 30
-      score -= n.length // desempate para nome mais objetivo
+      for (const token of targetTokens) {
+        if (n.includes(token)) score += 8
+      }
+
+      score -= n.length / 3 // desempate para nome mais objetivo
 
       for (const token of versionTokens) {
         if (n.includes(token)) score += 5
@@ -288,7 +295,30 @@ async function resolveModelByName(brandCode: string, modelName: string, versionN
 
       return { model: m, score }
     })
-    .sort((a, b) => b.score - a.score)
+
+  if (baseCandidates.length === 0) return null
+
+  // Evita cair em versões antigas do modelo (ex: gerações 1990) quando há opções modernas.
+  const nowYear = new Date().getFullYear()
+  const candidates = await Promise.all(
+    baseCandidates.slice(0, 14).map(async (candidate) => {
+      const years = await getFilteredFipeYears(brandCode, candidate.model.code, 2)
+      const latestYear = years[0] || 0
+      let recencyScore = 0
+
+      if (latestYear >= nowYear - 1) recencyScore += 80
+      else if (latestYear >= nowYear - 3) recencyScore += 50
+      else if (latestYear >= nowYear - 6) recencyScore += 20
+      else recencyScore -= 80
+
+      return {
+        model: candidate.model,
+        score: candidate.score + recencyScore,
+      }
+    })
+  )
+  
+  candidates.sort((a, b) => b.score - a.score)
 
   return candidates[0]?.model || null
 }

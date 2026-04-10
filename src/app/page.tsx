@@ -73,11 +73,11 @@ export default async function HomePage() {
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section style={{ background: 'var(--color-bg)', paddingTop: 'clamp(80px, 10vh, 120px)', paddingBottom: 'clamp(48px, 6vh, 80px)' }}>
         <div className="container max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 auto-rows-[minmax(320px,auto)]">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 auto-rows-[minmax(220px,auto)] sm:auto-rows-[minmax(260px,auto)] lg:auto-rows-[minmax(320px,auto)]">
              
 
              {/* BENTO 2: White Large Card (FIPE) */}
-             <div className="md:col-span-12 lg:col-span-8 bg-white border border-border rounded-[32px] p-8 lg:p-12 flex flex-col items-start justify-between shadow-sm relative overflow-hidden">
+             <div className="md:col-span-12 lg:col-span-8 bg-white border border-border rounded-[32px] p-6 sm:p-8 lg:p-12 flex flex-col items-start justify-between shadow-sm relative overflow-hidden">
                 <span className="w-10 h-10 rounded-full border border-border flex items-center justify-center font-bold text-sm bg-surface z-10">2</span>
                 
                 {/* Abstract Visual representation of a toggle/chart */}
@@ -100,7 +100,7 @@ export default async function HomePage() {
              </div>
 
              {/* BENTO 3: Abstract Image Card (Red) */}
-             <div className="md:col-span-12 lg:col-span-4 bg-[var(--color-bento-red)] rounded-[32px] p-8 lg:p-12 flex flex-col justify-between overflow-hidden relative text-white text-center md:text-left">
+             <div className="md:col-span-12 lg:col-span-4 bg-[var(--color-bento-red)] rounded-[32px] p-6 sm:p-8 lg:p-12 flex flex-col justify-between overflow-hidden relative text-white text-center md:text-left">
                   <h3 className="text-2xl lg:text-3xl font-extrabold mb-8 z-10 relative">
                       Compare qualquer carro lado a lado
                   </h3>
@@ -114,18 +114,18 @@ export default async function HomePage() {
              </div>
 
              {/* BENTO 4: White Small Card (Templates/Catalogue) */}
-             <div className="md:col-span-6 lg:col-span-3 bg-white border border-border rounded-[32px] p-8 flex flex-col justify-between shadow-sm">
+             <div className="md:col-span-6 lg:col-span-3 bg-white border border-border rounded-[32px] p-6 sm:p-8 flex flex-col justify-between shadow-sm">
                 <span className="w-8 h-8 rounded-full border border-border flex items-center justify-center font-bold text-sm bg-surface mb-8">4</span>
                 <h3 className="text-xl font-extrabold text-dark mb-4">Catálogo completo de modelos atualizados</h3>
                 <p className="text-text-secondary font-medium text-sm">Do popular zero km ao sedã premium, todas as informações em um só lugar.</p>
              </div>
 
              {/* BENTO 5: Abstract Graphic (Blue) */}
-             <div className="md:col-span-6 lg:col-span-4 bg-[var(--color-bento-blue)] rounded-[32px] overflow-hidden flex flex-col justify-end min-h-[320px] relative text-white">
+             <div className="md:col-span-6 lg:col-span-4 bg-[var(--color-bento-blue)] rounded-[32px] overflow-hidden flex flex-col justify-end min-h-[220px] sm:min-h-[280px] lg:min-h-[320px] relative text-white">
                   <div className="absolute inset-0 flex items-center justify-center opacity-30">
                       <div className="w-full h-[150%] bg-white/20 rotate-12 blur-3xl"></div>
                   </div>
-                  <div className="p-8 z-10">
+                  <div className="p-6 sm:p-8 z-10">
                      <h3 className="text-2xl font-extrabold mb-2 text-white">Estatísticas Reais</h3>
                      <p className="text-white/80 font-medium text-sm">Foque nos dados concretos esquecendo as métricas de vaidade.</p>
                   </div>
@@ -152,8 +152,8 @@ export default async function HomePage() {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div>
                 <p className="text-[11px] font-black uppercase tracking-widest text-dark/70">Marketplace Carbi</p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-dark mt-1">Tem carro para vender? Publique com preço FIPE em tempo real.</h2>
-                <p className="text-sm sm:text-base font-semibold text-dark/70 mt-2">Anuncie com até 10 fotos, comparação automática com FIPE e chat seguro direto na plataforma.</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-dark mt-1">Tem carro para vender? Anuncie gratuitamente em minutos.</h2>
+                <p className="text-sm sm:text-base font-semibold text-dark/70 mt-2">Publique com até 10 fotos, destaque no catálogo e contato seguro direto na plataforma.</p>
               </div>
               <Link
                 href="/anunciar-carro-bh"

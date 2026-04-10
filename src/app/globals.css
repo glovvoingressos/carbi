@@ -216,6 +216,13 @@ a[class*="bg-[#0A0A0A]"] {
   color: #fff !important;
 }
 
+button[style*="background: var(--color-dark)"],
+a[style*="background: var(--color-dark)"],
+button[style*="background-color: var(--color-dark)"],
+a[style*="background-color: var(--color-dark)"] {
+  color: #fff !important;
+}
+
 /* Caption / Eyebrow */
 .text-eyebrow {
   font-size: 11px;

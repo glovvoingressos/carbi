@@ -3,7 +3,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getCarsBySegment, formatBRL } from '@/data/cars'
 import { getCarDetail } from '@/lib/data-fetcher'
-import { getFipePrice } from '@/lib/fipe-api'
+import { getFipePrice, getFipeHistory, getFipeYearsByModelName } from '@/lib/fipe-api'
 import FipeCalculator from '@/components/car/FipeCalculator'
 import CarCard from '@/components/car/CarCard'
 import Badge from '@/components/ui/Badge'
@@ -15,7 +15,6 @@ import ReviewSection from '@/components/car/ReviewSection'
 import VideoReviews from '@/components/car/VideoReviews'
 import CarImage from '@/components/car/CarImage'
 import YearSelector from '@/components/car/YearSelector'
-import { getFipeHistory, getFipeYearsByModelName } from '@/lib/fipe-api'
 import FipeHistory from '@/components/car/FipeHistory'
 import { getEnhancedSpecs } from '@/lib/car-query-service'
 import { getRelatedListings } from '@/lib/marketplace-server'
@@ -62,14 +61,14 @@ export default async function CarDetailPage({
 
   let availableYears: number[] = []
   try {
-    availableYears = await getFipeYearsByModelName(car.brand, car.model, 5)
+    availableYears = await getFipeYearsByModelName(car.brand, car.model, 6)
   } catch {
     console.error('Failed to fetch years for selector')
   }
 
   if (availableYears.length === 0) {
     const baseYear = car.year || new Date().getFullYear()
-    availableYears = Array.from({ length: 5 }, (_, idx) => baseYear - idx)
+    availableYears = Array.from({ length: 6 }, (_, idx) => baseYear - idx)
   }
 
   // Ano efetivo sempre limitado aos últimos anos válidos retornados pela API
@@ -192,8 +191,8 @@ export default async function CarDetailPage({
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <p className="text-[11px] font-black uppercase tracking-widest text-dark/70">Destaque</p>
-                <h2 className="text-2xl font-black text-dark leading-tight mt-1">Quer vender seu carro com preço FIPE em destaque?</h2>
-                <p className="text-sm font-semibold text-dark/70 mt-2">Crie um anúncio em minutos com fotos, chat e referência FIPE na hora.</p>
+                <h2 className="text-2xl font-extrabold text-dark leading-tight mt-1">Quer anunciar seu carro com mais visibilidade?</h2>
+                <p className="text-sm font-semibold text-dark/70 mt-2">Publique em minutos, com fotos, contato direto e anúncio gratuito.</p>
               </div>
               <Link
                 href="/anunciar-carro-bh"
@@ -313,7 +312,7 @@ export default async function CarDetailPage({
                 Com motorização {car.engineType} e desempenho focado na eficiência, ele faz cerca de {car.fuelEconomyCityGas} km/l na cidade, o que representa um custo competitivo.
               </p>
               <p>
-                Levando em conta o desgaste natural e a projeção da Tabela FIPE (veja a nossa calculadora acima), a revenda
+                Levando em conta o desgaste natural e a projeção de valor ao longo do tempo, a revenda
                 tende a ser em linha com os concorrentes diretos. Se você busca {car.pros[0].toLowerCase()} com a segurança
                 de ter {car.trunkCapacity}L de porta-malas, vale sim a pena incluí-lo no seu radar.
               </p>
@@ -327,25 +326,6 @@ export default async function CarDetailPage({
                   Comparar concorrentes
                </Link>
             </div>
-          </section>
-
-          {/* Otimização de FAQ Schema */}
-          <section className="bg-surface rounded-3xl p-8 mt-12 mb-8 border border-border">
-             <h3 className="text-xl font-black text-dark mb-6">Perguntas Frequentes (FAQ)</h3>
-             <div className="space-y-6">
-                <div>
-                  <h4 className="font-bold text-dark mb-1">Qual o consumo real do {car.model}?</h4>
-                  <p className="text-sm text-text-secondary">Nos nossos dados técnicos, a média do {car.brand} {car.model} é de {car.fuelEconomyCityGas} km/litro em percurso urbano (gasolina).</p>
-                </div>
-                <div>
-                  <h4 className="font-bold text-dark mb-1">Qual o tamanho do porta-malas do {car.model}?</h4>
-                  <p className="text-sm text-text-secondary">A capacidade exata do compartimento de bagagem é de {car.trunkCapacity} litros, excelente para um {car.segment}.</p>
-                </div>
-                <div>
-                  <h4 className="font-bold text-dark mb-1">Como saber o preço de mercado atualizado?</h4>
-                  <p className="text-sm text-text-secondary">Utilize nossa Calculadora FIPE dinâmica nesta mesma página para ver o valor exato no mês vigente com base nos registros online oficiais.</p>
-                </div>
-             </div>
           </section>
 
           {/* Avaliações de Proprietários */}

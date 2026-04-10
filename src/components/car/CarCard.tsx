@@ -78,6 +78,9 @@ export default function CarCard({ car, index = 0, onCompare, isComparing = false
           model={car.model} 
           year={car.year} 
           src={car.image} 
+          fit="cover"
+          aspectRatio="16/10"
+          className="h-full w-full"
         />
 
         {onCompare && (

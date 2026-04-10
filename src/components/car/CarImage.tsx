@@ -12,9 +12,22 @@ interface CarImageProps {
   priority?: boolean
   className?: string
   style?: React.CSSProperties
+  fit?: 'contain' | 'cover'
+  aspectRatio?: string
 }
 
-export default function CarImage({ id, brand, model, year, src, priority = false, className, style }: CarImageProps) {
+export default function CarImage({
+  id,
+  brand,
+  model,
+  year,
+  src,
+  priority = false,
+  className,
+  style,
+  fit = 'contain',
+  aspectRatio = '16/10',
+}: CarImageProps) {
   const [mounted, setMounted] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [hasFinalError, setHasFinalError] = useState(false)
@@ -67,6 +80,10 @@ export default function CarImage({ id, brand, model, year, src, priority = false
   const imageCandidates = [
     src, // 1. O src exato vindo dos dados
     `/assets/cars/${id}.png`, // 2. O ID exato
+    ...brandVariants.flatMap((b) => [
+      `/assets/cars/${b}-${modelSlug}.png`,
+      `/assets/cars/${b}-${modelBaseSlug}.png`,
+    ]),
     
     // 3. Variações por Ano (Primeiro o solicitado, depois os fallbacks imediatos)
     ...brandVariants.flatMap((b) => [
@@ -94,7 +111,7 @@ export default function CarImage({ id, brand, model, year, src, priority = false
     return (
       <div 
         className={`relative overflow-hidden bg-[#eef2f5] dark:bg-neutral-900 ${className}`}
-        style={{ ...style, aspectRatio: '16/10' }}
+        style={{ ...style, aspectRatio }}
       >
         <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-12 h-1.5 bg-dark/10 rounded-full animate-bounce" />
@@ -108,7 +125,7 @@ export default function CarImage({ id, brand, model, year, src, priority = false
       className={`relative overflow-hidden bg-[#eef2f5] dark:bg-neutral-900 ${className}`}
       style={{
         ...style,
-        aspectRatio: '16/10',
+        aspectRatio,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -132,7 +149,7 @@ export default function CarImage({ id, brand, model, year, src, priority = false
               setIsLoading(false)
             }
           }}
-          className={`w-full h-full object-contain transition-all duration-700 ${isLoading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
+          className={`w-full h-full ${fit === 'cover' ? 'object-cover' : 'object-contain'} transition-all duration-700 ${isLoading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
           style={{
             transform: isLoading ? 'scale(0.95)' : 'scale(1.05)',
             pointerEvents: 'none'

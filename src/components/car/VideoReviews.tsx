@@ -12,7 +12,7 @@ interface VideoReview {
 interface NormalizedVideoReview extends VideoReview {
   id: string
   watchUrl: string
-  thumbnailUrl: string
+  embedUrl: string
 }
 
 interface VideoReviewsProps {
@@ -85,7 +85,7 @@ export default function VideoReviews({ brand, model, year }: VideoReviewsProps) 
               ...video,
               id,
               watchUrl: `https://www.youtube.com/watch?v=${id}`,
-              thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+              embedUrl: `https://www.youtube.com/embed/${id}`,
             }
           : null
       })
@@ -138,33 +138,34 @@ export default function VideoReviews({ brand, model, year }: VideoReviewsProps) 
                   href={video.watchUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute inset-0 block group/video"
+                  className="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-dark border border-dark/20"
                   aria-label={`Assistir no YouTube: ${video.title}`}
                 >
-                  <img
-                    src={video.thumbnailUrl}
-                    alt={video.title}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover/video:scale-105"
-                    onError={(event) => {
-                      const target = event.currentTarget
-                      target.style.display = 'none'
-                      const fallback = target.nextElementSibling as HTMLElement | null
-                      if (fallback) fallback.style.display = 'flex'
-                    }}
-                  />
-                  <div className="hidden absolute inset-0 items-center justify-center bg-dark/10">
-                    <span className="text-xs font-black uppercase tracking-widest text-dark/70">Sem miniatura</span>
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="h-12 w-12 rounded-full bg-white/90 border border-dark flex items-center justify-center shadow-md">
-                      <Play className="w-5 h-5 text-dark ml-0.5" />
-                    </div>
-                  </div>
+                  YouTube <ExternalLink className="h-3 w-3" />
                 </a>
+                <iframe
+                  src={video.embedUrl}
+                  title={video.title}
+                  loading="lazy"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="h-full w-full"
+                />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="h-12 w-12 rounded-full bg-white/90 border border-dark flex items-center justify-center shadow-md">
+                    <Play className="w-5 h-5 text-dark ml-0.5" />
+                  </div>
+                </div>
               </div>
 
-              <div className="p-4">
+              <a
+                href={video.watchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block p-4"
+                aria-label={`Assistir no YouTube: ${video.title}`}
+              >
                 <h3 className="font-bold text-sm leading-tight mb-2 line-clamp-2 min-h-[40px]">
                   {video.title}
                 </h3>
@@ -176,7 +177,7 @@ export default function VideoReviews({ brand, model, year }: VideoReviewsProps) 
                     {video.channel}
                   </span>
                 </div>
-              </div>
+              </a>
             </div>
           ))}
         </div>
