@@ -61,7 +61,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 sortByProfile === p.id
                   ? 'bg-primary text-white'
-                  : 'bg-white border border-border text-text-secondary hover:border-primary/30 hover:text-primary'
+                  : 'bg-[#f3f6fb] text-text-secondary hover:bg-[#edf2f8] hover:text-primary'
               }`}
             >
               {p.label}
@@ -78,7 +78,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 sortByPrice === r.id
                   ? 'bg-primary text-white'
-                  : 'bg-white border border-border text-text-secondary hover:border-primary/30 hover:text-primary'
+                  : 'bg-[#f3f6fb] text-text-secondary hover:bg-[#edf2f8] hover:text-primary'
               }`}
             >
               {r.label}
@@ -95,7 +95,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
 
           return (
             <div key={car.id} className={`${index === 0 && sortByProfile ? 'ring-2 ring-primary' : ''} rounded-xl`}>
-              <div className={`${index === 0 && sortByProfile ? 'bg-white ring-1 ring-inset ring-transparent rounded-xl' : ''}`}>
+              <div className={`${index === 0 && sortByProfile ? 'bg-[#f7f9fc] ring-1 ring-inset ring-transparent rounded-xl' : ''}`}>
                 <CarCard car={car} />
                 {index === 0 && sortByProfile && (
                   <div className="bg-primary-light rounded-b-xl border border-t-0 border-primary/20 px-4 py-3 -mt-2">
@@ -114,7 +114,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
         })}
       </div>
       {rankedCars.length === 0 && (
-        <div className="mt-8 rounded-xl border border-border bg-white p-6 text-sm font-semibold text-text-secondary">
+        <div className="mt-8 rounded-xl bg-[#f7f9fc] p-6 text-sm font-semibold text-text-secondary">
           Nenhum resultado encontrado para a busca atual.
         </div>
       )}

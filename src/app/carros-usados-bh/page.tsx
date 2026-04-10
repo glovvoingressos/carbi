@@ -51,21 +51,21 @@ export default async function CarrosUsadosBHPage() {
       <section className="py-8 bg-surface">
          <div className="container max-w-4xl mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-               <div className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-border">
+               <div className="flex items-center gap-3 bg-[#f7f9fc] p-4 rounded-2xl">
                   <CheckCircle2 className="text-[#00D632] w-8 h-8 flex-shrink-0" />
                   <div>
                     <h4 className="font-black text-dark">Valor Atualizado Ao Vivo</h4>
                     <p className="text-xs text-text-secondary font-medium mt-1">Garantia de negócio justo.</p>
                   </div>
                </div>
-               <div className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-border">
+               <div className="flex items-center gap-3 bg-[#f7f9fc] p-4 rounded-2xl">
                   <CheckCircle2 className="text-[#00D632] w-8 h-8 flex-shrink-0" />
                   <div>
                     <h4 className="font-black text-dark">Atendimento Local</h4>
                     <p className="text-xs text-text-secondary font-medium mt-1">Conectamos você aos lojistas de BH.</p>
                   </div>
                </div>
-               <div className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-border">
+               <div className="flex items-center gap-3 bg-[#f7f9fc] p-4 rounded-2xl">
                   <CheckCircle2 className="text-[#00D632] w-8 h-8 flex-shrink-0" />
                   <div>
                     <h4 className="font-black text-dark">Venda em 24h</h4>

@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
+import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 
 type ListingPatchPayload = {
   title?: string
   description?: string
   price?: number
   status?: 'active' | 'sold' | 'paused' | 'archived'
+  vin?: string
 }
 
 export async function PATCH(
@@ -55,6 +57,13 @@ export async function PATCH(
       updates.status = body.status
       updates.published_at = body.status === 'active' ? new Date().toISOString() : null
     }
+    if (typeof body.vin === 'string') {
+      const vin = body.vin.trim().toUpperCase()
+      if (vin && !/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)) {
+        return NextResponse.json({ error: 'VIN inválido. Use 17 caracteres válidos.' }, { status: 400 })
+      }
+      updates.vin = vin || null
+    }
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'Nenhum campo válido para atualizar.' }, { status: 400 })
@@ -63,7 +72,7 @@ export async function PATCH(
     const supabase = getSupabaseServerClient(auth.accessToken)
     const { data: listing, error: listingError } = await supabase
       .from('vehicle_listings')
-      .select('id, user_id')
+      .select('id, user_id, vehicle_id')
       .eq('id', listingId)
       .single()
 
@@ -79,11 +88,28 @@ export async function PATCH(
       .from('vehicle_listings')
       .update(updates)
       .eq('id', listingId)
-      .select('id, slug, title, description, price, status, updated_at')
+      .select('id, slug, title, description, price, status, updated_at, vin')
       .single()
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    if (typeof updates.vin !== 'undefined' && listing.vehicle_id) {
+      await supabase
+        .from('vehicles')
+        .update({ vin: updates.vin as string | null })
+        .eq('id', listing.vehicle_id)
+
+      if (typeof updates.vin === 'string' && updates.vin.length === 17) {
+        await runAutoDevSync({
+          vehicleId: listing.vehicle_id,
+          requesterId: auth.userId,
+          accessToken: auth.accessToken,
+          vinOverride: updates.vin,
+          force: true,
+        })
+      }
     }
 
     return NextResponse.json(data)

@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
         version,
         year,
         year_model,
+        vin,
         mileage,
         price,
         transmission,

@@ -15,12 +15,14 @@ export default function ListingCard({ listing }: { listing: ListingPublic }) {
   return (
     <Link
       href={`/anuncios/${listing.slug}`}
-      className="group rounded-3xl border border-border bg-white p-3 shadow-sm transition hover:-translate-y-0.5"
+      className="group pastel-card pastel-card-blue rounded-3xl p-3 transition hover:-translate-y-0.5"
     >
       {cover ? (
-        <img src={cover} alt={listing.title} className="h-44 w-full rounded-2xl object-cover" />
+        <div className="aspect-square w-full overflow-hidden rounded-2xl bg-white/75">
+          <img src={cover} alt={listing.title} className="h-full w-full object-cover" />
+        </div>
       ) : (
-        <div className="h-44 w-full rounded-2xl border border-border bg-surface flex items-center justify-center text-xs font-bold uppercase tracking-widest text-text-tertiary">
+        <div className="aspect-square w-full rounded-2xl bg-white/75 flex items-center justify-center text-xs font-bold uppercase tracking-widest text-text-tertiary">
           Sem imagem
         </div>
       )}

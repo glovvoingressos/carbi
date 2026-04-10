@@ -3,6 +3,7 @@ import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { ListingFormPayload, validateListingPayload } from '@/lib/marketplace'
 import { queryPublicListings } from '@/lib/marketplace-server'
+import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 
 export async function GET(req: NextRequest) {
   try {
@@ -60,6 +61,8 @@ export async function POST(req: NextRequest) {
       brand: payload.brand.trim(),
       model: payload.model.trim(),
       version: payload.version?.trim() || null,
+      trim: payload.version?.trim() || null,
+      vin: payload.vin?.trim().toUpperCase() || null,
       year: payload.year,
       year_model: payload.year_model,
       transmission: payload.transmission.trim(),
@@ -111,6 +114,7 @@ export async function POST(req: NextRequest) {
       horsepower: payload.horsepower || null,
       plate_final: payload.plate_final?.trim() || null,
       doors: payload.doors || null,
+      vin: payload.vin?.trim().toUpperCase() || null,
       fipe_brand_code: payload.fipe_brand_code || null,
       fipe_model_code: payload.fipe_model_code || null,
       fipe_year_code: payload.fipe_year_code || null,
@@ -131,7 +135,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json(data, { status: 201 })
+    if (payload.vin) {
+      const sync = await runAutoDevSync({
+        vehicleId: vehicle.id,
+        requesterId: auth.userId,
+        accessToken: auth.accessToken,
+        vinOverride: payload.vin,
+        force: true,
+      })
+
+      if (!sync.success) {
+        console.warn('Auto.dev sync failed after listing creation', {
+          listingId: data.id,
+          vehicleId: vehicle.id,
+          errors: sync.errors,
+        })
+      }
+    }
+
+    return NextResponse.json({ ...data, vehicle_id: vehicle.id }, { status: 201 })
   } catch (error) {
     console.error('POST /api/marketplace/listings failed', error)
     return NextResponse.json({ error: 'Falha ao criar anúncio.' }, { status: 500 })

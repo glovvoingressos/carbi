@@ -21,10 +21,10 @@ export default function FipeHistory({ history }: FipeHistoryProps) {
   const latestPrice = history[0].priceNum
   
   return (
-    <div className="bg-white border-2 border-dark rounded-[40px] overflow-hidden shadow-[8px_8px_0_#000] mt-12 mb-8">
-      <div className="bg-[var(--color-bento-blue)] border-b-2 border-dark p-8 flex items-center justify-between">
+    <div className="pastel-card pastel-card-blue rounded-[40px] overflow-hidden mt-12 mb-8">
+      <div className="bg-[var(--color-bento-blue)] p-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-dark shadow-[3px_3px_0_#000] border-2 border-dark">
+          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-dark shadow-[3px_3px_0_#000]">
             <Calendar className="w-6 h-6" />
           </div>
           <div>
@@ -47,12 +47,12 @@ export default function FipeHistory({ history }: FipeHistoryProps) {
             return (
               <div 
                 key={item.year} 
-                className={`relative p-5 rounded-[28px] border-2 border-dark transition-all hover:-translate-y-1 ${
-                  isLatest ? 'bg-[var(--color-bento-yellow)] shadow-[4px_4px_0_#000]' : 'bg-surface hover:bg-white shadow-sm'
+                className={`relative p-5 rounded-[28px] transition-all hover:-translate-y-1 ${
+                  isLatest ? 'bg-[var(--color-bento-yellow)] shadow-[4px_4px_0_#000]' : 'bg-white/70 hover:bg-white shadow-sm'
                 }`}
               >
                 {isLatest && (
-                  <div className="absolute -top-3 -right-2 bg-dark text-white text-[9px] font-black px-2 py-1 rounded rotate-[10deg] uppercase border border-dark">
+                  <div className="absolute -top-3 -right-2 bg-dark text-white text-[9px] font-black px-2 py-1 rounded rotate-[10deg] uppercase">
                     Atual
                   </div>
                 )}
@@ -82,12 +82,12 @@ export default function FipeHistory({ history }: FipeHistoryProps) {
           })}
         </div>
 
-        <div className="mt-8 p-4 bg-dark/5 rounded-2xl border border-dashed border-dark/10 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="mt-8 p-4 bg-white/60 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-[11px] font-bold text-text-tertiary">
             * Valores médios de mercado para o modelo e versão selecionados (referência mensal oficial).
           </p>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-[var(--color-bento-yellow)] rounded-full border border-dark" />
+            <div className="w-2 h-2 bg-[var(--color-bento-yellow)] rounded-full" />
             <span className="text-[10px] font-black uppercase tracking-widest">Referência Atual</span>
           </div>
         </div>

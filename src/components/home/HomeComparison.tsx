@@ -37,9 +37,8 @@ export default function HomeComparison() {
     <section style={{ paddingBlock: 'clamp(32px, 5vh, 64px)', background: 'var(--color-bg)' }}>
       <div className="container">
         <div
-          className="relative overflow-hidden rounded-[40px] border border-dark/5 shadow-[0_20px_40px_-20px_rgba(167,200,255,0.4)]"
+          className="relative overflow-hidden rounded-[40px] pastel-card"
           style={{
-            background: 'var(--color-bento-blue)',
             padding: 'clamp(28px, 5vw, 64px)',
           }}
         >
@@ -51,7 +50,19 @@ export default function HomeComparison() {
             <div>
               <p className="text-[12px] font-black uppercase tracking-[0.2em] text-dark/40 mb-4">Ferramenta Inteligente</p>
               <h2 className="text-4xl md:text-6xl font-black text-dark tracking-tighter leading-[0.9] mb-6 uppercase">
-                {comparison ? 'Resumo do <br/>Versus' : 'Em dúvida entre <br/>dois carros?'}
+                {comparison ? (
+                  <>
+                    Resumo do
+                    <br />
+                    Versus
+                  </>
+                ) : (
+                  <>
+                    Em dúvida entre
+                    <br />
+                    dois carros?
+                  </>
+                )}
               </h2>
               <p className="text-lg font-medium text-dark/60 leading-relaxed max-w-md mb-8">
                 {comparison 
@@ -80,7 +91,7 @@ export default function HomeComparison() {
                 {comparison && (
                   <button 
                     onClick={() => setSelected([null, null])}
-                    className="px-6 h-14 bg-white/50 border border-dark/10 rounded-full font-bold text-dark/60 hover:text-dark transition-colors"
+                    className="px-6 h-14 bg-[#edf4ff] rounded-full font-bold text-dark/60 hover:text-dark transition-colors"
                   >
                     Resetar
                   </button>
@@ -92,7 +103,7 @@ export default function HomeComparison() {
             <div className={`relative flex flex-col gap-6 ${comparison ? 'animate-in fade-in duration-700' : ''}`}>
                {comparison ? (
                   /* Summary View */
-                  <div className="bg-white/60 backdrop-blur-xl border-2 border-dark rounded-[32px] p-6 shadow-[10px_10px_0_#0A0A0A]">
+                  <div className="pastel-card rounded-[32px] p-6">
                      <div className="space-y-4">
                         <SummaryRow 
                            label="Preço" 
@@ -224,8 +235,8 @@ function Slot({ num, car, onClick, icon, accent = false }: any) {
          onClick={onClick}
          className="relative group transition-all duration-500 hover:-translate-y-2"
       >
-         <div className={`w-32 h-44 sm:w-44 sm:h-64 bg-white border-2 border-dark rounded-[32px] shadow-[8px_8px_0_#0A0A0A] p-4 flex flex-col justify-between items-center group-hover:shadow-[12px_12px_0_#0A0A0A] transition-all overflow-hidden ${car ? 'border-solid' : 'border-dashed opacity-80'}`}>
-            <div className="w-full h-24 sm:h-32 bg-neutral-50 rounded-2xl flex items-center justify-center group-hover:bg-white transition-all relative overflow-hidden">
+         <div className={`w-32 h-44 sm:w-44 sm:h-64 pastel-card ${accent ? 'pastel-card-yellow' : ''} rounded-[32px] p-4 flex flex-col justify-between items-center transition-all overflow-hidden ${car ? '' : 'opacity-80'}`}>
+            <div className="w-full h-24 sm:h-32 bg-[#f5f8ff] rounded-2xl flex items-center justify-center transition-all relative overflow-hidden">
                {car ? (
                   <CarImage id={car.id} brand={car.brand} model={car.model} year={car.year} src={car.image} className="w-full h-full" />
                ) : (

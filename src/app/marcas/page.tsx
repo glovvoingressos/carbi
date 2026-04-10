@@ -56,10 +56,10 @@ export default async function MarcasPage() {
               <Link
                 key={brand}
                 href={`/marcas/${slug}`}
-                className="group relative bg-white border-2 border-dark rounded-[32px] p-6 text-center shadow-[4px_4px_0_#0A0A0A] transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0_#0A0A0A] flex flex-col items-center justify-center overflow-hidden"
+                className="group relative pastel-card rounded-[32px] p-6 text-center transition-all hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center overflow-hidden"
               >
                 <div 
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 border-2 border-dark shadow-sm bg-white p-2 relative z-10"
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 shadow-sm bg-white p-2 relative z-10"
                   style={{ backgroundColor: bgColor }}
                 >
                   <BrandLogo 
@@ -71,7 +71,7 @@ export default async function MarcasPage() {
 
                 <p className="text-xl font-black text-dark tracking-tight relative z-10 uppercase">{brand}</p>
                 <div className="mt-3">
-                   <span className="bg-surface text-text-secondary border border-border font-bold text-[11px] px-3 py-1 rounded-full uppercase tracking-widest relative z-10 group-hover:bg-dark group-hover:text-white transition-colors">
+                   <span className="bg-white/70 text-text-secondary font-bold text-[11px] px-3 py-1 rounded-full uppercase tracking-widest relative z-10 group-hover:bg-dark group-hover:text-white transition-colors">
                      {brandCars.length} modelo{brandCars.length !== 1 ? 's' : ''}
                    </span>
                 </div>

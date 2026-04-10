@@ -32,6 +32,7 @@ export interface ListingFormPayload {
   horsepower?: number | null
   plate_final?: string
   doors?: number | null
+  vin?: string | null
   fipe_brand_code?: string
   fipe_model_code?: string
   fipe_year_code?: string
@@ -64,6 +65,7 @@ export interface ListingPublic {
   horsepower: number | null
   plate_final: string | null
   doors: number | null
+  vin?: string | null
   fipe_price: number | null
   fipe_difference_value: number | null
   fipe_difference_percent: number | null
@@ -136,6 +138,9 @@ export function validateListingPayload(payload: ListingFormPayload): string[] {
   if (!Number.isFinite(payload.year_model) || payload.year_model < 1950 || payload.year_model > 2100) errors.push('Ano/modelo inválido.')
   if (!Number.isFinite(payload.mileage) || payload.mileage < 0) errors.push('Quilometragem inválida.')
   if (!Number.isFinite(payload.price) || payload.price <= 0) errors.push('Preço inválido.')
+  if (payload.vin && !/^[A-HJ-NPR-Z0-9]{17}$/.test(payload.vin.trim().toUpperCase())) {
+    errors.push('VIN inválido. Use 17 caracteres válidos.')
+  }
 
   return errors
 }

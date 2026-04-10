@@ -46,6 +46,7 @@ interface FormState {
   horsepower: string
   plateFinal: string
   doors: string
+  vin: string
 }
 
 const INITIAL_STATE: FormState = {
@@ -69,6 +70,7 @@ const INITIAL_STATE: FormState = {
   horsepower: '',
   plateFinal: '',
   doors: '',
+  vin: '',
 }
 
 function authHeader(token: string) {
@@ -435,6 +437,7 @@ export default function ListingForm() {
           horsepower: form.horsepower ? Number(form.horsepower) : null,
           plate_final: form.plateFinal,
           doors: form.doors ? Number(form.doors) : null,
+          vin: form.vin ? form.vin.trim().toUpperCase() : null,
           fipe_brand_code: selectedBrandCode || null,
           fipe_model_code: selectedModelCode || null,
           fipe_year_code: selectedVersionCode || null,
@@ -606,9 +609,13 @@ export default function ListingForm() {
 
               <input className="input" placeholder="Ano fabricação" value={form.year} onChange={(e) => handleInput('year', e.target.value.replace(/\D/g, '').slice(0, 4))} />
               <input className="input" placeholder="Ano/modelo" value={form.yearModel} onChange={(e) => handleInput('yearModel', e.target.value.replace(/\D/g, '').slice(0, 4))} />
+              <input className="input" placeholder="VIN (opcional, 17 caracteres)" value={form.vin} onChange={(e) => handleInput('vin', e.target.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, 17))} />
               <input className="input" placeholder="Motor (ex: 1.0 Turbo)" value={form.engine} onChange={(e) => handleInput('engine', e.target.value)} />
               <input className="input" placeholder="Potência (cv)" value={form.horsepower} onChange={(e) => handleInput('horsepower', e.target.value.replace(/\D/g, '').slice(0, 3))} />
             </div>
+            <p className="text-xs text-text-secondary">
+              Se informar VIN válido, o sistema tenta enriquecer o anúncio automaticamente com fotos e ficha técnica da Auto.dev.
+            </p>
 
             <div className="rounded-2xl border border-border bg-surface p-4">
               <div className="flex items-center justify-between gap-3">

@@ -91,12 +91,12 @@ export default async function HomePage() {
              
 
              {/* BENTO 2: White Large Card (Valor atualizado) */}
-             <div className="md:col-span-12 lg:col-span-8 bg-white border border-border rounded-[32px] p-6 sm:p-8 lg:p-12 flex flex-col items-start justify-between shadow-sm relative overflow-hidden">
-                <span className="w-10 h-10 rounded-full border border-border flex items-center justify-center font-bold text-sm bg-surface z-10">2</span>
+             <div className="md:col-span-12 lg:col-span-8 pastel-card rounded-[32px] p-6 sm:p-8 lg:p-12 flex flex-col items-start justify-between relative overflow-hidden">
+                <span className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-surface z-10">2</span>
                 
                 {/* Abstract Visual representation of a toggle/chart */}
                 <div className="absolute right-8 top-8 lg:right-16 lg:top-16 opacity-20 lg:opacity-100 pointer-events-none">
-                    <div className="w-48 h-24 bg-surface border border-border rounded-2xl p-4 flex items-center gap-4">
+                    <div className="w-48 h-24 bg-surface rounded-2xl p-4 flex items-center gap-4">
                         <div className="w-16 h-8 bg-dark rounded-full p-1 relative">
                             <div className="w-6 h-6 bg-[var(--color-bento-yellow)] rounded-full absolute right-1"></div>
                         </div>
@@ -129,8 +129,8 @@ export default async function HomePage() {
              </div>
 
              {/* BENTO 4: White Small Card (Templates/Catalogue) */}
-             <div className="md:col-span-6 lg:col-span-3 bg-white border border-border rounded-[32px] p-6 sm:p-8 flex flex-col justify-start gap-5 shadow-sm relative overflow-hidden min-h-[210px] sm:min-h-[250px]">
-                <span className="w-8 h-8 rounded-full border border-border flex items-center justify-center font-bold text-sm bg-surface">4</span>
+             <div className="md:col-span-6 lg:col-span-3 pastel-card pastel-card-yellow rounded-[32px] p-6 sm:p-8 flex flex-col justify-start gap-5 relative overflow-hidden min-h-[210px] sm:min-h-[250px]">
+                <span className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-surface">4</span>
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-dark leading-tight">Catálogo completo de modelos atualizados</h3>
                 <p className="text-text-secondary font-semibold text-sm sm:text-base leading-relaxed">Do popular zero km ao sedã premium, todas as informações em um só lugar.</p>
                 <div className="absolute right-4 bottom-4 opacity-10 pointer-events-none">
@@ -184,7 +184,8 @@ export default async function HomePage() {
               {featuredListing ? (
                 <Link
                   href={`/anuncios/${featuredListing.slug}`}
-                  className="group block overflow-hidden rounded-[28px] border-2 border-dark bg-[#eaf7ff] p-5 sm:p-7 shadow-[6px_6px_0_#000] transition hover:-translate-y-1"
+                  className="group block overflow-hidden rounded-[28px] p-5 sm:p-7 transition hover:-translate-y-1"
+                  style={{ background: '#e6f0ff' }}
                 >
                   <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
                     <div className="overflow-hidden rounded-2xl bg-white">
@@ -200,7 +201,7 @@ export default async function HomePage() {
                         </div>
                       )}
                     </div>
-                    <div>
+                    <div className="rounded-2xl p-4 sm:p-5" style={{ background: '#f3f8ff' }}>
                       <p className="text-[11px] font-black uppercase tracking-[0.14em] text-dark/65">Destaque do dia</p>
                       <h3 className="mt-1 text-2xl font-black leading-tight text-dark sm:text-3xl">{featuredListing.title}</h3>
                       <p className="mt-2 text-4xl font-black text-dark">{formatBRL(Number(featuredListing.price))}</p>
@@ -223,7 +224,7 @@ export default async function HomePage() {
               </div>
             </div>
           ) : (
-            <div className="rounded-[24px] border border-border bg-white p-6 sm:p-8">
+            <div className="pastel-card p-6 sm:p-8">
               <p className="text-sm font-semibold text-text-secondary">Ainda não há anúncios ativos.</p>
               <p className="mt-1 text-lg font-black text-dark">Seja o primeiro a publicar e ganhar destaque na home.</p>
               <Link
@@ -240,7 +241,7 @@ export default async function HomePage() {
 
       <section className="pb-16">
         <div className="container">
-          <div className="rounded-[32px] border-2 border-dark bg-[#fff4cf] p-6 sm:p-8 shadow-[6px_6px_0_#000]">
+          <div className="pastel-card pastel-card-yellow rounded-[32px] p-6 sm:p-8">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div>
                 <p className="text-[11px] font-black uppercase tracking-widest text-dark/70">Marketplace Carbi</p>
@@ -249,7 +250,7 @@ export default async function HomePage() {
               </div>
               <Link
                 href="/anunciar-carro-bh"
-                className="inline-flex items-center justify-center rounded-full bg-[#dff7e8] px-6 py-3 text-dark font-black uppercase tracking-wider border-2 border-dark shadow-[4px_4px_0_#000] hover:-translate-y-1 transition-all w-full sm:w-auto"
+                className="inline-flex items-center justify-center rounded-full bg-[#dff7e8] px-6 py-3 text-dark font-black uppercase tracking-wider shadow-[4px_4px_0_#000] hover:-translate-y-1 transition-all w-full sm:w-auto"
               >
                 Anunciar meu carro
               </Link>
@@ -398,7 +399,7 @@ export default async function HomePage() {
             {trustMetrics.map((m, i) => (
               <div
                 key={i}
-                className="scroll-reveal relative rounded-[22px] border border-black/10 bg-white p-4 sm:p-5 text-left shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all overflow-hidden"
+                className="scroll-reveal relative pastel-card rounded-[22px] p-4 sm:p-5 text-left hover:-translate-y-0.5 transition-all overflow-hidden"
                 style={{ transitionDelay: `${i * 60}ms` }}
               >
                 <div className="absolute -right-4 -top-4 opacity-10 pointer-events-none">
@@ -485,10 +486,10 @@ export default async function HomePage() {
                 <Link
                   key={brand}
                   href={`/marcas/${slug}`}
-                  className="flex-shrink-0 group relative bg-white border-2 border-dark rounded-3xl p-5 shadow-[4px_4px_0_#0A0A0A] hover:bg-[#fafafa] hover:-translate-y-1 hover:shadow-[6px_6px_0_#0A0A0A] transition-all flex flex-col items-center justify-center min-w-[140px] select-none"
+                  className="flex-shrink-0 group relative pastel-card rounded-3xl p-5 hover:bg-[#f0f4fa] hover:-translate-y-1 transition-all flex flex-col items-center justify-center min-w-[140px] select-none"
                 >
                   <div 
-                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 border-2 border-dark shadow-sm p-1.5"
+                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 shadow-sm p-1.5"
                      style={{ backgroundColor: bgColor }}
                   >
                      <BrandLogo 

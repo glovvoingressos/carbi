@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <div className="container mx-auto max-w-lg px-4 pb-16 pt-28">
-      <AuthCard />
+      <AuthCard redirectTo="/minha-conta" />
     </div>
   )
 }

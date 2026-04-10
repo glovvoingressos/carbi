@@ -17,9 +17,10 @@ import CarImage from '@/components/car/CarImage'
 import YearSelector from '@/components/car/YearSelector'
 import FipeHistory from '@/components/car/FipeHistory'
 import { getEnhancedSpecs } from '@/lib/car-query-service'
-import { getRelatedListings } from '@/lib/marketplace-server'
+import { getListingVehicleId, getRelatedListings } from '@/lib/marketplace-server'
 import MarketplaceListingCard from '@/components/marketplace/ListingCard'
 import { getAllCars } from '@/lib/data-fetcher'
+import { getVehicleEnrichmentForPublic } from '@/lib/vehicle-enrichment-server'
 
 // Remove generateStaticParams for large database to avoid slow builds
 // export function generateStaticParams() { ... }
@@ -87,6 +88,9 @@ export default async function CarDetailPage({
     yearModel: displayYear || undefined,
     limit: 4,
   })
+  const primaryListing = relatedListings[0]
+  const listingVehicleId = primaryListing?.vehicle_id || (primaryListing ? await getListingVehicleId(primaryListing.id) : null)
+  const modelEnrichment = listingVehicleId ? (await getVehicleEnrichmentForPublic(listingVehicleId)).enrichment : null
   
   // Converte a string "R$ 150.000" em número para cálculos
   const parseFipeValue = (val: string) => parseFloat(val.replace(/[^\d,]/g, '').replace(',', '.'));
@@ -127,10 +131,10 @@ export default async function CarDetailPage({
         <div className="space-y-8">
           {/* Hero */}
           <div className="w-full">
-            <div className="grid md:grid-cols-2 bg-white border-2 border-dark rounded-[40px] overflow-hidden shadow-[6px_6px_0_#000]">
+            <div className="grid md:grid-cols-2 pastel-card pastel-card-blue rounded-[40px] overflow-hidden">
               <div className="aspect-[4/3] md:aspect-auto bg-[#b4d2ff] flex items-center justify-center p-0 sm:p-8 relative overflow-hidden">
                  {/* Estrela / Decorativo Cash App style (opcional) */}
-                 <div className="absolute top-4 left-4 w-12 h-12 rounded-full border border-dark flex items-center justify-center text-dark font-black bg-[var(--color-bento-yellow)] rotate-[-10deg]">✨</div>
+                 <div className="absolute top-4 left-4 w-12 h-12 rounded-full flex items-center justify-center text-dark font-black bg-[var(--color-bento-yellow)] rotate-[-10deg]">✨</div>
                  
                  <CarImage 
                    id={car.id} 
@@ -143,18 +147,18 @@ export default async function CarDetailPage({
                    className="h-full w-full rounded-none sm:rounded-[32px] overflow-hidden shadow-sm"
                  />
               </div>
-              <div className="p-8 sm:p-12 flex flex-col justify-center bg-white">
+              <div className="p-8 sm:p-12 flex flex-col justify-center bg-[#f3f6fb]">
                 <div className="flex flex-wrap gap-3 mb-6">
-                  <span className="bg-dark text-white font-black tracking-widest text-[11px] px-3 py-1.5 rounded rotate-[2deg] uppercase border border-dark">
+                  <span className="bg-dark text-white font-black tracking-widest text-[11px] px-3 py-1.5 rounded rotate-[2deg] uppercase">
                      {car.segment}
                   </span>
                   {car.year === 2024 && (
-                     <span className="bg-[var(--color-accent)] text-dark font-black tracking-widest text-[11px] px-3 py-1.5 rounded rotate-[-3deg] uppercase shadow-[2px_2px_0_#000] border border-dark">
+                     <span className="bg-[var(--color-accent)] text-dark font-black tracking-widest text-[11px] px-3 py-1.5 rounded rotate-[-3deg] uppercase shadow-[2px_2px_0_#000]">
                        Novo
                      </span>
                   )}
                   {car.turbo && (
-                     <span className="bg-[var(--color-bento-red)] text-white font-black tracking-widest text-[11px] px-3 py-1.5 rounded rotate-[1deg] uppercase shadow-[2px_2px_0_#000] border border-dark">
+                     <span className="bg-[var(--color-bento-red)] text-white font-black tracking-widest text-[11px] px-3 py-1.5 rounded rotate-[1deg] uppercase shadow-[2px_2px_0_#000]">
                        Turbo
                      </span>
                   )}
@@ -167,7 +171,7 @@ export default async function CarDetailPage({
                    <YearSelector currentYear={displayYear || 'Sem ano'} availableYears={availableYears} />
                    
                    <Link href="/comparar"
-                     className="inline-flex items-center justify-between bg-[var(--color-accent)] text-dark rounded-full pl-6 pr-2 py-2 transition-all hover:scale-[1.02] active:scale-[0.98] w-max gap-8 border-2 border-dark shadow-[4px_4px_0_#000]">
+                     className="inline-flex items-center justify-between bg-[var(--color-accent)] text-dark rounded-full pl-6 pr-2 py-2 transition-all hover:scale-[1.02] active:scale-[0.98] w-max gap-8 shadow-[4px_4px_0_#000]">
                      <span className="font-black text-[13px] tracking-widest uppercase">Comparar</span>
                      <div className="w-8 h-8 flex items-center justify-center bg-dark rounded-full text-white">
                        <ArrowLeftRight className="w-4 h-4" />
@@ -176,12 +180,12 @@ export default async function CarDetailPage({
                 </div>
                 
                 {searchYear && (
-                  <div className="mt-4 p-3 bg-surface border border-dashed border-dark/20 rounded-xl text-[10px] font-bold text-text-tertiary">
+                  <div className="mt-4 p-3 bg-white/70 rounded-xl text-[10px] font-bold text-text-tertiary">
                      ⚠️ Exibindo dados de {displayYear}. Alguns campos técnicos podem variar por versão.
                   </div>
                 )}
                 {!searchYear && !displayYear && (
-                  <div className="mt-4 p-3 bg-surface border border-dashed border-dark/20 rounded-xl text-[10px] font-bold text-text-tertiary">
+                  <div className="mt-4 p-3 bg-white/70 rounded-xl text-[10px] font-bold text-text-tertiary">
                      Não há anos válidos disponíveis na referência atual para este modelo.
                   </div>
                 )}
@@ -194,7 +198,7 @@ export default async function CarDetailPage({
             </div>
           </div>
 
-          <section className="rounded-[32px] border-2 border-dark bg-[#dff7e8] p-6 sm:p-8 shadow-[6px_6px_0_#000]">
+          <section className="pastel-card pastel-card-green rounded-[32px] p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <p className="text-[11px] font-black uppercase tracking-widest text-dark/70">Destaque</p>
@@ -203,7 +207,7 @@ export default async function CarDetailPage({
               </div>
               <Link
                 href="/anunciar-carro-bh"
-                className="inline-flex items-center justify-center rounded-full bg-[var(--color-bento-yellow)] px-6 py-3 text-dark font-black uppercase tracking-wider border-2 border-dark shadow-[4px_4px_0_#000] hover:-translate-y-1 transition-all"
+                className="inline-flex items-center justify-center rounded-full bg-[var(--color-bento-yellow)] px-6 py-3 text-dark font-black uppercase tracking-wider shadow-[4px_4px_0_#000] hover:-translate-y-1 transition-all"
               >
                 Anunciar meu carro
               </Link>
@@ -309,8 +313,24 @@ export default async function CarDetailPage({
           {/* Histórico 6 Anos "Bonitinho" */}
           <FipeHistory history={priceHistory} />
 
+          {modelEnrichment && (
+            <section className="pastel-card pastel-card-blue rounded-[40px] p-8 sm:p-12 mt-12">
+              <h2 className="text-2xl font-black text-dark">Dados extras de veículo real anunciado</h2>
+              <p className="mt-1 text-sm text-text-secondary">Complemento com dados persistidos (cache), sem dependência de consulta externa em tempo real.</p>
+
+              <div className="mt-5 grid gap-2 text-sm text-dark sm:grid-cols-2">
+                <p><strong>Motor:</strong> {modelEnrichment.powertrain.engine || 'Não informado'}</p>
+                <p><strong>Potência:</strong> {modelEnrichment.powertrain.horsepower ? `${modelEnrichment.powertrain.horsepower} cv` : 'Não informado'}</p>
+                <p><strong>Torque:</strong> {modelEnrichment.powertrain.torque ? `${modelEnrichment.powertrain.torque} Nm` : 'Não informado'}</p>
+                <p><strong>Câmbio:</strong> {modelEnrichment.powertrain.transmission || 'Não informado'}</p>
+                <p><strong>Tração:</strong> {modelEnrichment.powertrain.drivetrain || 'Não informado'}</p>
+                <p><strong>Combustível:</strong> {modelEnrichment.powertrain.fuelType || 'Não informado'}</p>
+              </div>
+            </section>
+          )}
+
           {/* Seção SEO Programático: Vale a Pena Comprar? */}
-          <section className="bg-white rounded-[40px] p-8 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mt-12 mb-8">
+          <section className="pastel-card rounded-[40px] p-8 sm:p-12 mt-12 mb-8">
             <h2 className="text-2xl sm:text-3xl font-black text-dark tracking-tight mb-6">
               Vale a pena comprar o {car.brand} {car.model} em 2026?
             </h2>
@@ -326,11 +346,11 @@ export default async function CarDetailPage({
               </p>
             </div>
             
-            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 border-t border-border pt-6">
-               <Link href="/carros-usados-bh" className="w-full sm:w-auto bg-[var(--color-bento-yellow)] text-dark font-black px-6 py-3 rounded-full border-2 border-dark flex items-center justify-center gap-2 hover:bg-[var(--color-accent)] hover:-translate-y-1 transition-all">
+            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 pt-6">
+               <Link href="/carros-usados-bh" className="w-full sm:w-auto bg-[var(--color-bento-yellow)] text-dark font-black px-6 py-3 rounded-full flex items-center justify-center gap-2 hover:bg-[var(--color-accent)] hover:-translate-y-1 transition-all">
                   Ver ofertas perto de mim <ArrowRight className="w-4 h-4" />
                </Link>
-               <Link href="/comparar" className="w-full sm:w-auto bg-surface text-dark border-2 border-border font-bold px-6 py-3 rounded-full flex items-center justify-center hover:-translate-y-1 transition-all">
+               <Link href="/comparar" className="w-full sm:w-auto bg-white/80 text-dark font-bold px-6 py-3 rounded-full flex items-center justify-center hover:-translate-y-1 transition-all">
                   Comparar concorrentes
                </Link>
             </div>
@@ -345,7 +365,7 @@ export default async function CarDetailPage({
 
         {/* COLUNA LATERAL (DIREITA) - Stick on Desktop */}
         <aside className="hidden lg:block sticky top-24 space-y-4">
-          <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+          <div className="pastel-card pastel-card-blue rounded-2xl p-6">
             <h3 className="text-sm font-bold text-text-tertiary uppercase tracking-wider mb-4">Estatísticas Principais</h3>
             <div className="space-y-4">
               <StatCard label="Preço" value={displayPriceLabel} isWinner={fipePrice !== null ? fipePrice <= bestPrice : false} />
@@ -407,7 +427,7 @@ function StatCard({ label, value, isWinner }: { label: string; value: string; is
   }
 
   return (
-    <div className={`bg-white border rounded-lg p-4 ${isWinner ? 'border-success/40 bg-success-light' : 'border-border'}`}>
+    <div className={`rounded-lg p-4 ${isWinner ? 'bg-[#dcfce7]' : 'bg-white/80'}`}>
       <div className="flex items-center gap-1.5 mb-1.5">
         {icons[label]}
         <p className="text-xs text-text-tertiary font-medium">{label}</p>

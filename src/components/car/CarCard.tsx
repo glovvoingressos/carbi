@@ -60,9 +60,10 @@ export default function CarCard({ car, index = 0, onCompare, isComparing = false
 
   return (
     <article
-      className={`car-card relative bg-white border border-black/5 rounded-[24px] sm:rounded-[32px] p-0 sm:p-3.5 pb-3.5 sm:pb-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl flex flex-col group scroll-reveal sr-delay-${Math.min(index + 1, 6)}`}
+      className={`car-card pastel-card pastel-card-blue relative rounded-[24px] sm:rounded-[32px] p-0 sm:p-3.5 pb-3.5 sm:pb-5 transition-all hover:-translate-y-1 hover:shadow-xl flex flex-col group scroll-reveal sr-delay-${Math.min(index + 1, 6)}`}
       onClick={() => router.push(detailUrl)}
       style={{ cursor: 'pointer' }}
+      suppressHydrationWarning
     >
       {/* ── Área da imagem ────────────────────────────── */}
       <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] bg-[#f4f6f8] rounded-[24px] sm:rounded-[24px] overflow-hidden">

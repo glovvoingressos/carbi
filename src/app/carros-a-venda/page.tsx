@@ -29,7 +29,7 @@ export default async function CarrosAVendaPage({
           name="q"
           defaultValue={query}
           placeholder="Filtrar por marca ou modelo"
-          className="h-11 flex-1 rounded-2xl border border-border bg-white px-4 text-sm font-medium outline-none focus:ring-2 focus:ring-dark/10"
+          className="h-11 flex-1 rounded-2xl bg-[#f7f9fc] px-4 text-sm font-medium outline-none focus:ring-2 focus:ring-dark/10"
         />
         <button
           type="submit"
@@ -46,7 +46,7 @@ export default async function CarrosAVendaPage({
           ))}
         </div>
       ) : (
-        <div className="mt-8 rounded-2xl border border-border bg-white p-6 text-sm font-semibold text-text-secondary">
+        <div className="mt-8 rounded-2xl bg-[#f7f9fc] p-6 text-sm font-semibold text-text-secondary">
           Nenhum anúncio encontrado no momento.
         </div>
       )}

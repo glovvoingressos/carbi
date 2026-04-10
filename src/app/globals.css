@@ -241,6 +241,50 @@ a[style*="background-color: var(--color-dark)"] {
   color: var(--color-text-3);
 }
 
+/* ━━━━━━━━━━ PASTEL CARDS (sem borda) ━━━━━━━━━━ */
+.pastel-card {
+  border: none !important;
+  background: #f7f9fc;
+  border-radius: 24px;
+  box-shadow: none !important;
+}
+
+.pastel-card-blue { background: #eaf3ff; }
+.pastel-card-green { background: #ecf9ef; }
+.pastel-card-yellow { background: #fff8dc; }
+.pastel-card-lilac { background: #f3efff; }
+
+.pastel-card:hover {
+  box-shadow: none !important;
+}
+
+/* Cards brancos/translúcidos: sombra leve e moderna */
+:is(div, section, article, aside, li)[class*="rounded"][class*="bg-white"]:not([class*="rounded-full"]),
+:is(div, section, article, aside, li)[class*="rounded"][class*="bg-white/"]:not([class*="rounded-full"]),
+:is(div, section, article, aside, li)[class*="rounded"][class*="backdrop-blur"]:not([class*="rounded-full"]) {
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+}
+
+/* Neutralização global do estilo antigo "borda grossa + carimbo preto" */
+[class*="border-2 border-dark"],
+[class*="border border-dark"],
+[class*="border border-dark/"],
+[class*="border-2 border-[#0A0A0A]"] {
+  border-width: 0 !important;
+  border-color: transparent !important;
+}
+
+[class*="shadow-[2px_2px_0_#"],
+[class*="shadow-[3px_3px_0_#"],
+[class*="shadow-[4px_4px_0_#"],
+[class*="shadow-[5px_5px_0_#"],
+[class*="shadow-[6px_6px_0_#"],
+[class*="shadow-[8px_8px_0_#"],
+[class*="shadow-[10px_10px_0_#"],
+[class*="shadow-[12px_12px_0_#"] {
+  box-shadow: 0 10px 30px rgba(10, 10, 10, 0.08) !important;
+}
+
 /* ━━━━━━━━━━ BUTTONS ━━━━━━━━━━ */
 
 .btn {

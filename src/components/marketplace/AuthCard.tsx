@@ -1,14 +1,17 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 interface Props {
   onAuthenticated?: () => void
   compact?: boolean
+  redirectTo?: string
 }
 
-export default function AuthCard({ onAuthenticated, compact = false }: Props) {
+export default function AuthCard({ onAuthenticated, compact = false, redirectTo }: Props) {
+  const router = useRouter()
   const supabaseReady = isSupabaseBrowserConfigured()
   const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [email, setEmail] = useState('')
@@ -43,6 +46,7 @@ export default function AuthCard({ onAuthenticated, compact = false }: Props) {
 
         setMessage('Login efetuado com sucesso.')
         onAuthenticated?.()
+        if (redirectTo) router.push(redirectTo)
       } else {
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
@@ -60,6 +64,7 @@ export default function AuthCard({ onAuthenticated, compact = false }: Props) {
         if (data.session) {
           setMessage('Conta criada e login realizado.')
           onAuthenticated?.()
+          if (redirectTo) router.push(redirectTo)
         } else {
           setMessage('Conta criada. Confirme seu e-mail para continuar.')
         }
@@ -70,7 +75,7 @@ export default function AuthCard({ onAuthenticated, compact = false }: Props) {
   }
 
   return (
-    <div className={`bg-white border-2 border-dark rounded-[28px] shadow-[4px_4px_0_#000] ${compact ? 'p-5' : 'p-7'}`}>
+    <div className={`pastel-card pastel-card-yellow ${compact ? 'p-5' : 'p-7'}`}>
       <h3 className="text-xl font-black text-dark">Entre para anunciar</h3>
       <p className="text-sm text-text-secondary mt-2">Seu contato fica protegido: comprador e vendedor falam só pelo chat interno.</p>
 
@@ -105,7 +110,7 @@ export default function AuthCard({ onAuthenticated, compact = false }: Props) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-2xl bg-dark text-white font-black py-3 disabled:opacity-60"
+          className="w-full rounded-2xl bg-[#dff7e8] text-dark border border-dark font-black py-3 disabled:opacity-60 hover:-translate-y-0.5 transition"
         >
           {loading ? 'Processando...' : mode === 'login' ? 'Entrar' : 'Criar conta'}
         </button>

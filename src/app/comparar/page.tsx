@@ -136,12 +136,12 @@ function ComparePageContent() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
         <select value={filterBrand} onChange={(e) => setFilterBrand(e.target.value)}
-          className="bg-white border border-[#0A0A0A]/5 rounded-[16px] px-5 py-3 text-[14px] font-semibold text-[#0A0A0A] shadow-sm hover:shadow-md focus:outline-none transition-all appearance-none min-w-[220px]">
+          className="bg-[#f7f9fc] rounded-[16px] px-5 py-3 text-[14px] font-semibold text-[#0A0A0A] shadow-sm hover:shadow-md focus:outline-none transition-all appearance-none min-w-[220px]">
           <option value="">Todas as Marcas</option>
           {brands.map((b) => <option key={b} value={b}>{b}</option>)}
         </select>
         <select value={filterSegment} onChange={(e) => setFilterSegment(e.target.value)}
-          className="bg-white border border-[#0A0A0A]/5 rounded-[16px] px-5 py-3 text-[14px] font-semibold text-[#0A0A0A] shadow-sm hover:shadow-md focus:outline-none transition-all appearance-none min-w-[220px]">
+          className="bg-[#f7f9fc] rounded-[16px] px-5 py-3 text-[14px] font-semibold text-[#0A0A0A] shadow-sm hover:shadow-md focus:outline-none transition-all appearance-none min-w-[220px]">
           <option value="">Todos os Segmentos</option>
           {segments.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
@@ -167,7 +167,7 @@ function ComparePageContent() {
 
       {/* Car selector grid */}
       {loadingCatalog && (
-        <div className="mb-8 flex items-center justify-center gap-2 rounded-2xl border border-border bg-white px-4 py-3 text-sm font-semibold text-text-secondary">
+        <div className="mb-8 flex items-center justify-center gap-2 rounded-2xl bg-[#f7f9fc] px-4 py-3 text-sm font-semibold text-text-secondary">
           <Loader2 className="h-4 w-4 animate-spin" /> Carregando catálogo...
         </div>
       )}
@@ -187,10 +187,10 @@ function ComparePageContent() {
               disabled={isDisabled}
               className={`text-left rounded-[24px] overflow-hidden transition-all relative flex flex-col ${
                 isSelected
-                  ? 'bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#00D632]'
+                  ? 'bg-[#f4fff2] shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#00D632]'
                   : isDisabled
                   ? 'opacity-40 cursor-not-allowed bg-[#f4f6f8]'
-                  : 'bg-white border border-[#0A0A0A]/5 shadow-sm hover:-translate-y-1 hover:shadow-lg'
+                  : 'pastel-card shadow-sm hover:-translate-y-1 hover:shadow-lg'
               }`}
             >
               {isSelected && (
@@ -208,7 +208,7 @@ function ComparePageContent() {
                   className="w-full h-full"
                 />
               </div>
-              <div className="p-4 bg-white flex-1">
+              <div className="p-4 bg-[#f7f9fc] flex-1">
                 <p className="text-[10px] font-bold text-[#0A0A0A]/40 uppercase tracking-widest">{car.brand}</p>
                 <p className="text-[14px] font-heading text-[#0A0A0A] leading-tight mt-1 tracking-wide">{car.model}</p>
                 <p className="text-[12px] text-[#0A0A0A]/60 font-semibold mt-2 font-heading">{formatBRL(car.priceBrl)}</p>
@@ -221,14 +221,14 @@ function ComparePageContent() {
       {/* Comparison Table */}
       {comparison && comparison.cars.length >= 2 && (
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-500">
-          <div className="bg-white rounded-[32px] overflow-hidden shadow-[0_8px_40px_rgb(0,0,0,0.06)] border border-[#0A0A0A]/5 mb-10">
+          <div className="pastel-card rounded-[32px] overflow-hidden shadow-[0_8px_40px_rgb(0,0,0,0.06)] mb-10">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[600px] border-collapse">
                 <thead>
                   <tr className="border-b border-[#0A0A0A]/5 bg-[#fcfcfd]">
                     <th className="text-left p-6 text-[12px] font-semibold text-[#0A0A0A]/40 uppercase tracking-widest w-40">Ficha Técnica</th>
                     {comparison.cars.map((car) => (
-                      <th key={car.id} className="p-6 text-center border-l border-[#0A0A0A]/5 bg-white">
+                    <th key={car.id} className="p-6 text-center border-l border-[#0A0A0A]/5 bg-[#f7f9fc]">
                         <Link href={`/${car.brand.toLowerCase().replace(/\s+/g, '-')}/${car.slug}`} className="group block">
                           <div className="w-24 h-16 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                              <CarImage 

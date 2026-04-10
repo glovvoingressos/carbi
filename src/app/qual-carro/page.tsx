@@ -136,7 +136,7 @@ export default function QualCarroPage() {
         <h1 className="text-2xl font-bold text-text mb-6">Sua recomenda&ccedil;&atilde;o</h1>
 
         {/* Top pick */}
-        <div className="bg-white border border-primary/20 rounded-xl p-5 mb-4">
+        <div className="pastel-card rounded-xl p-5 mb-4">
           <p className="text-xs font-medium text-primary uppercase tracking-wider mb-2">Mais recomendado</p>
           <div className="flex items-center gap-4">
             <CarImage
@@ -164,7 +164,7 @@ export default function QualCarroPage() {
         {/* Other picks */}
         <div className="space-y-2 mb-8">
           {results.slice(1).map((result, i) => (
-            <div key={result.car.id} className="bg-white border border-border rounded-xl p-4 flex items-center gap-3 hover:border-primary/30 transition-colors">
+            <div key={result.car.id} className="bg-[#f7f9fc] rounded-xl p-4 flex items-center gap-3 transition-colors">
               <span className="text-xs font-bold text-text-tertiary w-6 text-center">{i + 2}</span>
               <CarImage
                 id={result.car.id}
@@ -193,7 +193,7 @@ export default function QualCarroPage() {
         </div>
 
         {/* Summary */}
-        <div className="bg-surface border border-border rounded-xl p-5 mb-6">
+        <div className="bg-[#f7f9fc] rounded-xl p-5 mb-6">
           <h3 className="text-sm font-semibold text-text mb-2">Seu perfil</h3>
           <ul className="text-xs text-text-secondary space-y-1">
             {answers.orcamento && <li>Orçamento: {answers.orcamento.label}</li>}
@@ -205,7 +205,7 @@ export default function QualCarroPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <button onClick={reset} className="flex items-center justify-center gap-2 text-sm font-medium text-text-secondary hover:text-text px-4 py-2.5 border border-border rounded-lg hover:bg-white transition-colors">
+          <button onClick={reset} className="flex items-center justify-center gap-2 text-sm font-medium text-text-secondary hover:text-text px-4 py-2.5 rounded-lg bg-[#f2f6fb] hover:bg-[#e9f0f7] transition-colors">
             <RotateCcw className="w-4 h-4" /> Refazer teste
           </button>
           <Link href="/comparar" className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-bold px-5 py-2.5 rounded-lg transition-colors">
@@ -220,7 +220,7 @@ export default function QualCarroPage() {
   return (
     <div className="max-w-xl mx-auto px-4 sm:px-6 py-8">
       {catalogLoading && (
-        <div className="mb-4 flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-4 py-3 text-sm font-semibold text-text-secondary">
+        <div className="mb-4 flex items-center justify-center gap-2 rounded-xl bg-[#f7f9fc] px-4 py-3 text-sm font-semibold text-text-secondary">
           <Loader2 className="h-4 w-4 animate-spin" /> Carregando catálogo...
         </div>
       )}
@@ -238,7 +238,7 @@ export default function QualCarroPage() {
         <div className="bg-primary h-1.5 rounded-full transition-all duration-300" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
       </div>
 
-      <div className="bg-white border border-border rounded-xl p-5 sm:p-6">
+      <div className="pastel-card rounded-xl p-5 sm:p-6">
         {/* Step 0: Budget */}
         {step === 0 && (
           <>

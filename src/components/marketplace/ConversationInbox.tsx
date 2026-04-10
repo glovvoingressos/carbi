@@ -251,7 +251,7 @@ export default function ConversationInbox() {
 
   if (!ready) {
     return (
-      <div className="rounded-3xl border border-border bg-white p-8 text-center">
+      <div className="pastel-card pastel-card-green p-8 text-center">
         <Loader2 className="mx-auto h-5 w-5 animate-spin" />
       </div>
     )
@@ -263,7 +263,7 @@ export default function ConversationInbox() {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
-      <aside className="rounded-3xl border border-border bg-white p-3">
+      <aside className="pastel-card pastel-card-blue p-3">
         <h3 className="px-2 py-1 text-sm font-black uppercase tracking-wider text-dark">Conversas</h3>
         {loadingConversations ? <p className="p-2 text-sm text-text-secondary">Carregando...</p> : null}
 
@@ -273,7 +273,7 @@ export default function ConversationInbox() {
               key={conversation.id}
               type="button"
               onClick={() => setSelectedId(conversation.id)}
-              className={`w-full rounded-2xl border px-3 py-2 text-left ${selectedId === conversation.id ? 'border-dark bg-surface' : 'border-border bg-white'}`}
+              className={`w-full rounded-2xl px-3 py-2 text-left ${selectedId === conversation.id ? 'bg-[#fff8dc]' : 'bg-white/85'}`}
             >
               <p className="line-clamp-1 text-sm font-bold text-dark">{conversation.vehicle_listings_public.title}</p>
               <p className="text-xs font-semibold text-text-secondary">{formatBRL(Number(conversation.vehicle_listings_public.price))}</p>
@@ -287,7 +287,7 @@ export default function ConversationInbox() {
         </div>
       </aside>
 
-      <section className="rounded-3xl border border-border bg-white p-4">
+      <section className="pastel-card pastel-card-yellow p-4">
         {!selectedConversation ? (
           <p className="text-sm text-text-secondary">Selecione uma conversa para começar.</p>
         ) : (
@@ -299,7 +299,7 @@ export default function ConversationInbox() {
               </p>
             </div>
 
-            <div className="h-[360px] space-y-2 overflow-y-auto rounded-2xl bg-surface p-3">
+            <div className="h-[360px] space-y-2 overflow-y-auto rounded-2xl bg-white/70 p-3">
               {loadingMessages ? <p className="text-sm text-text-secondary">Carregando mensagens...</p> : null}
               {messages.map((message) => (
                 <div

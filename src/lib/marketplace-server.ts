@@ -76,6 +76,7 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
     .select(`
       id,
       user_id,
+      vehicle_id,
       title,
       description,
       brand,
@@ -83,6 +84,7 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
       version,
       year,
       year_model,
+      vin,
       mileage,
       price,
       transmission,
@@ -169,4 +171,18 @@ export async function searchPublicListings(query: string, limit = 24): Promise<L
   const q = query.trim()
   if (!q) return getLatestPublicListings(limit)
   return queryListings({ q, limit })
+}
+
+export async function getListingVehicleId(listingId: string): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null
+
+  const supabase = getSupabaseServerClient()
+  const { data, error } = await supabase
+    .from('vehicle_listings')
+    .select('vehicle_id')
+    .eq('id', listingId)
+    .maybeSingle()
+
+  if (error || !data) return null
+  return (data as { vehicle_id?: string | null }).vehicle_id || null
 }

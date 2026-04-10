@@ -97,7 +97,7 @@ export default function VideoReviews({ brand, model, year }: VideoReviewsProps) 
     <section className="mt-16 sm:mt-24">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#FF0000] rounded-xl flex items-center justify-center text-white shadow-[2px_2px_0_#000] border border-dark">
+          <div className="w-10 h-10 bg-[#FF0000] rounded-xl flex items-center justify-center text-white shadow-[2px_2px_0_#000]">
             <PlayCircle className="w-6 h-6" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight italic">
@@ -115,7 +115,7 @@ export default function VideoReviews({ brand, model, year }: VideoReviewsProps) 
       </div>
 
       {videos.length === 0 ? (
-        <div className="rounded-[24px] border-2 border-dark bg-white p-6 shadow-[6px_6px_0_#000]">
+        <div className="pastel-card pastel-card-yellow rounded-[24px] p-6">
           <p className="text-sm font-bold text-dark mb-2">Não encontramos vídeos validados para este modelo.</p>
           <a
             href={searchUrl}
@@ -131,7 +131,7 @@ export default function VideoReviews({ brand, model, year }: VideoReviewsProps) 
           {videos.slice(0, 4).map((video) => (
             <div
               key={video.id}
-              className="group relative bg-white border-2 border-dark rounded-[24px] overflow-hidden shadow-[6px_6px_0_#000] transition-transform hover:-translate-y-1"
+              className="group relative pastel-card pastel-card-blue rounded-[24px] overflow-hidden transition-transform hover:-translate-y-1"
             >
               <div className="aspect-video relative bg-dark/5 overflow-hidden">
                 <iframe

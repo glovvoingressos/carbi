@@ -110,7 +110,7 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
               ))}
             </div>
           ) : (
-             <div className="text-center py-20 bg-white rounded-3xl border border-border">
+             <div className="text-center py-20 bg-[#f7f9fc] rounded-3xl">
                 <p className="text-xl font-bold text-dark mb-4">Nenhum carro encontrado para este critério específico no momento.</p>
                 <Link href="/qual-carro" className="text-[var(--color-bento-red)] hover:underline font-black">Refaça o teste de compatibilidade</Link>
              </div>
