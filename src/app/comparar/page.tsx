@@ -5,8 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { formatBRL } from '@/data/cars'
 import type { CarSpec } from '@/data/cars/types'
-import { Check, X, ArrowLeftRight, Loader2 } from 'lucide-react'
-import Badge from '@/components/ui/Badge'
+import { Check, X, ArrowLeftRight, Loader2, Search } from 'lucide-react'
 import CarImage from '@/components/car/CarImage'
 
 function compareCarsLocal(cars: CarSpec[], selectedIds: string[]) {
@@ -45,13 +44,16 @@ function compareCarsLocal(cars: CarSpec[], selectedIds: string[]) {
 function ComparePageContent() {
   const searchParams = useSearchParams()
   const initialIds = searchParams.get('ids')?.split(',').filter(Boolean) || []
-  
+
   const [cars, setCars] = useState<CarSpec[]>([])
   const [loadingCatalog, setLoadingCatalog] = useState(true)
   const [catalogError, setCatalogError] = useState<string | null>(null)
-  const [selected, setSelected] = useState<string[]>(initialIds)
-  const [filterSegment, setFilterSegment] = useState('')
-  const [filterBrand, setFilterBrand] = useState('')
+  const [queries, setQueries] = useState(['', ''])
+  const [selectedIds, setSelectedIds] = useState<(string | null)[]>([
+    initialIds[0] ?? null,
+    initialIds[1] ?? null,
+  ])
+  const [openPicker, setOpenPicker] = useState<number | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -86,30 +88,56 @@ function ComparePageContent() {
     }
   }, [])
 
-  // Sincroniza parâmetros iniciais se mudarem (opcional)
   useEffect(() => {
-    if (initialIds.length > 0 && selected.length === 0) {
-      setSelected(initialIds)
+    if (initialIds.length > 0 && selectedIds.every((id) => !id)) {
+      setSelectedIds([initialIds[0] ?? null, initialIds[1] ?? null])
     }
-  }, [searchParams])
+  }, [initialIds, selectedIds])
 
-  const segments = useMemo(() => [...new Set(cars.map((c) => c.segment))], [cars])
-  const brands = useMemo(() => [...new Set(cars.map((c) => c.brand))], [cars])
+  const selectedCars = useMemo(() => {
+    return selectedIds.map((id) => cars.find((c) => c.id === id) ?? null)
+  }, [cars, selectedIds])
 
-  const filtered = useMemo(() => cars.filter((c) => {
-    if (filterSegment && c.segment !== filterSegment) return false
-    if (filterBrand && c.brand !== filterBrand) return false
-    return true
-  }), [cars, filterSegment, filterBrand])
+  const canCompare = Boolean(selectedIds[0] && selectedIds[1])
+  const comparison = canCompare ? compareCarsLocal(cars, selectedIds.filter(Boolean) as string[]) : null
 
-  const comparison = selected.length >= 2 ? compareCarsLocal(cars, selected) : null
+  function handleSelect(slotIndex: number, carId: string) {
+    setSelectedIds((prev) => {
+      const next = [...prev]
+      next[slotIndex] = carId
+      return next
+    })
+    setQueries((prev) => {
+      const next = [...prev]
+      next[slotIndex] = ''
+      return next
+    })
+    setOpenPicker(null)
+  }
 
-  function toggleCar(id: string) {
-    if (selected.includes(id)) {
-      setSelected((prev) => prev.filter((x) => x !== id))
-    } else if (selected.length < 3) {
-      setSelected((prev) => [...prev, id])
-    }
+  function clearSlot(slotIndex: number) {
+    setSelectedIds((prev) => {
+      const next = [...prev]
+      next[slotIndex] = null
+      return next
+    })
+  }
+
+  function optionsForSlot(slotIndex: number) {
+    const query = queries[slotIndex].trim().toLowerCase()
+    const blockedId = selectedIds[slotIndex === 0 ? 1 : 0]
+
+    const filtered = cars.filter((car) => {
+      if (blockedId && car.id === blockedId) return false
+      if (!query) return false
+      return (
+        car.model.toLowerCase().includes(query) ||
+        car.brand.toLowerCase().includes(query) ||
+        `${car.brand} ${car.model}`.toLowerCase().includes(query)
+      )
+    })
+
+    return filtered.slice(0, 8)
   }
 
   const selectFields = [
@@ -128,44 +156,13 @@ function ComparePageContent() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16">
       <div className="mb-12 text-center flex flex-col items-center">
-        <div className="bg-[#f0f4f8] text-[#0A0A0A] px-5 py-2 rounded-full font-bold text-[12px] tracking-widest uppercase mb-6 shadow-sm">Versus Mode</div>
+        <div className="bg-[#f0f4f8] text-[#0A0A0A] px-5 py-2 rounded-full font-bold text-[12px] tracking-widest uppercase mb-6">Versus Mode</div>
         <h1 className="text-4xl md:text-5xl font-bold text-[#0A0A0A] tracking-[-0.04em] mb-4">Comparador de Carros</h1>
-        <p className="text-[16px] text-[#0A0A0A]/60 max-w-md mx-auto leading-relaxed">Selecione até 3 veículos e descubra rapidamente quem leva a melhor em nosso raio-x técnico.</p>
+        <p className="text-[16px] text-[#0A0A0A]/60 max-w-2xl mx-auto leading-relaxed">
+          Pesquise e selecione os 2 carros para comparar. A análise só é liberada quando ambos estiverem escolhidos corretamente.
+        </p>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
-        <select value={filterBrand} onChange={(e) => setFilterBrand(e.target.value)}
-          className="bg-[#f7f9fc] rounded-[16px] px-5 py-3 text-[14px] font-semibold text-[#0A0A0A] shadow-sm hover:shadow-md focus:outline-none transition-all appearance-none min-w-[220px]">
-          <option value="">Todas as Marcas</option>
-          {brands.map((b) => <option key={b} value={b}>{b}</option>)}
-        </select>
-        <select value={filterSegment} onChange={(e) => setFilterSegment(e.target.value)}
-          className="bg-[#f7f9fc] rounded-[16px] px-5 py-3 text-[14px] font-semibold text-[#0A0A0A] shadow-sm hover:shadow-md focus:outline-none transition-all appearance-none min-w-[220px]">
-          <option value="">Todos os Segmentos</option>
-          {segments.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
-      </div>
-
-      {/* Selected cars chips */}
-      <div className="flex flex-wrap items-center justify-center gap-3 mb-12 min-h-[44px]">
-        {selected.length === 0 && (
-          <span className="text-[13px] font-medium text-[#0A0A0A]/40 bg-[#f4f6f8] rounded-full px-6 py-2">Nenhum veículo selecionado para o combate</span>
-        )}
-        {selected.map((id) => {
-          const car = cars.find((c) => c.id === id)
-          return car ? (
-            <span key={id} className="inline-flex items-center gap-2 bg-[#00D632] text-white text-[13px] font-bold px-4 py-2 rounded-xl shadow-sm tracking-wide">
-              {car.brand} {car.model}
-              <button onClick={() => toggleCar(id)} className="w-6 h-6 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition-colors">
-                <X className="w-4 h-4 text-white" />
-              </button>
-            </span>
-          ) : null
-        })}
-      </div>
-
-      {/* Car selector grid */}
       {loadingCatalog && (
         <div className="mb-8 flex items-center justify-center gap-2 rounded-2xl bg-[#f7f9fc] px-4 py-3 text-sm font-semibold text-text-secondary">
           <Loader2 className="h-4 w-4 animate-spin" /> Carregando catálogo...
@@ -176,46 +173,99 @@ function ComparePageContent() {
           {catalogError}
         </div>
       )}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-16">
-        {filtered.map((car) => {
-          const isSelected = selected.includes(car.id)
-          const isDisabled = !isSelected && selected.length >= 3
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+        {[0, 1].map((slotIndex) => {
+          const selectedCar = selectedCars[slotIndex]
+          const options = optionsForSlot(slotIndex)
+          const isOpen = openPicker === slotIndex
+          const colorClass = slotIndex === 0 ? 'pastel-card-blue' : 'pastel-card-green'
+
           return (
-            <button
-              key={car.id}
-              onClick={() => !isDisabled && toggleCar(car.id)}
-              disabled={isDisabled}
-              className={`text-left rounded-[24px] overflow-hidden transition-all relative flex flex-col ${
-                isSelected
-                  ? 'bg-[#f4fff2] shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#00D632]'
-                  : isDisabled
-                  ? 'opacity-40 cursor-not-allowed bg-[#f4f6f8]'
-                  : 'pastel-card shadow-sm hover:-translate-y-1 hover:shadow-lg'
-              }`}
-            >
-              {isSelected && (
-                <div className="absolute top-3 right-3 w-6 h-6 bg-[#00D632] rounded-full flex items-center justify-center z-10 shadow-sm">
-                  <Check className="w-4 h-4 text-white" strokeWidth={3} />
+            <div key={slotIndex} className={`pastel-card ${colorClass} rounded-[28px] p-5 md:p-6 relative`}>
+              <p className="text-[11px] uppercase tracking-[0.2em] font-bold text-[#0A0A0A]/45 mb-2">
+                Carro {slotIndex + 1}
+              </p>
+
+              {selectedCar ? (
+                <div className="bg-white/60 rounded-2xl p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-20 h-14 rounded-xl overflow-hidden bg-white/80 shrink-0">
+                      <CarImage
+                        id={selectedCar.id}
+                        brand={selectedCar.brand}
+                        model={selectedCar.model}
+                        year={selectedCar.year}
+                        src={selectedCar.image}
+                        className="w-full h-full"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-[#0A0A0A] truncate">{selectedCar.brand} {selectedCar.model}</p>
+                      <p className="text-xs text-[#0A0A0A]/60">{selectedCar.year} • {formatBRL(selectedCar.priceBrl)}</p>
+                    </div>
+                    <button
+                      onClick={() => clearSlot(slotIndex)}
+                      className="ml-auto w-8 h-8 rounded-full bg-white text-[#0A0A0A]/70 hover:text-[#0A0A0A] flex items-center justify-center"
+                      aria-label="Remover carro selecionado"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
+              ) : (
+                <>
+                  <div className="relative">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#0A0A0A]/40" />
+                    <input
+                      value={queries[slotIndex]}
+                      onFocus={() => setOpenPicker(slotIndex)}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        setQueries((prev) => {
+                          const next = [...prev]
+                          next[slotIndex] = value
+                          return next
+                        })
+                        setOpenPicker(slotIndex)
+                      }}
+                      placeholder="Busque por marca ou modelo"
+                      className="w-full bg-white/75 rounded-2xl h-12 pl-10 pr-4 text-sm font-medium text-[#0A0A0A] placeholder:text-[#0A0A0A]/40 outline-none"
+                    />
+                  </div>
+
+                  {isOpen && (
+                    <div className="mt-3 bg-white/85 rounded-2xl max-h-72 overflow-y-auto p-2">
+                      {queries[slotIndex].trim().length < 2 && (
+                        <p className="text-sm text-[#0A0A0A]/60 px-3 py-2">Digite ao menos 2 letras para buscar.</p>
+                      )}
+                      {queries[slotIndex].trim().length >= 2 && options.length === 0 && (
+                        <p className="text-sm text-[#0A0A0A]/60 px-3 py-2">Nenhum modelo encontrado.</p>
+                      )}
+                      {options.map((car) => (
+                        <button
+                          key={car.id}
+                          onClick={() => handleSelect(slotIndex, car.id)}
+                          className="w-full text-left rounded-xl px-3 py-2 hover:bg-[#f4f6f8] transition-colors"
+                        >
+                          <p className="text-sm font-semibold text-[#0A0A0A]">{car.brand} {car.model}</p>
+                          <p className="text-xs text-[#0A0A0A]/60">{car.year} • {formatBRL(car.priceBrl)}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
-              <div className="aspect-[4/3] bg-[#f8fafc] overflow-hidden p-3 relative">
-                <CarImage 
-                  id={car.id} 
-                  brand={car.brand} 
-                  model={car.model} 
-                  year={car.year} 
-                  src={car.image} 
-                  className="w-full h-full"
-                />
-              </div>
-              <div className="p-4 bg-[#f7f9fc] flex-1">
-                <p className="text-[10px] font-bold text-[#0A0A0A]/40 uppercase tracking-widest">{car.brand}</p>
-                <p className="text-[14px] font-heading text-[#0A0A0A] leading-tight mt-1 tracking-wide">{car.model}</p>
-                <p className="text-[12px] text-[#0A0A0A]/60 font-semibold mt-2 font-heading">{formatBRL(car.priceBrl)}</p>
-              </div>
-            </button>
+            </div>
           )
         })}
+      </div>
+
+      <div className="mb-14 text-center">
+        <div className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold ${canCompare ? 'bg-[#dbffd8] text-[#14631f]' : 'bg-[#f1f3f5] text-[#6b7280]'}`}>
+          {canCompare ? <Check className="w-4 h-4" /> : <Loader2 className="w-4 h-4" />}
+          {canCompare ? 'Comparação liberada' : 'Selecione os 2 carros para liberar a comparação'}
+        </div>
       </div>
 
       {/* Comparison Table */}
