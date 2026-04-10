@@ -128,7 +128,7 @@ export default async function CarDetailPage({
           {/* Hero */}
           <div className="w-full">
             <div className="grid md:grid-cols-2 bg-white border-2 border-dark rounded-[40px] overflow-hidden shadow-[6px_6px_0_#000]">
-              <div className="aspect-[16/10] md:aspect-auto bg-[#b4d2ff] flex items-center justify-center p-6 sm:p-8 relative">
+              <div className="aspect-[4/3] md:aspect-auto bg-[#b4d2ff] flex items-center justify-center p-2 sm:p-8 relative">
                  {/* Estrela / Decorativo Cash App style (opcional) */}
                  <div className="absolute top-4 left-4 w-12 h-12 rounded-full border border-dark flex items-center justify-center text-dark font-black bg-[var(--color-bento-yellow)] rotate-[-10deg]">✨</div>
                  
@@ -138,7 +138,9 @@ export default async function CarDetailPage({
                    model={car.model} 
                    year={car.year} 
                    src={car.image} 
-                   className="w-full object-contain filter drop-shadow-2xl transition-transform hover:scale-105 duration-500 rounded-[32px] overflow-hidden shadow-sm"
+                   fit="contain"
+                   aspectRatio="4/3"
+                   className="h-full w-full rounded-[20px] sm:rounded-[32px] overflow-hidden shadow-sm"
                  />
               </div>
               <div className="p-8 sm:p-12 flex flex-col justify-center bg-white">

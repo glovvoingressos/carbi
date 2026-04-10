@@ -60,12 +60,12 @@ export default function CarCard({ car, index = 0, onCompare, isComparing = false
 
   return (
     <article
-      className={`car-card relative bg-white border border-black/5 rounded-[24px] sm:rounded-[32px] p-2.5 sm:p-3.5 pb-3.5 sm:pb-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl flex flex-col group scroll-reveal sr-delay-${Math.min(index + 1, 6)}`}
+      className={`car-card relative bg-white border border-black/5 rounded-[24px] sm:rounded-[32px] p-0 sm:p-3.5 pb-3.5 sm:pb-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl flex flex-col group scroll-reveal sr-delay-${Math.min(index + 1, 6)}`}
       onClick={() => router.push(detailUrl)}
       style={{ cursor: 'pointer' }}
     >
       {/* ── Área da imagem ────────────────────────────── */}
-      <div className="relative w-full aspect-[16/10] bg-[#f4f6f8] rounded-[18px] sm:rounded-[24px] overflow-hidden">
+      <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] bg-[#f4f6f8] rounded-[24px] sm:rounded-[24px] overflow-hidden">
         {badge && (
           <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
             <span className={badge.className} style={{ display: 'inline-block', fontSize: 9, ...badge.style, border: 'none', boxShadow: 'none' }}>{badge.label}</span>
@@ -78,8 +78,8 @@ export default function CarCard({ car, index = 0, onCompare, isComparing = false
           model={car.model} 
           year={car.year} 
           src={car.image} 
-          fit="cover"
-          aspectRatio="16/10"
+          fit="contain"
+          aspectRatio="4/3"
           className="h-full w-full"
         />
 
@@ -100,7 +100,7 @@ export default function CarCard({ car, index = 0, onCompare, isComparing = false
       </div>
 
       {/* ── Conteúdo ──────────────────────────────────── */}
-      <div className="px-1.5 sm:px-3 pt-3.5 sm:pt-5 flex flex-col flex-1">
+      <div className="px-3 sm:px-3 pt-3.5 sm:pt-5 flex flex-col flex-1">
         <div className="flex items-center justify-between mb-2.5 sm:mb-3">
           <div className="flex items-center gap-1.5">
             <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-[#F59E0B] text-[#F59E0B]" />

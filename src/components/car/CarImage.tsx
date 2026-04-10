@@ -183,7 +183,8 @@ export default function CarImage({
           }}
           className={`w-full h-full ${fit === 'cover' ? 'object-cover' : 'object-contain'} transition-all duration-700 ${isLoading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
           style={{
-            transform: isLoading ? 'scale(0.95)' : 'scale(1.05)',
+            transform: isLoading ? 'scale(0.98)' : fit === 'cover' ? 'scale(1.03)' : 'scale(1)',
+            objectPosition: 'center center',
             pointerEvents: 'none'
           }}
           loading={priority || currentIndex === 0 ? 'eager' : 'lazy'}
