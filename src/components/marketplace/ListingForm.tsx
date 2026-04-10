@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2 } from 'lucide-react'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
-import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
+import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
 import {
   LISTING_ALLOWED_TYPES,
@@ -78,6 +78,7 @@ function authHeader(token: string) {
 }
 
 export default function ListingForm() {
+  const supabaseReady = isSupabaseBrowserConfigured()
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [form, setForm] = useState<FormState>(INITIAL_STATE)
@@ -117,6 +118,12 @@ export default function ListingForm() {
   }, [form])
 
   useEffect(() => {
+    if (!supabaseReady) {
+      setSessionReady(true)
+      setIsAuthenticated(false)
+      return
+    }
+
     let unsubscribe: (() => void) | null = null
 
     const boot = async () => {
@@ -136,13 +143,17 @@ export default function ListingForm() {
     return () => {
       unsubscribe?.()
     }
-  }, [])
+  }, [supabaseReady])
 
   useEffect(() => {
     const loadBrands = async () => {
-      const response = await fetch('/api/fipe/brands')
-      const data = (await response.json()) as FipeItem[]
-      setBrands(data || [])
+      try {
+        const response = await fetch('/api/fipe/brands')
+        const data = (await response.json()) as FipeItem[]
+        setBrands(data || [])
+      } catch {
+        setError('Falha ao carregar marcas de referência.')
+      }
     }
 
     void loadBrands()
@@ -156,9 +167,13 @@ export default function ListingForm() {
     }
 
     const loadModels = async () => {
-      const response = await fetch(`/api/fipe/models?brandCode=${selectedBrandCode}`)
-      const data = (await response.json()) as FipeItem[]
-      setModels(data || [])
+      try {
+        const response = await fetch(`/api/fipe/models?brandCode=${selectedBrandCode}`)
+        const data = (await response.json()) as FipeItem[]
+        setModels(data || [])
+      } catch {
+        setError('Falha ao carregar modelos.')
+      }
       setSelectedModelCode('')
       setYears([])
       setSelectedYear(null)
@@ -178,9 +193,13 @@ export default function ListingForm() {
     }
 
     const loadYears = async () => {
-      const response = await fetch(`/api/fipe/years?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}`)
-      const data = (await response.json()) as number[]
-      setYears(data || [])
+      try {
+        const response = await fetch(`/api/fipe/years?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}`)
+        const data = (await response.json()) as number[]
+        setYears(data || [])
+      } catch {
+        setError('Falha ao carregar anos.')
+      }
       setSelectedYear(null)
       setVersions([])
       setSelectedVersionCode('')
@@ -199,11 +218,15 @@ export default function ListingForm() {
     }
 
     const loadVersions = async () => {
-      const response = await fetch(
-        `/api/fipe/versions?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}&year=${selectedYear}`,
-      )
-      const data = (await response.json()) as FipeVersionOption[]
-      setVersions(data || [])
+      try {
+        const response = await fetch(
+          `/api/fipe/versions?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}&year=${selectedYear}`,
+        )
+        const data = (await response.json()) as FipeVersionOption[]
+        setVersions(data || [])
+      } catch {
+        setError('Falha ao carregar versões.')
+      }
       setSelectedVersionCode('')
       setFipeResult(null)
     }
@@ -225,6 +248,9 @@ export default function ListingForm() {
         )
         const data = (await response.json()) as FipeResult | null
         setFipeResult(data)
+        if (!data) {
+          setError('Não foi possível obter o valor atualizado para esta versão.')
+        }
       } finally {
         setFipeLoading(false)
       }
@@ -338,6 +364,11 @@ export default function ListingForm() {
     setSuccess(null)
 
     try {
+      if (!supabaseReady) {
+        setError('Supabase não configurado no ambiente. Não é possível publicar o anúncio.')
+        return
+      }
+
       const supabase = getSupabaseBrowserClient()
       const {
         data: { session },
@@ -486,7 +517,7 @@ export default function ListingForm() {
                 const selected = brands.find((item) => item.code === code)
                 handleInput('brand', selected?.name || '')
               }}>
-                <option value="">Marca (FIPE)</option>
+                <option value="">Marca (referência)</option>
                 {brands.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
               </select>
 
@@ -496,7 +527,7 @@ export default function ListingForm() {
                 const selected = models.find((item) => item.code === code)
                 handleInput('model', selected?.name || '')
               }} disabled={!selectedBrandCode}>
-                <option value="">Modelo (FIPE)</option>
+                <option value="">Modelo (referência)</option>
                 {models.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
               </select>
 
@@ -507,7 +538,7 @@ export default function ListingForm() {
                 handleInput('year', yearText)
                 handleInput('yearModel', yearText)
               }} disabled={!selectedModelCode}>
-                <option value="">Ano (FIPE)</option>
+                <option value="">Ano (referência)</option>
                 {years.map((year) => <option key={year} value={year}>{year}</option>)}
               </select>
 
@@ -516,7 +547,7 @@ export default function ListingForm() {
                 const selected = versions.find((item) => item.code === e.target.value)
                 handleInput('fuel', selected?.fuelType || '')
               }} disabled={!selectedYear}>
-                <option value="">Versão/Combustível (FIPE)</option>
+                <option value="">Versão/Combustível (referência)</option>
                 {versions.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
               </select>
 
@@ -528,25 +559,25 @@ export default function ListingForm() {
 
             <div className="rounded-2xl border border-border bg-surface p-4">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-bold text-dark">Referência FIPE</p>
+                <p className="text-sm font-bold text-dark">Referência de preço</p>
                 <span className={`rounded-full px-3 py-1 text-xs font-bold ${fipeBadgeClass}`}>
-                  {comparison.status === 'below' && 'Abaixo da FIPE'}
-                  {comparison.status === 'near' && 'Próximo da FIPE'}
-                  {comparison.status === 'above' && 'Acima da FIPE'}
+                  {comparison.status === 'below' && 'Abaixo do preço médio'}
+                  {comparison.status === 'near' && 'Próximo do preço médio'}
+                  {comparison.status === 'above' && 'Acima do preço médio'}
                   {comparison.status === 'unknown' && 'Sem referência definida'}
                 </span>
               </div>
               {fipeLoading ? (
-                <p className="mt-2 text-sm text-text-secondary">Consultando FIPE...</p>
+                <p className="mt-2 text-sm text-text-secondary">Consultando valor atualizado...</p>
               ) : fipeResult ? (
                 <div className="mt-3 grid gap-2 text-sm">
-                  <p><strong>FIPE:</strong> {fipeResult.price}</p>
+                  <p><strong>Preço médio:</strong> {fipeResult.price}</p>
                   <p><strong>Seu anúncio:</strong> {priceNumber ? formatBRL(priceNumber) : 'Informe o preço'}</p>
                   <p><strong>Diferença:</strong> {comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</p>
                   <p><strong>Percentual:</strong> {comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</p>
                 </div>
               ) : (
-                <p className="mt-2 text-sm text-text-secondary">Selecione marca, modelo, ano e versão para exibir FIPE em tempo real.</p>
+                <p className="mt-2 text-sm text-text-secondary">Selecione marca, modelo, ano e versão para exibir o valor atualizado em tempo real.</p>
               )}
             </div>
           </div>

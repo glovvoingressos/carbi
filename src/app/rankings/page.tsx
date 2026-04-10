@@ -1,9 +1,11 @@
 import Link from 'next/link'
-import { cars, formatBRL, profiles, priceRanges, matchCarToProfile, getCarScoreByProfile } from '@/data/cars'
+import { formatBRL, profiles, priceRanges, matchCarToProfile, getCarScoreByProfile } from '@/data/cars'
 import CarCard from '@/components/car/CarCard'
 import { Trophy, Filter } from 'lucide-react'
+import { getAllCars } from '@/lib/data-fetcher'
 
 export default async function RankingsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string }> }) {
+  const cars = await getAllCars()
   const sp = await searchParams
   const sortByProfile = sp.profile || null
   const sortByPrice = sp.priceRange || null

@@ -54,6 +54,7 @@ type CacheEntry = {
 
 const responseCache = new Map<string, CacheEntry>()
 let referencesCache: { expiresAt: number; items: FipeReference[] } | null = null
+let warnedMissingToken = false
 
 function normalize(str: string): string {
   if (!str) return ''
@@ -64,6 +65,59 @@ function normalize(str: string): string {
     .replace(/[^a-z0-9\s-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function extractReferenceName(value: Record<string, unknown>): string {
+  const direct = value.name
+  if (typeof direct === 'string' && direct.trim()) return direct
+  const month = value.month
+  if (typeof month === 'string' && month.trim()) return month
+  return ''
+}
+
+function sanitizeFipeItems(raw: unknown): FipeItem[] {
+  if (!Array.isArray(raw)) return []
+  return raw
+    .filter((item) => isObject(item))
+    .map((item) => ({
+      code: String(item.code ?? '').trim(),
+      name: String(item.name ?? '').trim(),
+    }))
+    .filter((item) => item.code.length > 0 && item.name.length > 0)
+}
+
+function sanitizeFipeReferences(raw: unknown): FipeReference[] {
+  if (!Array.isArray(raw)) return []
+  return raw
+    .filter((item) => isObject(item))
+    .map((item) => ({
+      code: String(item.code ?? '').trim(),
+      name: extractReferenceName(item),
+    }))
+    .filter((item) => item.code.length > 0 && item.name.length > 0)
+}
+
+function sanitizeFipeDetail(raw: unknown): FipeResult | null {
+  if (!isObject(raw)) return null
+  const required = ['price', 'brand', 'model', 'fuel', 'codeFipe', 'referenceMonth'] as const
+  for (const key of required) {
+    if (typeof raw[key] !== 'string' || !String(raw[key]).trim()) return null
+  }
+  if (typeof raw.modelYear !== 'number') return null
+  if (typeof raw.vehicleType !== 'number') return null
+  return raw as unknown as FipeResult
+}
+
+function hasErrorPayload(raw: unknown): raw is { error: string } {
+  return isObject(raw) && typeof raw.error === 'string'
+}
+
+function hasToken(tokens: string[], token: string): boolean {
+  return tokens.includes(token)
 }
 
 function parseYearNumber(name: string): number | null {
@@ -144,6 +198,9 @@ async function fetchFipe<T>(
 
     if (TOKEN) {
       headers['X-Subscription-Token'] = TOKEN
+    } else if (!warnedMissingToken) {
+      console.warn('FIPE API token não configurado. Defina FIPE_API_TOKEN para evitar respostas parciais.')
+      warnedMissingToken = true
     }
 
     const response = await fetch(`${BASE_URL}${finalEndpoint}`, {
@@ -156,13 +213,18 @@ async function fetchFipe<T>(
       return null
     }
 
-    const data = (await response.json()) as T
+    const data = (await response.json()) as unknown
+    if (hasErrorPayload(data)) {
+      console.error(`FIPE API payload error at ${finalEndpoint}: ${data.error}`)
+      return null
+    }
+
     responseCache.set(cacheKey, {
       expiresAt: Date.now() + ttlMs,
       value: data,
     })
 
-    return data
+    return data as T
   } catch (err) {
     console.error(`FIPE API fetch failed at ${finalEndpoint}:`, err)
     return null
@@ -175,10 +237,11 @@ export async function getFipeReferences(): Promise<FipeReference[]> {
     return referencesCache.items
   }
 
-  const references = (await fetchFipe<FipeReference[]>('/references', {
+  const rawReferences = await fetchFipe<unknown>('/references', {
     ttlMs: REFERENCE_TTL_MS,
     includeReference: false,
-  })) || []
+  })
+  const references = sanitizeFipeReferences(rawReferences)
 
   referencesCache = {
     expiresAt: now + REFERENCE_TTL_MS,
@@ -194,19 +257,23 @@ async function getLatestReferenceCode(): Promise<string | undefined> {
 }
 
 export async function getFipeBrands(): Promise<FipeItem[]> {
-  return (await fetchFipe<FipeItem[]>('/cars/brands', { ttlMs: META_TTL_MS })) || []
+  const raw = await fetchFipe<unknown>('/cars/brands', { ttlMs: META_TTL_MS })
+  return sanitizeFipeItems(raw)
 }
 
 export async function getFipeModels(brandCode: string): Promise<FipeItem[]> {
-  return (await fetchFipe<FipeItem[]>(`/cars/brands/${brandCode}/models`, { ttlMs: META_TTL_MS })) || []
+  const raw = await fetchFipe<unknown>(`/cars/brands/${brandCode}/models`, { ttlMs: META_TTL_MS })
+  return sanitizeFipeItems(raw)
 }
 
 export async function getFipeYears(brandCode: string, modelCode: string): Promise<FipeItem[]> {
-  return (await fetchFipe<FipeItem[]>(`/cars/brands/${brandCode}/models/${modelCode}/years`, { ttlMs: META_TTL_MS })) || []
+  const raw = await fetchFipe<unknown>(`/cars/brands/${brandCode}/models/${modelCode}/years`, { ttlMs: META_TTL_MS })
+  return sanitizeFipeItems(raw)
 }
 
 export async function getFipeDetailByCode(brandCode: string, modelCode: string, yearCode: string): Promise<FipeResult | null> {
-  return await fetchFipe<FipeResult>(`/cars/brands/${brandCode}/models/${modelCode}/years/${yearCode}`, { ttlMs: DETAIL_TTL_MS })
+  const raw = await fetchFipe<unknown>(`/cars/brands/${brandCode}/models/${modelCode}/years/${yearCode}`, { ttlMs: DETAIL_TTL_MS })
+  return sanitizeFipeDetail(raw)
 }
 
 export async function getFilteredFipeYears(brandCode: string, modelCode: string, limit = 6): Promise<number[]> {
@@ -253,12 +320,16 @@ export async function getFipeYearsByModelName(brandName: string, modelName: stri
 
 async function resolveBrandByName(brandName: string): Promise<FipeItem | null> {
   const brands = await getFipeBrands()
-  const target = normalize(brandName)
+  const target = normalize(brandName).replace(/\bvolkswagen\b/g, 'vw')
+  const targetTokens = target.split(' ').filter((t) => t.length >= 2)
 
   return (
-    brands.find((b) => normalize(b.name) === target) ||
-    brands.find((b) => normalize(b.name).startsWith(target)) ||
-    brands.find((b) => normalize(b.name).includes(target)) ||
+    brands.find((b) => normalize(b.name).replace(/\bvolkswagen\b/g, 'vw') === target) ||
+    brands.find((b) => normalize(b.name).replace(/\bvolkswagen\b/g, 'vw').startsWith(target)) ||
+    brands.find((b) => {
+      const tokens = normalize(b.name).replace(/\bvolkswagen\b/g, 'vw').split(' ').filter((t) => t.length >= 2)
+      return targetTokens.every((token) => hasToken(tokens, token))
+    }) ||
     null
   )
 }
@@ -274,8 +345,9 @@ async function resolveModelByName(brandCode: string, modelName: string, versionN
   const baseCandidates = models
     .filter((m) => {
       const n = normalize(m.name)
-      const hasTarget = n === target || n.startsWith(target + ' ') || n.includes(` ${target}`) || n.includes(target)
-      const hasTokens = targetTokens.every((token) => n.includes(token))
+      const nTokens = n.split(' ').filter((t) => t.length >= 2)
+      const hasTarget = n === target || n.startsWith(target + ' ')
+      const hasTokens = targetTokens.every((token) => hasToken(nTokens, token))
       return hasTarget || hasTokens
     })
     .map((m) => {
@@ -283,14 +355,15 @@ async function resolveModelByName(brandCode: string, modelName: string, versionN
       let score = 0
       if (n === target) score += 100
       if (n.startsWith(target + ' ')) score += 30
+      const nTokens = n.split(' ').filter((t) => t.length >= 2)
       for (const token of targetTokens) {
-        if (n.includes(token)) score += 8
+        if (hasToken(nTokens, token)) score += 8
       }
 
       score -= n.length / 3 // desempate para nome mais objetivo
 
       for (const token of versionTokens) {
-        if (n.includes(token)) score += 5
+        if (hasToken(nTokens, token)) score += 5
       }
 
       return { model: m, score }
@@ -306,7 +379,8 @@ async function resolveModelByName(brandCode: string, modelName: string, versionN
       const latestYear = years[0] || 0
       let recencyScore = 0
 
-      if (latestYear >= nowYear - 1) recencyScore += 80
+      if (latestYear === 0) recencyScore -= 30
+      else if (latestYear >= nowYear - 1) recencyScore += 80
       else if (latestYear >= nowYear - 3) recencyScore += 50
       else if (latestYear >= nowYear - 6) recencyScore += 20
       else recencyScore -= 80

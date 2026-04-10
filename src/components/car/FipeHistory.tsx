@@ -28,7 +28,7 @@ export default function FipeHistory({ history }: FipeHistoryProps) {
             <Calendar className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-2xl font-black uppercase tracking-tight italic text-dark">Histórico FIPE</h3>
+            <h3 className="text-2xl font-black uppercase tracking-tight italic text-dark">Histórico de Valor</h3>
             <p className="text-xs font-bold text-dark/60 uppercase tracking-widest">Trajetória de valor (6 anos)</p>
           </div>
         </div>
@@ -84,7 +84,7 @@ export default function FipeHistory({ history }: FipeHistoryProps) {
 
         <div className="mt-8 p-4 bg-dark/5 rounded-2xl border border-dashed border-dark/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-[11px] font-bold text-text-tertiary">
-            * Valores médios de mercado baseados na tabela FIPE para o modelo e versão selecionados.
+            * Valores médios de mercado para o modelo e versão selecionados (referência mensal oficial).
           </p>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-[var(--color-bento-yellow)] rounded-full border border-dark" />

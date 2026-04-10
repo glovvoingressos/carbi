@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { safeSanitizeMessage } from '@/lib/marketplace'
-import { getSupabaseServerClient } from '@/lib/supabase-server'
+import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ listingId: string }> },
 ) {
   try {
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json({ error: 'Supabase não configurado.' }, { status: 503 })
+    }
+
     const auth = await getAuthContext(req)
     if (!auth) {
       return NextResponse.json({ error: 'Faça login para iniciar conversa.' }, { status: 401 })

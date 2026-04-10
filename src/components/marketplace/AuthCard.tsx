@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
-import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
+import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 interface Props {
   onAuthenticated?: () => void
@@ -9,6 +9,7 @@ interface Props {
 }
 
 export default function AuthCard({ onAuthenticated, compact = false }: Props) {
+  const supabaseReady = isSupabaseBrowserConfigured()
   const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -18,6 +19,10 @@ export default function AuthCard({ onAuthenticated, compact = false }: Props) {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    if (!supabaseReady) {
+      setError('Autenticação indisponível: configure NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY.')
+      return
+    }
     setLoading(true)
     setError(null)
     setMessage(null)
@@ -68,6 +73,12 @@ export default function AuthCard({ onAuthenticated, compact = false }: Props) {
     <div className={`bg-white border-2 border-dark rounded-[28px] shadow-[4px_4px_0_#000] ${compact ? 'p-5' : 'p-7'}`}>
       <h3 className="text-xl font-black text-dark">Entre para anunciar</h3>
       <p className="text-sm text-text-secondary mt-2">Seu contato fica protegido: comprador e vendedor falam só pelo chat interno.</p>
+
+      {!supabaseReady && (
+        <p className="mt-3 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800">
+          Ambiente sem Supabase configurado. O login/cadastro fica indisponível até configurar as variáveis públicas.
+        </p>
+      )}
 
       <form className="mt-5 space-y-3" onSubmit={handleSubmit}>
         <input

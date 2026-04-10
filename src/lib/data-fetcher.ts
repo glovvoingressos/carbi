@@ -1,6 +1,36 @@
 import { supabase } from './supabase'
 import { CarSpec, cars as staticCars } from '@/data/cars'
 
+function normalizeName(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function slugify(value: string): string {
+  return normalizeName(value).replace(/\s+/g, '-')
+}
+
+function getTemplateCar(dbCar: any): CarSpec | null {
+  const brand = normalizeName(dbCar.brand_name || '')
+  const model = normalizeName(dbCar.model_name || '')
+  const year = Number(dbCar.year_model || 0)
+
+  const sameBrandModel = staticCars.filter(
+    (car) => normalizeName(car.brand) === brand && normalizeName(car.model) === model
+  )
+  if (sameBrandModel.length === 0) return null
+
+  const exactYear = sameBrandModel.find((car) => car.year === year)
+  if (exactYear) return exactYear
+
+  return sameBrandModel.sort((a, b) => Math.abs(a.year - year) - Math.abs(b.year - year))[0] || null
+}
+
 export async function getDBCars(): Promise<CarSpec[]> {
   if (!supabase) return []
   
@@ -8,136 +38,44 @@ export async function getDBCars(): Promise<CarSpec[]> {
     .from('external_car_catalog')
     .select('*')
     .order('imported_at', { ascending: false })
-    .limit(50) // Showing latest 50 for now to keep it sane
+    .limit(500)
 
   if (error) {
     console.error('Error fetching cars from DB:', error)
     return []
   }
 
-  return data.map((dbCar: any) => {
-    const brandSlug = dbCar.brand_name.toLowerCase().trim().replace(/\s+/g, '-')
-    let modelSlug = dbCar.model_name.toLowerCase().trim().replace(/\s+/g, '-')
-    
-    // Normalizations for common mismatch
-    if (modelSlug === 'hr-v') modelSlug = 'hrv'
-    if (brandSlug === 'caoa-chery') modelSlug = 'tiggo-5x' // hardcoded example fix from earlier inventory
-    
-    // Check if we have an image in the static mapping first, otherwise build local path
-    const staticImg = staticCars.find(sc => sc.slug === modelSlug)?.image
-    const assetPath = staticImg || `/assets/cars/${brandSlug}-${modelSlug}-2024.png`
+  return data
+    .map((dbCar: any): CarSpec | null => {
+      const template = getTemplateCar(dbCar)
+      if (!template) return null
 
-    return {
-      id: dbCar.id,
-      brand: dbCar.brand_name,
-      model: dbCar.model_name,
-      version: dbCar.version_name,
-      year: dbCar.year_model,
-      slug: modelSlug,
-      segment: dbCar.vehicle_type === 'carros' ? 'hatch' : 'suv', // Basic mapping
-      category: 'compacto',
-      priceBrl: parseFloat(dbCar.price_brl),
-      engineType: dbCar.fuel_type,
-      displacement: '1.0', // Default
-      cylinderCount: 3,
-      turbo: false,
-      horsepower: 0,
-      torque: 0,
-      transmission: 'Manual',
-      drive: 'Dianteira',
-      lengthMm: 0,
-      widthMm: 0,
-      heightMm: 0,
-      wheelbaseMm: 0,
-      weightKg: 0,
-      trunkCapacity: 0,
-      seats: 5,
-      fuelEconomyCityGas: 0,
-      fuelEconomyRoadGas: 0,
-      topSpeed: 0,
-      acceleration0100: 0,
-      airbagsCount: 2,
-      absBrakes: true,
-      esc: true,
-      hasCarplay: false,
-      hasAndroidAuto: false,
-      hasAc: true,
-      hasRearCamera: false,
-      hasMultimedia: false,
-      hasCruiseCtrl: false,
-      latinNcap: 0,
-      isofix: true,
-      tags: [dbCar.brand_name.toLowerCase(), dbCar.fuel_type.toLowerCase()],
-      isPopular: false,
-      pros: ['Preço atualizado', 'Dados em tempo real'],
-      cons: ['Sem ficha técnica completa'],
-      shortDesc: `${dbCar.model_name} em sua versão ${dbCar.version_name}. Dados extraídos da FIPE.`,
-      idealFor: 'Quem busca um carro com preço atualizado pela FIPE',
-      image: assetPath,
-    }
-  })
+      const modelSlug = slugify(dbCar.model_name || template.model)
+      const brandSlug = slugify(dbCar.brand_name || template.brand)
+      const parsedPrice = Number(dbCar.price_brl)
+
+      return {
+        ...template,
+        id: String(dbCar.id || template.id),
+        brand: dbCar.brand_name || template.brand,
+        model: dbCar.model_name || template.model,
+        version: dbCar.version_name || template.version,
+        year: Number(dbCar.year_model || template.year),
+        slug: modelSlug || template.slug,
+        priceBrl: Number.isFinite(parsedPrice) ? parsedPrice : template.priceBrl,
+        engineType: dbCar.fuel_type || template.engineType,
+        shortDesc: `${dbCar.model_name || template.model} em sua versão ${dbCar.version_name || template.version}. Valor atualizado com referência mensal oficial.`,
+        idealFor: 'Quem busca valor atualizado e ficha técnica confiável',
+        image: template.image || `/assets/cars/${brandSlug}-${modelSlug}-${Number(dbCar.year_model || template.year)}.png`,
+      } as CarSpec
+    })
+    .filter((car: CarSpec | null): car is CarSpec => car !== null)
 }
 
 export async function getCarsByBrand(brand: string): Promise<CarSpec[]> {
-  if (!supabase) return []
-
-  const { data, error } = await supabase
-    .from('external_car_catalog')
-    .select('*')
-    .eq('brand_name', brand)
-    .order('year_model', { ascending: false })
-
-  if (error) return []
-  
-  // Reuse mapping logic (to be refactored if needed, but for now simple)
-  return data.map((dbCar: any) => ({
-    id: dbCar.id,
-    brand: dbCar.brand_name,
-    model: dbCar.model_name,
-    version: dbCar.version_name,
-    year: dbCar.year_model,
-    slug: dbCar.model_name.toLowerCase().replace(/\s+/g, '-'),
-    segment: 'suv', // Basic mapping
-    category: dbCar.vehicle_type === 'carros' ? 'compacto' : 'utilitario',
-    priceBrl: parseFloat(dbCar.price_brl),
-    engineType: dbCar.fuel_type,
-    displacement: '1.0',
-    cylinderCount: 3,
-    turbo: false,
-    horsepower: 0,
-    torque: 0,
-    transmission: 'Manual',
-    drive: 'Dianteira',
-    lengthMm: 0,
-    widthMm: 0,
-    heightMm: 0,
-    wheelbaseMm: 0,
-    weightKg: 0,
-    trunkCapacity: 0,
-    seats: 5,
-    fuelEconomyCityGas: 0,
-    fuelEconomyRoadGas: 0,
-    topSpeed: 0,
-    acceleration0100: 0,
-    airbagsCount: 2,
-    absBrakes: true,
-    esc: true,
-    hasCarplay: false,
-    hasAndroidAuto: false,
-    hasAc: true,
-    hasRearCamera: false,
-    hasMultimedia: false,
-    hasCruiseCtrl: false,
-    latinNcap: 0,
-    isofix: true,
-    tags: [dbCar.brand_name.toLowerCase()],
-    isPopular: false,
-    pros: ['Preço atualizado'],
-    cons: ['Sem ficha técnica completa'],
-    shortDesc: dbCar.version_name,
-    idealFor: 'Informação baseada na FIPE',
-    image: 'https://images.unsplash.com/photo-1621007890657-93d3859b6e8c?w=800&auto=format&fit=crop',
-  }))
+  const allCars = await getAllCars()
+  const target = normalizeName(brand)
+  return allCars.filter((car) => normalizeName(car.brand) === target)
 }
 
 export async function getCarDetail(brandSlug: string, modelSlug: string): Promise<CarSpec | null> {
@@ -170,18 +108,23 @@ export async function getAllCars(): Promise<CarSpec[]> {
     }
     
     // Merge static cars with DB cars
-    const dbSlugs = new Set(dbCars.map(c => c.slug))
+    const dbKeys = new Set(
+      dbCars.map((c) => `${normalizeName(c.brand)}|${normalizeName(c.model)}|${c.year}`)
+    )
     const filteredStatic = staticCars.map(car => ({
       ...car,
       // Priority: DB Override > Static Path
       image: assetOverrides[car.id] || car.image
-    })).filter(c => !dbSlugs.has(c.slug))
+    })).filter((c) => {
+      const key = `${normalizeName(c.brand)}|${normalizeName(c.model)}|${c.year}`
+      return !dbKeys.has(key)
+    })
 
     const finalCars = [...dbCars, ...filteredStatic]
     
     return finalCars.sort((a, b) => (b.isPopular ? 1 : 0) - (a.isPopular ? 1 : 0))
   } catch (err) {
     console.error('Failed to merge cars:', err)
-    return staticCars
+    return [...staticCars]
   }
 }

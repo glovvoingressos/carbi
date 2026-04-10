@@ -76,7 +76,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 auto-rows-[minmax(180px,auto)] sm:auto-rows-[minmax(240px,auto)] lg:auto-rows-[minmax(320px,auto)]">
              
 
-             {/* BENTO 2: White Large Card (FIPE) */}
+             {/* BENTO 2: White Large Card (Valor atualizado) */}
              <div className="md:col-span-12 lg:col-span-8 bg-white border border-border rounded-[32px] p-6 sm:p-8 lg:p-12 flex flex-col items-start justify-between shadow-sm relative overflow-hidden">
                 <span className="w-10 h-10 rounded-full border border-border flex items-center justify-center font-bold text-sm bg-surface z-10">2</span>
                 
@@ -86,12 +86,12 @@ export default async function HomePage() {
                         <div className="w-16 h-8 bg-dark rounded-full p-1 relative">
                             <div className="w-6 h-6 bg-[var(--color-bento-yellow)] rounded-full absolute right-1"></div>
                         </div>
-                        <p className="text-xs font-bold font-mono">FIPE Track</p>
+                        <p className="text-xs font-bold font-mono">Price Track</p>
                     </div>
                 </div>
 
                 <div className="mt-16 lg:mt-32 max-w-md z-10">
-                    <h3 className="text-3xl lg:text-4xl font-extrabold text-dark mb-4">Planeje a compra com a Tabela FIPE atualizada</h3>
+                    <h3 className="text-3xl lg:text-4xl font-extrabold text-dark mb-4">Planeje a compra com valor atualizado</h3>
                     <div className="flex flex-col gap-2 items-start">
                         <span className="text-xs font-bold uppercase tracking-widest min-w-[48px] bg-[var(--color-bento-yellow)] px-3 py-1 rounded-[12px] text-dark">Lançamento</span>
                         <p className="text-text-secondary font-medium text-lg leading-relaxed">Avalie o histórico de desvalorização e tome a decisão financeira correta instantaneamente.</p>

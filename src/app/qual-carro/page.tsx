@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { cars, matchCarToProfile, getCarScoreByProfile, formatBRL } from '@/data/cars'
-import { ArrowRight, ArrowLeft, RotateCcw } from 'lucide-react'
+import { getCarScoreByProfile, formatBRL } from '@/data/cars'
+import type { CarSpec } from '@/data/cars/types'
+import { ArrowRight, ArrowLeft, RotateCcw, Loader2 } from 'lucide-react'
 import CarImage from '@/components/car/CarImage'
 
 const steps = ['Orçamento', 'Uso', 'Passageiros', 'Prioridade', 'Tipo']
@@ -32,6 +33,9 @@ const prioridades = [
 const tipos = ['Qualquer', 'Hatch', 'Sedan', 'SUV']
 
 export default function QualCarroPage() {
+  const [cars, setCars] = useState<CarSpec[]>([])
+  const [catalogLoading, setCatalogLoading] = useState(true)
+  const [catalogError, setCatalogError] = useState<string | null>(null)
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({
     orcamento: null as typeof orcamentos[0] | null,
@@ -41,6 +45,34 @@ export default function QualCarroPage() {
     tipo: null as string | null,
   })
   const [results, setResults] = useState<ReturnType<typeof calculateResults> | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    const loadCars = async () => {
+      setCatalogLoading(true)
+      setCatalogError(null)
+      try {
+        const response = await fetch('/api/cars')
+        const data = await response.json()
+        if (!response.ok) {
+          throw new Error(data?.error || 'Falha ao carregar catálogo.')
+        }
+        if (!cancelled) {
+          setCars(Array.isArray(data) ? data : [])
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setCatalogError(error instanceof Error ? error.message : 'Falha ao carregar catálogo.')
+        }
+      } finally {
+        if (!cancelled) setCatalogLoading(false)
+      }
+    }
+    void loadCars()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   function calculateResults() {
     let filtered = [...cars]
@@ -73,6 +105,10 @@ export default function QualCarroPage() {
   }
 
   function handleFinish() {
+    if (cars.length === 0) {
+      setCatalogError('Catálogo indisponível no momento.')
+      return
+    }
     setResults(calculateResults())
   }
 
@@ -183,6 +219,16 @@ export default function QualCarroPage() {
   /* Quiz steps */
   return (
     <div className="max-w-xl mx-auto px-4 sm:px-6 py-8">
+      {catalogLoading && (
+        <div className="mb-4 flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-4 py-3 text-sm font-semibold text-text-secondary">
+          <Loader2 className="h-4 w-4 animate-spin" /> Carregando catálogo...
+        </div>
+      )}
+      {catalogError && (
+        <div className="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          {catalogError}
+        </div>
+      )}
       {/* Progress */}
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm font-medium text-text-tertiary">Passo {step + 1} de {steps.length}</p>

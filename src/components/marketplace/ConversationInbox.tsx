@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Send, Loader2 } from 'lucide-react'
-import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
+import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
 
@@ -31,6 +31,7 @@ interface MessageItem {
 }
 
 export default function ConversationInbox() {
+  const supabaseReady = isSupabaseBrowserConfigured()
   const searchParams = useSearchParams()
   const selectedFromQuery = searchParams.get('conversation')
 
@@ -54,6 +55,13 @@ export default function ConversationInbox() {
   )
 
   useEffect(() => {
+    if (!supabaseReady) {
+      setReady(true)
+      setAuthenticated(false)
+      setError('Chat indisponível: Supabase não configurado no ambiente.')
+      return
+    }
+
     let unsubscribe: (() => void) | null = null
 
     const init = async () => {
@@ -80,7 +88,7 @@ export default function ConversationInbox() {
     return () => {
       unsubscribe?.()
     }
-  }, [])
+  }, [supabaseReady])
 
   const fetchConversations = async (accessToken: string) => {
     setLoadingConversations(true)

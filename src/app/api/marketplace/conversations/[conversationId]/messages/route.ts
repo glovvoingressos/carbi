@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { safeSanitizeMessage } from '@/lib/marketplace'
-import { getSupabaseServerClient } from '@/lib/supabase-server'
+import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 
 async function canAccessConversation(accessToken: string, conversationId: string, userId: string) {
   const supabase = getSupabaseServerClient(accessToken)
@@ -20,6 +20,10 @@ export async function GET(
   { params }: { params: Promise<{ conversationId: string }> },
 ) {
   try {
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json({ error: 'Supabase não configurado.' }, { status: 503 })
+    }
+
     const auth = await getAuthContext(req)
     if (!auth) {
       return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })
@@ -54,6 +58,10 @@ export async function POST(
   { params }: { params: Promise<{ conversationId: string }> },
 ) {
   try {
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json({ error: 'Supabase não configurado.' }, { status: 503 })
+    }
+
     const auth = await getAuthContext(req)
     if (!auth) {
       return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })

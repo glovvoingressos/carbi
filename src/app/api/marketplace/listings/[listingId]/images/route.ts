@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
-import { getSupabaseServerClient } from '@/lib/supabase-server'
+import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { LISTING_MAX_IMAGES, ListingImageInput } from '@/lib/marketplace'
 
 export async function POST(
@@ -8,6 +8,10 @@ export async function POST(
   { params }: { params: Promise<{ listingId: string }> },
 ) {
   try {
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json({ error: 'Supabase não configurado.' }, { status: 503 })
+    }
+
     const auth = await getAuthContext(req)
     if (!auth) {
       return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })

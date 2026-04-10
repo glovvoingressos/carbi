@@ -80,14 +80,14 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             <p className="mt-1 text-4xl font-black text-dark">{formatBRL(Number(listing.price))}</p>
 
             <div className="mt-4 rounded-2xl bg-surface p-4 text-sm">
-              <p><strong>FIPE:</strong> {listing.fipe_price ? formatBRL(Number(listing.fipe_price)) : 'Indisponível'}</p>
+              <p><strong>Preço médio:</strong> {listing.fipe_price ? formatBRL(Number(listing.fipe_price)) : 'Indisponível'}</p>
               <p><strong>Diferença:</strong> {comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</p>
               <p><strong>Percentual:</strong> {comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</p>
               <p className="mt-2 font-bold">
-                {comparison.status === 'below' && 'Anúncio abaixo da FIPE'}
-                {comparison.status === 'near' && 'Anúncio próximo da FIPE'}
-                {comparison.status === 'above' && 'Anúncio acima da FIPE'}
-                {comparison.status === 'unknown' && 'Sem referência FIPE'}
+                {comparison.status === 'below' && 'Anúncio abaixo do preço médio'}
+                {comparison.status === 'near' && 'Anúncio próximo do preço médio'}
+                {comparison.status === 'above' && 'Anúncio acima do preço médio'}
+                {comparison.status === 'unknown' && 'Sem referência de preço'}
               </p>
             </div>
           </div>

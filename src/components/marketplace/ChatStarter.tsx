@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MessageCircle, Loader2 } from 'lucide-react'
-import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
+import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
 
 export default function ChatStarter({ listingId }: { listingId: string }) {
+  const supabaseReady = isSupabaseBrowserConfigured()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -17,6 +18,10 @@ export default function ChatStarter({ listingId }: { listingId: string }) {
     setError(null)
 
     try {
+      if (!supabaseReady) {
+        throw new Error('Chat indisponível: Supabase não configurado no ambiente.')
+      }
+
       const supabase = getSupabaseBrowserClient()
       const {
         data: { session },

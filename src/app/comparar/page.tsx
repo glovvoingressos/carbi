@@ -3,21 +3,88 @@
 import { Suspense, useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { cars, formatBRL, compareCars } from '@/data/cars'
-import { Check, X, ArrowLeftRight } from 'lucide-react'
+import { formatBRL } from '@/data/cars'
+import type { CarSpec } from '@/data/cars/types'
+import { Check, X, ArrowLeftRight, Loader2 } from 'lucide-react'
 import Badge from '@/components/ui/Badge'
 import CarImage from '@/components/car/CarImage'
 
-const segments = [...new Set(cars.map((c) => c.segment))]
-const brands = [...new Set(cars.map((c) => c.brand))]
+function compareCarsLocal(cars: CarSpec[], selectedIds: string[]) {
+  const selectedCars = cars.filter((c) => selectedIds.includes(c.id))
+  const winners: Record<string, string> = {}
+  if (selectedCars.length === 0) {
+    return { cars: [] as CarSpec[], winners }
+  }
+
+  const fields = [
+    { key: 'priceBrl', lower: true },
+    { key: 'horsepower', lower: false },
+    { key: 'torque', lower: false },
+    { key: 'fuelEconomyCityGas', lower: false },
+    { key: 'acceleration0100', lower: true },
+    { key: 'trunkCapacity', lower: false },
+    { key: 'airbagsCount', lower: false },
+    { key: 'latinNcap', lower: false },
+  ] as const
+
+  fields.forEach((field) => {
+    let bestCar = selectedCars[0]
+    for (const car of selectedCars) {
+      const currentVal = Number(car[field.key] || 0)
+      const bestVal = Number(bestCar[field.key] || 0)
+      if (field.lower ? currentVal < bestVal : currentVal > bestVal) {
+        bestCar = car
+      }
+    }
+    winners[field.key] = bestCar.id
+  })
+
+  return { cars: selectedCars, winners }
+}
 
 function ComparePageContent() {
   const searchParams = useSearchParams()
   const initialIds = searchParams.get('ids')?.split(',').filter(Boolean) || []
   
+  const [cars, setCars] = useState<CarSpec[]>([])
+  const [loadingCatalog, setLoadingCatalog] = useState(true)
+  const [catalogError, setCatalogError] = useState<string | null>(null)
   const [selected, setSelected] = useState<string[]>(initialIds)
   const [filterSegment, setFilterSegment] = useState('')
   const [filterBrand, setFilterBrand] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadCars = async () => {
+      setLoadingCatalog(true)
+      setCatalogError(null)
+      try {
+        const response = await fetch('/api/cars')
+        const data = await response.json()
+        if (!response.ok) {
+          throw new Error(data?.error || 'Falha ao carregar catálogo.')
+        }
+        if (!cancelled) {
+          setCars(Array.isArray(data) ? data : [])
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setCatalogError(error instanceof Error ? error.message : 'Falha ao carregar catálogo.')
+          setCars([])
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingCatalog(false)
+        }
+      }
+    }
+
+    void loadCars()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Sincroniza parâmetros iniciais se mudarem (opcional)
   useEffect(() => {
@@ -26,13 +93,16 @@ function ComparePageContent() {
     }
   }, [searchParams])
 
+  const segments = useMemo(() => [...new Set(cars.map((c) => c.segment))], [cars])
+  const brands = useMemo(() => [...new Set(cars.map((c) => c.brand))], [cars])
+
   const filtered = useMemo(() => cars.filter((c) => {
     if (filterSegment && c.segment !== filterSegment) return false
     if (filterBrand && c.brand !== filterBrand) return false
     return true
-  }), [filterSegment, filterBrand])
+  }), [cars, filterSegment, filterBrand])
 
-  const comparison = selected.length >= 2 ? compareCars(selected) : null
+  const comparison = selected.length >= 2 ? compareCarsLocal(cars, selected) : null
 
   function toggleCar(id: string) {
     if (selected.includes(id)) {
@@ -43,16 +113,16 @@ function ComparePageContent() {
   }
 
   const selectFields = [
-    { key: 'priceBrl', label: 'Pre&ccedil;o', format: (c: typeof cars[0]) => formatBRL(c.priceBrl), num: (c: typeof cars[0]) => c.priceBrl, lower: true },
-    { key: 'hp', label: 'Pot&ecirc;ncia', format: (c: typeof cars[0]) => `${c.horsepower} cv`, num: (c: typeof cars[0]) => c.horsepower, lower: false },
-    { key: 'torque', label: 'Torque', format: (c: typeof cars[0]) => `${c.torque} Nm`, num: (c: typeof cars[0]) => c.torque, lower: false },
-    { key: 'motor', label: 'Motor', format: (c: typeof cars[0]) => `${c.engineType} ${c.displacement}L${c.turbo ? ' Turbo' : ''}`, num: undefined, lower: false },
-    { key: 'trans', label: 'C&acirc;mbio', format: (c: typeof cars[0]) => c.transmission, num: undefined, lower: false },
-    { key: 'consumo', label: 'Consumo cidade', format: (c: typeof cars[0]) => `${c.fuelEconomyCityGas} km/l`, num: (c: typeof cars[0]) => c.fuelEconomyCityGas, lower: false },
-    { key: 'acel', label: '0-100 km/h', format: (c: typeof cars[0]) => `${c.acceleration0100}s`, num: (c: typeof cars[0]) => c.acceleration0100, lower: true },
-    { key: 'malas', label: 'Porta-malas', format: (c: typeof cars[0]) => `${c.trunkCapacity} L`, num: (c: typeof cars[0]) => c.trunkCapacity, lower: false },
-    { key: 'airbags', label: 'Airbags', format: (c: typeof cars[0]) => String(c.airbagsCount), num: (c: typeof cars[0]) => c.airbagsCount, lower: false },
-    { key: 'ncap', label: 'Latin NCAP', format: (c: typeof cars[0]) => c.latinNcap > 0 ? `${c.latinNcap}/5` : 'N/A', num: (c: typeof cars[0]) => c.latinNcap * 10, lower: false },
+    { key: 'priceBrl', label: 'Preço', format: (c: CarSpec) => formatBRL(c.priceBrl), num: (c: CarSpec) => c.priceBrl, lower: true },
+    { key: 'hp', label: 'Potência', format: (c: CarSpec) => `${c.horsepower} cv`, num: (c: CarSpec) => c.horsepower, lower: false },
+    { key: 'torque', label: 'Torque', format: (c: CarSpec) => `${c.torque} Nm`, num: (c: CarSpec) => c.torque, lower: false },
+    { key: 'motor', label: 'Motor', format: (c: CarSpec) => `${c.engineType} ${c.displacement}L${c.turbo ? ' Turbo' : ''}`, num: undefined, lower: false },
+    { key: 'trans', label: 'Câmbio', format: (c: CarSpec) => c.transmission, num: undefined, lower: false },
+    { key: 'consumo', label: 'Consumo cidade', format: (c: CarSpec) => `${c.fuelEconomyCityGas} km/l`, num: (c: CarSpec) => c.fuelEconomyCityGas, lower: false },
+    { key: 'acel', label: '0-100 km/h', format: (c: CarSpec) => `${c.acceleration0100}s`, num: (c: CarSpec) => c.acceleration0100, lower: true },
+    { key: 'malas', label: 'Porta-malas', format: (c: CarSpec) => `${c.trunkCapacity} L`, num: (c: CarSpec) => c.trunkCapacity, lower: false },
+    { key: 'airbags', label: 'Airbags', format: (c: CarSpec) => String(c.airbagsCount), num: (c: CarSpec) => c.airbagsCount, lower: false },
+    { key: 'ncap', label: 'Latin NCAP', format: (c: CarSpec) => c.latinNcap > 0 ? `${c.latinNcap}/5` : 'N/A', num: (c: CarSpec) => c.latinNcap * 10, lower: false },
   ]
 
   return (
@@ -96,6 +166,16 @@ function ComparePageContent() {
       </div>
 
       {/* Car selector grid */}
+      {loadingCatalog && (
+        <div className="mb-8 flex items-center justify-center gap-2 rounded-2xl border border-border bg-white px-4 py-3 text-sm font-semibold text-text-secondary">
+          <Loader2 className="h-4 w-4 animate-spin" /> Carregando catálogo...
+        </div>
+      )}
+      {catalogError && (
+        <div className="mb-8 rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          {catalogError}
+        </div>
+      )}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-16">
         {filtered.map((car) => {
           const isSelected = selected.includes(car.id)

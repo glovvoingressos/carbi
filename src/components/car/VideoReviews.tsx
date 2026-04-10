@@ -12,7 +12,6 @@ interface VideoReview {
 interface NormalizedVideoReview extends VideoReview {
   id: string
   watchUrl: string
-  embedUrl: string
 }
 
 interface VideoReviewsProps {
@@ -85,7 +84,6 @@ export default function VideoReviews({ brand, model, year }: VideoReviewsProps) 
               ...video,
               id,
               watchUrl: `https://www.youtube.com/watch?v=${id}`,
-              embedUrl: `https://www.youtube.com/embed/${id}`,
             }
           : null
       })
@@ -138,20 +136,33 @@ export default function VideoReviews({ brand, model, year }: VideoReviewsProps) 
                   href={video.watchUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-dark border border-dark/20"
+                  className="absolute inset-0 z-10"
                   aria-label={`Assistir no YouTube: ${video.title}`}
                 >
-                  YouTube <ExternalLink className="h-3 w-3" />
                 </a>
-                <iframe
-                  src={video.embedUrl}
-                  title={video.title}
+                <img
+                  src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
+                  alt={video.title}
                   loading="lazy"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="h-full w-full"
+                  className="h-full w-full object-cover"
+                  onError={(event) => {
+                    const target = event.currentTarget
+                    if (target.dataset.fallbackTried !== '1') {
+                      target.dataset.fallbackTried = '1'
+                      target.src = `https://img.youtube.com/vi/${video.id}/mqdefault.jpg`
+                      return
+                    }
+                    target.style.display = 'none'
+                    const fallback = target.nextElementSibling as HTMLElement | null
+                    if (fallback) fallback.style.display = 'flex'
+                  }}
                 />
+                <div className="hidden absolute inset-0 items-center justify-center bg-slate-100">
+                  <span className="text-xs font-black uppercase tracking-widest text-dark/60">Vídeo indisponível</span>
+                </div>
+                <div className="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-dark border border-dark/20">
+                  YouTube <ExternalLink className="h-3 w-3" />
+                </div>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="h-12 w-12 rounded-full bg-white/90 border border-dark flex items-center justify-center shadow-md">
                     <Play className="w-5 h-5 text-dark ml-0.5" />

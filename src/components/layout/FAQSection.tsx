@@ -4,10 +4,10 @@ import { useState } from 'react'
 import { ArrowDown } from 'lucide-react'
 
 const faqs = [
-  { q: "O que é o carbi?", a: "O carbi é a plataforma definitiva para quem busca inteligência automotiva. Comparamos preços reais da FIPE, dados técnicos de performance e avaliações de mercado para que você nunca faça um mau negócio." },
+  { q: "O que é o carbi?", a: "O carbi é uma plataforma de inteligência automotiva. Você compara valor de mercado, dados técnicos e avaliações para tomar decisões mais seguras na compra e venda." },
   { q: "Qual o melhor carro para Uber/Aplicativo em 2026?", a: "Para 2026, modelos como o BYD Dolphin Mini e o Renault Kwid E-Tech lideram o ranking de aplicativos pela economia de energia. Se busca combustão, o Fiat Mobi e o Chevrolet Onix continuam sendo os reis do custo-benefício e manutenção barata." },
   { q: "Vale a pena comprar carro elétrico para trabalhar?", a: "Sim, se você roda mais de 100km por dia. Em 2026, o custo por km rodado de um elétrico é cerca de 1/4 do valor de um carro a gasolina, o que gera uma economia de até R$ 2.000 mensais para motoristas de aplicativo." },
-  { q: "A Tabela FIPE é atualizada automaticamente?", a: "Sim! Monitoramos a API oficial da FIPE diariamente. Todos os preços que você vê aqui já refletem os valores atualizados para o ano/modelo 2026." },
+  { q: "Os valores são atualizados automaticamente?", a: "Sim. A plataforma consulta referência mensal oficial por API e atualiza o valor conforme marca, modelo, ano e versão selecionados." },
   { q: "Qual o SUV mais econômico de 2026?", a: "O Toyota Corolla Cross Hybrid e o GWM Haval H6 lideram nossa lista de SUVs com melhor eficiência energética, equilibrando luxo com um consumo urbano impressionante." },
   { q: "Como funciona o 'Ranking carbi'?", a: "Nosso algoritmo pondera 12 critérios: da desvalorização média anual à nota de segurança do Latin NCAP. Só os carros que realmente entregam o que prometem chegam ao topo da lista." }
 ]

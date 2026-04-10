@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { getCarsBySegment, formatBRL } from '@/data/cars'
+import { formatBRL } from '@/data/cars'
 import { getCarDetail } from '@/lib/data-fetcher'
 import { getFipePrice, getFipeHistory, getFipeYearsByModelName } from '@/lib/fipe-api'
 import FipeCalculator from '@/components/car/FipeCalculator'
@@ -19,6 +19,7 @@ import FipeHistory from '@/components/car/FipeHistory'
 import { getEnhancedSpecs } from '@/lib/car-query-service'
 import { getRelatedListings } from '@/lib/marketplace-server'
 import MarketplaceListingCard from '@/components/marketplace/ListingCard'
+import { getAllCars } from '@/lib/data-fetcher'
 
 // Remove generateStaticParams for large database to avoid slow builds
 // export function generateStaticParams() { ... }
@@ -49,15 +50,16 @@ export default async function CarDetailPage({
 
   const requestedYear = searchYear ? parseInt(searchYear, 10) : car.year
 
+  const allCars = await getAllCars()
   const brandSlug = car.brand.toLowerCase().replace(/\s+/g, '-')
-  const similarCars = getCarsBySegment(car.segment).filter((c) => c.id !== car.id).slice(0, 4)
-
-  const segmentCars = getCarsBySegment(car.segment)
-  const bestPrice = Math.min(...segmentCars.map((c) => c.priceBrl))
-  const bestConsumption = Math.max(...segmentCars.map((c) => c.fuelEconomyCityGas))
-  const bestHp = Math.max(...segmentCars.map((c) => c.horsepower))
-  const bestTorque = Math.max(...segmentCars.map((c) => c.torque))
-  const bestTrunk = Math.max(...segmentCars.map((c) => c.trunkCapacity))
+  const segmentCars = allCars.filter((c) => c.segment === car.segment)
+  const similarCars = segmentCars.filter((c) => c.id !== car.id).slice(0, 4)
+  const benchmarkCars = segmentCars.length > 0 ? segmentCars : [car]
+  const bestPrice = Math.min(...benchmarkCars.map((c) => c.priceBrl))
+  const bestConsumption = Math.max(...benchmarkCars.map((c) => c.fuelEconomyCityGas))
+  const bestHp = Math.max(...benchmarkCars.map((c) => c.horsepower))
+  const bestTorque = Math.max(...benchmarkCars.map((c) => c.torque))
+  const bestTrunk = Math.max(...benchmarkCars.map((c) => c.trunkCapacity))
 
   let availableYears: number[] = []
   try {
@@ -76,7 +78,7 @@ export default async function CarDetailPage({
     ? requestedYear
     : (availableYears[0] || car.year)
 
-  // Lógica da Tabela FIPE Real (com versão/combustível)
+  // Consulta de valor atualizado por versão/combustível
   const fipeData = await getFipePrice(car.brand, car.model, displayYear, car.version);
 
   // Busca histórico de preços (6 anos) - Agora com Version Awareness
@@ -288,7 +290,7 @@ export default async function CarDetailPage({
             </div>
           </div>
 
-          {/* Calculadora FIPE Interativa com Seletores de Versão e Ano */}
+          {/* Calculadora de valor atualizado com seletores de versão e ano */}
           <div className="mt-12 mb-8" id="fipe">
             <FipeCalculator 
               initialBrandName={car.brand}

@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
-import { getSupabaseServerClient } from '@/lib/supabase-server'
+import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { ListingFormPayload, validateListingPayload } from '@/lib/marketplace'
 
 export async function GET(req: NextRequest) {
   try {
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json({ error: 'Supabase não configurado.' }, { status: 503 })
+    }
+
     const supabase = getSupabaseServerClient()
     const brand = req.nextUrl.searchParams.get('brand')
     const model = req.nextUrl.searchParams.get('model')
@@ -40,6 +44,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json({ error: 'Supabase não configurado.' }, { status: 503 })
+    }
+
     const auth = await getAuthContext(req)
     if (!auth) {
       return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })

@@ -19,10 +19,10 @@ export default function ListingCard({ listing }: { listing: ListingPublic }) {
           {listing.year}/{listing.year_model} • {listing.mileage.toLocaleString('pt-BR')} km • {listing.city}/{listing.state}
         </p>
         <p className="mt-1 text-xs font-bold text-text-tertiary">
-          {fipe.status === 'below' && 'Abaixo da FIPE'}
-          {fipe.status === 'near' && 'Próximo da FIPE'}
-          {fipe.status === 'above' && 'Acima da FIPE'}
-          {fipe.status === 'unknown' && 'FIPE indisponível'}
+          {fipe.status === 'below' && 'Abaixo do preço médio'}
+          {fipe.status === 'near' && 'Próximo do preço médio'}
+          {fipe.status === 'above' && 'Acima do preço médio'}
+          {fipe.status === 'unknown' && 'Referência indisponível'}
         </p>
       </div>
     </Link>

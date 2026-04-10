@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseServerClient } from '@/lib/supabase-server'
+import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ identifier: string }> },
 ) {
   try {
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json({ error: 'Supabase não configurado.' }, { status: 503 })
+    }
+
     const { identifier } = await params
     const supabase = getSupabaseServerClient()
 

@@ -2,13 +2,13 @@ import React from 'react'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, MapPin, CheckCircle2 } from 'lucide-react'
-import { getDBCars } from '@/lib/data-fetcher'
+import { getAllCars } from '@/lib/data-fetcher'
 import CarCard from '@/components/car/CarCard'
 import { LocalBusinessBHTicketsSchema } from '@/components/seo/JsonLd'
 
 export const metadata: Metadata = {
   title: 'Carros Usados em BH (Belo Horizonte) | Compra e Venda | Carbi',
-  description: 'Procurando carros usados e seminovos em Belo Horizonte (BH)? Encontre as melhores ofertas verificadas, compare preços da Tabela FIPE e faça um negócio seguro.',
+  description: 'Procurando carros usados e seminovos em Belo Horizonte (BH)? Encontre ofertas verificadas, compare valores atualizados e faça um negócio seguro.',
   keywords: ['carros usados bh', 'comprar carro belo horizonte', 'seminovos bh', 'loja de carros bh', 'veículos usados'],
   openGraph: {
     title: 'Carros Usados e Seminovos em BH - As Melhores Ofertas',
@@ -19,9 +19,9 @@ export const metadata: Metadata = {
 }
 
 export default async function CarrosUsadosBHPage() {
-  // Fetch some popular cars from the general database to simulate local inventory
-  const cars = await getDBCars();
-  const displayCars = cars.slice(0, 12); // display a nice grid
+  // Carrega ofertas reais do catálogo integrado
+  const cars = await getAllCars();
+  const displayCars = cars.slice(0, 12);
 
   return (
     <div className="bg-surface min-h-screen">
@@ -37,7 +37,7 @@ export default async function CarrosUsadosBHPage() {
             O carro perfeito para você,<br className="hidden md:block" /> com a confiança que <span className="text-[var(--color-bento-red)]">BH merece.</span>
           </h1>
           <p className="text-lg md:text-xl font-medium text-text-secondary max-w-2xl mx-auto leading-relaxed mb-8">
-            Compare centenas de opções reais, verifique o preço pela Tabela FIPE oficial na hora e não caia em furadas.
+            Compare centenas de opções reais, confira valor atualizado na hora e não caia em furadas.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
              <Link href="/anunciar-carro-bh" className="bg-dark text-white font-black px-8 py-4 rounded-xl flex items-center gap-2 hover:bg-opacity-90 hover:-translate-y-1 transition-all">
@@ -54,7 +54,7 @@ export default async function CarrosUsadosBHPage() {
                <div className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-border">
                   <CheckCircle2 className="text-[#00D632] w-8 h-8 flex-shrink-0" />
                   <div>
-                    <h4 className="font-black text-dark">Preço FIPE Ao Vivo</h4>
+                    <h4 className="font-black text-dark">Valor Atualizado Ao Vivo</h4>
                     <p className="text-xs text-text-secondary font-medium mt-1">Garantia de negócio justo.</p>
                   </div>
                </div>
@@ -101,8 +101,8 @@ export default async function CarrosUsadosBHPage() {
             <div className="space-y-4">
               <p>O mercado de <strong>carros usados em BH</strong> é um dos mais aquecidos do Brasil. Com o relevo acidentado (famosos morros), mineiros costumam procurar veículos com bom torque, suspensão reforçada e, preferencialmente, motorização 1.6 ou superior.</p>
               
-              <h3 className="text-lg font-bold text-dark mt-6 mb-2">Por que pesquisar a Tabela Fipe antes de comprar em BH?</h3>
-              <p>Antes de visitar uma concessionária ou fechar negócio com pessoa física, consulte sempre a nossa ferramenta de Tabela FIPE. Ela garante que você não pagará ágio excessivo. Muitos lojistas na região da Avenida Antônio Carlos e Via Expressa já utilizam nossa referência de mercado.</p>
+              <h3 className="text-lg font-bold text-dark mt-6 mb-2">Por que pesquisar o valor de referência antes de comprar em BH?</h3>
+              <p>Antes de visitar uma concessionária ou fechar negócio com pessoa física, consulte sempre a nossa ferramenta de valor atualizado. Ela ajuda a evitar ágio excessivo e melhora sua margem de negociação.</p>
               
               <h3 className="text-lg font-bold text-dark mt-6 mb-2">Como anunciar meu carro para venda rápida em Belo Horizonte?</h3>
               <p>Se você pesquisa "como vender meu carro rápido em BH", a resposta está na visibilidade estruturada. Na Carbi, separamos o ruído e deixamos sua ficha técnica brilhando. <Link href="/anunciar-carro-bh" className="text-blue-600 underline">Clique aqui para criar seu anúncio local</Link> e ser visto por milhares de compradores diários na região metropolitana.</p>

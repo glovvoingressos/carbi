@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { cars, formatBRL } from '@/data/cars'
 import { CheckCircle2, DollarSign, Zap, Plus, ArrowRight, ShieldCheck } from 'lucide-react'
 import Badge from '@/components/ui/Badge'
 

@@ -39,6 +39,10 @@ function normalize(value: string): string {
     .trim()
 }
 
+function tokenize(value: string): string[] {
+  return normalize(value).split(' ').filter((token) => token.length >= 2)
+}
+
 async function getJson<T>(url: string): Promise<T> {
   const response = await fetch(url)
   if (!response.ok) {
@@ -99,7 +103,7 @@ export default function FipeCalculator({
           setSelectedBrand(brandMatch.code)
         }
       } catch {
-        if (!cancelled) setError('Não foi possível carregar as marcas FIPE.')
+        if (!cancelled) setError('Não foi possível carregar as marcas de referência.')
       } finally {
         if (!cancelled) setLoading((prev) => ({ ...prev, brands: false }))
       }
@@ -139,10 +143,12 @@ export default function FipeCalculator({
         const modelMatch = modelSource.find((m) => {
           const modelNormalized = normalize(m.name)
           const initialNormalized = normalize(initialModelName)
+          const modelTokens = tokenize(m.name)
+          const initialTokens = tokenize(initialModelName)
           return (
             modelNormalized === initialNormalized ||
             modelNormalized.startsWith(initialNormalized + ' ') ||
-            modelNormalized.includes(initialNormalized)
+            initialTokens.every((token) => modelTokens.includes(token))
           )
         })
 
@@ -313,7 +319,7 @@ export default function FipeCalculator({
         detailCache.current.set(cacheKey, data)
         setResult(data)
       } catch {
-        if (!cancelled) setError('Não foi possível carregar o valor FIPE.')
+        if (!cancelled) setError('Não foi possível carregar o valor atualizado.')
       } finally {
         if (!cancelled) setLoading((prev) => ({ ...prev, detail: false }))
       }
@@ -333,7 +339,7 @@ export default function FipeCalculator({
         <div className="w-10 h-10 bg-[var(--color-bento-red)] rounded-xl flex items-center justify-center text-white shadow-[2px_2px_0_#000] border border-dark">
           <TrendingDown className="w-6 h-6" />
         </div>
-        <h3 className="text-xl font-black uppercase tracking-tight italic">Consulta FIPE Oficial</h3>
+        <h3 className="text-xl font-black uppercase tracking-tight italic">Consulta de Valor Atualizado</h3>
       </div>
 
       <div className="grid gap-4 mb-8">
@@ -433,7 +439,7 @@ export default function FipeCalculator({
       {!loading.detail && result && hasAllFilters ? (
         <div className="space-y-4 pt-6 border-t-2 border-dark border-dashed">
           <div>
-            <p className="text-[11px] text-text-tertiary uppercase font-black tracking-widest mb-1.5">Valor FIPE Atual</p>
+            <p className="text-[11px] text-text-tertiary uppercase font-black tracking-widest mb-1.5">Valor Atual</p>
             <p className="text-4xl font-black text-dark tracking-[-0.05em]">{result.price}</p>
           </div>
 
@@ -450,14 +456,14 @@ export default function FipeCalculator({
 
           <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary bg-surface/50 p-3 rounded-xl border border-dashed border-dark/20">
             <Loader2 className="w-3 h-3 text-[var(--color-bento-yellow)]" />
-            Referência FIPE: {result.referenceMonth} • Código FIPE: {result.codeFipe}
+            Referência mensal: {result.referenceMonth} • Código oficial: {result.codeFipe}
           </div>
         </div>
       ) : null}
 
       {!loading.detail && !result && (
         <div className="pt-6 text-center text-text-tertiary font-bold italic border-t-2 border-dark border-dashed">
-          Selecione marca, modelo, ano e versão para consultar o valor FIPE.
+          Selecione marca, modelo, ano e versão para consultar o valor atualizado.
         </div>
       )}
     </div>

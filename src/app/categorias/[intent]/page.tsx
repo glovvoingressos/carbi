@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Sparkles, ArrowRight } from 'lucide-react'
-import { getDBCars } from '@/lib/data-fetcher'
+import { getAllCars } from '@/lib/data-fetcher'
 import CarCard from '@/components/car/CarCard'
 
 // SEO Definitions mapped to intents
@@ -16,7 +16,7 @@ const INTENTS: Record<string, { title: string, desc: string, h1: string, filter:
   },
   'ate-100-mil': {
     title: 'Melhores Carros até 100 mil | Custo Benefício',
-    desc: 'Encontre o melhor carro até 100 mil reais na Carbi. Compare SUVs, Sedans e Hatches com preços atualizados pela Tabela FIPE.',
+    desc: 'Encontre o melhor carro até 100 mil reais na Carbi. Compare SUVs, sedans e hatches com valor atualizado de mercado.',
     h1: 'Melhores Carros até 100 mil reais',
     filter: (c) => c.priceBrl <= 100000 && c.priceBrl > 50000
   },
@@ -82,8 +82,8 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
   }
 
   // Fetch cars and apply intent filter
-  const allCars = await getDBCars(); // Ideally a more robust fetching strat here, but for demo:
-  const filteredCars = allCars.filter(data.filter).slice(0, 16); // limit results
+  const allCars = await getAllCars();
+  const filteredCars = allCars.filter(data.filter).slice(0, 16)
 
   return (
     <div className="bg-surface min-h-screen">
