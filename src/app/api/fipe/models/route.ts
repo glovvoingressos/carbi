@@ -3,7 +3,10 @@ import { getFipeModels } from '@/lib/fipe-api'
 
 export async function GET(req: NextRequest) {
   const brandCode = req.nextUrl.searchParams.get('brandCode')
-  if (!brandCode) return NextResponse.json([], { status: 400 })
+  if (!brandCode) return NextResponse.json({ error: 'brandCode é obrigatório.' }, { status: 400 })
   const models = await getFipeModels(brandCode)
+  if (!Array.isArray(models)) {
+    return NextResponse.json({ error: 'Resposta inválida de modelos.' }, { status: 502 })
+  }
   return NextResponse.json(models)
 }

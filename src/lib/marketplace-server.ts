@@ -47,3 +47,38 @@ export async function getRelatedListings(params: {
   if (error || !data) return []
   return data as ListingPublic[]
 }
+
+export async function getLatestPublicListings(limit = 8): Promise<ListingPublic[]> {
+  if (!isSupabaseConfigured()) return []
+
+  const supabase = getSupabaseServerClient()
+  const safeLimit = Math.min(Math.max(limit, 1), 30)
+
+  const { data, error } = await supabase
+    .from('vehicle_listings_public')
+    .select('*')
+    .order('published_at', { ascending: false })
+    .limit(safeLimit)
+
+  if (error || !data) return []
+  return data as ListingPublic[]
+}
+
+export async function searchPublicListings(query: string, limit = 24): Promise<ListingPublic[]> {
+  if (!isSupabaseConfigured()) return []
+  const q = query.trim()
+  if (!q) return getLatestPublicListings(limit)
+
+  const supabase = getSupabaseServerClient()
+  const safeLimit = Math.min(Math.max(limit, 1), 60)
+
+  const { data, error } = await supabase
+    .from('vehicle_listings_public')
+    .select('*')
+    .or(`brand.ilike.%${q}%,model.ilike.%${q}%`)
+    .order('published_at', { ascending: false })
+    .limit(safeLimit)
+
+  if (error || !data) return []
+  return data as ListingPublic[]
+}

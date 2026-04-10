@@ -68,44 +68,42 @@ export default async function CarDetailPage({
     console.error('Failed to fetch years for selector')
   }
 
-  if (availableYears.length === 0) {
-    const baseYear = car.year || new Date().getFullYear()
-    availableYears = Array.from({ length: 6 }, (_, idx) => baseYear - idx)
-  }
-
   // Ano efetivo sempre limitado aos últimos anos válidos retornados pela API
   const displayYear = Number.isFinite(requestedYear) && availableYears.includes(requestedYear)
     ? requestedYear
-    : (availableYears[0] || car.year)
+    : (availableYears[0] || null)
 
   // Consulta de valor atualizado por versão/combustível
-  const fipeData = await getFipePrice(car.brand, car.model, displayYear, car.version);
+  const fipeData = displayYear ? await getFipePrice(car.brand, car.model, displayYear, car.version) : null
 
   // Busca histórico de preços (6 anos) - Agora com Version Awareness
   const priceHistory = await getFipeHistory(car.brand, car.model, 6, car.version)
 
   // Busca especificações aprimoradas para o ano selecionado via CarQuery
-  const enhancedSpecs = await getEnhancedSpecs(car.brand, car.model, displayYear)
+  const enhancedSpecs = displayYear ? await getEnhancedSpecs(car.brand, car.model, displayYear) : null
   const relatedListings = await getRelatedListings({
     brand: car.brand,
     model: car.model,
-    yearModel: displayYear,
+    yearModel: displayYear || undefined,
     limit: 4,
   })
   
   // Converte a string "R$ 150.000" em número para cálculos
   const parseFipeValue = (val: string) => parseFloat(val.replace(/[^\d,]/g, '').replace(',', '.'));
   
-  const fipePrice = fipeData 
-    ? parseFipeValue(fipeData.price) 
-    : car.priceBrl;
-
-  // Projeção VIP de Desvalorização (Agora baseada em dados reais abaixo)
-  const yr0 = fipePrice;
+  const fipePrice = fipeData ? parseFipeValue(fipeData.price) : null
+  const displayPriceLabel = fipePrice ? formatBRL(fipePrice) : 'Não disponível'
 
   const displayHp = enhancedSpecs?.horsepower || car.horsepower
   const displayTorque = enhancedSpecs?.torque || car.torque
   const displayWeight = enhancedSpecs?.weight || car.weightKg
+  const displayEngine = car.displacement && car.displacement !== 'Não informado'
+    ? `${car.engineType} ${car.displacement}L${car.turbo ? ' Turbo' : ''}`
+    : 'Não informado'
+  const displayTransmission = car.transmission && car.transmission !== 'Não informado' ? car.transmission : 'Não informado'
+  const displayFuel = car.engineType && car.engineType !== 'Não informado' ? car.engineType : 'Não informado'
+  const displayConsumption = car.fuelEconomyCityGas > 0 ? `${car.fuelEconomyCityGas} km/l` : 'Não informado'
+  const displayTrunk = car.trunkCapacity > 0 ? `${car.trunkCapacity} L` : 'Não informado'
 
   return (
     <div className="container mx-auto px-4 pt-24 pb-8">
@@ -162,9 +160,9 @@ export default async function CarDetailPage({
                 <h1 className="text-3xl sm:text-5xl font-heading text-text tracking-[-0.01em] leading-none mb-1">{car.brand} {car.model}</h1>
                 <p className="text-sm text-text-secondary mt-1">{car.version}</p>
                 <p className="text-sm text-text-tertiary mt-1 mb-3">Preço médio</p>
-                <p className="text-4xl sm:text-5xl font-normal font-sans text-primary tracking-[-0.02em]">{formatBRL(fipePrice)}</p>
+                <p className="text-4xl sm:text-5xl font-normal font-sans text-primary tracking-[-0.02em]">{displayPriceLabel}</p>
                 <div className="flex flex-col sm:flex-row gap-4 mt-6 items-start sm:items-center">
-                   <YearSelector currentYear={displayYear} availableYears={availableYears} />
+                   <YearSelector currentYear={displayYear || 'Sem ano'} availableYears={availableYears} />
                    
                    <Link href="/comparar"
                      className="inline-flex items-center justify-between bg-[var(--color-accent)] text-dark rounded-full pl-6 pr-2 py-2 transition-all hover:scale-[1.02] active:scale-[0.98] w-max gap-8 border-2 border-dark shadow-[4px_4px_0_#000]">
@@ -177,7 +175,12 @@ export default async function CarDetailPage({
                 
                 {searchYear && (
                   <div className="mt-4 p-3 bg-surface border border-dashed border-dark/20 rounded-xl text-[10px] font-bold text-text-tertiary">
-                     ⚠️ Exibindo dados de {displayYear}. Alguns campos técnicos podem refletir o modelo de referência 2024/2026.
+                     ⚠️ Exibindo dados de {displayYear}. Alguns campos técnicos podem variar por versão.
+                  </div>
+                )}
+                {!searchYear && !displayYear && (
+                  <div className="mt-4 p-3 bg-surface border border-dashed border-dark/20 rounded-xl text-[10px] font-bold text-text-tertiary">
+                     Não há anos válidos disponíveis na referência atual para este modelo.
                   </div>
                 )}
                 
@@ -207,8 +210,8 @@ export default async function CarDetailPage({
 
           {/* Key Stats Mobile (Hidden on Desktop) */}
           <div className="grid grid-cols-2 gap-3 lg:hidden">
-            <StatCard label="Preço" value={formatBRL(fipePrice)} isWinner={fipePrice <= bestPrice} />
-            <StatCard label="Consumo" value={`${car.fuelEconomyCityGas} km/l`} isWinner={car.fuelEconomyCityGas === bestConsumption} />
+            <StatCard label="Preço" value={displayPriceLabel} isWinner={fipePrice !== null ? fipePrice <= bestPrice : false} />
+            <StatCard label="Consumo" value={displayConsumption} isWinner={car.fuelEconomyCityGas > 0 ? car.fuelEconomyCityGas === bestConsumption : false} />
             <StatCard label="Potência" value={`${displayHp} cv`} isWinner={displayHp >= bestHp} />
             <StatCard label="Torque" value={`${displayTorque} Nm`} isWinner={displayTorque >= bestTorque} />
           </div>
@@ -220,13 +223,14 @@ export default async function CarDetailPage({
                  1. Especificações
               </div>
               <div className="space-y-4 text-sm mt-4 font-medium">
-                <SpecRow label="Motor" value={`${car.engineType} ${car.displacement}L${car.turbo ? ' Turbo' : ''}`} />
-                <SpecRow label="Câmbio" value={car.transmission} />
+                <SpecRow label="Motor" value={displayEngine} />
+                <SpecRow label="Câmbio" value={displayTransmission} />
+                <SpecRow label="Combustível" value={displayFuel} />
                 <SpecRow label="Tração" value={car.drive} />
                 <SpecRow label="Peso" value={`${displayWeight} kg`} />
                 <SpecRow label="Comprimento" value={`${car.lengthMm} mm`} />
                 <SpecRow label="Entre-eixos" value={`${car.wheelbaseMm} mm`} />
-                <SpecRow label="Porta-malas" value={`${car.trunkCapacity} L`} isWinner={car.trunkCapacity === bestTrunk} />
+                <SpecRow label="Porta-malas" value={displayTrunk} isWinner={car.trunkCapacity > 0 ? car.trunkCapacity === bestTrunk : false} />
                 <SpecRow label="Vel. máxima" value={`${car.topSpeed} km/h`} />
                 <SpecRow label="0-100 km/h" value={`${car.acceleration0100}s`} />
               </div>
@@ -238,9 +242,9 @@ export default async function CarDetailPage({
                    2. Especificações do Motor ({displayYear})
                 </div>
                 <div className="space-y-4 text-sm font-semibold mt-4">
-                  <SpecRow label="Potência" value={`${displayHp} cv`} isWinner={displayHp >= bestHp} />
-                  <SpecRow label="Torque" value={`${displayTorque} Nm`} isWinner={displayTorque >= bestTorque} />
-                  <SpecRow label="Tipo Motor" value={`${car.engineType} ${car.displacement}L`} />
+                  <SpecRow label="Potência" value={displayHp > 0 ? `${displayHp} cv` : 'Não informado'} isWinner={displayHp > 0 ? displayHp >= bestHp : false} />
+                  <SpecRow label="Torque" value={displayTorque > 0 ? `${displayTorque} Nm` : 'Não informado'} isWinner={displayTorque > 0 ? displayTorque >= bestTorque : false} />
+                  <SpecRow label="Tipo Motor" value={displayEngine} />
                   <SpecRow label="Aspiração" value={car.turbo ? 'Turbo' : 'Natural'} />
                 </div>
               </div>
@@ -250,7 +254,7 @@ export default async function CarDetailPage({
                    3. Segurança e Tech
                 </div>
                 <div className="space-y-4 text-sm font-semibold mt-4">
-                  <SpecRow label="Airbags" value={`${car.airbagsCount}`} />
+                  <SpecRow label="Airbags" value={car.airbagsCount > 0 ? `${car.airbagsCount}` : 'Não informado'} />
                   <SpecRow label="Latin NCAP" value={car.latinNcap > 0 ? `${car.latinNcap}/5` : 'N/A'} />
                   <SpecRow label="Multimídia" value={car.hasMultimedia ? 'Sim' : 'Não'} />
                   <SpecRow label="Smartphone" value={car.hasCarplay ? 'Apple/Android' : 'Não'} />
@@ -334,7 +338,7 @@ export default async function CarDetailPage({
           <ReviewSection carId={car.id} />
 
           {/* Vídeos do YouTube */}
-          <VideoReviews brand={car.brand} model={car.model} year={displayYear} />
+          <VideoReviews brand={car.brand} model={car.model} year={displayYear || car.year} />
         </div>
 
         {/* COLUNA LATERAL (DIREITA) - Stick on Desktop */}
@@ -342,11 +346,11 @@ export default async function CarDetailPage({
           <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
             <h3 className="text-sm font-bold text-text-tertiary uppercase tracking-wider mb-4">Estatísticas Principais</h3>
             <div className="space-y-4">
-              <StatCard label="Preço" value={formatBRL(car.priceBrl)} isWinner={car.priceBrl === bestPrice} />
-              <StatCard label="Consumo" value={`${car.fuelEconomyCityGas} km/l`} isWinner={car.fuelEconomyCityGas === bestConsumption} />
+              <StatCard label="Preço" value={displayPriceLabel} isWinner={fipePrice !== null ? fipePrice <= bestPrice : false} />
+              <StatCard label="Consumo" value={displayConsumption} isWinner={car.fuelEconomyCityGas > 0 ? car.fuelEconomyCityGas === bestConsumption : false} />
               <StatCard label="Potência" value={`${car.horsepower} cv`} isWinner={car.horsepower === bestHp} />
               <StatCard label="Torque" value={`${car.torque} Nm`} isWinner={car.torque === bestTorque} />
-              <StatCard label="Porta-malas" value={`${car.trunkCapacity} L`} isWinner={car.trunkCapacity === bestTrunk} />
+              <StatCard label="Porta-malas" value={displayTrunk} isWinner={car.trunkCapacity > 0 ? car.trunkCapacity === bestTrunk : false} />
             </div>
           </div>
           

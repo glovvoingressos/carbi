@@ -10,6 +10,8 @@ import { getAllCars } from '@/lib/data-fetcher'
 import FAQSection from '@/components/layout/FAQSection'
 import HomeComparison from '@/components/home/HomeComparison'
 import BrandLogo from '@/components/brand/BrandLogo'
+import ListingCard from '@/components/marketplace/ListingCard'
+import { getLatestPublicListings } from '@/lib/marketplace-server'
 
 // ── Dados estáticos ─────────────────────────────────────────────────────────
 
@@ -52,6 +54,7 @@ function formatK(n: number) {
 
 export default async function HomePage() {
   const cars   = await getAllCars()
+  const latestListings = await getLatestPublicListings(8)
   const popular = cars.filter((c) => c.isPopular || c.priceBrl > 0).slice(0, 12)
   const electricCars = cars.filter((c) => c.segment === 'electric').slice(0, 8)
   const brands  = [...new Set(cars.map((c) => c.brand))].sort()
@@ -150,6 +153,31 @@ export default async function HomePage() {
            <p className="text-sm font-bold text-text-secondary mt-4">
               {cars.length}+ veículos listados em tempo real na Carbi
            </p>
+        </div>
+      </section>
+
+      <section className="pb-16">
+        <div className="container">
+          <div className="mb-6 flex items-end justify-between">
+            <div>
+              <p className="text-eyebrow">Marketplace</p>
+              <h2 className="text-h2">Últimos anunciados</h2>
+            </div>
+            <Link href="/carros-a-venda" className="text-sm font-bold text-text-secondary hover:text-dark">
+              Ver todos
+            </Link>
+          </div>
+          {latestListings.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {latestListings.map((listing) => (
+                <ListingCard key={listing.id} listing={listing} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-border bg-white p-6 text-sm font-semibold text-text-secondary">
+              Sem anúncios ativos no momento.
+            </div>
+          )}
         </div>
       </section>
 

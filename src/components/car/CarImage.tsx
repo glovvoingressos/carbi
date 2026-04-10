@@ -51,6 +51,8 @@ export default function CarImage({
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
 
+  const tokenize = (value: string) => slug(value).split('-').filter(Boolean)
+
   const brandSlug = slug(brand)
   const modelSlug = slug(model)
   const modelBaseSlug = modelSlug
@@ -95,16 +97,46 @@ export default function CarImage({
       ])
     ]),
 
-    `/assets/decorations/car-3d.png`, // 4. Fallback visual genérico
   ].filter(Boolean) as string[]
 
-  const uniqueImageCandidates = Array.from(new Set(imageCandidates))
+  const manifestPaths = Array.from(availableCarAssetPaths)
+  const modelTokens = tokenize(modelBaseSlug)
+
+  const bestManifestMatch = manifestPaths
+    .map((assetPath) => {
+      const file = assetPath.replace('/assets/cars/', '').replace('.png', '')
+      const fileTokens = file.split('-').filter(Boolean)
+      let score = 0
+
+      if (file.includes(`${brandSlug}-`) || file.includes(`vw-`)) score += 30
+      for (const token of modelTokens) {
+        if (fileTokens.includes(token)) score += 8
+      }
+      if (file.includes(`${modelBaseSlug}-`)) score += 20
+      if (file.endsWith('-2025')) score += 3
+      if (file.endsWith('-2024')) score += 2
+
+      return { assetPath, score }
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)[0]?.assetPath
+
+  const uniqueImageCandidates = Array.from(new Set([
+    ...imageCandidates,
+    ...(bestManifestMatch ? [bestManifestMatch] : []),
+  ]))
   const localCandidates = uniqueImageCandidates.filter((path) => {
     if (!path.startsWith('/assets/cars/')) return true
     return availableCarAssetPaths.has(path)
   })
-  const resolvedCandidates =
-    localCandidates.length > 0 ? localCandidates : ['/assets/decorations/car-3d.png']
+  const resolvedCandidates = localCandidates
+
+  useEffect(() => {
+    if (resolvedCandidates.length === 0) {
+      setHasFinalError(true)
+      setIsLoading(false)
+    }
+  }, [resolvedCandidates.length])
 
   // Skeleton de hidratação (SSR Safe)
   if (!mounted) {
@@ -131,7 +163,7 @@ export default function CarImage({
         justifyContent: 'center'
       }}
     >
-      {!hasFinalError && (
+      {!hasFinalError && resolvedCandidates.length > 0 && (
         <img
           key={currentIndex} // FORÇA O REACT A CRIAR UM NOVO ELEMENTO E DISPARAR ONLOAD/ONERROR
           src={resolvedCandidates[currentIndex]}
@@ -159,7 +191,7 @@ export default function CarImage({
       )}
 
       {/* Loading Shimmer / Pulse */}
-      {isLoading && (
+      {isLoading && resolvedCandidates.length > 0 && (
         <div className="absolute inset-0 flex items-center justify-center bg-dark/5 animate-pulse z-10">
           <div className="w-12 h-1.5 bg-dark/10 rounded-full animate-bounce" />
         </div>
@@ -177,10 +209,10 @@ export default function CarImage({
            
            <div className="flex flex-col items-center gap-1.5 z-10">
               <p className="text-[10px] sm:text-[11px] font-black text-dark uppercase tracking-[0.15em] text-center leading-tight bg-[var(--color-bento-yellow)] px-3 py-1.5 rounded rotate-[-1deg] border border-dark shadow-[2px_2px_0_#0A0A0A]">
-                Preview {year}
+                Imagem indisponível
               </p>
               <p className="text-[9px] font-bold text-dark/30 uppercase tracking-widest text-center mt-1">
-                 Asset em processamento
+                 Fonte real não encontrada
               </p>
            </div>
            <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-24 bg-dark/5 blur-3xl rounded-full skew-x-12 pointer-events-none" />

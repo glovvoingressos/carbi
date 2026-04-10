@@ -10,4 +10,3 @@ export async function GET() {
     return NextResponse.json({ error: 'Falha ao carregar catálogo.' }, { status: 500 })
   }
 }
-

@@ -9,8 +9,16 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
   const sp = await searchParams
   const sortByProfile = sp.profile || null
   const sortByPrice = sp.priceRange || null
+  const query = (sp.q || '').trim().toLowerCase()
 
   let ranked = [...cars]
+
+  if (query) {
+    ranked = ranked.filter((car) => {
+      const haystack = `${car.brand} ${car.model} ${car.version}`.toLowerCase()
+      return haystack.includes(query)
+    })
+  }
 
   if (sortByProfile) {
     const scored = ranked
@@ -36,6 +44,8 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
       <p className="text-sm text-text-secondary mt-1">
         {activeProfile
           ? `Ranking por ${activeProfile.label.toLowerCase()}`
+          : query
+          ? `Resultados reais para "${sp.q}".`
           : 'Os melhores por perfil e pre&ccedil;o.'}
       </p>
 
@@ -103,6 +113,11 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
           )
         })}
       </div>
+      {rankedCars.length === 0 && (
+        <div className="mt-8 rounded-xl border border-border bg-white p-6 text-sm font-semibold text-text-secondary">
+          Nenhum resultado encontrado para a busca atual.
+        </div>
+      )}
     </div>
   )
 }

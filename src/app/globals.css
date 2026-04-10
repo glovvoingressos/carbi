@@ -390,50 +390,6 @@ a[style*="background-color: var(--color-dark)"] {
 .nav-link:hover  { color: var(--color-text); background: rgba(0,0,0,0.05); }
 .nav-link.active { color: var(--color-text); font-weight: 600; }
 
-/* ━━━━━━━━━━ BOTTOM NAV ━━━━━━━━━━ */
-
-.bottom-nav {
-  position: fixed;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 4px;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: var(--radius-2xl);
-  box-shadow: 0 -2px 0 rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.12);
-  border: 1px solid var(--color-border);
-}
-
-.bottom-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 8px 18px;
-  border-radius: 22px;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  color: var(--color-text-3);
-  transition: var(--t);
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  text-decoration: none;
-}
-.bottom-nav-item.active {
-  background: var(--color-dark);
-  color: #fff;
-  animation: spring-pop 300ms var(--ease-spring);
-}
-.bottom-nav-item svg { width: 18px; height: 18px; }
-
 /* ━━━━━━━━━━ CAR CARDS ━━━━━━━━━━ */
 
 .car-card {

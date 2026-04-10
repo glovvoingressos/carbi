@@ -1,14 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import { Menu, X, Search, CarFront, Home, BarChart3, GitCompare, Sparkles, ChevronRight, MessageCircle } from 'lucide-react'
 
 export default function Navbar() {
+  const router = useRouter()
   const [scrolled, setScrolled] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
   const pathname = usePathname()
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -37,12 +39,24 @@ export default function Navbar() {
     { href: '/comparar', label: 'Comparar',  icon: GitCompare },
     { href: '/rankings', label: 'Rankings',  icon: BarChart3 },
     { href: '/anunciar-carro-bh', label: 'Anunciar', icon: Sparkles },
+    { href: '/carros-a-venda', label: 'Carros à venda', icon: Sparkles },
     { href: '/carros-usados-bh', label: 'Comprar em BH', icon: Sparkles },
     { href: '/minha-conta/conversas', label: 'Conversas', icon: MessageCircle },
   ]
 
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href)
+
+  const handleSearchSubmit = (event: React.FormEvent) => {
+    event.preventDefault()
+    const query = searchTerm.trim()
+    setSearchOpen(false)
+    if (!query) {
+      router.push('/rankings')
+      return
+    }
+    router.push(`/rankings?q=${encodeURIComponent(query)}`)
+  }
 
   return (
     <>
@@ -99,24 +113,43 @@ export default function Navbar() {
           >
             <X className="w-6 h-6 text-dark" />
           </button>
-          <div className="w-full max-w-2xl">
+          <form className="w-full max-w-2xl" onSubmit={handleSearchSubmit}>
             <h2 className="text-4xl font-display mb-8 text-center">O que você procura?</h2>
             <div className="relative group">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-dark/20 group-focus-within:text-[var(--color-accent)] transition-colors" />
               <input 
                 ref={searchRef}
-                type="text"
+                type="search"
                 placeholder="Marca, modelo ou categoria..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full h-20 bg-[#f4f6f8] rounded-[32px] pl-16 pr-8 text-2xl font-medium outline-none border-2 border-transparent focus:border-[var(--color-accent)] transition-all shadow-sm"
               />
             </div>
+            <button
+              type="submit"
+              className="mt-4 w-full rounded-full bg-dark px-6 py-3 text-sm font-black uppercase tracking-widest text-white"
+            >
+              Pesquisar
+            </button>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <p className="w-full text-center text-sm text-dark/40 font-medium mb-2 uppercase tracking-widest">Sugestões</p>
               {['SUV', 'Elétrico', 'Hatch', 'Polo', 'T-Cross'].map(s => (
-                <button key={s} className="px-6 py-3 bg-[#f4f6f8] rounded-full text-sm font-bold hover:bg-dark hover:text-white transition-all">{s}</button>
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm(s)
+                    router.push(`/rankings?q=${encodeURIComponent(s)}`)
+                    setSearchOpen(false)
+                  }}
+                  className="px-6 py-3 bg-[#f4f6f8] rounded-full text-sm font-bold hover:bg-dark hover:text-white transition-all"
+                >
+                  {s}
+                </button>
               ))}
             </div>
-          </div>
+          </form>
         </div>
       )}
 

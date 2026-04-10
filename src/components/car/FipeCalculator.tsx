@@ -43,6 +43,16 @@ function tokenize(value: string): string[] {
   return normalize(value).split(' ').filter((token) => token.length >= 2)
 }
 
+async function getLatestYearForModel(brandCode: string, modelCode: string): Promise<number> {
+  try {
+    const data = await getJson<number[]>(`/api/fipe/years?brandCode=${brandCode}&modelCode=${modelCode}`)
+    if (!Array.isArray(data) || data.length === 0) return 0
+    return data[0] || 0
+  } catch {
+    return 0
+  }
+}
+
 async function getJson<T>(url: string): Promise<T> {
   const response = await fetch(url)
   if (!response.ok) {
@@ -140,7 +150,7 @@ export default function FipeCalculator({
         }
 
         const modelSource = modelsCache.current.get(selectedBrand) || []
-        const modelMatch = modelSource.find((m) => {
+        const modelCandidates = modelSource.filter((m) => {
           const modelNormalized = normalize(m.name)
           const initialNormalized = normalize(initialModelName)
           const modelTokens = tokenize(m.name)
@@ -152,8 +162,17 @@ export default function FipeCalculator({
           )
         })
 
-        if (modelMatch) {
-          setSelectedModel((prev) => prev || modelMatch.code)
+        if (modelCandidates.length > 0) {
+          const scored = await Promise.all(
+            modelCandidates.slice(0, 12).map(async (candidate) => ({
+              candidate,
+              latestYear: await getLatestYearForModel(selectedBrand, candidate.code),
+            }))
+          )
+
+          scored.sort((a, b) => b.latestYear - a.latestYear)
+          const bestMatch = scored[0]?.candidate || modelCandidates[0]
+          setSelectedModel((prev) => prev || bestMatch.code)
         }
       } catch {
         if (!cancelled) setError('Não foi possível carregar os modelos da marca.')
@@ -332,6 +351,14 @@ export default function FipeCalculator({
   }, [hasAllFilters, selectedBrand, selectedModel, selectedYear, selectedVersion])
 
   const selectedVersionObj = versions.find((v) => v.code === selectedVersion) || null
+  const hasValidResult = Boolean(
+    result &&
+    result.codeFipe &&
+    result.price &&
+    selectedVersionObj &&
+    result.model.toLowerCase().includes(initialModelName.toLowerCase().split(' ')[0])
+  )
+  const safeResult = hasValidResult ? result : null
 
   return (
     <div className="bg-white border-2 border-dark rounded-[32px] overflow-hidden shadow-[8px_8px_0_#000] p-6 sm:p-8">
@@ -436,11 +463,11 @@ export default function FipeCalculator({
         </div>
       )}
 
-      {!loading.detail && result && hasAllFilters ? (
+      {!loading.detail && safeResult && hasAllFilters ? (
         <div className="space-y-4 pt-6 border-t-2 border-dark border-dashed">
           <div>
             <p className="text-[11px] text-text-tertiary uppercase font-black tracking-widest mb-1.5">Valor Atual</p>
-            <p className="text-4xl font-black text-dark tracking-[-0.05em]">{result.price}</p>
+            <p className="text-4xl font-black text-dark tracking-[-0.05em]">{safeResult.price}</p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-3 text-xs font-bold">
@@ -450,18 +477,18 @@ export default function FipeCalculator({
             </div>
             <div className="bg-surface border border-dark/20 rounded-xl px-3 py-2">
               <span className="text-text-tertiary uppercase tracking-wider">Combustível</span>
-              <p className="text-dark mt-1">{selectedVersionObj?.fuelType || result.fuel}</p>
+              <p className="text-dark mt-1">{selectedVersionObj?.fuelType || safeResult.fuel}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary bg-surface/50 p-3 rounded-xl border border-dashed border-dark/20">
             <Loader2 className="w-3 h-3 text-[var(--color-bento-yellow)]" />
-            Referência mensal: {result.referenceMonth} • Código oficial: {result.codeFipe}
+            Referência mensal: {safeResult.referenceMonth} • Código oficial: {safeResult.codeFipe}
           </div>
         </div>
       ) : null}
 
-      {!loading.detail && !result && (
+      {!loading.detail && !hasValidResult && (
         <div className="pt-6 text-center text-text-tertiary font-bold italic border-t-2 border-dark border-dashed">
           Selecione marca, modelo, ano e versão para consultar o valor atualizado.
         </div>

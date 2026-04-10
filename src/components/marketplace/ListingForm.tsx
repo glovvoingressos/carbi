@@ -149,8 +149,9 @@ export default function ListingForm() {
     const loadBrands = async () => {
       try {
         const response = await fetch('/api/fipe/brands')
-        const data = (await response.json()) as FipeItem[]
-        setBrands(data || [])
+        if (!response.ok) throw new Error('Falha na consulta de marcas.')
+        const data = (await response.json()) as unknown
+        setBrands(Array.isArray(data) ? (data as FipeItem[]) : [])
       } catch {
         setError('Falha ao carregar marcas de referência.')
       }
@@ -169,8 +170,9 @@ export default function ListingForm() {
     const loadModels = async () => {
       try {
         const response = await fetch(`/api/fipe/models?brandCode=${selectedBrandCode}`)
-        const data = (await response.json()) as FipeItem[]
-        setModels(data || [])
+        if (!response.ok) throw new Error('Falha na consulta de modelos.')
+        const data = (await response.json()) as unknown
+        setModels(Array.isArray(data) ? (data as FipeItem[]) : [])
       } catch {
         setError('Falha ao carregar modelos.')
       }
@@ -195,8 +197,9 @@ export default function ListingForm() {
     const loadYears = async () => {
       try {
         const response = await fetch(`/api/fipe/years?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}`)
-        const data = (await response.json()) as number[]
-        setYears(data || [])
+        if (!response.ok) throw new Error('Falha na consulta de anos.')
+        const data = (await response.json()) as unknown
+        setYears(Array.isArray(data) ? (data as number[]) : [])
       } catch {
         setError('Falha ao carregar anos.')
       }
@@ -222,8 +225,9 @@ export default function ListingForm() {
         const response = await fetch(
           `/api/fipe/versions?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}&year=${selectedYear}`,
         )
-        const data = (await response.json()) as FipeVersionOption[]
-        setVersions(data || [])
+        if (!response.ok) throw new Error('Falha na consulta de versões.')
+        const data = (await response.json()) as unknown
+        setVersions(Array.isArray(data) ? (data as FipeVersionOption[]) : [])
       } catch {
         setError('Falha ao carregar versões.')
       }
@@ -246,11 +250,18 @@ export default function ListingForm() {
         const response = await fetch(
           `/api/fipe/detail?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}&yearCode=${selectedVersionCode}`,
         )
-        const data = (await response.json()) as FipeResult | null
-        setFipeResult(data)
-        if (!data) {
+        if (!response.ok) {
+          setFipeResult(null)
           setError('Não foi possível obter o valor atualizado para esta versão.')
+          return
         }
+        const data = (await response.json()) as FipeResult | null
+        if (!data?.codeFipe || !data?.price) {
+          setFipeResult(null)
+          setError('Resposta inválida para esta combinação de modelo/ano/versão.')
+          return
+        }
+        setFipeResult(data)
       } finally {
         setFipeLoading(false)
       }
@@ -459,8 +470,10 @@ export default function ListingForm() {
       }
 
       localStorage.removeItem(DRAFT_KEY)
-      setSuccess('Anúncio publicado com sucesso.')
-      router.push(`/anuncios/${created.slug}`)
+      setSuccess('Carro anunciado com sucesso')
+      setTimeout(() => {
+        router.push(`/anuncios/${created.slug}`)
+      }, 800)
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Falha ao publicar anúncio.')
     } finally {

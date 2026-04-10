@@ -3,6 +3,11 @@ import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { ListingFormPayload, validateListingPayload } from '@/lib/marketplace'
 
+function isMissingTableError(message?: string): boolean {
+  if (!message) return false
+  return message.includes('Could not find the table')
+}
+
 export async function GET(req: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
@@ -12,6 +17,7 @@ export async function GET(req: NextRequest) {
     const supabase = getSupabaseServerClient()
     const brand = req.nextUrl.searchParams.get('brand')
     const model = req.nextUrl.searchParams.get('model')
+    const q = (req.nextUrl.searchParams.get('q') || '').trim()
     const yearModel = req.nextUrl.searchParams.get('yearModel')
     const limitParam = req.nextUrl.searchParams.get('limit')
     const excludeId = req.nextUrl.searchParams.get('excludeId')
@@ -24,14 +30,18 @@ export async function GET(req: NextRequest) {
       .order('published_at', { ascending: false })
       .limit(limit)
 
-    if (brand) query = query.ilike('brand', brand)
-    if (model) query = query.ilike('model', model)
+    if (brand) query = query.ilike('brand', `%${brand}%`)
+    if (model) query = query.ilike('model', `%${model}%`)
+    if (q) query = query.or(`brand.ilike.%${q}%,model.ilike.%${q}%`)
     if (yearModel) query = query.eq('year_model', Number(yearModel))
     if (excludeId) query = query.neq('id', excludeId)
 
     const { data, error } = await query
 
     if (error) {
+      if (isMissingTableError(error.message)) {
+        return NextResponse.json({ error: 'Schema do marketplace não aplicado no Supabase.' }, { status: 503 })
+      }
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -100,6 +110,9 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (error) {
+      if (isMissingTableError(error.message)) {
+        return NextResponse.json({ error: 'Schema do marketplace não aplicado no Supabase.' }, { status: 503 })
+      }
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 

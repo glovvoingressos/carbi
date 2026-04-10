@@ -2,7 +2,6 @@
 
 import { useEffect, useCallback } from 'react'
 import Navbar from './Navbar'
-import BottomNav from './BottomNav'
 import Footer from './Footer'
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
@@ -48,11 +47,10 @@ export default function ClientShell({ children }: { children: React.ReactNode })
   return (
     <>
       <Navbar />
-      <div style={{ minHeight: '100vh', paddingBottom: '80px' }} className="md:pb-0">
+      <div style={{ minHeight: '100vh' }}>
         {children}
       </div>
       <Footer />
-      <BottomNav />
     </>
   )
 }

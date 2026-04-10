@@ -3,7 +3,7 @@ import { ListingPublic, getFipeComparison } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
 
 export default function ListingCard({ listing }: { listing: ListingPublic }) {
-  const cover = listing.images?.[0]?.url || '/assets/decorations/car-3d.png'
+  const cover = listing.images?.[0]?.url || null
   const fipe = getFipeComparison(Number(listing.price), listing.fipe_price)
 
   return (
@@ -11,7 +11,13 @@ export default function ListingCard({ listing }: { listing: ListingPublic }) {
       href={`/anuncios/${listing.slug}`}
       className="group rounded-3xl border border-border bg-white p-3 shadow-sm transition hover:-translate-y-0.5"
     >
-      <img src={cover} alt={listing.title} className="h-44 w-full rounded-2xl object-cover" />
+      {cover ? (
+        <img src={cover} alt={listing.title} className="h-44 w-full rounded-2xl object-cover" />
+      ) : (
+        <div className="h-44 w-full rounded-2xl border border-border bg-surface flex items-center justify-center text-xs font-bold uppercase tracking-widest text-text-tertiary">
+          Sem imagem
+        </div>
+      )}
       <div className="p-2">
         <h3 className="line-clamp-2 text-sm font-black text-dark">{listing.title}</h3>
         <p className="mt-1 text-xl font-black text-dark">{formatBRL(Number(listing.price))}</p>
