@@ -150,13 +150,74 @@ export default function ConversationInbox() {
   useEffect(() => {
     if (!token || !selectedId) return
     void fetchMessages(token, selectedId)
-
-    const interval = window.setInterval(() => {
-      void fetchMessages(token, selectedId)
-    }, 6000)
-
-    return () => window.clearInterval(interval)
   }, [token, selectedId])
+
+  useEffect(() => {
+    if (!token || !myUserId || !selectedId || !supabaseReady) return
+    const supabase = getSupabaseBrowserClient()
+
+    const messageChannel = supabase
+      .channel(`messages:${selectedId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'conversation_messages',
+          filter: `conversation_id=eq.${selectedId}`,
+        },
+        () => {
+          void fetchMessages(token, selectedId)
+        },
+      )
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(messageChannel)
+    }
+  }, [token, myUserId, selectedId, supabaseReady])
+
+  useEffect(() => {
+    if (!token || !myUserId || !supabaseReady) return
+    const supabase = getSupabaseBrowserClient()
+
+    const sellerChannel = supabase
+      .channel(`conversations:seller:${myUserId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'conversations',
+          filter: `seller_user_id=eq.${myUserId}`,
+        },
+        () => {
+          void fetchConversations(token)
+        },
+      )
+      .subscribe()
+
+    const buyerChannel = supabase
+      .channel(`conversations:buyer:${myUserId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'conversations',
+          filter: `buyer_user_id=eq.${myUserId}`,
+        },
+        () => {
+          void fetchConversations(token)
+        },
+      )
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(sellerChannel)
+      void supabase.removeChannel(buyerChannel)
+    }
+  }, [token, myUserId, supabaseReady])
 
   const sendMessage = async () => {
     if (!token || !selectedId || !messageText.trim()) return
@@ -179,7 +240,7 @@ export default function ConversationInbox() {
       }
 
       setMessageText('')
-      setMessages((prev) => [...prev, payload])
+      await fetchMessages(token, selectedId)
       await fetchConversations(token)
     } catch (sendError) {
       setError(sendError instanceof Error ? sendError.message : 'Falha ao enviar mensagem.')

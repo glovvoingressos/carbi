@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, Save, Upload } from 'lucide-react'
+import { Loader2, Save, Upload, Trash2 } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import {
   LISTING_ALLOWED_TYPES,
@@ -22,6 +22,7 @@ interface DashboardImage {
 
 interface DashboardListing {
   id: string
+  vehicle_id?: string | null
   slug: string
   title: string
   description: string
@@ -60,6 +61,7 @@ export default function MyListingsDashboard() {
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
   const [newImages, setNewImages] = useState<UploadImageItem[]>([])
+  const [status, setStatus] = useState<'active' | 'sold' | 'paused' | 'archived'>('active')
   const [loadingListings, setLoadingListings] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -151,6 +153,7 @@ export default function MyListingsDashboard() {
     setTitle(selectedListing.title)
     setDescription(selectedListing.description)
     setPrice(String(selectedListing.price))
+    setStatus((selectedListing.status as 'active' | 'sold' | 'paused' | 'archived') || 'active')
     setNewImages((prev) => {
       prev.forEach((item) => URL.revokeObjectURL(item.previewUrl))
       return []
@@ -216,6 +219,7 @@ export default function MyListingsDashboard() {
           title: title.trim(),
           description: description.trim(),
           price: parsedPrice,
+          status,
         }),
       })
       const payload = await response.json().catch(() => ({}))
@@ -225,12 +229,56 @@ export default function MyListingsDashboard() {
 
       setListings((prev) => prev.map((item) => (
         item.id === selectedListing.id
-          ? { ...item, title: title.trim(), description: description.trim(), price: parsedPrice }
+          ? { ...item, title: title.trim(), description: description.trim(), price: parsedPrice, status }
           : item
       )))
       setSuccess('Anúncio atualizado com sucesso.')
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : 'Falha ao salvar anúncio.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const deleteListing = async () => {
+    if (!selectedListing) return
+    const confirmed = window.confirm('Deseja excluir este anúncio? Esta ação não pode ser desfeita.')
+    if (!confirmed) return
+
+    setSaving(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const supabase = getSupabaseBrowserClient()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session?.access_token) {
+        setError('Faça login novamente para continuar.')
+        return
+      }
+
+      const response = await fetch(`/api/marketplace/listings/${selectedListing.id}`, {
+        method: 'DELETE',
+        headers: authHeader(session.access_token),
+      })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(payload.error || 'Falha ao excluir anúncio.')
+      }
+
+      const next = listings.filter((item) => item.id !== selectedListing.id)
+      setListings(next)
+      if (next[0]) {
+        setSelectedId(next[0].id)
+      } else {
+        setSelectedId('')
+      }
+      setSuccess('Anúncio excluído com sucesso.')
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : 'Falha ao excluir anúncio.')
     } finally {
       setSaving(false)
     }
@@ -356,6 +404,9 @@ export default function MyListingsDashboard() {
                   <p className="mt-0.5 text-xs font-semibold text-text-secondary">
                     {listing.brand} {listing.model} • {formatBRL(Number(listing.price))}
                   </p>
+                  <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-text-tertiary">
+                    Status: {listing.status}
+                  </p>
                 </button>
               ))}
             </div>
@@ -398,6 +449,16 @@ export default function MyListingsDashboard() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Descrição"
                 />
+                <select
+                  className="input"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as 'active' | 'sold' | 'paused' | 'archived')}
+                >
+                  <option value="active">Ativo</option>
+                  <option value="paused">Pausado</option>
+                  <option value="sold">Vendido</option>
+                  <option value="archived">Arquivado</option>
+                </select>
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -431,6 +492,16 @@ export default function MyListingsDashboard() {
                 >
                   {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                   Atualizar fotos
+                </button>
+
+                <button
+                  type="button"
+                  onClick={deleteListing}
+                  disabled={saving}
+                  className="inline-flex items-center gap-2 rounded-full border border-red-500 px-5 py-2 text-sm font-black text-red-600 disabled:opacity-60"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Excluir anúncio
                 </button>
               </div>
 

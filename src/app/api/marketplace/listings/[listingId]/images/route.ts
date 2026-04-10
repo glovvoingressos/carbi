@@ -33,7 +33,7 @@ export async function POST(
 
     const { data: listing, error: listingError } = await supabase
       .from('vehicle_listings')
-      .select('id, user_id')
+      .select('id, user_id, vehicle_id')
       .eq('id', listingId)
       .single()
 
@@ -53,6 +53,11 @@ export async function POST(
       is_primary: index === 0,
     }))
 
+    const { data: oldImages } = await supabase
+      .from('vehicle_listing_images')
+      .select('storage_path')
+      .eq('listing_id', listingId)
+
     const { error: deleteError } = await supabase.from('vehicle_listing_images').delete().eq('listing_id', listingId)
     if (deleteError) {
       return NextResponse.json({ error: deleteError.message }, { status: 500 })
@@ -61,6 +66,34 @@ export async function POST(
     const { error: insertError } = await supabase.from('vehicle_listing_images').insert(normalized)
     if (insertError) {
       return NextResponse.json({ error: insertError.message }, { status: 500 })
+    }
+
+    if (listing.vehicle_id) {
+      const normalizedVehicleImages = images.slice(0, LISTING_MAX_IMAGES).map((img, index) => ({
+        vehicle_id: listing.vehicle_id,
+        storage_path: img.storage_path,
+        public_url: img.public_url,
+        sort_order: index,
+        is_primary: index === 0,
+      }))
+      const { error: deleteVehicleImagesError } = await supabase
+        .from('vehicle_images')
+        .delete()
+        .eq('vehicle_id', listing.vehicle_id)
+      if (deleteVehicleImagesError) {
+        return NextResponse.json({ error: deleteVehicleImagesError.message }, { status: 500 })
+      }
+      const { error: insertVehicleImagesError } = await supabase
+        .from('vehicle_images')
+        .insert(normalizedVehicleImages)
+      if (insertVehicleImagesError) {
+        return NextResponse.json({ error: insertVehicleImagesError.message }, { status: 500 })
+      }
+    }
+
+    const oldStoragePaths = (oldImages || []).map((row) => row.storage_path).filter(Boolean)
+    if (oldStoragePaths.length > 0) {
+      await supabase.storage.from('vehicle-listings').remove(oldStoragePaths)
     }
 
     return NextResponse.json({ ok: true })

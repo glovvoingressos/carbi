@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
       .from('vehicle_listings')
       .select(`
         id,
+        vehicle_id,
         slug,
         title,
         description,

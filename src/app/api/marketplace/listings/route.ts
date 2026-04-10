@@ -4,11 +4,6 @@ import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-se
 import { ListingFormPayload, validateListingPayload } from '@/lib/marketplace'
 import { queryPublicListings } from '@/lib/marketplace-server'
 
-function isMissingTableError(message?: string): boolean {
-  if (!message) return false
-  return message.includes('Could not find the table')
-}
-
 export async function GET(req: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
@@ -60,8 +55,42 @@ export async function POST(req: NextRequest) {
 
     const supabase = getSupabaseServerClient(auth.accessToken)
 
+    const vehiclePayload = {
+      owner_user_id: auth.userId,
+      brand: payload.brand.trim(),
+      model: payload.model.trim(),
+      version: payload.version?.trim() || null,
+      year: payload.year,
+      year_model: payload.year_model,
+      transmission: payload.transmission.trim(),
+      fuel: payload.fuel.trim(),
+      color: payload.color.trim(),
+      body_type: payload.body_type.trim(),
+      engine: payload.engine?.trim() || null,
+      horsepower: payload.horsepower || null,
+      doors: payload.doors || null,
+      mileage: payload.mileage,
+      fipe_brand_code: payload.fipe_brand_code || null,
+      fipe_model_code: payload.fipe_model_code || null,
+      fipe_year_code: payload.fipe_year_code || null,
+      fipe_reference_month: payload.fipe_reference_month || null,
+      fipe_price: payload.fipe_price || null,
+      technical_data: payload.structured_data || {},
+    }
+
+    const { data: vehicle, error: vehicleError } = await supabase
+      .from('vehicles')
+      .insert(vehiclePayload)
+      .select('id')
+      .single()
+
+    if (vehicleError || !vehicle) {
+      return NextResponse.json({ error: vehicleError?.message || 'Falha ao criar veículo.' }, { status: 500 })
+    }
+
     const insertPayload = {
       user_id: auth.userId,
+      vehicle_id: vehicle.id,
       title: payload.title.trim(),
       description: payload.description.trim(),
       brand: payload.brand.trim(),
@@ -98,9 +127,7 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (error) {
-      if (isMissingTableError(error.message)) {
-        return NextResponse.json({ error: 'Schema do marketplace não aplicado no Supabase.' }, { status: 503 })
-      }
+      await supabase.from('vehicles').delete().eq('id', vehicle.id)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 

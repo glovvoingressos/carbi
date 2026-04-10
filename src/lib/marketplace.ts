@@ -43,6 +43,7 @@ export interface ListingFormPayload {
 export interface ListingPublic {
   id: string
   user_id: string
+  vehicle_id?: string | null
   title: string
   description: string
   brand: string
@@ -67,7 +68,7 @@ export interface ListingPublic {
   fipe_difference_value: number | null
   fipe_difference_percent: number | null
   fipe_reference_month: string | null
-  status: string
+  status: 'draft' | 'active' | 'sold' | 'archived' | 'paused' | string
   slug: string
   published_at: string | null
   created_at: string

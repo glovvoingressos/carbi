@@ -8,7 +8,8 @@
     "build": "next build",
     "postbuild": "next-sitemap",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:marketplace:e2e": "node scripts/test-marketplace-e2e.mjs"
   },
   "keywords": [],
   "author": "",
