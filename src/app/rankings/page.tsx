@@ -30,7 +30,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="text-2xl font-normal font-heading text-text tracking-wide">Rankings</h1>
+      <h1 className="text-2xl font-heading text-text tracking-wide">Rankings</h1>
       <p className="text-sm text-text-secondary mt-1">
         {activeProfile
           ? `Ranking por ${activeProfile.label.toLowerCase()}`

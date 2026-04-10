@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { cars, formatBRL, compareCars } from '@/data/cars'
 import { Check, X, ArrowLeftRight } from 'lucide-react'
 import Badge from '@/components/ui/Badge'
+import CarImage from '@/components/car/CarImage'
 
 const segments = [...new Set(cars.map((c) => c.segment))]
 const brands = [...new Set(cars.map((c) => c.brand))]
@@ -118,11 +119,18 @@ export default function ComparePage() {
                 </div>
               )}
               <div className="aspect-[4/3] bg-[#f8fafc] overflow-hidden p-3 relative">
-                <img src={car.image} alt={`${car.brand} ${car.model}`} className="w-full h-full object-contain" width={200} height={150} />
+                <CarImage 
+                  id={car.id} 
+                  brand={car.brand} 
+                  model={car.model} 
+                  year={car.year} 
+                  src={car.image} 
+                  className="w-full h-full"
+                />
               </div>
               <div className="p-4 bg-white flex-1">
                 <p className="text-[10px] font-bold text-[#0A0A0A]/40 uppercase tracking-widest">{car.brand}</p>
-                <p className="text-[14px] font-normal font-heading text-[#0A0A0A] leading-tight mt-1 tracking-wide">{car.model}</p>
+                <p className="text-[14px] font-heading text-[#0A0A0A] leading-tight mt-1 tracking-wide">{car.model}</p>
                 <p className="text-[12px] text-[#0A0A0A]/60 font-semibold mt-2 font-heading">{formatBRL(car.priceBrl)}</p>
               </div>
             </button>
@@ -142,8 +150,17 @@ export default function ComparePage() {
                     {comparison.cars.map((car) => (
                       <th key={car.id} className="p-6 text-center border-l border-[#0A0A0A]/5 bg-white">
                         <Link href={`/${car.brand.toLowerCase().replace(/\s+/g, '-')}/${car.slug}`} className="group block">
-                          <img src={car.image} alt={car.model} className="w-24 h-16 object-contain mx-auto mb-4 group-hover:scale-110 transition-transform duration-300" />
-                          <p className="font-heading font-normal text-[15px] text-[#0A0A0A] tracking-wide leading-tight">{car.brand} {car.model}</p>
+                          <div className="w-24 h-16 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                             <CarImage 
+                               id={car.id} 
+                               brand={car.brand} 
+                               model={car.model} 
+                               year={car.year} 
+                               src={car.image} 
+                               className="w-full h-full"
+                             />
+                          </div>
+                          <p className="font-heading text-[15px] text-[#0A0A0A] tracking-wide leading-tight">{car.brand} {car.model}</p>
                           <p className="text-[13px] text-[#0A0A0A]/60 font-semibold mt-1 font-heading">{formatBRL(car.priceBrl)}</p>
                         </Link>
                       </th>
@@ -208,7 +225,7 @@ export default function ComparePage() {
                         O Ganhador
                       </div>
                     )}
-                    <p className="text-[18px] font-normal font-heading tracking-wide leading-none mb-1 mt-1">{car.brand} {car.model}</p>
+                    <p className="text-[18px] font-heading tracking-wide leading-none mb-1 mt-1">{car.brand} {car.model}</p>
                     <p className={`text-[13px] font-medium mb-5 ${isOverallWinner ? 'text-[#0A0A0A]/50' : 'text-white/60'}`}>Venceu {wins} de {total} análises técnicas</p>
                     <div className={`w-full rounded-full h-2 ${isOverallWinner ? 'bg-[#f4f6f8]' : 'bg-black/20'}`}>
                       <div className={`h-full rounded-full ${isOverallWinner ? 'bg-[#00D632]' : 'bg-white'}`} style={{ width: `${(wins / total) * 100}%` }} />

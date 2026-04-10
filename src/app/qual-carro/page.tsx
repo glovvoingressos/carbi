@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { cars, matchCarToProfile, getCarScoreByProfile, formatBRL } from '@/data/cars'
 import { ArrowRight, ArrowLeft, RotateCcw } from 'lucide-react'
+import CarImage from '@/components/car/CarImage'
 
 const steps = ['Orçamento', 'Uso', 'Passageiros', 'Prioridade', 'Tipo']
 
@@ -102,7 +103,14 @@ export default function QualCarroPage() {
         <div className="bg-white border border-primary/20 rounded-xl p-5 mb-4">
           <p className="text-xs font-medium text-primary uppercase tracking-wider mb-2">Mais recomendado</p>
           <div className="flex items-center gap-4">
-            <img src={topResult.car.image} alt={topResult.car.model} className="w-24 h-16 sm:w-32 sm:h-20 object-cover rounded-lg" />
+            <CarImage
+              id={topResult.car.id}
+              brand={topResult.car.brand}
+              model={topResult.car.model}
+              year={topResult.car.year}
+              src={topResult.car.image}
+              className="w-24 h-16 sm:w-32 sm:h-20 rounded-lg"
+            />
             <div className="flex-1 min-w-0">
               <h2 className="font-bold text-text">{topResult.car.brand} {topResult.car.model}</h2>
               <p className="text-xs text-text-secondary">{topResult.car.version} &middot; {topResult.car.year}</p>
@@ -122,7 +130,14 @@ export default function QualCarroPage() {
           {results.slice(1).map((result, i) => (
             <div key={result.car.id} className="bg-white border border-border rounded-xl p-4 flex items-center gap-3 hover:border-primary/30 transition-colors">
               <span className="text-xs font-bold text-text-tertiary w-6 text-center">{i + 2}</span>
-              <img src={result.car.image} alt={result.car.model} className="w-14 h-10 object-cover rounded hidden sm:block" />
+              <CarImage
+                id={result.car.id}
+                brand={result.car.brand}
+                model={result.car.model}
+                year={result.car.year}
+                src={result.car.image}
+                className="w-14 h-10 rounded hidden sm:block"
+              />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-text">{result.car.brand} {result.car.model}</p>
                 <p className="text-xs text-text-secondary">{result.car.version}</p>
@@ -157,7 +172,7 @@ export default function QualCarroPage() {
           <button onClick={reset} className="flex items-center justify-center gap-2 text-sm font-medium text-text-secondary hover:text-text px-4 py-2.5 border border-border rounded-lg hover:bg-white transition-colors">
             <RotateCcw className="w-4 h-4" /> Refazer teste
           </button>
-          <Link href="/comparar" className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-dark text-sm font-bold px-5 py-2.5 rounded-lg transition-colors">
+          <Link href="/comparar" className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-bold px-5 py-2.5 rounded-lg transition-colors">
             Comparar carros &rarr;
           </Link>
         </div>
@@ -299,7 +314,7 @@ export default function QualCarroPage() {
           </button>
           <button
             onClick={next}
-            className="flex items-center gap-1.5 bg-primary hover:bg-primary-hover text-dark px-5 py-2 rounded-lg text-sm font-bold transition-colors"
+            className="flex items-center gap-1.5 bg-primary hover:bg-primary-hover text-white px-5 py-2 rounded-lg text-sm font-bold transition-colors"
           >
             {step === steps.length - 1 ? 'Ver resultado' : 'Avançar'} <ArrowRight className="w-4 h-4" />
           </button>

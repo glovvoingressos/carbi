@@ -71,16 +71,10 @@ export default async function HomePage() {
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           § 1.5 — BENTO GRID FEATURES
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section style={{ background: 'var(--color-bg)', paddingBottom: 'clamp(48px, 6vh, 80px)' }}>
+      <section style={{ background: 'var(--color-bg)', paddingTop: 'clamp(80px, 10vh, 120px)', paddingBottom: 'clamp(48px, 6vh, 80px)' }}>
         <div className="container max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 auto-rows-[minmax(320px,auto)]">
              
-             {/* BENTO 1: FEATURED HERO PHRASE (Lime/Yellow) */}
-             <div className="md:col-span-12 bg-[var(--color-bento-yellow)] rounded-[32px] p-10 md:p-16 flex flex-col items-center justify-center shadow-sm relative overflow-hidden text-center min-h-[400px]">
-                  <h1 className="text-hero mx-auto" style={{ maxWidth: '100%', marginBottom: 0 }}>
-                    A ferramenta que ajuda <span className="inline-block translate-y-[2px] mx-1">👥</span> você a descobrir <span className="inline-block translate-y-[2px] mx-1">🚗</span> o carro ideal, consultar a <span className="inline-block translate-y-[2px] mx-1">💸</span> tabela FIPE e fazer a <span className="inline-block translate-y-[2px] mx-1">🎯</span> melhor escolha <span className="inline-block translate-y-[2px] mx-1">📝</span>
-                  </h1>
-             </div>
 
              {/* BENTO 2: White Large Card (FIPE) */}
              <div className="md:col-span-12 lg:col-span-8 bg-white border border-border rounded-[32px] p-8 lg:p-12 flex flex-col items-start justify-between shadow-sm relative overflow-hidden">
@@ -149,6 +143,26 @@ export default async function HomePage() {
            <p className="text-sm font-bold text-text-secondary mt-4">
               {cars.length}+ veículos listados em tempo real na Carbi
            </p>
+        </div>
+      </section>
+
+      <section className="pb-16">
+        <div className="container">
+          <div className="rounded-[32px] border-2 border-dark bg-[#fff4cf] p-6 sm:p-8 shadow-[6px_6px_0_#000]">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-widest text-dark/70">Marketplace Carbi</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-dark mt-1">Tem carro para vender? Publique com preço FIPE em tempo real.</h2>
+                <p className="text-sm sm:text-base font-semibold text-dark/70 mt-2">Anuncie com até 10 fotos, comparação automática com FIPE e chat seguro direto na plataforma.</p>
+              </div>
+              <Link
+                href="/anunciar-carro-bh"
+                className="inline-flex items-center justify-center rounded-full bg-[#dff7e8] px-6 py-3 text-dark font-black uppercase tracking-wider border-2 border-dark shadow-[4px_4px_0_#000] hover:-translate-y-1 transition-all w-full sm:w-auto"
+              >
+                Anunciar meu carro
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -224,13 +238,14 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Grid */}
-          <div
+          <div 
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(min(160px, 100%), 1fr))',
-              gap: 'clamp(8px, 1vw, 16px)',
+              gridTemplateColumns: 'repeat(5, 1fr)',
+              gap: 'clamp(8px, 1.5vw, 16px)',
+              width: '100%'
             }}
+            className="grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
           >
             {popular.map((car, i) => (
               <CarCard key={car.id} car={car} index={i} />
@@ -281,12 +296,14 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div
+            <div 
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(min(240px, 100%), 1fr))',
-                gap: 'clamp(12px, 2vw, 16px)',
+                gridTemplateColumns: 'repeat(5, 1fr)',
+                gap: 'clamp(8px, 1.5vw, 16px)',
+                width: '100%'
               }}
+              className="grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
             >
               {electricCars.map((car, i) => (
                 <CarCard key={car.id} car={car} index={i} />

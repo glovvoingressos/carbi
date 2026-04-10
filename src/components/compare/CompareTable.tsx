@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { CarSpec } from '@/data/cars'
 import { formatBRL } from '@/data/cars'
+import CarImage from '@/components/car/CarImage'
 
 interface CompareRowProps {
   label: string
@@ -52,7 +53,16 @@ export default function CompareTable({ cars, winners }: CompareTableProps) {
           const brandSlug = car.brand.toLowerCase().replace(/\s+/g, '-')
           return (
             <Link href={`/${brandSlug}/${car.slug}`} className="bg-white rounded-lg p-4 border text-center hover:border-blue-300 transition-colors" key={car.id}>
-              <img src={car.image} alt={`${car.brand} ${car.model}`} className="w-full h-28 object-cover rounded-md mb-2" width={200} height={112} />
+              <div className="w-full h-28 rounded-md mb-2 overflow-hidden">
+                <CarImage
+                  id={car.id}
+                  brand={car.brand}
+                  model={car.model}
+                  year={car.year}
+                  src={car.image}
+                  className="w-full h-full"
+                />
+              </div>
               <h3 className="font-bold text-sm">{car.brand} {car.model}</h3>
               <p className="text-xs text-gray-500">{car.version}</p>
               <p className="text-blue-600 font-bold text-sm mt-1">{formatBRL(car.priceBrl)}</p>

@@ -16,28 +16,7 @@ interface Review {
 }
 
 export default function ReviewSection({ carId }: { carId: string }) {
-  const [reviews, setReviews] = useState<Review[]>([
-    {
-      id: '1',
-      userName: 'Ricardo Silva',
-      rating: 5,
-      pros: ['Economia de combustível', 'Dirigibilidade', 'Central multimídia'],
-      cons: ['Porta-malas poderia ser maior'],
-      comment: 'O carro é sensacional para o dia a dia. Faço 16km/l na cidade sem esforço.',
-      photos: ['https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400'],
-      date: 'há 2 meses'
-    },
-    {
-      id: '2',
-      userName: 'Mariana Costa',
-      rating: 4,
-      pros: ['Espaço interno', 'Segurança'],
-      cons: ['Suspensão um pouco rígida'],
-      comment: 'Ótimo carro para família, me sinto muito segura levando as crianças.',
-      photos: [],
-      date: 'há 3 semanas'
-    }
-  ])
+  const [reviews, setReviews] = useState<Review[]>([])
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [newReview, setNewReview] = useState({
@@ -94,61 +73,70 @@ export default function ReviewSection({ carId }: { carId: string }) {
         </button>
       </div>
 
-      {/* Grid de Reviews */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {reviews.map(review => (
-          <div key={review.id} className="bg-white border-2 border-dark rounded-[40px] p-8 shadow-[8px_8px_0_#0A0A0A] flex flex-col">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <p className="font-black text-xl uppercase tracking-tight">{review.userName}</p>
-                <p className="text-xs font-bold text-dark/30 uppercase tracking-widest">{review.date}</p>
-              </div>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map(s => (
-                  <Star key={s} className={`w-5 h-5 ${s <= review.rating ? 'fill-[var(--color-bento-yellow)] text-[var(--color-bento-yellow)]' : 'text-dark/10'}`} />
-                ))}
-              </div>
-            </div>
-
-            <p className="text-dark/70 font-medium mb-8 leading-relaxed italic">"{review.comment}"</p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-              <div className="bg-[var(--color-bg)-alt] p-5 rounded-3xl border border-dark/5">
-                <p className="text-[10px] font-black text-[#00D632] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                   <ThumbsUp className="w-3 h-3" /> Prós
-                </p>
-                <ul className="space-y-2">
-                  {review.pros.map((p, i) => (
-                    <li key={i} className="text-sm font-bold text-dark flex items-start gap-2">
-                       <Check className="w-4 h-4 text-[#00D632] mt-0.5 flex-shrink-0" /> {p}
-                    </li>
+      {reviews.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {reviews.map(review => (
+            <div key={review.id} className="bg-white border-2 border-dark rounded-[40px] p-8 shadow-[8px_8px_0_#0A0A0A] flex flex-col">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <p className="font-black text-xl uppercase tracking-tight">{review.userName}</p>
+                  <p className="text-xs font-bold text-dark/30 uppercase tracking-widest">{review.date}</p>
+                </div>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map(s => (
+                    <Star key={s} className={`w-5 h-5 ${s <= review.rating ? 'fill-[var(--color-bento-yellow)] text-[var(--color-bento-yellow)]' : 'text-dark/10'}`} />
                   ))}
-                </ul>
+                </div>
               </div>
-              <div className="bg-[var(--color-bg)-alt] p-5 rounded-3xl border border-dark/5">
-                <p className="text-[10px] font-black text-[var(--color-bento-red)] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                   <ThumbsDown className="w-3 h-3" /> Contras
-                </p>
-                <ul className="space-y-2">
-                  {review.cons.map((c, i) => (
-                    <li key={i} className="text-sm font-bold text-dark flex items-start gap-2">
-                       <AlertTriangle className="w-4 h-4 text-[var(--color-bento-red)] mt-0.5 flex-shrink-0" /> {c}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
 
-            {review.photos.length > 0 && (
-              <div className="flex gap-3 overflow-x-auto pb-2">
-                {review.photos.map((p, i) => (
-                  <img key={i} src={p} alt="Review" className="w-32 h-24 object-cover rounded-2xl border-2 border-dark shadow-sm flex-shrink-0" />
-                ))}
+              <p className="text-dark/70 font-medium mb-8 leading-relaxed italic">"{review.comment}"</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                <div className="bg-[var(--color-bg)-alt] p-5 rounded-3xl border border-dark/5">
+                  <p className="text-[10px] font-black text-[#00D632] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                     <ThumbsUp className="w-3 h-3" /> Prós
+                  </p>
+                  <ul className="space-y-2">
+                    {review.pros.map((p, i) => (
+                      <li key={i} className="text-sm font-bold text-dark flex items-start gap-2">
+                         <Check className="w-4 h-4 text-[#00D632] mt-0.5 flex-shrink-0" /> {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-[var(--color-bg)-alt] p-5 rounded-3xl border border-dark/5">
+                  <p className="text-[10px] font-black text-[var(--color-bento-red)] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                     <ThumbsDown className="w-3 h-3" /> Contras
+                  </p>
+                  <ul className="space-y-2">
+                    {review.cons.map((c, i) => (
+                      <li key={i} className="text-sm font-bold text-dark flex items-start gap-2">
+                         <AlertTriangle className="w-4 h-4 text-[var(--color-bento-red)] mt-0.5 flex-shrink-0" /> {c}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            )}
+
+              {review.photos.length > 0 && (
+                <div className="flex gap-3 overflow-x-auto pb-2">
+                  {review.photos.map((p, i) => (
+                    <img key={i} src={p} alt="Review" className="w-32 h-24 object-cover rounded-2xl border-2 border-dark shadow-sm flex-shrink-0" />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white border-2 border-dark border-dashed rounded-[40px] p-12 text-center group cursor-pointer hover:bg-neutral-50 transition-colors" onClick={() => setIsFormOpen(true)}>
+          <div className="w-20 h-20 bg-neutral-100 rounded-[32px] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <MessageSquare className="w-10 h-10 text-dark/20" />
           </div>
-        ))}
-      </div>
+          <h3 className="text-2xl font-black uppercase tracking-tight mb-2">Faça a primeira avaliação!</h3>
+          <p className="text-dark/50 font-medium max-w-sm mx-auto">Você é dono deste carro ou já dirigiu muito? Compartilhe sua experiência real com a comunidade.</p>
+        </div>
+      )}
 
       {/* Modal de Formulário */}
       {isFormOpen && (

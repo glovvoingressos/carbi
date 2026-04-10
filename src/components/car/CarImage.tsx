@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import { availableCarAssetPaths } from '@/data/carAssetManifest'
 
 interface CarImageProps {
   id: string
@@ -15,31 +15,88 @@ interface CarImageProps {
 }
 
 export default function CarImage({ id, brand, model, year, src, priority = false, className, style }: CarImageProps) {
-  const [error, setError] = useState(false)
-  const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [hasFinalError, setHasFinalError] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const imageSrc = src || `/assets/cars/${id}.png`
+  useEffect(() => {
+    setCurrentIndex(0)
+    setHasFinalError(false)
+    setIsLoading(true)
+  }, [id, src, brand, model, year])
 
-  // Durante SSR e primeira hidratação, renderizamos apenas o container e o skeleton básico
-  // que deve ser IDÊNTICO ao que o servidor enviou para evitar o erro de hidratação.
+  const slug = (value: string) =>
+    value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+
+  const brandSlug = slug(brand)
+  const modelSlug = slug(model)
+  const modelBaseSlug = modelSlug
+    .split('-')
+    .filter(Boolean)
+    .reduce<string[]>((acc, token) => {
+      // Remove tokens que começam com número ou são categorias técnicas
+      if (/^\d/.test(token)) return acc
+      if (acc.length > 0 && ['turbo', 'cvt', 'at', 'mt', 'premium', 'plus', 'drive', 'xls', 'xlsa', 'highline', 'platinum', 'premier', 'griffe', 'diamond', 'iconic', 'like', 'touring'].includes(token)) {
+        return acc
+      }
+      acc.push(token)
+      return acc
+    }, [])
+    .join('-') || modelSlug
+
+  const brandVariants = [
+    brandSlug,
+    brandSlug.replace('volkswagen', 'vw'),
+    brandSlug.replace('caoa-chery', 'cao-chery'),
+  ]
+
+  // Lista de candidatos em ordem de prioridade
+  // Se o ano for 2026, tentamos logo 2025 e 2024 como alternativas principais
+  const fallbackYears = year >= 2025 ? [2025, 2024] : [2024]
+  
+  const imageCandidates = [
+    src, // 1. O src exato vindo dos dados
+    `/assets/cars/${id}.png`, // 2. O ID exato
+    
+    // 3. Variações por Ano (Primeiro o solicitado, depois os fallbacks imediatos)
+    ...brandVariants.flatMap((b) => [
+      `/assets/cars/${b}-${modelSlug}-${year}.png`,
+      `/assets/cars/${b}-${modelBaseSlug}-${year}.png`,
+      ...fallbackYears.flatMap(fy => [
+        `/assets/cars/${b}-${modelSlug}-${fy}.png`,
+        `/assets/cars/${b}-${modelBaseSlug}-${fy}.png`,
+      ])
+    ]),
+
+    `/assets/decorations/car-3d.png`, // 4. Fallback visual genérico
+  ].filter(Boolean) as string[]
+
+  const uniqueImageCandidates = Array.from(new Set(imageCandidates))
+  const localCandidates = uniqueImageCandidates.filter((path) => {
+    if (!path.startsWith('/assets/cars/')) return true
+    return availableCarAssetPaths.has(path)
+  })
+  const resolvedCandidates =
+    localCandidates.length > 0 ? localCandidates : ['/assets/decorations/car-3d.png']
+
+  // Skeleton de hidratação (SSR Safe)
   if (!mounted) {
     return (
       <div 
         className={`relative overflow-hidden bg-[#eef2f5] dark:bg-neutral-900 ${className}`}
-        style={{
-          ...style,
-          aspectRatio: '16/10',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
+        style={{ ...style, aspectRatio: '16/10' }}
       >
-        <div className="absolute inset-0 bg-[#eef2f5] flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-12 h-1.5 bg-dark/10 rounded-full animate-bounce" />
         </div>
       </div>
@@ -57,34 +114,43 @@ export default function CarImage({ id, brand, model, year, src, priority = false
         justifyContent: 'center'
       }}
     >
-      {/* Loading Shimmer */}
-      {loading && (
-        <div className="absolute inset-0 bg-neutral-200 animate-pulse z-10" />
-      )}
-
-      {/* Main Image - Only render if no error */}
-      {!error && (
+      {!hasFinalError && (
         <img
-          src={imageSrc}
+          key={currentIndex} // FORÇA O REACT A CRIAR UM NOVO ELEMENTO E DISPARAR ONLOAD/ONERROR
+          src={resolvedCandidates[currentIndex]}
           alt={`${brand} ${model} ${year}`}
-          onLoad={() => setLoading(false)}
-          onError={() => {
-            setError(true)
-            setLoading(false)
+          onLoad={() => {
+            setIsLoading(false)
           }}
-          className={`w-full h-full object-contain transition-all duration-700 ${loading ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}
+          onError={() => {
+            const next = currentIndex + 1
+            if (next < resolvedCandidates.length) {
+              setCurrentIndex(next)
+              setIsLoading(true)
+            } else {
+              setHasFinalError(true)
+              setIsLoading(false)
+            }
+          }}
+          className={`w-full h-full object-contain transition-all duration-700 ${isLoading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
           style={{
-            transform: 'scale(1.05)',
+            transform: isLoading ? 'scale(0.95)' : 'scale(1.05)',
             pointerEvents: 'none'
           }}
-          loading={priority ? 'eager' : 'lazy'}
+          loading={priority || currentIndex === 0 ? 'eager' : 'lazy'}
         />
       )}
 
-      {/* Premium CSS-Only Fallback */}
-      {error && (
+      {/* Loading Shimmer / Pulse */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-dark/5 animate-pulse z-10">
+          <div className="w-12 h-1.5 bg-dark/10 rounded-full animate-bounce" />
+        </div>
+      )}
+
+      {/* Premium Fallback UI (Se tudo falhar) */}
+      {hasFinalError && (
         <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-[#eef2f5] to-[#dde4e9]">
-           {/* Decorative Stencil Icon */}
            <div className="relative mb-3 flex items-center justify-center">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/50 backdrop-blur-md border border-dark/5 rounded-full absolute animate-pulse" />
               <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white border-2 border-dark shadow-[4px_4px_0_#0A0A0A] rounded-xl flex items-center justify-center text-dark rotate-[2deg] z-10">
@@ -94,22 +160,14 @@ export default function CarImage({ id, brand, model, year, src, priority = false
            
            <div className="flex flex-col items-center gap-1.5 z-10">
               <p className="text-[10px] sm:text-[11px] font-black text-dark uppercase tracking-[0.15em] text-center leading-tight bg-[var(--color-bento-yellow)] px-3 py-1.5 rounded rotate-[-1deg] border border-dark shadow-[2px_2px_0_#0A0A0A]">
-                Preview 2026
+                Preview {year}
               </p>
               <p className="text-[9px] font-bold text-dark/30 uppercase tracking-widest text-center mt-1">
                  Asset em processamento
               </p>
            </div>
-           
            <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-24 bg-dark/5 blur-3xl rounded-full skew-x-12 pointer-events-none" />
         </div>
-      )}
-
-      {/* Skeleton state if loading */}
-      {loading && !error && (
-         <div className="absolute inset-0 bg-[#eef2f5] flex items-center justify-center">
-            <div className="w-12 h-1.5 bg-dark/10 rounded-full animate-bounce" />
-         </div>
       )}
     </div>
   )

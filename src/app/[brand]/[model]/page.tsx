@@ -12,6 +12,14 @@ import {
 } from 'lucide-react'
 import { VehicleSchema } from '@/components/seo/JsonLd'
 import ReviewSection from '@/components/car/ReviewSection'
+import VideoReviews from '@/components/car/VideoReviews'
+import CarImage from '@/components/car/CarImage'
+import YearSelector from '@/components/car/YearSelector'
+import { getFipeHistory, getFipeYearsByModelName } from '@/lib/fipe-api'
+import FipeHistory from '@/components/car/FipeHistory'
+import { getEnhancedSpecs } from '@/lib/car-query-service'
+import { getRelatedListings } from '@/lib/marketplace-server'
+import MarketplaceListingCard from '@/components/marketplace/ListingCard'
 
 // Remove generateStaticParams for large database to avoid slow builds
 // export function generateStaticParams() { ... }
@@ -27,11 +35,20 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
   }
 }
 
-export default async function CarDetailPage({ params }: { params: Promise<{ brand: string; model: string }> }) {
+export default async function CarDetailPage({ 
+  params,
+  searchParams 
+}: { 
+  params: Promise<{ brand: string; model: string }>,
+  searchParams: Promise<{ year?: string }>
+}) {
   const resolved = await params
+  const { year: searchYear } = await searchParams
   const car = await getCarDetail(resolved.brand, resolved.model)
 
   if (!car) notFound()
+
+  const requestedYear = searchYear ? parseInt(searchYear, 10) : car.year
 
   const brandSlug = car.brand.toLowerCase().replace(/\s+/g, '-')
   const similarCars = getCarsBySegment(car.segment).filter((c) => c.id !== car.id).slice(0, 4)
@@ -43,21 +60,51 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
   const bestTorque = Math.max(...segmentCars.map((c) => c.torque))
   const bestTrunk = Math.max(...segmentCars.map((c) => c.trunkCapacity))
 
-  // Lógica da Tabela FIPE Real
-  const fipeData = await getFipePrice(car.brand, car.model, car.year);
+  let availableYears: number[] = []
+  try {
+    availableYears = await getFipeYearsByModelName(car.brand, car.model, 5)
+  } catch {
+    console.error('Failed to fetch years for selector')
+  }
+
+  if (availableYears.length === 0) {
+    const baseYear = car.year || new Date().getFullYear()
+    availableYears = Array.from({ length: 5 }, (_, idx) => baseYear - idx)
+  }
+
+  // Ano efetivo sempre limitado aos últimos anos válidos retornados pela API
+  const displayYear = Number.isFinite(requestedYear) && availableYears.includes(requestedYear)
+    ? requestedYear
+    : (availableYears[0] || car.year)
+
+  // Lógica da Tabela FIPE Real (com versão/combustível)
+  const fipeData = await getFipePrice(car.brand, car.model, displayYear, car.version);
+
+  // Busca histórico de preços (6 anos) - Agora com Version Awareness
+  const priceHistory = await getFipeHistory(car.brand, car.model, 6, car.version)
+
+  // Busca especificações aprimoradas para o ano selecionado via CarQuery
+  const enhancedSpecs = await getEnhancedSpecs(car.brand, car.model, displayYear)
+  const relatedListings = await getRelatedListings({
+    brand: car.brand,
+    model: car.model,
+    yearModel: displayYear,
+    limit: 4,
+  })
   
   // Converte a string "R$ 150.000" em número para cálculos
   const parseFipeValue = (val: string) => parseFloat(val.replace(/[^\d,]/g, '').replace(',', '.'));
   
   const fipePrice = fipeData 
     ? parseFipeValue(fipeData.price) 
-    : (car.year === 2026 ? car.priceBrl : car.priceBrl * 0.95);
+    : car.priceBrl;
 
-  // Projeção VIP de Desvalorização (Estimativa baseada na FIPE Real se disponível)
+  // Projeção VIP de Desvalorização (Agora baseada em dados reais abaixo)
   const yr0 = fipePrice;
-  const yr1 = fipePrice * 0.88;
-  const yr2 = fipePrice * 0.81;
-  const yr3 = fipePrice * 0.74;
+
+  const displayHp = enhancedSpecs?.horsepower || car.horsepower
+  const displayTorque = enhancedSpecs?.torque || car.torque
+  const displayWeight = enhancedSpecs?.weight || car.weightKg
 
   return (
     <div className="container mx-auto px-4 pt-24 pb-8">
@@ -86,7 +133,14 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
                  {/* Estrela / Decorativo Cash App style (opcional) */}
                  <div className="absolute top-4 left-4 w-12 h-12 rounded-full border border-dark flex items-center justify-center text-dark font-black bg-[var(--color-bento-yellow)] rotate-[-10deg]">✨</div>
                  
-                 <img src={car.image} alt={`${car.brand} ${car.model}`} className="w-full object-contain filter drop-shadow-2xl transition-transform hover:scale-105 duration-500 rounded-[32px] overflow-hidden shadow-sm" width={600} height={450} />
+                 <CarImage 
+                   id={car.id} 
+                   brand={car.brand} 
+                   model={car.model} 
+                   year={car.year} 
+                   src={car.image} 
+                   className="w-full object-contain filter drop-shadow-2xl transition-transform hover:scale-105 duration-500 rounded-[32px] overflow-hidden shadow-sm"
+                 />
               </div>
               <div className="p-8 sm:p-12 flex flex-col justify-center bg-white">
                 <div className="flex flex-wrap gap-3 mb-6">
@@ -104,31 +158,58 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
                      </span>
                   )}
                 </div>
-                <h1 className="text-3xl sm:text-5xl font-normal font-heading text-text tracking-[-0.01em] leading-none mb-1">{car.brand} {car.model}</h1>
+                <h1 className="text-3xl sm:text-5xl font-heading text-text tracking-[-0.01em] leading-none mb-1">{car.brand} {car.model}</h1>
                 <p className="text-sm text-text-secondary mt-1">{car.version}</p>
                 <p className="text-sm text-text-tertiary mt-1 mb-3">Preço médio</p>
-                <p className="text-4xl sm:text-5xl font-normal font-sans text-primary tracking-[-0.02em]">{formatBRL(car.priceBrl)}</p>
-                <p className="text-sm text-text-secondary mt-4 leading-relaxed">{car.shortDesc}</p>
+                <p className="text-4xl sm:text-5xl font-normal font-sans text-primary tracking-[-0.02em]">{formatBRL(fipePrice)}</p>
+                <div className="flex flex-col sm:flex-row gap-4 mt-6 items-start sm:items-center">
+                   <YearSelector currentYear={displayYear} availableYears={availableYears} />
+                   
+                   <Link href="/comparar"
+                     className="inline-flex items-center justify-between bg-[var(--color-accent)] text-dark rounded-full pl-6 pr-2 py-2 transition-all hover:scale-[1.02] active:scale-[0.98] w-max gap-8 border-2 border-dark shadow-[4px_4px_0_#000]">
+                     <span className="font-black text-[13px] tracking-widest uppercase">Comparar</span>
+                     <div className="w-8 h-8 flex items-center justify-center bg-dark rounded-full text-white">
+                       <ArrowLeftRight className="w-4 h-4" />
+                     </div>
+                   </Link>
+                </div>
+                
+                {searchYear && (
+                  <div className="mt-4 p-3 bg-surface border border-dashed border-dark/20 rounded-xl text-[10px] font-bold text-text-tertiary">
+                     ⚠️ Exibindo dados de {displayYear}. Alguns campos técnicos podem refletir o modelo de referência 2024/2026.
+                  </div>
+                )}
+                
+                <p className="text-sm text-text-secondary mt-6 leading-relaxed">{car.shortDesc}</p>
                 <p className="text-sm text-text mt-3">
                   <span className="font-medium">Ideal para:</span> {car.idealFor}
                 </p>
-                <Link href="/comparar"
-                  className="mt-6 inline-flex items-center justify-between bg-[var(--color-accent)] text-dark rounded-full pl-6 pr-2 py-2 transition-all hover:scale-[1.02] active:scale-[0.98] w-max gap-8 border-2 border-dark shadow-[4px_4px_0_#000]">
-                  <span className="font-black text-[13px] tracking-widest uppercase">Comparar</span>
-                  <div className="w-8 h-8 flex items-center justify-center bg-dark rounded-full text-white">
-                    <ArrowLeftRight className="w-4 h-4" />
-                  </div>
-                </Link>
               </div>
             </div>
           </div>
 
+          <section className="rounded-[32px] border-2 border-dark bg-[#dff7e8] p-6 sm:p-8 shadow-[6px_6px_0_#000]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-widest text-dark/70">Destaque</p>
+                <h2 className="text-2xl font-black text-dark leading-tight mt-1">Quer vender seu carro com preço FIPE em destaque?</h2>
+                <p className="text-sm font-semibold text-dark/70 mt-2">Crie um anúncio em minutos com fotos, chat e referência FIPE na hora.</p>
+              </div>
+              <Link
+                href="/anunciar-carro-bh"
+                className="inline-flex items-center justify-center rounded-full bg-[var(--color-bento-yellow)] px-6 py-3 text-dark font-black uppercase tracking-wider border-2 border-dark shadow-[4px_4px_0_#000] hover:-translate-y-1 transition-all"
+              >
+                Anunciar meu carro
+              </Link>
+            </div>
+          </section>
+
           {/* Key Stats Mobile (Hidden on Desktop) */}
           <div className="grid grid-cols-2 gap-3 lg:hidden">
-            <StatCard label="Preço" value={formatBRL(car.priceBrl)} isWinner={car.priceBrl === bestPrice} />
+            <StatCard label="Preço" value={formatBRL(fipePrice)} isWinner={fipePrice <= bestPrice} />
             <StatCard label="Consumo" value={`${car.fuelEconomyCityGas} km/l`} isWinner={car.fuelEconomyCityGas === bestConsumption} />
-            <StatCard label="Potência" value={`${car.horsepower} cv`} isWinner={car.horsepower === bestHp} />
-            <StatCard label="Torque" value={`${car.torque} Nm`} isWinner={car.torque === bestTorque} />
+            <StatCard label="Potência" value={`${displayHp} cv`} isWinner={displayHp >= bestHp} />
+            <StatCard label="Torque" value={`${displayTorque} Nm`} isWinner={displayTorque >= bestTorque} />
           </div>
 
           {/* Details grid */}
@@ -141,7 +222,7 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
                 <SpecRow label="Motor" value={`${car.engineType} ${car.displacement}L${car.turbo ? ' Turbo' : ''}`} />
                 <SpecRow label="Câmbio" value={car.transmission} />
                 <SpecRow label="Tração" value={car.drive} />
-                <SpecRow label="Peso" value={`${car.weightKg} kg`} />
+                <SpecRow label="Peso" value={`${displayWeight} kg`} />
                 <SpecRow label="Comprimento" value={`${car.lengthMm} mm`} />
                 <SpecRow label="Entre-eixos" value={`${car.wheelbaseMm} mm`} />
                 <SpecRow label="Porta-malas" value={`${car.trunkCapacity} L`} isWinner={car.trunkCapacity === bestTrunk} />
@@ -153,28 +234,25 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
             <div className="space-y-8 md:space-y-10">
               <div className="bg-[var(--color-bento-blue)] rounded-[40px] p-8 sm:p-10 relative shadow-sm text-dark">
                 <div className="absolute -top-5 -left-3 bg-[var(--color-bento-red)] text-white font-black tracking-widest px-5 py-2 rounded-lg rotate-[2deg] shadow-sm uppercase">
-                   2. Segurança
+                   2. Especificações do Motor ({displayYear})
                 </div>
                 <div className="space-y-4 text-sm font-semibold mt-4">
-                  <SpecRow label="Airbags" value={`${car.airbagsCount}`} />
-                  <SpecRow label="ABS" value={car.absBrakes ? 'Sim' : 'Não'} />
-                  <SpecRow label="ESC" value={car.esc ? 'Sim' : 'Não'} isGood={car.esc} />
-                  <SpecRow label="Latin NCAP" value={car.latinNcap > 0 ? `${car.latinNcap}/5` : 'N/A'} />
-                  <SpecRow label="ISOFIX" value={car.isofix ? 'Sim' : 'Não'} />
+                  <SpecRow label="Potência" value={`${displayHp} cv`} isWinner={displayHp >= bestHp} />
+                  <SpecRow label="Torque" value={`${displayTorque} Nm`} isWinner={displayTorque >= bestTorque} />
+                  <SpecRow label="Tipo Motor" value={`${car.engineType} ${car.displacement}L`} />
+                  <SpecRow label="Aspiração" value={car.turbo ? 'Turbo' : 'Natural'} />
                 </div>
               </div>
 
               <div className="bg-[var(--color-bento-yellow)] rounded-[40px] p-8 sm:p-10 relative shadow-sm text-dark">
                 <div className="absolute -top-5 -left-3 bg-[var(--color-bento-red)] text-white font-black tracking-widest px-5 py-2 rounded-lg rotate-[-1deg] shadow-sm uppercase">
-                   3. Tecnologia
+                   3. Segurança e Tech
                 </div>
                 <div className="space-y-4 text-sm font-semibold mt-4">
-                  <SpecRow label="Central multimídia" value={car.hasMultimedia ? 'Sim' : 'Não'} />
-                  <SpecRow label="Apple CarPlay" value={car.hasCarplay ? 'Sim' : 'Não'} />
-                  <SpecRow label="Android Auto" value={car.hasAndroidAuto ? 'Sim' : 'Não'} />
-                  <SpecRow label="Câmera de ré" value={car.hasRearCamera ? 'Sim' : 'Não'} />
-                  <SpecRow label="Controle de cruzeiro" value={car.hasCruiseCtrl ? 'Sim' : 'Não'} />
-                  <SpecRow label="Ar-condicionado" value={car.hasAc ? 'Sim' : 'Não'} />
+                  <SpecRow label="Airbags" value={`${car.airbagsCount}`} />
+                  <SpecRow label="Latin NCAP" value={car.latinNcap > 0 ? `${car.latinNcap}/5` : 'N/A'} />
+                  <SpecRow label="Multimídia" value={car.hasMultimedia ? 'Sim' : 'Não'} />
+                  <SpecRow label="Smartphone" value={car.hasCarplay ? 'Apple/Android' : 'Não'} />
                 </div>
               </div>
             </div>
@@ -217,8 +295,12 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
               initialBrandName={car.brand}
               initialModelName={car.model}
               initialYear={car.year}
+              initialVersionName={car.version}
             />
           </div>
+
+          {/* Histórico 6 Anos "Bonitinho" */}
+          <FipeHistory history={priceHistory} />
 
           {/* Seção SEO Programático: Vale a Pena Comprar? */}
           <section className="bg-white rounded-[40px] p-8 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mt-12 mb-8">
@@ -238,7 +320,7 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
             </div>
             
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 border-t border-border pt-6">
-               <Link href="/carros-usados-bh" className="w-full sm:w-auto bg-dark text-white font-black px-6 py-3 rounded-full flex items-center justify-center gap-2 hover:bg-[var(--color-bento-red)] hover:-translate-y-1 transition-all">
+               <Link href="/carros-usados-bh" className="w-full sm:w-auto bg-[var(--color-bento-yellow)] text-dark font-black px-6 py-3 rounded-full border-2 border-dark flex items-center justify-center gap-2 hover:bg-[var(--color-accent)] hover:-translate-y-1 transition-all">
                   Ver ofertas perto de mim <ArrowRight className="w-4 h-4" />
                </Link>
                <Link href="/comparar" className="w-full sm:w-auto bg-surface text-dark border-2 border-border font-bold px-6 py-3 rounded-full flex items-center justify-center hover:-translate-y-1 transition-all">
@@ -268,6 +350,9 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
 
           {/* Avaliações de Proprietários */}
           <ReviewSection carId={car.id} />
+
+          {/* Vídeos do YouTube */}
+          <VideoReviews brand={car.brand} model={car.model} year={displayYear} />
         </div>
 
         {/* COLUNA LATERAL (DIREITA) - Stick on Desktop */}
@@ -305,6 +390,17 @@ export default async function CarDetailPage({ params }: { params: Promise<{ bran
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {similarCars.map((c) => (
               <CarCard key={c.id} car={c} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {relatedListings.length > 0 && (
+        <div className="mt-12">
+          <h2 className="text-xl font-bold text-text mb-6">Veículos anunciados deste modelo</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {relatedListings.map((listing) => (
+              <MarketplaceListingCard key={listing.id} listing={listing} />
             ))}
           </div>
         </div>

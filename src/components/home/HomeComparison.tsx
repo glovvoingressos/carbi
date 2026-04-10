@@ -3,7 +3,8 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { cars, formatBRL, compareCars } from '@/data/cars'
-import { Plus, ArrowRight, Zap, Trophy, X, Search, Fuel, Package, ShieldCheck } from 'lucide-react'
+import { Plus, ArrowRight, Zap, Trophy, X, Search, Fuel, Package, ShieldCheck, DollarSign } from 'lucide-react'
+import CarImage from '@/components/car/CarImage'
 
 export default function HomeComparison() {
   const [selected, setSelected] = useState<(string | null)[]>([null, null])
@@ -126,14 +127,14 @@ export default function HomeComparison() {
                      <div className="mt-8 flex items-center justify-between pt-6 border-t border-dark/5">
                         <div className="flex flex-col items-center">
                            <div className="w-12 h-12 rounded-full overflow-hidden border border-dark/10 bg-white mb-2 shadow-sm">
-                              <img src={carA?.image} alt={carA?.model} className="w-full h-full object-contain p-1" />
+                              <CarImage id={carA?.id!} brand={carA?.brand!} model={carA?.model!} year={carA?.year!} src={carA?.image} className="w-full h-full" />
                            </div>
                            <p className="text-[10px] font-black uppercase tracking-widest text-dark">{carA?.model}</p>
                         </div>
                         <div className="text-sm font-black text-dark/20 italic tracking-tighter">VERSUS</div>
                         <div className="flex flex-col items-center">
                            <div className="w-12 h-12 rounded-full overflow-hidden border border-dark/10 bg-white mb-2 shadow-sm">
-                              <img src={carB?.image} alt={carB?.model} className="w-full h-full object-contain p-1" />
+                              <CarImage id={carB?.id!} brand={carB?.brand!} model={carB?.model!} year={carB?.year!} src={carB?.image} className="w-full h-full" />
                            </div>
                            <p className="text-[10px] font-black uppercase tracking-widest text-dark">{carB?.model}</p>
                         </div>
@@ -198,11 +199,11 @@ export default function HomeComparison() {
                     className="w-full p-4 rounded-2xl border border-dark/5 flex items-center gap-4 hover:bg-dark hover:text-white transition-all group"
                   >
                      <div className="w-16 h-12 bg-[#f8fafc] rounded-xl overflow-hidden p-1 flex items-center justify-center group-hover:bg-white transition-colors">
-                        <img src={car.image} alt={car.model} className="w-full h-full object-contain" />
+                        <CarImage id={car.id} brand={car.brand} model={car.model} year={car.year} src={car.image} className="w-full h-full" />
                      </div>
                      <div className="text-left">
                         <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest">{car.brand}</p>
-                        <p className="font-heading font-normal text-lg leading-none">{car.model}</p>
+                        <p className="font-heading text-lg leading-none">{car.model}</p>
                      </div>
                      <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
                         <ArrowRight className="w-5 h-5" />
@@ -226,7 +227,7 @@ function Slot({ num, car, onClick, icon, accent = false }: any) {
          <div className={`w-32 h-44 sm:w-44 sm:h-64 bg-white border-2 border-dark rounded-[32px] shadow-[8px_8px_0_#0A0A0A] p-4 flex flex-col justify-between items-center group-hover:shadow-[12px_12px_0_#0A0A0A] transition-all overflow-hidden ${car ? 'border-solid' : 'border-dashed opacity-80'}`}>
             <div className="w-full h-24 sm:h-32 bg-neutral-50 rounded-2xl flex items-center justify-center group-hover:bg-white transition-all relative overflow-hidden">
                {car ? (
-                  <img src={car.image} alt={car.model} className="w-full h-full object-contain p-2 animate-in fade-in duration-500" />
+                  <CarImage id={car.id} brand={car.brand} model={car.model} year={car.year} src={car.image} className="w-full h-full" />
                ) : (
                   <div className="w-12 h-12 rounded-full border-2 border-dashed border-dark/10 flex items-center justify-center group-hover:border-dark group-hover:animate-spin-slow">
                      <Plus className="w-6 h-6 text-dark/30 group-hover:text-dark" />
@@ -269,10 +270,4 @@ function SummaryRow({ label, icon, winner, valA, valB }: any) {
          </div>
       </div>
    )
-}
-
-function DollarSign({ className }: { className?: string }) {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-  )
 }

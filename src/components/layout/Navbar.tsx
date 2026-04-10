@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
-import { Menu, X, Search, CarFront, Home, BarChart3, GitCompare, Sparkles, ChevronRight } from 'lucide-react'
+import { Menu, X, Search, CarFront, Home, BarChart3, GitCompare, Sparkles, ChevronRight, MessageCircle } from 'lucide-react'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -36,8 +36,9 @@ export default function Navbar() {
     { href: '/marcas',   label: 'Marcas',    icon: CarFront },
     { href: '/comparar', label: 'Comparar',  icon: GitCompare },
     { href: '/rankings', label: 'Rankings',  icon: BarChart3 },
-    { href: '/anunciar-carro-bh', label: 'Vender em BH', icon: Sparkles },
+    { href: '/anunciar-carro-bh', label: 'Anunciar', icon: Sparkles },
     { href: '/carros-usados-bh', label: 'Comprar em BH', icon: Sparkles },
+    { href: '/minha-conta/conversas', label: 'Conversas', icon: MessageCircle },
   ]
 
   const isActive = (href: string) =>
@@ -60,13 +61,8 @@ export default function Navbar() {
               : 'w-full max-w-[1200px] h-16 px-8 bg-transparent'
           } rounded-full`}
         >
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-dark rounded-xl flex items-center justify-center transition-transform group-hover:scale-110">
-              <CarFront className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-heading text-[20px] tracking-tighter text-dark lowercase">
-              carbi
-            </span>
+          <Link href="/" className="font-display text-[24px] tracking-tighter text-dark lowercase transition-opacity hover:opacity-70">
+            carbi
           </Link>
 
           {/* Actions */}
@@ -104,7 +100,7 @@ export default function Navbar() {
             <X className="w-6 h-6 text-dark" />
           </button>
           <div className="w-full max-w-2xl">
-            <h2 className="text-4xl font-heading mb-8 text-center">O que você procura?</h2>
+            <h2 className="text-4xl font-display mb-8 text-center">O que você procura?</h2>
             <div className="relative group">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-dark/20 group-focus-within:text-[var(--color-accent)] transition-colors" />
               <input 
@@ -135,14 +131,9 @@ export default function Navbar() {
           />
           <aside className="relative w-full md:w-[480px] h-full bg-white shadow-[-20px_0_60px_rgba(0,0,0,0.1)] p-8 md:p-12 flex flex-col animate-in slide-in-from-right duration-500 ease-spring">
             <div className="flex items-center justify-between mb-16">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-dark rounded-xl flex items-center justify-center">
-                  <CarFront className="w-4 h-4 text-white" />
-                </div>
-                <span className="font-heading text-2xl tracking-tighter text-dark lowercase">
-                  carbi
-                </span>
-              </Link>
+               <Link href="/" className="font-display text-3xl tracking-tighter text-dark lowercase">
+                carbi
+               </Link>
               <button 
                 onClick={() => setDrawerOpen(false)}
                 className="p-3 bg-[#f4f6f8] rounded-full hover:bg-black/5 transition-colors"
@@ -201,4 +192,3 @@ export default function Navbar() {
     </>
   )
 }
-

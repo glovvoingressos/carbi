@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Search, Heart, User } from 'lucide-react'
+import { Home, Search, MessageCircle, PlusCircle } from 'lucide-react'
 
 import { useState, useEffect } from 'react'
 
@@ -19,8 +19,8 @@ export default function BottomNav() {
   const items = [
     { href: '/', label: 'Início', icon: Home },
     { href: '/marcas', label: 'Buscar', icon: Search },
-    { href: '/rankings', label: 'Rankings', icon: Heart },
-    { href: '/qual-carro', label: 'Perfil', icon: User },
+    { href: '/anunciar-carro-bh', label: 'Anunciar', icon: PlusCircle },
+    { href: '/minha-conta/conversas', label: 'Conversas', icon: MessageCircle },
   ]
 
   return (

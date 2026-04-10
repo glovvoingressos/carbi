@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { CarFront, ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 
 const NAV_LINKS = [
   { group: 'Plataforma', links: [
@@ -32,19 +32,8 @@ export default function Footer() {
         >
           {/* Coluna: marca */}
           <div style={{ gridColumn: 'span 2' }} className="footer-brand-col">
-            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <div
-                style={{
-                  width: 36, height: 36,
-                  borderRadius: 10,
-                  background: 'var(--color-dark)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <CarFront style={{ width: 18, height: 18, color: '#fff' }} />
-              </div>
-              <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em', textTransform: 'lowercase' }}>
+            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', marginBottom: 16 }}>
+              <span style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.04em', textTransform: 'lowercase' }}>
                 carbi
               </span>
             </Link>

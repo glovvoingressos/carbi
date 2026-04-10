@@ -1,115 +1,331 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { TrendingDown, ChevronRight, Gauge, Zap } from 'lucide-react'
-import { FipeItem, FipeResult } from '@/lib/fipe-api'
-import { formatBRL } from '@/data/cars'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Loader2, TrendingDown } from 'lucide-react'
+import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
 
 interface FipeCalculatorProps {
   initialBrandName: string
   initialModelName: string
   initialYear: number | string
+  initialVersionName?: string
+}
+
+type LoadingState = {
+  brands: boolean
+  models: boolean
+  years: boolean
+  versions: boolean
+  detail: boolean
+}
+
+const initialLoading: LoadingState = {
+  brands: false,
+  models: false,
+  years: false,
+  versions: false,
+  detail: false,
+}
+
+const skeletonClass = 'h-12 w-full rounded-xl bg-slate-200/70 animate-pulse'
+
+function normalize(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+async function getJson<T>(url: string): Promise<T> {
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Falha ao consultar ${url}: ${response.status}`)
+  }
+  return response.json()
 }
 
 export default function FipeCalculator({
   initialBrandName,
   initialModelName,
   initialYear,
+  initialVersionName,
 }: FipeCalculatorProps) {
   const [brands, setBrands] = useState<FipeItem[]>([])
   const [models, setModels] = useState<FipeItem[]>([])
-  const [years, setYears] = useState<FipeItem[]>([])
-  
-  const [selectedBrand, setSelectedBrand] = useState<string>('')
-  const [selectedModel, setSelectedModel] = useState<string>('')
-  const [selectedYear, setSelectedYear] = useState<string>('')
-  
+  const [years, setYears] = useState<number[]>([])
+  const [versions, setVersions] = useState<FipeVersionOption[]>([])
+
+  const [selectedBrand, setSelectedBrand] = useState('')
+  const [selectedModel, setSelectedModel] = useState('')
+  const [selectedYear, setSelectedYear] = useState<number | null>(null)
+  const [selectedVersion, setSelectedVersion] = useState('')
+
   const [result, setResult] = useState<FipeResult | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState<LoadingState>(initialLoading)
 
-  // Fetch Brands on mount
+  const modelsCache = useRef(new Map<string, FipeItem[]>())
+  const yearsCache = useRef(new Map<string, number[]>())
+  const versionsCache = useRef(new Map<string, FipeVersionOption[]>())
+  const detailCache = useRef(new Map<string, FipeResult | null>())
+
+  const hasAllFilters = useMemo(
+    () => Boolean(selectedBrand && selectedModel && selectedYear && selectedVersion),
+    [selectedBrand, selectedModel, selectedYear, selectedVersion]
+  )
+
   useEffect(() => {
-    async function init() {
-      const response = await fetch('/api/fipe/brands')
-      const data = await response.json()
-      setBrands(data)
+    let cancelled = false
 
-      // Find initial brand
-      const b = data.find((b: FipeItem) => 
-        b.name.toLowerCase() === initialBrandName.toLowerCase() ||
-        b.name.toLowerCase().includes(initialBrandName.toLowerCase())
-      )
-      if (b) setSelectedBrand(b.code)
+    async function fetchBrands() {
+      setLoading((prev) => ({ ...prev, brands: true }))
+      setError(null)
+
+      try {
+        const data = await getJson<FipeItem[]>('/api/fipe/brands')
+        if (cancelled) return
+        setBrands(data)
+
+        const brandMatch = data.find((b) => {
+          const name = normalize(b.name)
+          const initial = normalize(initialBrandName)
+          return name === initial || name.includes(initial)
+        })
+
+        if (brandMatch) {
+          setSelectedBrand(brandMatch.code)
+        }
+      } catch {
+        if (!cancelled) setError('Não foi possível carregar as marcas FIPE.')
+      } finally {
+        if (!cancelled) setLoading((prev) => ({ ...prev, brands: false }))
+      }
     }
-    init()
+
+    fetchBrands()
+    return () => {
+      cancelled = true
+    }
   }, [initialBrandName])
 
-  // Fetch Models when Brand changes
   useEffect(() => {
-    if (!selectedBrand) return
-    async function fetchModels() {
-      setLoading(true)
-      const response = await fetch(`/api/fipe/models?brandCode=${selectedBrand}`)
-      const data = await response.json()
-      setModels(data)
-      
-      // Auto-select initial model if it matches
-      const m = data.find((m: FipeItem) => {
-        const name = m.name.toLowerCase()
-        const search = initialModelName.toLowerCase()
-        return name === search || name.startsWith(search + ' ')
-      })
-      if (m && !selectedModel) setSelectedModel(m.code)
-      
-      setLoading(false)
+    if (!selectedBrand) {
+      setModels([])
+      setSelectedModel('')
+      return
     }
+
+    let cancelled = false
+
+    async function fetchModels() {
+      setLoading((prev) => ({ ...prev, models: true }))
+      setError(null)
+
+      try {
+        if (modelsCache.current.has(selectedBrand)) {
+          const cached = modelsCache.current.get(selectedBrand) || []
+          setModels(cached)
+        } else {
+          const data = await getJson<FipeItem[]>(`/api/fipe/models?brandCode=${selectedBrand}`)
+          if (cancelled) return
+          modelsCache.current.set(selectedBrand, data)
+          setModels(data)
+        }
+
+        const modelSource = modelsCache.current.get(selectedBrand) || []
+        const modelMatch = modelSource.find((m) => {
+          const modelNormalized = normalize(m.name)
+          const initialNormalized = normalize(initialModelName)
+          return (
+            modelNormalized === initialNormalized ||
+            modelNormalized.startsWith(initialNormalized + ' ') ||
+            modelNormalized.includes(initialNormalized)
+          )
+        })
+
+        if (modelMatch) {
+          setSelectedModel((prev) => prev || modelMatch.code)
+        }
+      } catch {
+        if (!cancelled) setError('Não foi possível carregar os modelos da marca.')
+      } finally {
+        if (!cancelled) setLoading((prev) => ({ ...prev, models: false }))
+      }
+    }
+
+    setSelectedModel('')
+    setYears([])
+    setSelectedYear(null)
+    setVersions([])
+    setSelectedVersion('')
+    setResult(null)
+
     fetchModels()
+    return () => {
+      cancelled = true
+    }
   }, [selectedBrand, initialModelName])
 
-  // Fetch Years when Model changes
   useEffect(() => {
-    if (!selectedBrand || !selectedModel) return
-    async function fetchYears() {
-      setLoading(true)
-      const response = await fetch(`/api/fipe/years?brandCode=${selectedBrand}&modelCode=${selectedModel}`)
-      const data: FipeItem[] = await response.json()
-      
-      // Sort descending (latest years first)
-      const sorted = [...data].sort((a, b) => {
-        const ya = parseInt(a.name) || 0
-        const yb = parseInt(b.name) || 0
-        return yb - ya
-      })
-      
-      setYears(sorted)
-      
-      // Auto-select initial year if matches
-      const y = sorted.find((y: FipeItem) => y.name.includes(initialYear.toString())) 
-             || sorted.find((y: FipeItem) => y.name.toLowerCase().includes('zero km'))
-             || sorted[0]
-
-      if (y && !selectedYear) setSelectedYear(y.code)
-      
-      setLoading(false)
+    if (!selectedBrand || !selectedModel) {
+      setYears([])
+      setSelectedYear(null)
+      return
     }
+
+    let cancelled = false
+    const cacheKey = `${selectedBrand}:${selectedModel}`
+
+    async function fetchYears() {
+      setLoading((prev) => ({ ...prev, years: true }))
+      setError(null)
+
+      try {
+        if (yearsCache.current.has(cacheKey)) {
+          const cached = yearsCache.current.get(cacheKey) || []
+          setYears(cached)
+        } else {
+          const data = await getJson<number[]>(`/api/fipe/years?brandCode=${selectedBrand}&modelCode=${selectedModel}`)
+          if (cancelled) return
+          yearsCache.current.set(cacheKey, data)
+          setYears(data)
+        }
+
+        const yearSource = yearsCache.current.get(cacheKey) || []
+        const initialYearNum = typeof initialYear === 'number' ? initialYear : parseInt(initialYear, 10)
+        const yearMatch = yearSource.find((year) => year === initialYearNum)
+
+        setSelectedYear((prev) => prev || yearMatch || yearSource[0] || null)
+      } catch {
+        if (!cancelled) setError('Não foi possível carregar os anos disponíveis.')
+      } finally {
+        if (!cancelled) setLoading((prev) => ({ ...prev, years: false }))
+      }
+    }
+
+    setSelectedYear(null)
+    setVersions([])
+    setSelectedVersion('')
+    setResult(null)
+
     fetchYears()
+    return () => {
+      cancelled = true
+    }
   }, [selectedBrand, selectedModel, initialYear])
 
-  // Fetch Detail when Year changes
   useEffect(() => {
-    if (!selectedBrand || !selectedModel || !selectedYear) return
-    async function fetchDetail() {
-      setLoading(true)
-      const response = await fetch(`/api/fipe/detail?brandCode=${selectedBrand}&modelCode=${selectedModel}&yearCode=${selectedYear}`)
-      const data = await response.json()
-      setResult(data)
-      setLoading(false)
+    if (!selectedBrand || !selectedModel || !selectedYear) {
+      setVersions([])
+      setSelectedVersion('')
+      return
     }
-    fetchDetail()
-  }, [selectedBrand, selectedModel, selectedYear])
 
-  const parseFipeValue = (val: string) => parseFloat(val.replace(/[^\d,]/g, '').replace(',', '.'));
-  const fipePrice = result ? parseFipeValue(result.price) : 0;
+    let cancelled = false
+    const cacheKey = `${selectedBrand}:${selectedModel}:${selectedYear}`
+
+    async function fetchVersions() {
+      setLoading((prev) => ({ ...prev, versions: true }))
+      setError(null)
+
+      try {
+        if (versionsCache.current.has(cacheKey)) {
+          const cached = versionsCache.current.get(cacheKey) || []
+          setVersions(cached)
+        } else {
+          const data = await getJson<FipeVersionOption[]>(
+            `/api/fipe/versions?brandCode=${selectedBrand}&modelCode=${selectedModel}&year=${selectedYear}`
+          )
+          if (cancelled) return
+          versionsCache.current.set(cacheKey, data)
+          setVersions(data)
+        }
+
+        const versionSource = versionsCache.current.get(cacheKey) || []
+        if (versionSource.length === 0) {
+          setSelectedVersion('')
+          return
+        }
+
+        if (initialVersionName) {
+          const tokens = normalize(initialVersionName).split(' ').filter((t) => t.length >= 2)
+          const scored = versionSource
+            .map((item) => {
+              const name = normalize(item.name)
+              const fuel = normalize(item.fuelType)
+              let score = 0
+              for (const token of tokens) {
+                if (name.includes(token)) score += 5
+                if (fuel.includes(token)) score += 10
+              }
+              return { item, score }
+            })
+            .sort((a, b) => b.score - a.score)
+
+          setSelectedVersion((prev) => prev || scored[0]?.item.code || versionSource[0].code)
+          return
+        }
+
+        setSelectedVersion((prev) => prev || versionSource[0].code)
+      } catch {
+        if (!cancelled) setError('Não foi possível carregar as versões/combustível.')
+      } finally {
+        if (!cancelled) setLoading((prev) => ({ ...prev, versions: false }))
+      }
+    }
+
+    setSelectedVersion('')
+    setResult(null)
+
+    fetchVersions()
+    return () => {
+      cancelled = true
+    }
+  }, [selectedBrand, selectedModel, selectedYear, initialVersionName])
+
+  useEffect(() => {
+    if (!hasAllFilters || !selectedYear) {
+      setResult(null)
+      return
+    }
+
+    let cancelled = false
+    const cacheKey = `${selectedBrand}:${selectedModel}:${selectedYear}:${selectedVersion}`
+
+    async function fetchDetail() {
+      setLoading((prev) => ({ ...prev, detail: true }))
+      setError(null)
+
+      try {
+        if (detailCache.current.has(cacheKey)) {
+          setResult(detailCache.current.get(cacheKey) || null)
+          return
+        }
+
+        const data = await getJson<FipeResult | null>(
+          `/api/fipe/detail?brandCode=${selectedBrand}&modelCode=${selectedModel}&yearCode=${selectedVersion}`
+        )
+
+        if (cancelled) return
+        detailCache.current.set(cacheKey, data)
+        setResult(data)
+      } catch {
+        if (!cancelled) setError('Não foi possível carregar o valor FIPE.')
+      } finally {
+        if (!cancelled) setLoading((prev) => ({ ...prev, detail: false }))
+      }
+    }
+
+    fetchDetail()
+    return () => {
+      cancelled = true
+    }
+  }, [hasAllFilters, selectedBrand, selectedModel, selectedYear, selectedVersion])
+
+  const selectedVersionObj = versions.find((v) => v.code === selectedVersion) || null
 
   return (
     <div className="bg-white border-2 border-dark rounded-[32px] overflow-hidden shadow-[8px_8px_0_#000] p-6 sm:p-8">
@@ -117,79 +333,131 @@ export default function FipeCalculator({
         <div className="w-10 h-10 bg-[var(--color-bento-red)] rounded-xl flex items-center justify-center text-white shadow-[2px_2px_0_#000] border border-dark">
           <TrendingDown className="w-6 h-6" />
         </div>
-        <h3 className="text-xl font-black uppercase tracking-tight italic">Calculadora FIPE Real</h3>
+        <h3 className="text-xl font-black uppercase tracking-tight italic">Consulta FIPE Oficial</h3>
       </div>
 
       <div className="grid gap-4 mb-8">
-        {/* Brand Select (Read only or disabled since we are on a specific car page, but let's keep it for context) */}
         <div className="space-y-1.5">
           <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-1">Marca</label>
-          <select 
-            value={selectedBrand} 
-            onChange={(e) => { setSelectedBrand(e.target.value); setSelectedModel(''); setSelectedYear(''); }}
-            className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer"
-          >
-            <option value="">Selecione a Marca</option>
-            {brands.map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
-          </select>
+          {loading.brands ? (
+            <div className={skeletonClass} />
+          ) : (
+            <select
+              value={selectedBrand}
+              onChange={(e) => setSelectedBrand(e.target.value)}
+              className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer"
+            >
+              <option value="">Selecione a Marca</option>
+              {brands.map((b) => (
+                <option key={b.code} value={b.code}>{b.name}</option>
+              ))}
+            </select>
+          )}
         </div>
 
-        {/* Model/Version Select */}
         <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-1">Versão / Modelo</label>
-          <select 
-            value={selectedModel} 
-            onChange={(e) => { setSelectedModel(e.target.value); setSelectedYear(''); }}
-            disabled={!selectedBrand || loading}
-            className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer disabled:opacity-50"
-          >
-            <option value="">Selecione a Versão</option>
-            {models.map(m => <option key={m.code} value={m.code}>{m.name}</option>)}
-          </select>
+          <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-1">Modelo</label>
+          {loading.models ? (
+            <div className={skeletonClass} />
+          ) : (
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              disabled={!selectedBrand}
+              className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer disabled:opacity-50"
+            >
+              <option value="">Selecione o Modelo</option>
+              {models.map((m) => (
+                <option key={m.code} value={m.code}>{m.name}</option>
+              ))}
+            </select>
+          )}
         </div>
 
-        {/* Year Select */}
         <div className="space-y-1.5">
           <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-1">Ano Modelo</label>
-          <select 
-            value={selectedYear} 
-            onChange={(e) => setSelectedYear(e.target.value)}
-            disabled={!selectedModel || loading}
-            className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer disabled:opacity-50"
-          >
-            <option value="">Selecione o Ano</option>
-            {years.map(y => <option key={y.code} value={y.code}>{y.name}</option>)}
-          </select>
+          {loading.years ? (
+            <div className={skeletonClass} />
+          ) : (
+            <select
+              value={selectedYear ?? ''}
+              onChange={(e) => setSelectedYear(e.target.value ? parseInt(e.target.value, 10) : null)}
+              disabled={!selectedModel}
+              className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer disabled:opacity-50"
+            >
+              <option value="">Selecione o Ano</option>
+              {years.map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          )}
+          {years.length > 0 && (
+            <p className="text-[10px] text-text-tertiary font-semibold ml-1">Exibindo somente os 6 anos mais recentes.</p>
+          )}
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-1">Versão / Combustível</label>
+          {loading.versions ? (
+            <div className={skeletonClass} />
+          ) : (
+            <select
+              value={selectedVersion}
+              onChange={(e) => setSelectedVersion(e.target.value)}
+              disabled={!selectedYear}
+              className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer disabled:opacity-50"
+            >
+              <option value="">Selecione a Versão</option>
+              {versions.map((version) => (
+                <option key={version.code} value={version.code}>
+                  {version.name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
-      {result ? (
-        <div className="space-y-6 pt-6 border-t-2 border-dark border-dashed">
+      {error && (
+        <div className="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          {error}
+        </div>
+      )}
+
+      {loading.detail && (
+        <div className="pt-6 border-t-2 border-dark border-dashed">
+          <div className="h-9 w-56 rounded bg-slate-200/80 animate-pulse" />
+        </div>
+      )}
+
+      {!loading.detail && result && hasAllFilters ? (
+        <div className="space-y-4 pt-6 border-t-2 border-dark border-dashed">
           <div>
-            <p className="text-[11px] text-text-tertiary uppercase font-black tracking-widest mb-1.5">FIPE Atualizada</p>
+            <p className="text-[11px] text-text-tertiary uppercase font-black tracking-widest mb-1.5">Valor FIPE Atual</p>
             <p className="text-4xl font-black text-dark tracking-[-0.05em]">{result.price}</p>
           </div>
 
-          {/* Projeção */}
-          <div className="grid grid-cols-2 gap-4">
-             <div className="bg-surface border-2 border-dark rounded-2xl p-4 shadow-[4px_4px_0_#000]">
-                <p className="text-[9px] font-black uppercase tracking-widest text-text-tertiary mb-1">Previsão 2026</p>
-                <p className="text-lg font-black text-dark">{formatBRL(fipePrice * 0.88)}</p>
-             </div>
-             <div className="bg-surface border-2 border-dark rounded-2xl p-4 shadow-[4px_4px_0_#000]">
-                <p className="text-[9px] font-black uppercase tracking-widest text-text-tertiary mb-1">Previsão 2027</p>
-                <p className="text-lg font-black text-dark">{formatBRL(fipePrice * 0.81)}</p>
-             </div>
+          <div className="grid sm:grid-cols-2 gap-3 text-xs font-bold">
+            <div className="bg-surface border border-dark/20 rounded-xl px-3 py-2">
+              <span className="text-text-tertiary uppercase tracking-wider">Ano Selecionado</span>
+              <p className="text-dark mt-1">{selectedYear}</p>
+            </div>
+            <div className="bg-surface border border-dark/20 rounded-xl px-3 py-2">
+              <span className="text-text-tertiary uppercase tracking-wider">Combustível</span>
+              <p className="text-dark mt-1">{selectedVersionObj?.fuelType || result.fuel}</p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary bg-surface/50 p-3 rounded-xl border border-dashed border-dark/20">
-             <Zap className="w-3 h-3 text-[var(--color-bento-yellow)] fill-current" />
-             Dados extraídos em tempo real • Ref: {result.referenceMonth}
+            <Loader2 className="w-3 h-3 text-[var(--color-bento-yellow)]" />
+            Referência FIPE: {result.referenceMonth} • Código FIPE: {result.codeFipe}
           </div>
         </div>
-      ) : (
-        <div className="pt-6 text-center text-text-tertiary font-bold italic">
-          {loading ? 'Consultando base FIPE...' : 'Selecione os filtros acima'}
+      ) : null}
+
+      {!loading.detail && !result && (
+        <div className="pt-6 text-center text-text-tertiary font-bold italic border-t-2 border-dark border-dashed">
+          Selecione marca, modelo, ano e versão para consultar o valor FIPE.
         </div>
       )}
     </div>
