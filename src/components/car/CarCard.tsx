@@ -60,7 +60,7 @@ export default function CarCard({ car, index = 0, onCompare, isComparing = false
 
   return (
     <article
-      className={`car-card relative bg-white border border-black/5 rounded-[24px] sm:rounded-[32px] p-2 sm:p-3 pb-3 sm:pb-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl flex flex-col group scroll-reveal sr-delay-${Math.min(index + 1, 6)}`}
+      className={`car-card relative bg-white border border-black/5 rounded-[24px] sm:rounded-[32px] p-2.5 sm:p-3.5 pb-3.5 sm:pb-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl flex flex-col group scroll-reveal sr-delay-${Math.min(index + 1, 6)}`}
       onClick={() => router.push(detailUrl)}
       style={{ cursor: 'pointer' }}
     >
@@ -100,26 +100,26 @@ export default function CarCard({ car, index = 0, onCompare, isComparing = false
       </div>
 
       {/* ── Conteúdo ──────────────────────────────────── */}
-      <div className="px-1 sm:px-3 pt-3 sm:pt-5 flex flex-col flex-1">
-        <div className="flex items-center justify-between mb-2 sm:mb-3">
-          <div className="flex items-center gap-1">
-            <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-[#F59E0B] text-[#F59E0B]" />
-            <span className="text-[11px] sm:text-[13px] font-bold text-[#0A0A0A]">{rating}</span>
+      <div className="px-1.5 sm:px-3 pt-3.5 sm:pt-5 flex flex-col flex-1">
+        <div className="flex items-center justify-between mb-2.5 sm:mb-3">
+          <div className="flex items-center gap-1.5">
+            <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-[#F59E0B] text-[#F59E0B]" />
+            <span className="text-[12px] sm:text-[13px] font-bold text-[#0A0A0A]">{rating}</span>
           </div>
-          <span className="text-[10px] sm:text-[12px] font-semibold text-[#0A0A0A]/40 uppercase tracking-widest truncate max-w-[80px]">
+          <span className="text-[11px] sm:text-[12px] font-semibold text-[#0A0A0A]/45 uppercase tracking-widest truncate max-w-[84px]">
             {segLabel}
           </span>
         </div>
 
-        <h3 className="text-sm sm:text-xl font-bold text-[#0A0A0A] leading-tight mb-0.5 tracking-[-0.02em] line-clamp-1">
+        <h3 className="text-xl sm:text-[1.25rem] font-bold text-[#0A0A0A] leading-tight mb-0.5 tracking-[-0.02em] line-clamp-1">
           {car.model}
         </h3>
-        <p className="text-[11px] sm:text-[13px] text-[#0A0A0A]/50 mb-3 sm:mb-5 line-clamp-1">
+        <p className="text-[13px] sm:text-[13px] text-[#0A0A0A]/55 mb-3.5 sm:mb-5 line-clamp-1">
           {car.version}
         </p>
 
-        <div className="mb-3 sm:mb-5">
-          <span className="text-lg sm:text-2xl font-bold text-[#0A0A0A] tracking-[-0.03em] font-sans">
+        <div className="mb-3.5 sm:mb-5">
+          <span className="text-2xl sm:text-[2rem] font-bold text-[#0A0A0A] tracking-[-0.03em] font-sans leading-none">
             {formatBRL(car.priceBrl)}
           </span>
         </div>
@@ -136,14 +136,14 @@ export default function CarCard({ car, index = 0, onCompare, isComparing = false
         </div>
 
         {/* Linha de Ação */}
-        <div className="flex items-center gap-2 mt-auto pt-2 sm:pt-4 border-t border-black/5">
-          <div className="flex flex-1 items-center justify-between bg-[#f4f6f8] hover:bg-[#0A0A0A] hover:text-white text-[#0A0A0A] rounded-[14px] sm:rounded-[20px] px-3 sm:px-5 py-2 sm:py-3.5 transition-colors duration-300">
-            <span className="font-semibold text-[11px] sm:text-[13px]">Ver</span>
-            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 opacity-70" strokeWidth={2.5} />
+        <div className="flex items-center gap-2 mt-auto pt-2.5 sm:pt-4 border-t border-black/5">
+          <div className="flex flex-1 items-center justify-between bg-[#f4f6f8] hover:bg-[#0A0A0A] hover:text-white text-[#0A0A0A] rounded-[14px] sm:rounded-[20px] px-3.5 sm:px-5 py-2.5 sm:py-3.5 transition-colors duration-300">
+            <span className="font-semibold text-[14px] sm:text-[13px]">Ver</span>
+            <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-70" strokeWidth={2.5} />
           </div>
 
           <button
-            className={`w-9 h-9 sm:w-12 sm:h-12 flex items-center justify-center rounded-[14px] sm:rounded-[20px] transition-colors ${saved ? 'bg-[var(--color-bento-blue)] text-white' : 'bg-[#f4f6f8] text-[#0A0A0A]/40 hover:bg-black/5'}`}
+            className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-[14px] sm:rounded-[20px] transition-colors ${saved ? 'bg-[var(--color-bento-blue)] text-white' : 'bg-[#f4f6f8] text-[#0A0A0A]/40 hover:bg-black/5'}`}
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -151,7 +151,7 @@ export default function CarCard({ car, index = 0, onCompare, isComparing = false
             }}
             aria-label={saved ? 'Remover dos salvos' : 'Salvar carro'}
           >
-            <Bookmark className={`w-4 h-4 sm:w-5 sm:h-5 ${saved ? 'fill-white opacity-100' : 'opacity-70'}`} />
+            <Bookmark className={`w-4.5 h-4.5 sm:w-5 sm:h-5 ${saved ? 'fill-white opacity-100' : 'opacity-70'}`} />
           </button>
         </div>
       </div>

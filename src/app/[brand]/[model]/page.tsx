@@ -367,7 +367,7 @@ export default async function CarDetailPage({
       {similarCars.length > 0 && (
         <div className="mt-12">
           <h2 className="text-xl font-bold text-text mb-6">Carros similares populares</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {similarCars.map((c) => (
               <CarCard key={c.id} car={c} />
             ))}
@@ -378,7 +378,7 @@ export default async function CarDetailPage({
       {relatedListings.length > 0 && (
         <div className="mt-12">
           <h2 className="text-xl font-bold text-text mb-6">Veículos anunciados deste modelo</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {relatedListings.map((listing) => (
               <MarketplaceListingCard key={listing.id} listing={listing} />
             ))}

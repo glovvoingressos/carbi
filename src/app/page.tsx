@@ -73,7 +73,7 @@ export default async function HomePage() {
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section style={{ background: 'var(--color-bg)', paddingTop: 'clamp(80px, 10vh, 120px)', paddingBottom: 'clamp(48px, 6vh, 80px)' }}>
         <div className="container max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 auto-rows-[minmax(220px,auto)] sm:auto-rows-[minmax(260px,auto)] lg:auto-rows-[minmax(320px,auto)]">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 auto-rows-[minmax(180px,auto)] sm:auto-rows-[minmax(240px,auto)] lg:auto-rows-[minmax(320px,auto)]">
              
 
              {/* BENTO 2: White Large Card (FIPE) */}
@@ -100,34 +100,41 @@ export default async function HomePage() {
              </div>
 
              {/* BENTO 3: Abstract Image Card (Red) */}
-             <div className="md:col-span-12 lg:col-span-4 bg-[var(--color-bento-red)] rounded-[32px] p-6 sm:p-8 lg:p-12 flex flex-col justify-between overflow-hidden relative text-white text-center md:text-left">
-                  <h3 className="text-2xl lg:text-3xl font-extrabold mb-8 z-10 relative">
+             <div className="md:col-span-12 lg:col-span-4 bg-[var(--color-bento-red)] rounded-[32px] p-6 sm:p-8 lg:p-12 flex flex-col justify-end gap-4 overflow-hidden relative text-white text-left min-h-[210px] sm:min-h-[260px]">
+                  <h3 className="text-2xl sm:text-3xl lg:text-3xl font-extrabold z-10 relative max-w-[320px]">
                       Compare qualquer carro lado a lado
                   </h3>
-                  <div className="mt-8 z-10 relative">
-                     <p className="text-white/80 font-medium leading-relaxed max-w-[280px] mx-auto md:mx-0">Faça as melhores escolhas com base científica e sem achismos durante a pesquisa.</p>
+                  <p className="text-white/90 font-semibold leading-relaxed text-base sm:text-lg max-w-[310px] z-10 relative">Faça as melhores escolhas com base científica e sem achismos durante a pesquisa.</p>
+                  <div className="absolute top-5 right-5 z-0 opacity-20">
+                    <ArrowUpRight className="w-24 h-24 sm:w-16 sm:h-16" strokeWidth={1.6} />
                   </div>
                   {/* Decorative wave */}
-                  <svg className="absolute bottom-[-10%] right-[-10%] w-[120%] opacity-20 pointer-events-none" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                  <svg className="absolute bottom-[-36%] right-[-28%] w-[140%] opacity-10 pointer-events-none" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                      <path fill="#000000" d="M42.7,-73.4C55.9,-67.8,67.6,-58.2,76.6,-46.3C85.5,-34.4,91.8,-20.3,92.5,-6.1C93.2,8.2,88.4,22.6,80.7,35C73,47.5,62.3,58.1,50.1,65.6C37.8,73.1,23.9,77.5,10.2,78.2C-3.6,78.8,-17.1,75.8,-29.4,69.5C-41.6,63.1,-52.6,53.5,-61.2,42.1C-69.8,30.6,-76.1,17.4,-77.9,3.7C-79.7,-10,-77,-24.2,-70.6,-36.5C-64.2,-48.8,-54.1,-59,-42.2,-64.7C-30.3,-70.5,-16.7,-71.8,-1.9,-68.8C12.9,-65.8,29.5,-79.1,42.7,-73.4Z" transform="translate(100 100)" />
                   </svg>
              </div>
 
              {/* BENTO 4: White Small Card (Templates/Catalogue) */}
-             <div className="md:col-span-6 lg:col-span-3 bg-white border border-border rounded-[32px] p-6 sm:p-8 flex flex-col justify-between shadow-sm">
-                <span className="w-8 h-8 rounded-full border border-border flex items-center justify-center font-bold text-sm bg-surface mb-8">4</span>
-                <h3 className="text-xl font-extrabold text-dark mb-4">Catálogo completo de modelos atualizados</h3>
-                <p className="text-text-secondary font-medium text-sm">Do popular zero km ao sedã premium, todas as informações em um só lugar.</p>
+             <div className="md:col-span-6 lg:col-span-3 bg-white border border-border rounded-[32px] p-6 sm:p-8 flex flex-col justify-start gap-5 shadow-sm relative overflow-hidden min-h-[210px] sm:min-h-[250px]">
+                <span className="w-8 h-8 rounded-full border border-border flex items-center justify-center font-bold text-sm bg-surface">4</span>
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-dark leading-tight">Catálogo completo de modelos atualizados</h3>
+                <p className="text-text-secondary font-semibold text-sm sm:text-base leading-relaxed">Do popular zero km ao sedã premium, todas as informações em um só lugar.</p>
+                <div className="absolute right-4 bottom-4 opacity-10 pointer-events-none">
+                  <Fuel className="w-20 h-20 text-dark" />
+                </div>
              </div>
 
              {/* BENTO 5: Abstract Graphic (Blue) */}
-             <div className="md:col-span-6 lg:col-span-4 bg-[var(--color-bento-blue)] rounded-[32px] overflow-hidden flex flex-col justify-end min-h-[220px] sm:min-h-[280px] lg:min-h-[320px] relative text-white">
-                  <div className="absolute inset-0 flex items-center justify-center opacity-30">
+             <div className="md:col-span-6 lg:col-span-4 bg-[var(--color-bento-blue)] rounded-[32px] overflow-hidden flex flex-col justify-end min-h-[210px] sm:min-h-[280px] lg:min-h-[320px] relative text-white">
+                  <div className="absolute inset-0 flex items-center justify-center opacity-25">
                       <div className="w-full h-[150%] bg-white/20 rotate-12 blur-3xl"></div>
                   </div>
+                  <div className="absolute top-5 right-5 opacity-20 pointer-events-none">
+                    <Zap className="w-20 h-20 sm:w-14 sm:h-14 text-white" />
+                  </div>
                   <div className="p-6 sm:p-8 z-10">
-                     <h3 className="text-2xl font-extrabold mb-2 text-white">Estatísticas Reais</h3>
-                     <p className="text-white/80 font-medium text-sm">Foque nos dados concretos esquecendo as métricas de vaidade.</p>
+                     <h3 className="text-2xl sm:text-3xl font-extrabold mb-2 text-white">Estatísticas Reais</h3>
+                     <p className="text-white/90 font-semibold text-sm sm:text-base leading-relaxed">Foque nos dados concretos esquecendo as métricas de vaidade.</p>
                   </div>
              </div>
           </div>
@@ -238,15 +245,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div 
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(5, 1fr)',
-              gap: 'clamp(8px, 1.5vw, 16px)',
-              width: '100%'
-            }}
-            className="grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-          >
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
             {popular.map((car, i) => (
               <CarCard key={car.id} car={car} index={i} />
             ))}
@@ -296,15 +295,7 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div 
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(5, 1fr)',
-                gap: 'clamp(8px, 1.5vw, 16px)',
-                width: '100%'
-              }}
-              className="grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-            >
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
               {electricCars.map((car, i) => (
                 <CarCard key={car.id} car={car} index={i} />
               ))}
@@ -318,29 +309,23 @@ export default async function HomePage() {
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section className="trust-strip" style={{ paddingBlock: 'clamp(40px, 6vh, 72px)' }}>
         <div className="container">
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-              gap: 'clamp(24px, 4vw, 48px)',
-              textAlign: 'center',
-            }}
-          >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">
             {trustMetrics.map((m, i) => (
-              <div key={i} className="scroll-reveal" style={{ transitionDelay: `${i * 60}ms` }}>
-                <p
-                  style={{
-                    fontSize: 'clamp(28px, 4vw, 40px)',
-                    fontWeight: 900,
-                    letterSpacing: '-0.03em',
-                    color: 'var(--color-text)',
-                    lineHeight: 1,
-                    marginBottom: 6,
-                  }}
-                >
+              <div
+                key={i}
+                className="scroll-reveal relative rounded-[22px] border border-black/10 bg-white p-4 sm:p-5 text-left shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all overflow-hidden"
+                style={{ transitionDelay: `${i * 60}ms` }}
+              >
+                <div className="absolute -right-4 -top-4 opacity-10 pointer-events-none">
+                  {i % 4 === 0 && <Users className="w-16 h-16 text-dark" />}
+                  {i % 4 === 1 && <Fuel className="w-16 h-16 text-dark" />}
+                  {i % 4 === 2 && <Star className="w-16 h-16 text-dark" />}
+                  {i % 4 === 3 && <Zap className="w-16 h-16 text-dark" />}
+                </div>
+                <p className="text-3xl sm:text-4xl font-black tracking-[-0.03em] text-dark leading-none mb-1.5">
                   {m.value}
                 </p>
-                <p style={{ fontSize: 13, color: 'var(--color-text-3)', fontWeight: 500 }}>
+                <p className="text-[13px] sm:text-sm font-semibold text-text-secondary leading-tight max-w-[150px]">
                   {m.label}
                 </p>
               </div>

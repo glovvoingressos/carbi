@@ -104,7 +104,7 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
       <section className="py-16">
         <div className="container max-w-6xl mx-auto px-4">
           {filteredCars.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
               {filteredCars.map(car => (
                 <CarCard key={car.id} car={car} view="grid" />
               ))}

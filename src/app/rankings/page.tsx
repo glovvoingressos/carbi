@@ -76,7 +76,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
       </div>
 
       {/* Results as cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {rankedCars.map((car, index) => {
           const score = rankedScores[index]
           const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`
