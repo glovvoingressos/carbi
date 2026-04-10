@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { Suspense, useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { cars, formatBRL, compareCars } from '@/data/cars'
@@ -11,7 +11,7 @@ import CarImage from '@/components/car/CarImage'
 const segments = [...new Set(cars.map((c) => c.segment))]
 const brands = [...new Set(cars.map((c) => c.brand))]
 
-export default function ComparePage() {
+function ComparePageContent() {
   const searchParams = useSearchParams()
   const initialIds = searchParams.get('ids')?.split(',').filter(Boolean) || []
   
@@ -238,5 +238,13 @@ export default function ComparePage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function ComparePage() {
+  return (
+    <Suspense fallback={<div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16" />}>
+      <ComparePageContent />
+    </Suspense>
   )
 }
