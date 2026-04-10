@@ -11,6 +11,7 @@ import CarImage from './CarImage'
 interface CarCardProps {
   car: CarSpec
   index?: number
+  view?: 'grid' | 'list'
   onCompare?: (car: CarSpec) => void
   isComparing?: boolean
 }

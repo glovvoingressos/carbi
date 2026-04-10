@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Sparkles, ArrowRight } from 'lucide-react'
-import { getCarsBySegment, getDBCars } from '@/lib/data-fetcher'
+import { getDBCars } from '@/lib/data-fetcher'
 import CarCard from '@/components/car/CarCard'
 
 // SEO Definitions mapped to intents
