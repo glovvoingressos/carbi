@@ -100,6 +100,7 @@ export default function ListingForm() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [titleTouched, setTitleTouched] = useState(false)
 
   useEffect(() => {
     try {
@@ -280,8 +281,22 @@ export default function ListingForm() {
   const comparison = useMemo(() => getFipeComparison(priceNumber, fipeNumber), [priceNumber, fipeNumber])
 
   const handleInput = (field: keyof FormState, value: string) => {
+    if (field === 'title') setTitleTouched(true)
     setForm((prev) => ({ ...prev, [field]: value }))
   }
+
+  useEffect(() => {
+    if (!form.brand || !form.model || !form.yearModel) return
+    if (titleTouched && form.title.trim().length >= 8) return
+
+    const nextTitle = `${form.brand} ${form.model} ${form.yearModel}${form.version ? ` ${form.version}` : ''}`.trim()
+    if (!nextTitle) return
+
+    setForm((prev) => ({
+      ...prev,
+      title: nextTitle,
+    }))
+  }, [form.brand, form.model, form.yearModel, form.version, form.title, titleTouched])
 
   const handleImageSelect = (fileList: FileList | null) => {
     if (!fileList) return
@@ -559,6 +574,7 @@ export default function ListingForm() {
                 setSelectedVersionCode(e.target.value)
                 const selected = versions.find((item) => item.code === e.target.value)
                 handleInput('fuel', selected?.fuelType || '')
+                handleInput('version', selected?.name || form.version)
               }} disabled={!selectedYear}>
                 <option value="">Versão/Combustível (referência)</option>
                 {versions.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}

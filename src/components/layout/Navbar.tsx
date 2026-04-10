@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
-import { Menu, X, Search, CarFront, Home, BarChart3, GitCompare, Sparkles, ChevronRight, MessageCircle } from 'lucide-react'
+import { Menu, X, Search, CarFront, Home, BarChart3, GitCompare, Sparkles, ChevronRight, MessageCircle, LayoutDashboard } from 'lucide-react'
 
 export default function Navbar() {
   const router = useRouter()
@@ -41,6 +41,7 @@ export default function Navbar() {
     { href: '/anunciar-carro-bh', label: 'Anunciar', icon: Sparkles },
     { href: '/carros-a-venda', label: 'Carros à venda', icon: Sparkles },
     { href: '/carros-usados-bh', label: 'Comprar em BH', icon: Sparkles },
+    { href: '/minha-conta/anuncios', label: 'Meus anúncios', icon: LayoutDashboard },
     { href: '/minha-conta/conversas', label: 'Conversas', icon: MessageCircle },
   ]
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
+import { isSupabaseConfigured } from '@/lib/supabase-server'
+import { queryPublicListings } from '@/lib/marketplace-server'
 
 export async function GET(
   req: NextRequest,
@@ -11,24 +12,20 @@ export async function GET(
     }
 
     const { identifier } = await params
-    const supabase = getSupabaseServerClient()
-
-    const baseQuery = supabase
-      .from('vehicle_listings_public')
-      .select('*')
-      .limit(1)
-
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier)
 
-    const { data, error } = await (isUuid
-      ? baseQuery.eq('id', identifier).single()
-      : baseQuery.eq('slug', identifier).single())
+    const data = await queryPublicListings({
+      single: true,
+      limit: 1,
+      id: isUuid ? identifier : undefined,
+      slug: isUuid ? undefined : identifier,
+    })
 
-    if (error || !data) {
+    if (!data[0]) {
       return NextResponse.json({ error: 'Anúncio não encontrado.' }, { status: 404 })
     }
 
-    return NextResponse.json(data)
+    return NextResponse.json(data[0])
   } catch (error) {
     console.error('GET /api/marketplace/listings/[identifier] failed', error)
     return NextResponse.json({ error: 'Falha ao carregar anúncio.' }, { status: 500 })

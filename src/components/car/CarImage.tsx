@@ -28,14 +28,9 @@ export default function CarImage({
   fit = 'contain',
   aspectRatio = '16/10',
 }: CarImageProps) {
-  const [mounted, setMounted] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [hasFinalError, setHasFinalError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   useEffect(() => {
     setCurrentIndex(0)
@@ -138,20 +133,6 @@ export default function CarImage({
     }
   }, [resolvedCandidates.length])
 
-  // Skeleton de hidratação (SSR Safe)
-  if (!mounted) {
-    return (
-      <div 
-        className={`relative overflow-hidden bg-[#eef2f5] dark:bg-neutral-900 ${className}`}
-        style={{ ...style, aspectRatio }}
-      >
-        <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-12 h-1.5 bg-dark/10 rounded-full animate-bounce" />
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div 
       className={`relative overflow-hidden bg-[#eef2f5] dark:bg-neutral-900 ${className}`}
@@ -183,7 +164,7 @@ export default function CarImage({
           }}
           className={`w-full h-full ${fit === 'cover' ? 'object-cover' : 'object-contain'} transition-all duration-700 ${isLoading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
           style={{
-            transform: isLoading ? 'scale(0.98)' : fit === 'cover' ? 'scale(1.03)' : 'scale(1)',
+            transform: isLoading ? 'scale(0.98)' : 'scale(1)',
             objectPosition: 'center center',
             pointerEvents: 'none'
           }}

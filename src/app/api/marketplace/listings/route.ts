@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { ListingFormPayload, validateListingPayload } from '@/lib/marketplace'
+import { queryPublicListings } from '@/lib/marketplace-server'
 
 function isMissingTableError(message?: string): boolean {
   if (!message) return false
@@ -14,7 +15,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Supabase não configurado.' }, { status: 503 })
     }
 
-    const supabase = getSupabaseServerClient()
     const brand = req.nextUrl.searchParams.get('brand')
     const model = req.nextUrl.searchParams.get('model')
     const q = (req.nextUrl.searchParams.get('q') || '').trim()
@@ -24,28 +24,16 @@ export async function GET(req: NextRequest) {
 
     const limit = Math.min(Number(limitParam || '8') || 8, 20)
 
-    let query = supabase
-      .from('vehicle_listings_public')
-      .select('*')
-      .order('published_at', { ascending: false })
-      .limit(limit)
+    const data = await queryPublicListings({
+      brand: brand || undefined,
+      model: model || undefined,
+      q: q || undefined,
+      yearModel: yearModel ? Number(yearModel) : undefined,
+      excludeId: excludeId || undefined,
+      limit,
+    })
 
-    if (brand) query = query.ilike('brand', `%${brand}%`)
-    if (model) query = query.ilike('model', `%${model}%`)
-    if (q) query = query.or(`brand.ilike.%${q}%,model.ilike.%${q}%`)
-    if (yearModel) query = query.eq('year_model', Number(yearModel))
-    if (excludeId) query = query.neq('id', excludeId)
-
-    const { data, error } = await query
-
-    if (error) {
-      if (isMissingTableError(error.message)) {
-        return NextResponse.json({ error: 'Schema do marketplace não aplicado no Supabase.' }, { status: 503 })
-      }
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json(data || [])
+    return NextResponse.json(data)
   } catch (error) {
     console.error('GET /api/marketplace/listings failed', error)
     return NextResponse.json({ error: 'Falha ao carregar anúncios.' }, { status: 500 })
