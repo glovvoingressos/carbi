@@ -54,7 +54,9 @@ function formatK(n: number) {
 
 export default async function HomePage() {
   const cars   = await getAllCars()
-  const latestListings = await getLatestPublicListings(8)
+  const latestListings = await getLatestPublicListings(12)
+  const featuredListing = latestListings[0] || null
+  const recentListings = featuredListing ? latestListings.slice(1, 9) : latestListings.slice(0, 8)
   const popular = cars.filter((c) => c.isPopular || c.priceBrl > 0).slice(0, 12)
   const electricCars = cars.filter((c) => c.segment === 'electric').slice(0, 8)
   const brands  = [...new Set(cars.map((c) => c.brand))].sort()
@@ -158,24 +160,70 @@ export default async function HomePage() {
 
       <section className="pb-16">
         <div className="container">
-          <div className="mb-6 flex items-end justify-between">
-            <div>
-              <p className="text-eyebrow">Marketplace</p>
-              <h2 className="text-h2">Últimos anunciados</h2>
-            </div>
-            <Link href="/carros-a-venda" className="text-sm font-bold text-text-secondary hover:text-dark">
-              Ver todos
-            </Link>
-          </div>
           {latestListings.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {latestListings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
-              ))}
+            <div className="space-y-6">
+              <div className="mb-1 flex items-end justify-between">
+                <div>
+                  <p className="text-eyebrow">Marketplace</p>
+                  <h2 className="text-h2">Carros anunciados agora</h2>
+                </div>
+                <Link href="/carros-a-venda" className="text-sm font-bold text-text-secondary hover:text-dark">
+                  Ver todos
+                </Link>
+              </div>
+
+              {featuredListing ? (
+                <Link
+                  href={`/anuncios/${featuredListing.slug}`}
+                  className="group block overflow-hidden rounded-[28px] border-2 border-dark bg-[#eaf7ff] p-5 sm:p-7 shadow-[6px_6px_0_#000] transition hover:-translate-y-1"
+                >
+                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
+                    <div className="overflow-hidden rounded-2xl bg-white">
+                      {featuredListing.images?.[0]?.url ? (
+                        <img
+                          src={featuredListing.images[0].url}
+                          alt={featuredListing.title}
+                          className="h-56 w-full object-cover sm:h-72"
+                        />
+                      ) : (
+                        <div className="flex h-56 items-center justify-center bg-surface text-sm font-semibold text-text-secondary sm:h-72">
+                          Foto do anúncio indisponível
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-black uppercase tracking-[0.14em] text-dark/65">Destaque do dia</p>
+                      <h3 className="mt-1 text-2xl font-black leading-tight text-dark sm:text-3xl">{featuredListing.title}</h3>
+                      <p className="mt-2 text-4xl font-black text-dark">{formatBRL(Number(featuredListing.price))}</p>
+                      <p className="mt-2 text-sm font-semibold text-text-secondary">
+                        {featuredListing.year}/{featuredListing.year_model} • {featuredListing.mileage.toLocaleString('pt-BR')} km • {featuredListing.city}/{featuredListing.state}
+                      </p>
+                      <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-dark px-4 py-2 text-xs font-black uppercase tracking-wide text-white">
+                        Ver anúncio
+                        <ArrowRight className="h-4 w-4" />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ) : null}
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {recentListings.map((listing) => (
+                  <ListingCard key={listing.id} listing={listing} />
+                ))}
+              </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border bg-white p-6 text-sm font-semibold text-text-secondary">
-              Sem anúncios ativos no momento.
+            <div className="rounded-[24px] border border-border bg-white p-6 sm:p-8">
+              <p className="text-sm font-semibold text-text-secondary">Ainda não há anúncios ativos.</p>
+              <p className="mt-1 text-lg font-black text-dark">Seja o primeiro a publicar e ganhar destaque na home.</p>
+              <Link
+                href="/anunciar-carro-bh"
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-dark px-5 py-2.5 text-sm font-black text-white"
+              >
+                Anunciar agora
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           )}
         </div>

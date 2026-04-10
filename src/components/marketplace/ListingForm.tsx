@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2 } from 'lucide-react'
+import Link from 'next/link'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
@@ -100,6 +101,7 @@ export default function ListingForm() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [validationDetails, setValidationDetails] = useState<string[]>([])
   const [titleTouched, setTitleTouched] = useState(false)
 
   useEffect(() => {
@@ -346,9 +348,6 @@ export default function ListingForm() {
       if (!form.price || !form.mileage || !form.city || !form.state) {
         return 'Preencha preço, quilometragem, cidade e estado.'
       }
-      if (images.length === 0) {
-        return 'Adicione pelo menos 1 foto do veículo.'
-      }
     }
 
     if (step === 3) {
@@ -367,14 +366,17 @@ export default function ListingForm() {
     const validation = validateStep(currentStep)
     if (validation) {
       setError(validation)
+      setValidationDetails([])
       return
     }
     setError(null)
+    setValidationDetails([])
     setCurrentStep((prev) => Math.min(3, prev + 1))
   }
 
   const prevStep = () => {
     setError(null)
+    setValidationDetails([])
     setCurrentStep((prev) => Math.max(1, prev - 1))
   }
 
@@ -382,12 +384,14 @@ export default function ListingForm() {
     const validation = validateStep(3)
     if (validation) {
       setError(validation)
+      setValidationDetails([])
       return
     }
 
     setSaving(true)
     setError(null)
     setSuccess(null)
+    setValidationDetails([])
 
     try {
       if (!supabaseReady) {
@@ -443,6 +447,10 @@ export default function ListingForm() {
 
       if (!createResponse.ok) {
         const body = await createResponse.json().catch(() => ({}))
+        const details = Array.isArray(body?.details)
+          ? body.details.filter((item: unknown): item is string => typeof item === 'string')
+          : []
+        setValidationDetails(details)
         throw new Error(body.error || 'Falha ao criar anúncio.')
       }
 
@@ -473,15 +481,17 @@ export default function ListingForm() {
         })
       }
 
-      const imageResponse = await fetch(`/api/marketplace/listings/${created.id}/images`, {
-        method: 'POST',
-        headers: authHeader(session.access_token),
-        body: JSON.stringify({ images: uploaded }),
-      })
+      if (uploaded.length > 0) {
+        const imageResponse = await fetch(`/api/marketplace/listings/${created.id}/images`, {
+          method: 'POST',
+          headers: authHeader(session.access_token),
+          body: JSON.stringify({ images: uploaded }),
+        })
 
-      if (!imageResponse.ok) {
-        const body = await imageResponse.json().catch(() => ({}))
-        throw new Error(body.error || 'Falha ao persistir imagens do anúncio.')
+        if (!imageResponse.ok) {
+          const body = await imageResponse.json().catch(() => ({}))
+          throw new Error(body.error || 'Falha ao persistir imagens do anúncio.')
+        }
       }
 
       localStorage.removeItem(DRAFT_KEY)
@@ -520,6 +530,20 @@ export default function ListingForm() {
 
   return (
     <div className="space-y-6">
+      <div className="space-y-3">
+        <div className="h-2 rounded-full bg-border/80">
+          <div
+            className="h-full rounded-full bg-dark transition-all"
+            style={{ width: `${(currentStep / 3) * 100}%` }}
+          />
+        </div>
+        <p className="text-xs font-bold text-text-secondary">
+          {currentStep === 1 && 'Etapa 1 de 3: Dados principais do veículo'}
+          {currentStep === 2 && 'Etapa 2 de 3: Fotos, preço e localização'}
+          {currentStep === 3 && 'Etapa 3 de 3: Detalhes finais e publicação'}
+        </p>
+      </div>
+
       <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-text-tertiary">
         {[1, 2, 3].map((step) => (
           <div
@@ -624,9 +648,10 @@ export default function ListingForm() {
 
             <label className="flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-dark/40 p-4 text-sm font-bold text-dark">
               <ImagePlus className="h-4 w-4" />
-              Adicionar fotos ({images.length}/{LISTING_MAX_IMAGES})
+              Adicionar fotos (opcional) ({images.length}/{LISTING_MAX_IMAGES})
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
             </label>
+            <p className="text-xs font-semibold text-text-secondary">Você pode publicar sem foto e enviar as imagens depois no painel dos seus anúncios.</p>
 
             {images.length > 0 && (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -686,8 +711,27 @@ export default function ListingForm() {
           </div>
         )}
 
-        {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
-        {success && <p className="text-sm font-semibold text-emerald-700">{success}</p>}
+        {error ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+            <p className="text-sm font-semibold text-red-700">{error}</p>
+            {validationDetails.length > 0 ? (
+              <ul className="mt-2 space-y-1 text-xs font-medium text-red-700/90">
+                {validationDetails.map((detail) => (
+                  <li key={detail}>• {detail}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        ) : null}
+
+        {success ? (
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+            <p className="text-sm font-semibold text-emerald-700">{success}</p>
+            <Link href="/minha-conta/anuncios" className="mt-1 inline-block text-xs font-bold text-emerald-700 underline">
+              Ver meus anúncios
+            </Link>
+          </div>
+        ) : null}
 
         <div className="flex items-center justify-between pt-2">
           <button
