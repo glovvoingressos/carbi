@@ -28,12 +28,12 @@ export default function CarImage({
   fit = 'contain',
   aspectRatio = '16/10',
 }: CarImageProps) {
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [resolvedSrc, setResolvedSrc] = useState<string | null>(null)
   const [hasFinalError, setHasFinalError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    setCurrentIndex(0)
+    setResolvedSrc(null)
     setHasFinalError(false)
     setIsLoading(true)
   }, [id, src, brand, model, year])
@@ -133,6 +133,50 @@ export default function CarImage({
     }
   }, [resolvedCandidates.length])
 
+  useEffect(() => {
+    let cancelled = false
+
+    if (resolvedCandidates.length === 0) {
+      setHasFinalError(true)
+      setIsLoading(false)
+      return
+    }
+
+    const tryResolve = async () => {
+      setIsLoading(true)
+      setHasFinalError(false)
+
+      for (const candidate of resolvedCandidates) {
+        const loaded = await new Promise<boolean>((resolve) => {
+          const image = new window.Image()
+          image.onload = () => resolve(true)
+          image.onerror = () => resolve(false)
+          image.src = candidate
+          if (image.complete && image.naturalWidth > 0) resolve(true)
+        })
+
+        if (cancelled) return
+        if (loaded) {
+          setResolvedSrc(candidate)
+          setIsLoading(false)
+          return
+        }
+      }
+
+      if (!cancelled) {
+        setResolvedSrc(null)
+        setHasFinalError(true)
+        setIsLoading(false)
+      }
+    }
+
+    void tryResolve()
+
+    return () => {
+      cancelled = true
+    }
+  }, [resolvedCandidates])
+
   return (
     <div 
       className={`relative overflow-hidden bg-[#eef2f5] dark:bg-neutral-900 ${className}`}
@@ -144,31 +188,17 @@ export default function CarImage({
         justifyContent: 'center'
       }}
     >
-      {!hasFinalError && resolvedCandidates.length > 0 && (
+      {!hasFinalError && resolvedSrc && (
         <img
-          key={currentIndex} // FORÇA O REACT A CRIAR UM NOVO ELEMENTO E DISPARAR ONLOAD/ONERROR
-          src={resolvedCandidates[currentIndex]}
+          src={resolvedSrc}
           alt={`${brand} ${model} ${year}`}
-          onLoad={() => {
-            setIsLoading(false)
-          }}
-          onError={() => {
-            const next = currentIndex + 1
-            if (next < resolvedCandidates.length) {
-              setCurrentIndex(next)
-              setIsLoading(true)
-            } else {
-              setHasFinalError(true)
-              setIsLoading(false)
-            }
-          }}
           className={`w-full h-full ${fit === 'cover' ? 'object-cover' : 'object-contain'} transition-all duration-700 ${isLoading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
           style={{
             transform: isLoading ? 'scale(0.98)' : 'scale(1)',
             objectPosition: 'center center',
             pointerEvents: 'none'
           }}
-          loading={priority || currentIndex === 0 ? 'eager' : 'lazy'}
+          loading={priority ? 'eager' : 'lazy'}
         />
       )}
 
