@@ -6,6 +6,7 @@ import { getFipeComparison } from '@/lib/marketplace'
 import { getPublicListingBySlug, getRelatedListings } from '@/lib/marketplace-server'
 import ListingCard from '@/components/marketplace/ListingCard'
 import ChatStarter from '@/components/marketplace/ChatStarter'
+import { resolveMarketplaceCarImage } from '@/lib/car-image-fallback'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -35,6 +36,12 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   })
 
   const comparison = getFipeComparison(Number(listing.price), listing.fipe_price)
+  const fallbackCover = resolveMarketplaceCarImage({
+    brand: listing.brand,
+    model: listing.model,
+    year: listing.year_model,
+    preferredUrl: null,
+  })
 
   return (
     <div className="container mx-auto max-w-6xl px-4 pb-16 pt-24">
@@ -54,6 +61,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
               {(listing.images || []).map((image, index) => (
                 <img key={image.id || image.url || index} src={image.url} alt={`${listing.title} foto ${index + 1}`} className="h-56 w-full rounded-2xl object-cover" />
               ))}
+              {(!listing.images || listing.images.length === 0) && fallbackCover ? (
+                <img src={fallbackCover} alt={`${listing.title} imagem de referência`} className="h-56 w-full rounded-2xl object-cover sm:col-span-2" />
+              ) : null}
             </div>
           </div>
 

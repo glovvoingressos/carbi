@@ -12,6 +12,7 @@ import HomeComparison from '@/components/home/HomeComparison'
 import BrandLogo from '@/components/brand/BrandLogo'
 import ListingCard from '@/components/marketplace/ListingCard'
 import { getLatestPublicListings } from '@/lib/marketplace-server'
+import { resolveMarketplaceCarImage } from '@/lib/car-image-fallback'
 
 // ── Dados estáticos ─────────────────────────────────────────────────────────
 
@@ -57,6 +58,14 @@ export default async function HomePage() {
   const latestListings = await getLatestPublicListings(12)
   const featuredListing = latestListings[0] || null
   const recentListings = featuredListing ? latestListings.slice(1, 9) : latestListings.slice(0, 8)
+  const featuredCover = featuredListing
+    ? resolveMarketplaceCarImage({
+        brand: featuredListing.brand,
+        model: featuredListing.model,
+        year: featuredListing.year_model,
+        preferredUrl: featuredListing.images?.[0]?.url || null,
+      })
+    : null
   const popular = cars.filter((c) => c.isPopular || c.priceBrl > 0).slice(0, 12)
   const electricCars = cars.filter((c) => c.segment === 'electric').slice(0, 8)
   const brands  = [...new Set(cars.map((c) => c.brand))].sort()
@@ -179,9 +188,9 @@ export default async function HomePage() {
                 >
                   <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
                     <div className="overflow-hidden rounded-2xl bg-white">
-                      {featuredListing.images?.[0]?.url ? (
+                      {featuredCover ? (
                         <img
-                          src={featuredListing.images[0].url}
+                          src={featuredCover}
                           alt={featuredListing.title}
                           className="h-56 w-full object-cover sm:h-72"
                         />

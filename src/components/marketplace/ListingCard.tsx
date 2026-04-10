@@ -1,9 +1,15 @@
 import Link from 'next/link'
 import { ListingPublic, getFipeComparison } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
+import { resolveMarketplaceCarImage } from '@/lib/car-image-fallback'
 
 export default function ListingCard({ listing }: { listing: ListingPublic }) {
-  const cover = listing.images?.[0]?.url || null
+  const cover = resolveMarketplaceCarImage({
+    brand: listing.brand,
+    model: listing.model,
+    year: listing.year_model,
+    preferredUrl: listing.images?.[0]?.url || null,
+  })
   const fipe = getFipeComparison(Number(listing.price), listing.fipe_price)
 
   return (
