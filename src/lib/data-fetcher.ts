@@ -155,13 +155,17 @@ export async function getAllCars(): Promise<CarSpec[]> {
     
     // Fetch overrides from car_assets table if it exists
     let assetOverrides: Record<string, string> = {}
+    type AssetOverrideRow = {
+      car_id: string
+      image_url: string
+    }
     if (supabase) {
       const { data: assetData } = await supabase
         .from('car_assets')
         .select('car_id, image_url')
       
       if (assetData) {
-        assetOverrides = Object.fromEntries(assetData.map(a => [a.car_id, a.image_url]))
+        assetOverrides = Object.fromEntries((assetData as AssetOverrideRow[]).map((row) => [row.car_id, row.image_url]))
       }
     }
     
