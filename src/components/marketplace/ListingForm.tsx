@@ -173,7 +173,7 @@ export default function ListingForm() {
   useEffect(() => {
     if (!selectedBrandCode || !selectedModelCode) {
       setYears([])
-      setSelectedYearCode('')
+      setSelectedYear(null)
       return
     }
 
