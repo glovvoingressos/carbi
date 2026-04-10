@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { Suspense } from 'react'
 import ConversationInbox from '@/components/marketplace/ConversationInbox'
 
 export const metadata: Metadata = {
@@ -12,7 +13,9 @@ export default function ConversationsPage() {
       <h1 className="text-3xl font-black text-dark">Chat interno</h1>
       <p className="mt-2 text-sm text-text-secondary">Todas as negociações do seu anúncio ficam protegidas dentro da plataforma.</p>
       <div className="mt-6">
-        <ConversationInbox />
+        <Suspense fallback={<div className="rounded-2xl border border-border bg-white p-6 text-sm text-text-secondary">Carregando conversas...</div>}>
+          <ConversationInbox />
+        </Suspense>
       </div>
     </div>
   )
