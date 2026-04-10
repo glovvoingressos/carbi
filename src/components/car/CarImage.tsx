@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { availableCarAssetPaths } from '@/data/carAssetManifest'
 
 interface CarImageProps {
@@ -48,83 +48,79 @@ export default function CarImage({
 
   const tokenize = (value: string) => slug(value).split('-').filter(Boolean)
 
-  const brandSlug = slug(brand)
-  const modelSlug = slug(model)
-  const modelBaseSlug = modelSlug
-    .split('-')
-    .filter(Boolean)
-    .reduce<string[]>((acc, token) => {
-      // Remove tokens que começam com número ou são categorias técnicas
-      if (/^\d/.test(token)) return acc
-      if (acc.length > 0 && ['turbo', 'cvt', 'at', 'mt', 'premium', 'plus', 'drive', 'xls', 'xlsa', 'highline', 'platinum', 'premier', 'griffe', 'diamond', 'iconic', 'like', 'touring'].includes(token)) {
+  const resolvedCandidates = useMemo(() => {
+    const brandSlug = slug(brand)
+    const modelSlug = slug(model)
+    const modelBaseSlug = modelSlug
+      .split('-')
+      .filter(Boolean)
+      .reduce<string[]>((acc, token) => {
+        if (/^\d/.test(token)) return acc
+        if (acc.length > 0 && ['turbo', 'cvt', 'at', 'mt', 'premium', 'plus', 'drive', 'xls', 'xlsa', 'highline', 'platinum', 'premier', 'griffe', 'diamond', 'iconic', 'like', 'touring'].includes(token)) {
+          return acc
+        }
+        acc.push(token)
         return acc
-      }
-      acc.push(token)
-      return acc
-    }, [])
-    .join('-') || modelSlug
+      }, [])
+      .join('-') || modelSlug
 
-  const brandVariants = [
-    brandSlug,
-    brandSlug.replace('volkswagen', 'vw'),
-    brandSlug.replace('caoa-chery', 'cao-chery'),
-  ]
+    const brandVariants = [
+      brandSlug,
+      brandSlug.replace('volkswagen', 'vw'),
+      brandSlug.replace('caoa-chery', 'cao-chery'),
+    ]
 
-  // Lista de candidatos em ordem de prioridade
-  // Se o ano for 2026, tentamos logo 2025 e 2024 como alternativas principais
-  const fallbackYears = year >= 2025 ? [2025, 2024] : [2024]
-  
-  const imageCandidates = [
-    src, // 1. O src exato vindo dos dados
-    `/assets/cars/${id}.png`, // 2. O ID exato
-    ...brandVariants.flatMap((b) => [
-      `/assets/cars/${b}-${modelSlug}.png`,
-      `/assets/cars/${b}-${modelBaseSlug}.png`,
-    ]),
-    
-    // 3. Variações por Ano (Primeiro o solicitado, depois os fallbacks imediatos)
-    ...brandVariants.flatMap((b) => [
-      `/assets/cars/${b}-${modelSlug}-${year}.png`,
-      `/assets/cars/${b}-${modelBaseSlug}-${year}.png`,
-      ...fallbackYears.flatMap(fy => [
-        `/assets/cars/${b}-${modelSlug}-${fy}.png`,
-        `/assets/cars/${b}-${modelBaseSlug}-${fy}.png`,
-      ])
-    ]),
+    const fallbackYears = year >= 2025 ? [2025, 2024] : [2024]
 
-  ].filter(Boolean) as string[]
+    const imageCandidates = [
+      src,
+      `/assets/cars/${id}.png`,
+      ...brandVariants.flatMap((b) => [
+        `/assets/cars/${b}-${modelSlug}.png`,
+        `/assets/cars/${b}-${modelBaseSlug}.png`,
+      ]),
+      ...brandVariants.flatMap((b) => [
+        `/assets/cars/${b}-${modelSlug}-${year}.png`,
+        `/assets/cars/${b}-${modelBaseSlug}-${year}.png`,
+        ...fallbackYears.flatMap(fy => [
+          `/assets/cars/${b}-${modelSlug}-${fy}.png`,
+          `/assets/cars/${b}-${modelBaseSlug}-${fy}.png`,
+        ])
+      ]),
+    ].filter(Boolean) as string[]
 
-  const manifestPaths = Array.from(availableCarAssetPaths)
-  const modelTokens = tokenize(modelBaseSlug)
+    const manifestPaths = Array.from(availableCarAssetPaths)
+    const modelTokens = tokenize(modelBaseSlug)
 
-  const bestManifestMatch = manifestPaths
-    .map((assetPath) => {
-      const file = assetPath.replace('/assets/cars/', '').replace('.png', '')
-      const fileTokens = file.split('-').filter(Boolean)
-      let score = 0
+    const bestManifestMatch = manifestPaths
+      .map((assetPath) => {
+        const file = assetPath.replace('/assets/cars/', '').replace('.png', '')
+        const fileTokens = file.split('-').filter(Boolean)
+        let score = 0
 
-      if (file.includes(`${brandSlug}-`) || file.includes(`vw-`)) score += 30
-      for (const token of modelTokens) {
-        if (fileTokens.includes(token)) score += 8
-      }
-      if (file.includes(`${modelBaseSlug}-`)) score += 20
-      if (file.endsWith('-2025')) score += 3
-      if (file.endsWith('-2024')) score += 2
+        if (file.includes(`${brandSlug}-`) || file.includes(`vw-`)) score += 30
+        for (const token of modelTokens) {
+          if (fileTokens.includes(token)) score += 8
+        }
+        if (file.includes(`${modelBaseSlug}-`)) score += 20
+        if (file.endsWith('-2025')) score += 3
+        if (file.endsWith('-2024')) score += 2
 
-      return { assetPath, score }
+        return { assetPath, score }
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)[0]?.assetPath
+
+    const uniqueImageCandidates = Array.from(new Set([
+      ...imageCandidates,
+      ...(bestManifestMatch ? [bestManifestMatch] : []),
+    ]))
+
+    return uniqueImageCandidates.filter((path) => {
+      if (!path.startsWith('/assets/cars/')) return true
+      return availableCarAssetPaths.has(path)
     })
-    .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score)[0]?.assetPath
-
-  const uniqueImageCandidates = Array.from(new Set([
-    ...imageCandidates,
-    ...(bestManifestMatch ? [bestManifestMatch] : []),
-  ]))
-  const localCandidates = uniqueImageCandidates.filter((path) => {
-    if (!path.startsWith('/assets/cars/')) return true
-    return availableCarAssetPaths.has(path)
-  })
-  const resolvedCandidates = localCandidates
+  }, [brand, model, year, src, id])
 
   useEffect(() => {
     if (resolvedCandidates.length === 0) {
