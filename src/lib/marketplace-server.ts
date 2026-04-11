@@ -1,5 +1,7 @@
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { ListingPublic } from '@/lib/marketplace'
+import { getFipePrice } from '@/lib/fipe-api'
+import { parseFipePriceToNumber } from '@/lib/marketplace'
 
 type ListingImageRow = {
   id: string
@@ -52,6 +54,11 @@ type ListingPriceHistoryRow = {
   old_price: number | null
   new_price: number
   changed_at: string
+}
+
+type FipeFallbackValue = {
+  price: number | null
+  referenceMonth: string | null
 }
 
 function isMissingRelationError(message?: string): boolean {
@@ -114,8 +121,9 @@ function buildBadges(listing: ListingPublic, history: ListingPriceHistoryRow[]):
 
 async function enrichListingSignals(listings: ListingPublic[]): Promise<ListingPublic[]> {
   if (!listings.length) return listings
+  const hydratedListings = await hydrateMissingFipePrices(listings)
   const supabase = getSupabaseServerClient()
-  const listingIds = listings.map((item) => item.id)
+  const listingIds = hydratedListings.map((item) => item.id)
   const historyByListing = new Map<string, ListingPriceHistoryRow[]>()
 
   const { data: historyData, error: historyError } = await supabase
@@ -132,7 +140,7 @@ async function enrichListingSignals(listings: ListingPublic[]): Promise<ListingP
     }
   }
 
-  return listings.map((listing) => {
+  return hydratedListings.map((listing) => {
     const history = historyByListing.get(listing.id) || []
     const lastChange = history[0] || null
     const changesLast30d = history.filter((row) => {
@@ -154,6 +162,49 @@ async function enrichListingSignals(listings: ListingPublic[]): Promise<ListingP
       },
     }
   })
+}
+
+async function hydrateMissingFipePrices(listings: ListingPublic[]): Promise<ListingPublic[]> {
+  const cache = new Map<string, FipeFallbackValue>()
+
+  return Promise.all(
+    listings.map(async (listing) => {
+      if (typeof listing.fipe_price === 'number' && listing.fipe_price > 0) return listing
+
+      const key = `${listing.brand}|${listing.model}|${listing.year_model}|${listing.version || ''}`
+      if (!cache.has(key)) {
+        try {
+          const detail = await getFipePrice(
+            listing.brand,
+            listing.model,
+            listing.year_model,
+            listing.version || undefined,
+          )
+          const parsed = detail?.price ? parseFipePriceToNumber(detail.price) : 0
+          cache.set(key, {
+            price: Number.isFinite(parsed) && parsed > 0 ? parsed : null,
+            referenceMonth: detail?.referenceMonth || null,
+          })
+        } catch {
+          cache.set(key, { price: null, referenceMonth: null })
+        }
+      }
+
+      const fallback = cache.get(key)
+      if (!fallback?.price) return listing
+
+      const diffValue = Number(listing.price) - fallback.price
+      const diffPercent = fallback.price > 0 ? (diffValue / fallback.price) * 100 : null
+
+      return {
+        ...listing,
+        fipe_price: fallback.price,
+        fipe_reference_month: listing.fipe_reference_month || fallback.referenceMonth,
+        fipe_difference_value: Number.isFinite(diffValue) ? diffValue : null,
+        fipe_difference_percent: diffPercent !== null && Number.isFinite(diffPercent) ? diffPercent : null,
+      }
+    })
+  )
 }
 
 async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]> {

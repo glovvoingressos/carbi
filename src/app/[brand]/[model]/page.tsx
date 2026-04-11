@@ -165,7 +165,7 @@ export default async function CarDetailPage({
                 </div>
                 <h1 className="text-3xl sm:text-5xl font-heading text-text tracking-[-0.01em] leading-none mb-1">{car.brand} {car.model}</h1>
                 <p className="text-sm text-text-secondary mt-1">{car.version}</p>
-                <p className="text-sm text-text-tertiary mt-1 mb-3">Preço médio</p>
+                <p className="text-sm text-text-tertiary mt-1 mb-3">Preço FIPE</p>
                 <p className="text-4xl sm:text-5xl font-normal font-sans text-primary tracking-[-0.02em]">{displayPriceLabel}</p>
                 <div className="flex flex-col sm:flex-row gap-4 mt-6 items-start sm:items-center">
                    <YearSelector currentYear={displayYear || 'Sem ano'} availableYears={availableYears} />
@@ -216,7 +216,7 @@ export default async function CarDetailPage({
 
           {/* Key Stats Mobile (Hidden on Desktop) */}
           <div className="grid grid-cols-2 gap-3 lg:hidden">
-            <StatCard label="Preço" value={displayPriceLabel} isWinner={fipePrice !== null ? fipePrice <= bestPrice : false} />
+            <StatCard label="Preço FIPE" value={displayPriceLabel} isWinner={fipePrice !== null ? fipePrice <= bestPrice : false} />
             <StatCard label="Consumo" value={displayConsumption} isWinner={car.fuelEconomyCityGas > 0 ? car.fuelEconomyCityGas === bestConsumption : false} />
             <StatCard label="Potência" value={`${displayHp} cv`} isWinner={displayHp >= bestHp} />
             <StatCard label="Torque" value={`${displayTorque} Nm`} isWinner={displayTorque >= bestTorque} />
@@ -330,7 +330,7 @@ export default async function CarDetailPage({
           )}
 
           {/* Seção SEO Programático: Vale a Pena Comprar? */}
-          <section className="pastel-card rounded-[40px] p-8 sm:p-12 mt-12 mb-8">
+          <section className="pastel-card pastel-card-lilac rounded-[40px] p-8 sm:p-12 mt-12 mb-8">
             <h2 className="text-2xl sm:text-3xl font-black text-dark tracking-tight mb-6">
               Vale a pena comprar o {car.brand} {car.model} em 2026?
             </h2>
@@ -368,7 +368,7 @@ export default async function CarDetailPage({
           <div className="pastel-card pastel-card-blue rounded-2xl p-6">
             <h3 className="text-sm font-bold text-text-tertiary uppercase tracking-wider mb-4">Estatísticas Principais</h3>
             <div className="space-y-4">
-              <StatCard label="Preço" value={displayPriceLabel} isWinner={fipePrice !== null ? fipePrice <= bestPrice : false} />
+              <StatCard label="Preço FIPE" value={displayPriceLabel} isWinner={fipePrice !== null ? fipePrice <= bestPrice : false} />
               <StatCard label="Consumo" value={displayConsumption} isWinner={car.fuelEconomyCityGas > 0 ? car.fuelEconomyCityGas === bestConsumption : false} />
               <StatCard label="Potência" value={`${car.horsepower} cv`} isWinner={car.horsepower === bestHp} />
               <StatCard label="Torque" value={`${car.torque} Nm`} isWinner={car.torque === bestTorque} />
@@ -420,6 +420,7 @@ export default async function CarDetailPage({
 function StatCard({ label, value, isWinner }: { label: string; value: string; isWinner?: boolean }) {
   const icons: Record<string, React.ReactNode> = {
     'Preço': <Fuel className="w-4 h-4 text-text-tertiary" />,
+    'Preço FIPE': <Fuel className="w-4 h-4 text-text-tertiary" />,
     'Consumo': <Fuel className="w-4 h-4 text-text-secondary" />,
     'Potência': <Gauge className="w-4 h-4 text-text-tertiary" />,
     'Torque': <Timer className="w-4 h-4 text-text-tertiary" />,

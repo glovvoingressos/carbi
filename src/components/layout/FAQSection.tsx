@@ -16,32 +16,35 @@ export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section className="w-full bg-white py-24 md:py-32">
+    <section className="w-full bg-[#fff8f1] py-16 md:py-20">
       <div className="container" style={{ maxWidth: 900 }}>
-        <h2 className="text-center text-5xl md:text-6xl font-black text-dark mb-12 tracking-tighter">
+        <h2 className="text-center text-4xl md:text-5xl font-black text-dark mb-8 md:mb-10 tracking-tighter">
           Perguntas Frequentes
         </h2>
         
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           {faqs.map((faq, i) => {
             const isOpen = openIndex === i
-            // The last item has a green color in Cash App reference
-            const isLast = i === faqs.length - 1
-            const baseBg = isLast ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-bento-red)]'
+            const baseBg = i % 2 === 0 ? '#fff0e2' : '#ffe8d5'
+            const answerBg = i % 2 === 0 ? '#fff6ee' : '#fff1e5'
             
             return (
               <div key={i} className="flex flex-col">
                 <button 
                   onClick={() => setOpenIndex(isOpen ? null : i)}
-                  className={`w-full flex items-center justify-between px-8 py-5 md:py-6 rounded-full text-left transition-all hover:scale-[1.01] active:scale-[0.99] ${baseBg} shadow-sm border border-dark`}
+                  className="w-full flex items-center justify-between px-6 md:px-7 py-4 md:py-[18px] rounded-full text-left transition-all hover:scale-[1.01] active:scale-[0.99]"
+                  style={{ backgroundColor: baseBg }}
                 >
-                  <span className="text-dark font-black text-lg md:text-xl tracking-widest uppercase">{faq.q}</span>
+                  <span className="text-dark font-black text-base md:text-lg tracking-wide uppercase">{faq.q}</span>
                   <div className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-                    <ArrowDown className="w-8 h-8 md:w-10 md:h-10 text-dark stroke-[3px]" />
+                    <ArrowDown className="w-7 h-7 md:w-8 md:h-8 text-dark stroke-[2.75px]" />
                   </div>
                 </button>
                 {isOpen && (
-                  <div className="px-8 py-6 text-dark font-medium text-lg leading-relaxed animate-in slide-in-from-top-4 fade-in duration-300">
+                  <div
+                    className="mt-2 rounded-[22px] px-6 md:px-7 py-4 md:py-5 text-dark font-medium text-base md:text-lg leading-relaxed animate-in slide-in-from-top-4 fade-in duration-300"
+                    style={{ backgroundColor: answerBg }}
+                  >
                     {faq.a}
                   </div>
                 )}

@@ -15,7 +15,7 @@ export default function ConversationsPage() {
         <p className="mt-2 text-sm text-text-secondary">Todas as negociações do seu anúncio ficam protegidas dentro da plataforma.</p>
       </div>
       <div className="mt-6">
-        <Suspense fallback={<div className="pastel-card p-6 text-sm text-text-secondary">Carregando conversas...</div>}>
+        <Suspense fallback={<div className="pastel-card pastel-card-blue p-6 text-sm text-text-secondary">Carregando conversas...</div>}>
           <ConversationInbox />
         </Suspense>
       </div>

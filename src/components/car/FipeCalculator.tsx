@@ -466,7 +466,7 @@ export default function FipeCalculator({
       {!loading.detail && safeResult && hasAllFilters ? (
         <div className="space-y-4 pt-6 border-t-2 border-dark border-dashed">
           <div>
-            <p className="text-[11px] text-text-tertiary uppercase font-black tracking-widest mb-1.5">Valor Atual</p>
+            <p className="text-[11px] text-text-tertiary uppercase font-black tracking-widest mb-1.5">Preço FIPE</p>
             <p className="text-4xl font-black text-dark tracking-[-0.05em]">{safeResult.price}</p>
           </div>
 

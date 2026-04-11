@@ -3,7 +3,7 @@
 export default function HeroSearchBar() {
   return (
     <form
-      action="/rankings"
+      action="/carros-a-venda"
       method="get"
       role="search"
       aria-label="Buscar veículos"

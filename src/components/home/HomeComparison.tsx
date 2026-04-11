@@ -40,6 +40,7 @@ export default function HomeComparison() {
           className="relative overflow-hidden rounded-[40px] pastel-card pastel-card-blue"
           style={{
             padding: 'clamp(28px, 5vw, 64px)',
+            background: 'linear-gradient(135deg, #e7f0ff 0%, #edf6ff 55%, #f3f9ff 100%)',
           }}
         >
           {/* Background Glow */}
@@ -103,7 +104,7 @@ export default function HomeComparison() {
             <div className={`relative flex flex-col gap-6 ${comparison ? 'animate-in fade-in duration-700' : ''}`}>
                {comparison ? (
                   /* Summary View */
-                  <div className="pastel-card rounded-[32px] p-6">
+                  <div className="pastel-card pastel-card-lilac rounded-[32px] p-6">
                      <div className="space-y-4">
                         <SummaryRow 
                            label="Preço" 
@@ -235,19 +236,19 @@ function Slot({ num, car, onClick, icon, accent = false }: any) {
          onClick={onClick}
          className="relative group transition-all duration-500 hover:-translate-y-2"
       >
-         <div className={`w-32 h-44 sm:w-44 sm:h-64 pastel-card ${accent ? 'pastel-card-yellow' : ''} rounded-[32px] p-4 flex flex-col justify-between items-center transition-all overflow-hidden ${car ? '' : 'opacity-80'}`}>
-            <div className="w-full h-24 sm:h-32 bg-[#f5f8ff] rounded-2xl flex items-center justify-center transition-all relative overflow-hidden">
+         <div className={`w-32 h-44 sm:w-44 sm:h-64 rounded-[32px] p-4 flex flex-col justify-between items-center transition-all overflow-hidden ring-1 ring-black/10 ${accent ? 'bg-[#efe9cf]' : 'bg-[#dce7fb]'}`}>
+            <div className={`w-full h-24 sm:h-32 rounded-2xl flex items-center justify-center transition-all relative overflow-hidden ${accent ? 'bg-[#e6e9ef]' : 'bg-[#edf2ff]'}`}>
                {car ? (
                   <CarImage id={car.id} brand={car.brand} model={car.model} year={car.year} src={car.image} className="w-full h-full" />
                ) : (
-                  <div className="w-12 h-12 rounded-full border-2 border-dashed border-dark/10 flex items-center justify-center group-hover:border-dark group-hover:animate-spin-slow">
-                     <Plus className="w-6 h-6 text-dark/30 group-hover:text-dark" />
+                  <div className="w-12 h-12 rounded-full border-2 border-dashed border-dark/35 flex items-center justify-center group-hover:border-dark group-hover:animate-spin-slow">
+                     <Plus className="w-6 h-6 text-dark/70 group-hover:text-dark" />
                   </div>
                )}
             </div>
             
             <div className="w-full text-center">
-               <p className="text-[9px] font-black uppercase tracking-widest text-[#0a0a0a]/30 mb-1">Slot 0{num}</p>
+               <p className="text-[9px] font-black uppercase tracking-widest text-dark/45 mb-1">Slot 0{num}</p>
                <span className="text-[11px] sm:text-[13px] font-black uppercase tracking-tighter text-dark">
                   {car ? car.model : 'Selecionar'}
                </span>

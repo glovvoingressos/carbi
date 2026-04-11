@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.carbi.com.br
+
+# Sitemaps
+Sitemap: https://www.carbi.com.br/sitemap.xml

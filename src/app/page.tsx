@@ -1,10 +1,9 @@
 import Link from 'next/link'
-import { formatBRL } from '@/data/cars'
 import CarCard from '@/components/car/CarCard'
 import HeroSearchBar from '@/components/ui/HeroSearchBar'
 import {
   ArrowRight, ArrowUpRight, Star,
-  ChevronRight, CheckCircle2, Zap, Fuel, Users, Plus
+  ChevronRight, CheckCircle2, Zap, Fuel, Users, Plus, Sparkles, BrainCircuit
 } from 'lucide-react'
 import { getAllCars } from '@/lib/data-fetcher'
 import FAQSection from '@/components/layout/FAQSection'
@@ -12,7 +11,6 @@ import HomeComparison from '@/components/home/HomeComparison'
 import BrandLogo from '@/components/brand/BrandLogo'
 import ListingCard from '@/components/marketplace/ListingCard'
 import { getLatestPublicListings, getMarketplaceDiscoverySections } from '@/lib/marketplace-server'
-import { resolveMarketplaceCarImage } from '@/lib/car-image-fallback'
 import { QUICK_LINKS } from '@/lib/marketplace-seo'
 
 // ── Dados estáticos ─────────────────────────────────────────────────────────
@@ -58,16 +56,7 @@ export default async function HomePage() {
   const cars   = await getAllCars()
   const latestListings = await getLatestPublicListings(12)
   const discovery = await getMarketplaceDiscoverySections()
-  const featuredListing = latestListings[0] || null
-  const recentListings = featuredListing ? latestListings.slice(1, 9) : latestListings.slice(0, 8)
-  const featuredCover = featuredListing
-    ? resolveMarketplaceCarImage({
-        brand: featuredListing.brand,
-        model: featuredListing.model,
-        year: featuredListing.year_model,
-        preferredUrl: featuredListing.images?.[0]?.url || null,
-      })
-    : null
+  const recentListings = latestListings.slice(0, 8)
   const popular = cars.filter((c) => c.isPopular || c.priceBrl > 0).slice(0, 12)
   const electricCars = cars.filter((c) => c.segment === 'electric').slice(0, 8)
   const brands  = [...new Set(cars.map((c) => c.brand))].sort()
@@ -93,7 +82,7 @@ export default async function HomePage() {
              
 
              {/* BENTO 2: White Large Card (Valor atualizado) */}
-             <div className="md:col-span-12 lg:col-span-8 pastel-card rounded-[32px] p-6 sm:p-8 lg:p-12 flex flex-col items-start justify-between relative overflow-hidden">
+             <div className="md:col-span-12 lg:col-span-8 pastel-card pastel-card-blue rounded-[32px] p-6 sm:p-8 lg:p-12 flex flex-col items-start justify-between relative overflow-hidden">
                 <span className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-surface z-10">2</span>
                 
                 {/* Abstract Visual representation of a toggle/chart */}
@@ -169,12 +158,41 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="pb-16">
+      <section className="pb-14">
+        <div className="container">
+          <div
+            className="announce-card pastel-card rounded-[32px] p-7 sm:p-10 overflow-hidden relative"
+            style={{ background: 'linear-gradient(135deg, #d4ef7d 0%, #cdee63 100%)' }}
+          >
+            <div className="announce-glow pointer-events-none absolute -left-24 top-0 h-full w-24 bg-white/25 blur-xl" />
+            <div className="grid grid-cols-1 items-center">
+              <div className="max-w-3xl">
+                <h2 data-announce-line className="text-[32px] sm:text-[42px] leading-[1.05] font-extrabold text-dark mt-1">Anuncie seu carro em minutos</h2>
+                <p data-announce-line className="mt-3 text-xs sm:text-sm font-semibold text-dark/65">Leva menos de 2 minutos. Após clicar, você preenche e publica seu anúncio de carro com suporte ao Preço FIPE.</p>
+                <Link
+                  href="/anunciar-carro-bh"
+                  data-announce-line
+                  className="announce-cta mt-5 inline-flex items-center justify-center rounded-full px-6 py-3 font-black uppercase tracking-wider shadow-[4px_4px_0_#000] hover:-translate-y-1 transition-all w-full sm:w-auto"
+                  style={{
+                    backgroundColor: '#0f0f0f',
+                    border: '2px solid #0f0f0f',
+                    color: '#ffffff',
+                  }}
+                >
+                  Começar anúncio grátis
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="pt-8 sm:pt-10 pb-16">
         <div className="container">
           {latestListings.length > 0 ? (
             <div className="space-y-6">
               <div className="mb-1 flex items-end justify-between">
-                <div>
+                <div className="-mt-1.5 sm:-mt-2">
                   <p className="text-eyebrow">Marketplace</p>
                   <h2 className="text-h2">Carros anunciados agora</h2>
                 </div>
@@ -183,50 +201,17 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              {featuredListing ? (
-                <Link
-                  href={`/anuncios/${featuredListing.slug}`}
-                  className="group block overflow-hidden rounded-[28px] p-5 sm:p-7 transition hover:-translate-y-1"
-                  style={{ background: '#e6f0ff' }}
-                >
-                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
-                    <div className="overflow-hidden rounded-2xl bg-white">
-                      {featuredCover ? (
-                        <img
-                          src={featuredCover}
-                          alt={featuredListing.title}
-                          className="h-56 w-full object-cover sm:h-72"
-                        />
-                      ) : (
-                        <div className="flex h-56 items-center justify-center bg-surface text-sm font-semibold text-text-secondary sm:h-72">
-                          Foto do anúncio indisponível
-                        </div>
-                      )}
-                    </div>
-                    <div className="rounded-2xl p-4 sm:p-5" style={{ background: '#f3f8ff' }}>
-                      <p className="text-[11px] font-black uppercase tracking-[0.14em] text-dark/65">Destaque do dia</p>
-                      <h3 className="mt-1 text-2xl font-black leading-tight text-dark sm:text-3xl">{featuredListing.title}</h3>
-                      <p className="mt-2 text-4xl font-black text-dark">{formatBRL(Number(featuredListing.price))}</p>
-                      <p className="mt-2 text-sm font-semibold text-text-secondary">
-                        {featuredListing.year}/{featuredListing.year_model} • {featuredListing.mileage.toLocaleString('pt-BR')} km • {featuredListing.city}/{featuredListing.state}
-                      </p>
-                      <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-dark px-4 py-2 text-xs font-black uppercase tracking-wide text-white">
-                        Ver anúncio
-                        <ArrowRight className="h-4 w-4" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ) : null}
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {recentListings.map((listing) => (
                   <ListingCard key={listing.id} listing={listing} />
                 ))}
               </div>
             </div>
           ) : (
-            <div className="pastel-card p-6 sm:p-8">
+            <div
+              className="pastel-card pastel-card-green p-6 sm:p-8"
+              style={{ background: 'linear-gradient(135deg, #e9f7ee 0%, #f0fbf4 100%)' }}
+            >
               <p className="text-sm font-semibold text-text-secondary">Ainda não há anúncios ativos.</p>
               <p className="mt-1 text-lg font-black text-dark">Seja o primeiro a publicar e ganhar destaque na home.</p>
               <Link
@@ -244,7 +229,7 @@ export default async function HomePage() {
       {discovery.latest.length > 0 ? (
         <section className="pb-16">
           <div className="container space-y-10">
-            <div className="pastel-card p-6 sm:p-8">
+            <div className="pastel-card pastel-card-lilac p-6 sm:p-8">
               <p className="text-eyebrow">Explorar anúncios</p>
               <h2 className="text-h2">Descubra por preço, categoria e novidades</h2>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -260,27 +245,13 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {discovery.recent.length > 0 ? (
-              <div>
-                <div className="mb-3 flex items-end justify-between">
-                  <h3 className="text-xl font-black text-dark">Recém-publicados</h3>
-                  <Link href="/carros/mais-recentes" className="text-sm font-bold text-text-secondary">Ver mais</Link>
-                </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {discovery.recent.slice(0, 8).map((listing) => (
-                    <ListingCard key={`recent-${listing.id}`} listing={listing} />
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
             {discovery.reduced.length > 0 ? (
               <div>
                 <div className="mb-3 flex items-end justify-between">
                   <h3 className="text-xl font-black text-dark">Baixaram o preço</h3>
                   <Link href="/carros/mais-baratos" className="text-sm font-bold text-text-secondary">Ver mais</Link>
                 </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   {discovery.reduced.slice(0, 8).map((listing) => (
                     <ListingCard key={`drop-${listing.id}`} listing={listing} />
                   ))}
@@ -294,7 +265,7 @@ export default async function HomePage() {
                   <h3 className="text-xl font-black text-dark">Oportunidades do dia</h3>
                   <Link href="/carros/suv-ate-80-mil" className="text-sm font-bold text-text-secondary">Explorar</Link>
                 </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   {discovery.opportunities.slice(0, 8).map((listing) => (
                     <ListingCard key={`opp-${listing.id}`} listing={listing} />
                   ))}
@@ -304,26 +275,6 @@ export default async function HomePage() {
           </div>
         </section>
       ) : null}
-
-      <section className="pb-16">
-        <div className="container">
-          <div className="pastel-card pastel-card-yellow rounded-[32px] p-6 sm:p-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div>
-                <p className="text-[11px] font-black uppercase tracking-widest text-dark/70">Marketplace Carbi</p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-dark mt-1">Tem carro para vender? Anuncie gratuitamente em minutos.</h2>
-                <p className="text-sm sm:text-base font-semibold text-dark/70 mt-2">Publique com até 10 fotos, destaque no catálogo e contato seguro direto na plataforma.</p>
-              </div>
-              <Link
-                href="/anunciar-carro-bh"
-                className="inline-flex items-center justify-center rounded-full bg-[#dff7e8] px-6 py-3 text-dark font-black uppercase tracking-wider shadow-[4px_4px_0_#000] hover:-translate-y-1 transition-all w-full sm:w-auto"
-              >
-                Anunciar meu carro
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           § 3 — FILTER CHIPS (sticky)
@@ -466,7 +417,10 @@ export default async function HomePage() {
               <div
                 key={i}
                 className="scroll-reveal relative pastel-card rounded-[22px] p-4 sm:p-5 text-left hover:-translate-y-0.5 transition-all overflow-hidden"
-                style={{ transitionDelay: `${i * 60}ms` }}
+                style={{
+                  transitionDelay: `${i * 60}ms`,
+                  backgroundColor: ['#eaf3ff', '#ecf9ef', '#fff8dc', '#f3efff'][i % 4],
+                }}
               >
                 <div className="absolute -right-4 -top-4 opacity-10 pointer-events-none">
                   {i % 4 === 0 && <Users className="w-16 h-16 text-dark" />}
@@ -553,6 +507,7 @@ export default async function HomePage() {
                   key={brand}
                   href={`/marcas/${slug}`}
                   className="flex-shrink-0 group relative pastel-card rounded-3xl p-5 hover:bg-[#f0f4fa] hover:-translate-y-1 transition-all flex flex-col items-center justify-center min-w-[140px] select-none"
+                  style={{ backgroundColor: ['#eaf3ff', '#ecf9ef', '#fff8dc', '#f3efff'][i % 4] }}
                 >
                   <div 
                      className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 shadow-sm p-1.5"
@@ -589,13 +544,28 @@ export default async function HomePage() {
           textAlign: 'center',
         }}
       >
-        <div className="container">
-          <p className="text-eyebrow scroll-reveal" style={{ marginBottom: 16 }}>Pronto para decidir?</p>
+        <div className="container max-w-4xl">
+          <div
+            className="pastel-card pastel-card-blue rounded-[36px] p-7 sm:p-10 relative overflow-hidden"
+            style={{ background: 'linear-gradient(140deg, #c7d8f8 0%, #bfd2f3 100%)' }}
+          >
+            <div className="pointer-events-none absolute -right-8 -top-10 h-36 w-36 rounded-full bg-white/35 blur-2xl" />
+            <div className="pointer-events-none absolute -left-10 bottom-2 h-28 w-28 rounded-full bg-white/30 blur-2xl" />
+            <div className="mb-4 flex items-center justify-center gap-2">
+              <span className="anime-float inline-flex items-center gap-1 rounded-full bg-[var(--color-bento-yellow)] px-3 py-1 text-[11px] font-black uppercase tracking-[0.09em] text-dark">
+                <Sparkles className="h-3.5 w-3.5" />
+                IA carbi
+              </span>
+              <span className="anime-float inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#e6509f] text-white">
+                <BrainCircuit className="h-4.5 w-4.5" />
+              </span>
+            </div>
+            <p className="text-eyebrow scroll-reveal" style={{ marginBottom: 14 }}>Pronto para decidir?</p>
           <h2
             className="text-h2 scroll-reveal sr-delay-1"
             style={{ maxWidth: 480, marginInline: 'auto', marginBottom: 12 }}
           >
-            Seu próximo carro começa aqui.
+            Use nossa IA e encontre os modelos ideais para você.
           </h2>
           <p
             className="scroll-reveal sr-delay-2"
@@ -608,7 +578,7 @@ export default async function HomePage() {
               lineHeight: 1.65,
             }}
           >
-            Use nosso guia personalizado e encontre o veículo que combina com seu estilo e orçamento.
+            A IA da carbi cruza preço, perfil e uso para sugerir os modelos certos em segundos.
           </p>
           <div className="scroll-reveal sr-delay-3" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/qual-carro" className="btn btn-primary" style={{ height: 52, fontSize: 15 }}>
@@ -618,6 +588,7 @@ export default async function HomePage() {
             <Link href="/rankings" className="btn btn-outline" style={{ height: 52, fontSize: 15 }}>
               Explorar catálogo
             </Link>
+          </div>
           </div>
         </div>
       </section>

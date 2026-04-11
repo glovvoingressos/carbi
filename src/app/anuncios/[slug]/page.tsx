@@ -161,7 +161,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
           ) : null}
 
           {hasRecalls ? (
-            <div className="pastel-card p-5 bg-[#fff3e8]">
+            <div className="pastel-card pastel-card-yellow p-5">
               <h2 className="text-xl font-black text-dark">Avisos de recall (opcional)</h2>
               <p className="mt-1 text-xs font-semibold text-text-secondary">
                 Referência internacional (EUA). Confirme no Brasil com rede autorizada e órgãos locais.
@@ -185,7 +185,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             <p className="mt-1 text-4xl font-black text-dark">{formatBRL(Number(listing.price))}</p>
 
             <div className="mt-4 rounded-2xl bg-white/70 p-4 text-sm">
-              <p><strong>Preço médio:</strong> {listing.fipe_price ? formatBRL(Number(listing.fipe_price)) : 'Indisponível'}</p>
+              <p><strong>Preço FIPE:</strong> {listing.fipe_price ? formatBRL(Number(listing.fipe_price)) : 'Indisponível'}</p>
               <p><strong>Diferença:</strong> {comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</p>
               <p><strong>Percentual:</strong> {comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</p>
               <p className="mt-2 font-bold">

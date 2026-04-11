@@ -271,7 +271,7 @@ function ComparePageContent() {
       {/* Comparison Table */}
       {comparison && comparison.cars.length >= 2 && (
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-500">
-          <div className="pastel-card rounded-[32px] overflow-hidden shadow-[0_8px_40px_rgb(0,0,0,0.06)] mb-10">
+          <div className="pastel-card pastel-card-blue rounded-[32px] overflow-hidden shadow-[0_8px_40px_rgb(0,0,0,0.06)] mb-10">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[600px] border-collapse">
                 <thead>

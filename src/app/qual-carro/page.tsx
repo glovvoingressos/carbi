@@ -136,7 +136,7 @@ export default function QualCarroPage() {
         <h1 className="text-2xl font-bold text-text mb-6">Sua recomenda&ccedil;&atilde;o</h1>
 
         {/* Top pick */}
-        <div className="pastel-card rounded-xl p-5 mb-4">
+        <div className="pastel-card pastel-card-blue rounded-xl p-5 mb-4">
           <p className="text-xs font-medium text-primary uppercase tracking-wider mb-2">Mais recomendado</p>
           <div className="flex items-center gap-4">
             <CarImage
@@ -238,7 +238,7 @@ export default function QualCarroPage() {
         <div className="bg-primary h-1.5 rounded-full transition-all duration-300" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
       </div>
 
-      <div className="pastel-card rounded-xl p-5 sm:p-6">
+      <div className="pastel-card pastel-card-lilac rounded-xl p-5 sm:p-6">
         {/* Step 0: Budget */}
         {step === 0 && (
           <>

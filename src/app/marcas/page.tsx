@@ -51,12 +51,14 @@ export default async function MarcasPage() {
             // Alternate colors for variety
             const colors = ['#b4d2ff', '#E8D4FF', '#fff9d4', '#ffccd5']
             const bgColor = colors[i % colors.length]
+            const cardColors = ['#eaf3ff', '#ecf9ef', '#fff8dc', '#f3efff']
 
             return (
               <Link
                 key={brand}
                 href={`/marcas/${slug}`}
                 className="group relative pastel-card rounded-[32px] p-6 text-center transition-all hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center overflow-hidden"
+                style={{ backgroundColor: cardColors[i % cardColors.length] }}
               >
                 <div 
                   className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 shadow-sm bg-white p-2 relative z-10"

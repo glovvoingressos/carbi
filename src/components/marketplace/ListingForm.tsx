@@ -619,7 +619,7 @@ export default function ListingForm() {
 
             <div className="rounded-2xl border border-border bg-surface p-4">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-bold text-dark">Referência de preço</p>
+                <p className="text-sm font-bold text-dark">Referência FIPE</p>
                 <span className={`rounded-full px-3 py-1 text-xs font-bold ${fipeBadgeClass}`}>
                   {comparison.status === 'below' && 'Abaixo do preço médio'}
                   {comparison.status === 'near' && 'Próximo do preço médio'}
@@ -631,7 +631,7 @@ export default function ListingForm() {
                 <p className="mt-2 text-sm text-text-secondary">Consultando valor atualizado...</p>
               ) : fipeResult ? (
                 <div className="mt-3 grid gap-2 text-sm">
-                  <p><strong>Preço médio:</strong> {fipeResult.price}</p>
+                  <p><strong>Preço FIPE:</strong> {fipeResult.price}</p>
                   <p><strong>Seu anúncio:</strong> {priceNumber ? formatBRL(priceNumber) : 'Informe o preço'}</p>
                   <p><strong>Diferença:</strong> {comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</p>
                   <p><strong>Percentual:</strong> {comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</p>
