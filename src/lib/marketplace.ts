@@ -75,6 +75,20 @@ export interface ListingPublic {
   published_at: string | null
   created_at: string
   updated_at: string
+  price_updated_at?: string | null
+  badges?: Array<{
+    key: 'new' | 'price_drop' | 'below_fipe' | 'opportunity'
+    label: string
+  }>
+  listed_since?: string
+  price_updated_since?: string | null
+  price_history?: {
+    has_changes: boolean
+    changes_last_30d: number
+    last_old_price: number | null
+    last_new_price: number | null
+    last_changed_at: string | null
+  } | null
   images: Array<{
     id: string
     url: string

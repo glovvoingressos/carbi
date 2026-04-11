@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import ListingCard from '@/components/marketplace/ListingCard'
 import { fetchPublicListingsPage, ListingSort } from '@/lib/marketplace-server'
+import { ALLOWED_SORTS, QUICK_LINKS, resolveSeoPreset } from '@/lib/marketplace-seo'
 
 const SORT_OPTIONS: Array<{ value: ListingSort; label: string }> = [
   { value: 'recent', label: 'Mais recentes' },
@@ -11,64 +13,70 @@ const SORT_OPTIONS: Array<{ value: ListingSort; label: string }> = [
 ]
 
 export async function generateMetadata({
-  searchParams,
+  params,
 }: {
-  searchParams: Promise<{ q?: string }>
+  params: Promise<{ slug: string }>
 }): Promise<Metadata> {
-  const sp = await searchParams
-  const query = (sp.q || '').trim()
-  if (query) {
+  const { slug } = await params
+  const preset = resolveSeoPreset(slug)
+  if (!preset) {
     return {
-      title: `Carros à venda: ${query} | Carbi`,
-      description: `Explore anúncios reais de ${query} com atualização constante de preço, ano e quilometragem.`,
+      title: 'Carros à venda | Carbi',
+      description: 'Explore anúncios ativos com filtros inteligentes e dados reais.',
     }
   }
 
   return {
-    title: 'Carros à venda | Carbi',
-    description: 'Listagem completa de carros anunciados na plataforma com dados reais.',
+    title: preset.title,
+    description: preset.description,
+    alternates: {
+      canonical: `/carros/${preset.slug}`,
+    },
   }
 }
 
-export default async function CarrosAVendaPage({
+export default async function CarrosSeoPage({
+  params,
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; ordem?: ListingSort; pagina?: string }>
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ ordem?: ListingSort; pagina?: string }>
 }) {
+  const { slug } = await params
   const sp = await searchParams
-  const query = (sp.q || '').trim()
-  const sort = SORT_OPTIONS.some((option) => option.value === sp.ordem) ? sp.ordem! : 'recent'
+  const preset = resolveSeoPreset(slug)
+  if (!preset) notFound()
+
+  const sort = ALLOWED_SORTS.includes(sp.ordem as ListingSort) ? (sp.ordem as ListingSort) : (preset.listingQuery.sort || 'recent')
   const page = Math.max(Number(sp.pagina || '1') || 1, 1)
   const result = await fetchPublicListingsPage({
-    q: query || undefined,
+    ...preset.listingQuery,
     sort,
     page,
     pageSize: 24,
   })
-  const listings = result.items
   const totalPages = Math.max(1, Math.ceil(result.total / result.pageSize))
 
   return (
     <main className="container mx-auto max-w-6xl px-4 pb-16 pt-24">
-      <h1 className="text-3xl font-black text-dark">Carros à venda</h1>
+      <h1 className="text-3xl font-black text-dark">{preset.h1}</h1>
       <p className="mt-2 text-sm font-semibold text-text-secondary">
-        {query ? `Resultados para "${query}"` : 'Listagem completa dos anúncios mais recentes.'} • Página {page} de {totalPages}
+        {preset.intro} • Página {page} de {totalPages}
       </p>
 
-      <form action="/carros-a-venda" method="get" className="mt-5 flex gap-2">
-        <input
-          type="search"
-          name="q"
-          defaultValue={query}
-          placeholder="Filtrar por marca ou modelo"
-          className="h-11 flex-1 rounded-2xl bg-[#f7f9fc] px-4 text-sm font-medium outline-none focus:ring-2 focus:ring-dark/10"
-        />
-        <button
-          type="submit"
-          className="h-11 rounded-2xl bg-dark px-5 text-sm font-black uppercase tracking-wider text-white"
-        >
-          Buscar
-        </button>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {QUICK_LINKS.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            className="rounded-full bg-[#f7f9fc] px-4 py-2 text-xs font-black uppercase tracking-wide text-dark"
+          >
+            {link.label}
+          </a>
+        ))}
+      </div>
+
+      <form action={`/carros/${slug}`} method="get" className="mt-5 flex gap-2">
         <select
           name="ordem"
           defaultValue={sort}
@@ -79,25 +87,31 @@ export default async function CarrosAVendaPage({
           ))}
         </select>
         <input type="hidden" name="pagina" value="1" />
+        <button
+          type="submit"
+          className="h-11 rounded-2xl bg-dark px-5 text-sm font-black uppercase tracking-wider text-white"
+        >
+          Aplicar
+        </button>
       </form>
 
-      {listings.length > 0 ? (
+      {result.items.length > 0 ? (
         <>
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {listings.map((listing) => (
+            {result.items.map((listing) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
           </div>
           <div className="mt-6 flex items-center justify-between gap-3">
             <a
-              href={`/carros-a-venda?q=${encodeURIComponent(query)}&ordem=${sort}&pagina=${Math.max(page - 1, 1)}`}
+              href={`/carros/${slug}?ordem=${sort}&pagina=${Math.max(page - 1, 1)}`}
               aria-disabled={page <= 1}
               className={`rounded-full px-4 py-2 text-sm font-black uppercase tracking-wide ${page <= 1 ? 'pointer-events-none bg-surface text-text-tertiary' : 'bg-dark text-white'}`}
             >
               Anterior
             </a>
             <a
-              href={`/carros-a-venda?q=${encodeURIComponent(query)}&ordem=${sort}&pagina=${Math.min(page + 1, totalPages)}`}
+              href={`/carros/${slug}?ordem=${sort}&pagina=${Math.min(page + 1, totalPages)}`}
               aria-disabled={page >= totalPages}
               className={`rounded-full px-4 py-2 text-sm font-black uppercase tracking-wide ${page >= totalPages ? 'pointer-events-none bg-surface text-text-tertiary' : 'bg-dark text-white'}`}
             >
@@ -107,7 +121,7 @@ export default async function CarrosAVendaPage({
         </>
       ) : (
         <div className="mt-8 rounded-2xl bg-[#f7f9fc] p-6 text-sm font-semibold text-text-secondary">
-          Nenhum anúncio encontrado no momento.
+          Nenhum anúncio encontrado para este filtro no momento.
         </div>
       )}
     </main>

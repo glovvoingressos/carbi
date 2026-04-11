@@ -11,8 +11,9 @@ import FAQSection from '@/components/layout/FAQSection'
 import HomeComparison from '@/components/home/HomeComparison'
 import BrandLogo from '@/components/brand/BrandLogo'
 import ListingCard from '@/components/marketplace/ListingCard'
-import { getLatestPublicListings } from '@/lib/marketplace-server'
+import { getLatestPublicListings, getMarketplaceDiscoverySections } from '@/lib/marketplace-server'
 import { resolveMarketplaceCarImage } from '@/lib/car-image-fallback'
+import { QUICK_LINKS } from '@/lib/marketplace-seo'
 
 // ── Dados estáticos ─────────────────────────────────────────────────────────
 
@@ -56,6 +57,7 @@ function formatK(n: number) {
 export default async function HomePage() {
   const cars   = await getAllCars()
   const latestListings = await getLatestPublicListings(12)
+  const discovery = await getMarketplaceDiscoverySections()
   const featuredListing = latestListings[0] || null
   const recentListings = featuredListing ? latestListings.slice(1, 9) : latestListings.slice(0, 8)
   const featuredCover = featuredListing
@@ -238,6 +240,70 @@ export default async function HomePage() {
           )}
         </div>
       </section>
+
+      {discovery.latest.length > 0 ? (
+        <section className="pb-16">
+          <div className="container space-y-10">
+            <div className="pastel-card p-6 sm:p-8">
+              <p className="text-eyebrow">Explorar anúncios</p>
+              <h2 className="text-h2">Descubra por preço, categoria e novidades</h2>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {QUICK_LINKS.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="rounded-full bg-white/75 px-4 py-2 text-xs font-black uppercase tracking-wide text-dark"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {discovery.recent.length > 0 ? (
+              <div>
+                <div className="mb-3 flex items-end justify-between">
+                  <h3 className="text-xl font-black text-dark">Recém-publicados</h3>
+                  <Link href="/carros/mais-recentes" className="text-sm font-bold text-text-secondary">Ver mais</Link>
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {discovery.recent.slice(0, 8).map((listing) => (
+                    <ListingCard key={`recent-${listing.id}`} listing={listing} />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {discovery.reduced.length > 0 ? (
+              <div>
+                <div className="mb-3 flex items-end justify-between">
+                  <h3 className="text-xl font-black text-dark">Baixaram o preço</h3>
+                  <Link href="/carros/mais-baratos" className="text-sm font-bold text-text-secondary">Ver mais</Link>
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {discovery.reduced.slice(0, 8).map((listing) => (
+                    <ListingCard key={`drop-${listing.id}`} listing={listing} />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {discovery.opportunities.length > 0 ? (
+              <div>
+                <div className="mb-3 flex items-end justify-between">
+                  <h3 className="text-xl font-black text-dark">Oportunidades do dia</h3>
+                  <Link href="/carros/suv-ate-80-mil" className="text-sm font-bold text-text-secondary">Explorar</Link>
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {discovery.opportunities.slice(0, 8).map((listing) => (
+                    <ListingCard key={`opp-${listing.id}`} listing={listing} />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
 
       <section className="pb-16">
         <div className="container">

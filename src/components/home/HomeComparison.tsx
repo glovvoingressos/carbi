@@ -37,7 +37,7 @@ export default function HomeComparison() {
     <section style={{ paddingBlock: 'clamp(32px, 5vh, 64px)', background: 'var(--color-bg)' }}>
       <div className="container">
         <div
-          className="relative overflow-hidden rounded-[40px] pastel-card"
+          className="relative overflow-hidden rounded-[40px] pastel-card pastel-card-blue"
           style={{
             padding: 'clamp(28px, 5vw, 64px)',
           }}
