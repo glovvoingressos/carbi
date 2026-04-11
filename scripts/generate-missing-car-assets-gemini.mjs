@@ -30,7 +30,7 @@ function listExpectedAssetPaths() {
   const refs = []
   for (const file of files) {
     const content = fs.readFileSync(path.join(DATA_DIR, file), 'utf8')
-    const matches = [...content.matchAll(/image:\s*\"(\/assets\/cars\/[^\"]+\.png)\"/g)]
+    const matches = [...content.matchAll(/image:\s*['"](\/assets\/cars\/[^'"]+\.png)['"]/g)]
     for (const match of matches) refs.push(match[1])
   }
   return [...new Set(refs)]

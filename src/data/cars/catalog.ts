@@ -3,6 +3,7 @@ import { suvs } from './suvs'
 import { pickups } from './pickups'
 import { sedans } from './sedans'
 import { electric } from './electric'
+import { marketExpansion } from './marketExpansion'
 import { CarSpec } from './types'
 
 export const cars: CarSpec[] = [
@@ -10,5 +11,6 @@ export const cars: CarSpec[] = [
   ...suvs,
   ...pickups,
   ...sedans,
-  ...electric
+  ...electric,
+  ...marketExpansion
 ]
