@@ -16,7 +16,7 @@ export default function HeroSearchBar() {
         border: '1.5px solid var(--color-border-solid)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
         width: '100%',
-        maxWidth: '460px',
+        maxWidth: '920px',
         marginInline: 'auto'
       }}
     >

@@ -209,10 +209,10 @@ a.bg-dark {
   color: #fff !important;
 }
 
-button[class*="bg-dark"],
-a[class*="bg-dark"],
-button[class*="bg-[#0A0A0A]"],
-a[class*="bg-[#0A0A0A]"] {
+button[class~="bg-dark"],
+a[class~="bg-dark"],
+button[class~="bg-[#0A0A0A]"],
+a[class~="bg-[#0A0A0A]"] {
   color: #fff !important;
 }
 

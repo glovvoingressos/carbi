@@ -16,7 +16,7 @@ export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section className="w-full bg-[#fff8f1] py-16 md:py-20">
+    <section className="w-full bg-white py-16 md:py-20">
       <div className="container" style={{ maxWidth: 900 }}>
         <h2 className="text-center text-4xl md:text-5xl font-black text-dark mb-8 md:mb-10 tracking-tighter">
           Perguntas Frequentes
@@ -25,15 +25,19 @@ export default function FAQSection() {
         <div className="flex flex-col gap-3">
           {faqs.map((faq, i) => {
             const isOpen = openIndex === i
-            const baseBg = i % 2 === 0 ? '#fff0e2' : '#ffe8d5'
-            const answerBg = i % 2 === 0 ? '#fff6ee' : '#fff1e5'
             
             return (
               <div key={i} className="flex flex-col">
                 <button 
                   onClick={() => setOpenIndex(isOpen ? null : i)}
-                  className="w-full flex items-center justify-between px-6 md:px-7 py-4 md:py-[18px] rounded-full text-left transition-all hover:scale-[1.01] active:scale-[0.99]"
-                  style={{ backgroundColor: baseBg }}
+                  className="w-full flex items-center justify-between px-6 md:px-7 py-4 md:py-[18px] rounded-full text-left transition-all duration-300 hover:-translate-y-[1px] active:translate-y-0"
+                  style={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid rgba(15, 23, 42, 0.08)',
+                    boxShadow: isOpen
+                      ? '0 10px 24px rgba(15, 23, 42, 0.08)'
+                      : '0 4px 14px rgba(15, 23, 42, 0.06)',
+                  }}
                 >
                   <span className="text-dark font-black text-base md:text-lg tracking-wide uppercase">{faq.q}</span>
                   <div className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
@@ -43,7 +47,11 @@ export default function FAQSection() {
                 {isOpen && (
                   <div
                     className="mt-2 rounded-[22px] px-6 md:px-7 py-4 md:py-5 text-dark font-medium text-base md:text-lg leading-relaxed animate-in slide-in-from-top-4 fade-in duration-300"
-                    style={{ backgroundColor: answerBg }}
+                    style={{
+                      backgroundColor: '#ffffff',
+                      border: '1px solid rgba(15, 23, 42, 0.08)',
+                      boxShadow: '0 10px 24px rgba(15, 23, 42, 0.07)',
+                    }}
                   >
                     {faq.a}
                   </div>

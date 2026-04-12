@@ -2,8 +2,8 @@ import Link from 'next/link'
 import CarCard from '@/components/car/CarCard'
 import HeroSearchBar from '@/components/ui/HeroSearchBar'
 import {
-  ArrowRight, ArrowUpRight, Star,
-  ChevronRight, CheckCircle2, Zap, Fuel, Users, Plus, Sparkles, BrainCircuit
+  ArrowRight, ArrowUpRight,
+  ChevronRight, Sparkles, BrainCircuit
 } from 'lucide-react'
 import { getAllCars } from '@/lib/data-fetcher'
 import FAQSection from '@/components/layout/FAQSection'
@@ -63,13 +63,6 @@ export default async function HomePage() {
   const featured = cars.find((c) => c.isPopular && c.image && c.priceBrl > 100_000) || cars[0]
   const avgPrice = Math.round(cars.reduce((a, b) => a + b.priceBrl, 0) / cars.length)
 
-  const trustMetrics = [
-    { value: `${cars.length}+`,          label: 'Fichas catalogadas' },
-    { value: `${brands.length}`,         label: 'Marcas disponíveis' },
-    { value: '100%',                      label: 'Dados Oficiais' },
-    { value: 'Expert',                    label: 'Avaliação Média' },
-  ]
-
   return (
     <main>
 
@@ -78,7 +71,7 @@ export default async function HomePage() {
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section style={{ background: 'var(--color-bg)', paddingTop: 'clamp(80px, 10vh, 120px)', paddingBottom: 'clamp(48px, 6vh, 80px)' }}>
         <div className="container max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 auto-rows-[minmax(180px,auto)] sm:auto-rows-[minmax(240px,auto)] lg:auto-rows-[minmax(320px,auto)]">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6">
              
 
              {/* BENTO 2: White Large Card (Valor atualizado) */}
@@ -117,30 +110,6 @@ export default async function HomePage() {
                   <svg className="absolute bottom-[-36%] right-[-28%] w-[140%] opacity-10 pointer-events-none" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                      <path fill="#000000" d="M42.7,-73.4C55.9,-67.8,67.6,-58.2,76.6,-46.3C85.5,-34.4,91.8,-20.3,92.5,-6.1C93.2,8.2,88.4,22.6,80.7,35C73,47.5,62.3,58.1,50.1,65.6C37.8,73.1,23.9,77.5,10.2,78.2C-3.6,78.8,-17.1,75.8,-29.4,69.5C-41.6,63.1,-52.6,53.5,-61.2,42.1C-69.8,30.6,-76.1,17.4,-77.9,3.7C-79.7,-10,-77,-24.2,-70.6,-36.5C-64.2,-48.8,-54.1,-59,-42.2,-64.7C-30.3,-70.5,-16.7,-71.8,-1.9,-68.8C12.9,-65.8,29.5,-79.1,42.7,-73.4Z" transform="translate(100 100)" />
                   </svg>
-             </div>
-
-             {/* BENTO 4: White Small Card (Templates/Catalogue) */}
-             <div className="md:col-span-6 lg:col-span-3 pastel-card pastel-card-yellow rounded-[32px] p-6 sm:p-8 flex flex-col justify-start gap-5 relative overflow-hidden min-h-[210px] sm:min-h-[250px]">
-                <span className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-surface">4</span>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-dark leading-tight">Catálogo completo de modelos atualizados</h3>
-                <p className="text-text-secondary font-semibold text-sm sm:text-base leading-relaxed">Do popular zero km ao sedã premium, todas as informações em um só lugar.</p>
-                <div className="absolute right-4 bottom-4 opacity-10 pointer-events-none">
-                  <Fuel className="w-20 h-20 text-dark" />
-                </div>
-             </div>
-
-             {/* BENTO 5: Abstract Graphic (Blue) */}
-             <div className="md:col-span-6 lg:col-span-4 bg-[var(--color-bento-blue)] rounded-[32px] overflow-hidden flex flex-col justify-end min-h-[210px] sm:min-h-[280px] lg:min-h-[320px] relative text-white">
-                  <div className="absolute inset-0 flex items-center justify-center opacity-25">
-                      <div className="w-full h-[150%] bg-white/20 rotate-12 blur-3xl"></div>
-                  </div>
-                  <div className="absolute top-5 right-5 opacity-20 pointer-events-none">
-                    <Zap className="w-20 h-20 sm:w-14 sm:h-14 text-white" />
-                  </div>
-                  <div className="p-6 sm:p-8 z-10">
-                     <h3 className="text-2xl sm:text-3xl font-extrabold mb-2 text-white">Estatísticas Reais</h3>
-                     <p className="text-white/90 font-semibold text-sm sm:text-base leading-relaxed">Foque nos dados concretos esquecendo as métricas de vaidade.</p>
-                  </div>
              </div>
           </div>
         </div>
@@ -259,19 +228,6 @@ export default async function HomePage() {
               </div>
             ) : null}
 
-            {discovery.opportunities.length > 0 ? (
-              <div>
-                <div className="mb-3 flex items-end justify-between">
-                  <h3 className="text-xl font-black text-dark">Oportunidades do dia</h3>
-                  <Link href="/carros/suv-ate-80-mil" className="text-sm font-bold text-text-secondary">Explorar</Link>
-                </div>
-                <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {discovery.opportunities.slice(0, 8).map((listing) => (
-                    <ListingCard key={`opp-${listing.id}`} listing={listing} />
-                  ))}
-                </div>
-              </div>
-            ) : null}
           </div>
         </section>
       ) : null}
@@ -408,39 +364,6 @@ export default async function HomePage() {
       )}
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          § 5 — TRUST STRIP (métricas)
-          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="trust-strip" style={{ paddingBlock: 'clamp(40px, 6vh, 72px)' }}>
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">
-            {trustMetrics.map((m, i) => (
-              <div
-                key={i}
-                className="scroll-reveal relative pastel-card rounded-[22px] p-4 sm:p-5 text-left hover:-translate-y-0.5 transition-all overflow-hidden"
-                style={{
-                  transitionDelay: `${i * 60}ms`,
-                  backgroundColor: ['#eaf3ff', '#ecf9ef', '#fff8dc', '#f3efff'][i % 4],
-                }}
-              >
-                <div className="absolute -right-4 -top-4 opacity-10 pointer-events-none">
-                  {i % 4 === 0 && <Users className="w-16 h-16 text-dark" />}
-                  {i % 4 === 1 && <Fuel className="w-16 h-16 text-dark" />}
-                  {i % 4 === 2 && <Star className="w-16 h-16 text-dark" />}
-                  {i % 4 === 3 && <Zap className="w-16 h-16 text-dark" />}
-                </div>
-                <p className="text-3xl sm:text-4xl font-black tracking-[-0.03em] text-dark leading-none mb-1.5">
-                  {m.value}
-                </p>
-                <p className="text-[13px] sm:text-sm font-semibold text-text-secondary leading-tight max-w-[150px]">
-                  {m.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           § 6 — MARCAS
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section style={{ paddingBlock: 'clamp(48px, 7vh, 80px)' }}>
@@ -468,11 +391,9 @@ export default async function HomePage() {
               paddingLeft: 4, // prevent clipping
             }}
           >
-            {brands.slice(0, 12).map((brand, i) => {
+            {brands.slice(0, 12).map((brand) => {
               const count = cars.filter((c) => c.brand === brand).length
               const slug = brand.toLowerCase().replace(/\s+/g, '-')
-              const colors = ['#b4d2ff', '#E8D4FF', '#fff9d4', '#ffccd5']
-              const bgColor = colors[i % colors.length]
 
               // Domain mapping function inline
               const getDomain = (b: string) => {
@@ -506,12 +427,20 @@ export default async function HomePage() {
                 <Link
                   key={brand}
                   href={`/marcas/${slug}`}
-                  className="flex-shrink-0 group relative pastel-card rounded-3xl p-5 hover:bg-[#f0f4fa] hover:-translate-y-1 transition-all flex flex-col items-center justify-center min-w-[140px] select-none"
-                  style={{ backgroundColor: ['#eaf3ff', '#ecf9ef', '#fff8dc', '#f3efff'][i % 4] }}
+                  className="flex-shrink-0 group relative rounded-3xl p-5 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center min-w-[140px] select-none"
+                  style={{
+                    backgroundColor: '#f5f5f7',
+                    border: '1px solid rgba(15, 23, 42, 0.08)',
+                    boxShadow: '0 6px 18px rgba(15, 23, 42, 0.05)',
+                  }}
                 >
                   <div 
-                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 shadow-sm p-1.5"
-                     style={{ backgroundColor: bgColor }}
+                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 p-1.5"
+                     style={{
+                       backgroundColor: '#ffffff',
+                       border: '1px solid rgba(15, 23, 42, 0.08)',
+                       boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+                     }}
                   >
                      <BrandLogo 
                        brandName={brand} 
@@ -547,7 +476,7 @@ export default async function HomePage() {
         <div className="container max-w-4xl">
           <div
             className="pastel-card pastel-card-blue rounded-[36px] p-7 sm:p-10 relative overflow-hidden"
-            style={{ background: 'linear-gradient(140deg, #c7d8f8 0%, #bfd2f3 100%)' }}
+            style={{ background: 'linear-gradient(140deg, #d6f53d 0%, #c9ef2e 55%, #bee51f 100%)' }}
           >
             <div className="pointer-events-none absolute -right-8 -top-10 h-36 w-36 rounded-full bg-white/35 blur-2xl" />
             <div className="pointer-events-none absolute -left-10 bottom-2 h-28 w-28 rounded-full bg-white/30 blur-2xl" />
@@ -571,7 +500,7 @@ export default async function HomePage() {
             className="scroll-reveal sr-delay-2"
             style={{
               fontSize: 15,
-              color: 'var(--color-text-2)',
+              color: 'rgba(10, 10, 10, 0.68)',
               maxWidth: 380,
               marginInline: 'auto',
               marginBottom: 36,
@@ -581,11 +510,31 @@ export default async function HomePage() {
             A IA da carbi cruza preço, perfil e uso para sugerir os modelos certos em segundos.
           </p>
           <div className="scroll-reveal sr-delay-3" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/qual-carro" className="btn btn-primary" style={{ height: 52, fontSize: 15 }}>
+            <Link
+              href="/qual-carro"
+              className="btn btn-primary"
+              style={{
+                height: 52,
+                fontSize: 15,
+                background: '#0A0A0A',
+                color: '#FFFFFF',
+                boxShadow: '0 8px 20px rgba(10, 10, 10, 0.22)',
+              }}
+            >
               Encontrar meu carro
               <ArrowRight style={{ width: 16, height: 16 }} />
             </Link>
-            <Link href="/rankings" className="btn btn-outline" style={{ height: 52, fontSize: 15 }}>
+            <Link
+              href="/rankings"
+              className="btn btn-outline"
+              style={{
+                height: 52,
+                fontSize: 15,
+                background: '#FFFFFF',
+                color: '#0A0A0A',
+                border: '1.5px solid rgba(10, 10, 10, 0.14)',
+              }}
+            >
               Explorar catálogo
             </Link>
           </div>
