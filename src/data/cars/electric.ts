@@ -287,7 +287,7 @@ export const electric: CarSpec[] = [
     cons: ["Preço para poucos", "Visibilidade traseira limitada"],
     shortDesc: "O RS e-tron GT é o ápice da performance elétrica da Audi, unindo arte e tecnologia.",
     idealFor: "Fãs de tecnologia que buscam um GT elétrico com alma esportiva.",
-    image: "/assets/cars/audi-rs-etron-gt-quattro-2026.png"
+    image: "/assets/cars/audi-rs-etron-gt-quattro-2026-v2.png"
   },
   {
     id: "byd-dolphin-mini-ev-38kwh-2026",
