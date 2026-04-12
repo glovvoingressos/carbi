@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function AnunciarCarroBHPage() {
   return (
     <div className="min-h-screen bg-surface pb-20">
-      <section className="border-b-8 border-[var(--color-bento-red)] bg-[#dff7e8] pb-16 pt-24 text-dark">
+      <section className="bg-[#dff7e8] pb-16 pt-24 text-dark">
         <div className="container mx-auto max-w-5xl px-4">
           <p className="inline-flex rounded-full border border-dark/20 bg-white/70 px-4 py-1 text-xs font-black uppercase tracking-widest text-dark/70">
             Rápido • Fácil • Gratuito

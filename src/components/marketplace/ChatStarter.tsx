@@ -69,7 +69,7 @@ export default function ChatStarter({ listingId }: { listingId: string }) {
         className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-dark px-5 py-3 text-sm font-black text-white disabled:opacity-60"
       >
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
-        Conversar com anunciante
+        Conversar com vendedor
       </button>
       {error && <p className="text-xs font-semibold text-red-600">{error}</p>}
     </div>

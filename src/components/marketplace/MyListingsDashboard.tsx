@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, Save, Upload, Trash2 } from 'lucide-react'
+import { Loader2, Save, Upload, Trash2, ScanSearch } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import {
   LISTING_ALLOWED_TYPES,
@@ -67,6 +67,7 @@ export default function MyListingsDashboard() {
   const [loadingListings, setLoadingListings] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [blurringPlates, setBlurringPlates] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
@@ -363,6 +364,47 @@ export default function MyListingsDashboard() {
     }
   }
 
+  const blurListingPlates = async () => {
+    if (!selectedListing) return
+
+    setBlurringPlates(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const supabase = getSupabaseBrowserClient()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session?.access_token) {
+        setError('Faça login novamente para continuar.')
+        return
+      }
+
+      const response = await fetch(`/api/marketplace/listings/${selectedListing.id}/blur-plates`, {
+        method: 'POST',
+        headers: authHeader(session.access_token),
+      })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(payload.error || 'Falha ao borrar placas.')
+      }
+
+      const summary = payload?.data
+      setSuccess(
+        summary
+          ? `Borrar placa concluído: ${summary.blurred} foto(s) ajustada(s), ${summary.skipped} sem placa visível.`
+          : 'Borrar placa concluído com sucesso.'
+      )
+      await loadListings()
+    } catch (blurError) {
+      setError(blurError instanceof Error ? blurError.message : 'Falha ao borrar placas.')
+    } finally {
+      setBlurringPlates(false)
+    }
+  }
+
   if (!sessionReady) {
     return (
       <div className="pastel-card pastel-card-green p-8 text-center">
@@ -378,35 +420,35 @@ export default function MyListingsDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="pastel-card pastel-card-blue p-5 sm:p-6">
+      <div className="pastel-card p-5 sm:p-6" style={{ backgroundColor: '#edf2f7' }}>
         <h2 className="text-2xl font-black text-dark">Meus anúncios</h2>
-        <p className="mt-1 text-sm font-medium text-text-secondary">
+        <p className="mt-1 text-base font-medium text-text-secondary">
           Edite preço, descrição, título e substitua as fotos com dados reais.
         </p>
       </div>
 
       {loadingListings ? (
-        <div className="pastel-card pastel-card-yellow p-8 text-center">
+        <div className="pastel-card p-8 text-center" style={{ backgroundColor: '#edf2f7' }}>
           <Loader2 className="mx-auto h-5 w-5 animate-spin text-dark" />
           <p className="mt-2 text-sm text-text-secondary">Carregando anúncios...</p>
         </div>
       ) : listings.length === 0 ? (
-        <div className="pastel-card pastel-card-yellow p-8 text-sm font-semibold text-text-secondary">
+        <div className="pastel-card p-8 text-sm font-semibold text-text-secondary" style={{ backgroundColor: '#edf2f7' }}>
           Você ainda não possui anúncios ativos.
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-[300px_1fr]">
-          <aside className="pastel-card pastel-card-green p-3">
+          <aside className="pastel-card p-3" style={{ backgroundColor: '#edf2f7' }}>
             <div className="space-y-2">
               {listings.map((listing) => (
                 <button
                   key={listing.id}
                   type="button"
                   onClick={() => setSelectedId(listing.id)}
-                  className={`w-full rounded-2xl p-3 text-left transition ${selectedId === listing.id ? 'bg-[#eaf7ff]' : 'bg-white hover:bg-[#fff8dc]'}`}
+                  className={`w-full rounded-2xl p-3 text-left transition ${selectedId === listing.id ? 'bg-[#dce7f5]' : 'bg-white hover:bg-[#f6f8fb]'}`}
                 >
                   <p className="line-clamp-1 text-sm font-black text-dark">{listing.title}</p>
-                  <p className="mt-0.5 text-xs font-semibold text-text-secondary">
+                  <p className="mt-0.5 text-sm font-medium text-text-secondary">
                     {listing.brand} {listing.model} • {formatBRL(Number(listing.price))}
                   </p>
                   <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-text-tertiary">
@@ -418,10 +460,10 @@ export default function MyListingsDashboard() {
           </aside>
 
           {selectedListing ? (
-            <section className="pastel-card pastel-card-yellow p-5 sm:p-6">
+            <section className="pastel-card p-5 sm:p-6" style={{ backgroundColor: '#f1f4f8' }}>
               <div className="grid gap-4 sm:grid-cols-2">
                 {(selectedListing.images || []).map((image) => (
-                  <div key={image.id} className="aspect-square overflow-hidden rounded-2xl bg-white/75">
+                  <div key={image.id} className="aspect-square overflow-hidden rounded-2xl bg-white">
                     <img
                       src={image.public_url}
                       alt={selectedListing.title}
@@ -503,10 +545,20 @@ export default function MyListingsDashboard() {
                   type="button"
                   onClick={uploadImages}
                   disabled={uploading}
-                  className="inline-flex items-center gap-2 rounded-full bg-[var(--color-bento-yellow)] px-5 py-2 text-sm font-black text-dark disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#dce7f5] px-5 py-2 text-sm font-black text-dark disabled:opacity-60"
                 >
                   {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                   Atualizar fotos
+                </button>
+
+                <button
+                  type="button"
+                  onClick={blurListingPlates}
+                  disabled={blurringPlates || !selectedListing.images?.length}
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-black text-dark shadow-[0_4px_20px_rgba(0,0,0,0.05)] disabled:opacity-60"
+                >
+                  {blurringPlates ? <Loader2 className="h-4 w-4 animate-spin" /> : <ScanSearch className="h-4 w-4" />}
+                  Borrar placa
                 </button>
 
                 <button

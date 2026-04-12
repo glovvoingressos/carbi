@@ -263,8 +263,8 @@ export default function ConversationInbox() {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
-      <aside className="pastel-card pastel-card-blue p-3">
-        <h3 className="px-2 py-1 text-sm font-black uppercase tracking-wider text-dark">Conversas</h3>
+      <aside className="pastel-card p-3" style={{ backgroundColor: '#edf2f7' }}>
+        <h3 className="px-2 py-1 text-lg font-bold text-dark">Conversas</h3>
         {loadingConversations ? <p className="p-2 text-sm text-text-secondary">Carregando...</p> : null}
 
         <div className="mt-2 space-y-2">
@@ -273,11 +273,13 @@ export default function ConversationInbox() {
               key={conversation.id}
               type="button"
               onClick={() => setSelectedId(conversation.id)}
-              className={`w-full rounded-2xl px-3 py-2 text-left ${selectedId === conversation.id ? 'bg-[#fff8dc]' : 'bg-white/85'}`}
+              className={`w-full rounded-2xl px-3 py-2 text-left transition ${
+                selectedId === conversation.id ? 'bg-[#e5ebf3]' : 'bg-white/85 hover:bg-white'
+              }`}
             >
-              <p className="line-clamp-1 text-sm font-bold text-dark">{conversation.vehicle_listings_public.title}</p>
-              <p className="text-xs font-semibold text-text-secondary">{formatBRL(Number(conversation.vehicle_listings_public.price))}</p>
-              <p className="line-clamp-1 text-xs text-text-tertiary">{conversation.last_message_preview || 'Conversa iniciada.'}</p>
+              <p className="line-clamp-1 text-base font-semibold text-dark">{conversation.vehicle_listings_public.title}</p>
+              <p className="text-sm font-medium text-text-secondary">{formatBRL(Number(conversation.vehicle_listings_public.price))}</p>
+              <p className="line-clamp-1 text-sm text-text-tertiary">{conversation.last_message_preview || 'Conversa iniciada.'}</p>
             </button>
           ))}
 
@@ -287,27 +289,31 @@ export default function ConversationInbox() {
         </div>
       </aside>
 
-      <section className="pastel-card pastel-card-yellow p-4">
+      <section className="pastel-card p-4" style={{ backgroundColor: '#f1f4f8' }}>
         {!selectedConversation ? (
           <p className="text-sm text-text-secondary">Selecione uma conversa para começar.</p>
         ) : (
           <>
             <div className="mb-3 border-b border-border pb-3">
-              <p className="font-black text-dark">{selectedConversation.vehicle_listings_public.title}</p>
-              <p className="text-xs font-semibold text-text-secondary">
+              <p className="text-xl font-semibold text-dark">{selectedConversation.vehicle_listings_public.title}</p>
+              <p className="text-base font-medium text-text-secondary">
                 {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} • {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
               </p>
             </div>
 
-            <div className="h-[360px] space-y-2 overflow-y-auto rounded-2xl bg-white/70 p-3">
+            <div className="h-[360px] space-y-2 overflow-y-auto rounded-2xl bg-white/75 p-3">
               {loadingMessages ? <p className="text-sm text-text-secondary">Carregando mensagens...</p> : null}
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${message.sender_user_id === myUserId ? 'ml-auto bg-dark text-white' : 'bg-white border border-border text-dark'}`}
+                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-base leading-relaxed ${
+                    message.sender_user_id === myUserId
+                      ? 'ml-auto bg-white text-[#0f172a] shadow-[0_4px_14px_rgba(15,23,42,0.08)]'
+                      : 'bg-white text-dark shadow-[0_4px_14px_rgba(15,23,42,0.08)]'
+                  }`}
                 >
                   <p>{message.message}</p>
-                  <p className="mt-1 text-[10px] opacity-70">{new Date(message.created_at).toLocaleString('pt-BR')}</p>
+                  <p className="mt-1 text-[11px] text-[#475569]/80">{new Date(message.created_at).toLocaleString('pt-BR')}</p>
                 </div>
               ))}
             </div>
@@ -323,13 +329,13 @@ export default function ConversationInbox() {
                   }
                 }}
                 placeholder="Digite sua mensagem"
-                className="flex-1 rounded-full border border-border px-4 py-2 text-sm"
+                className="flex-1 rounded-full border border-border bg-white px-4 py-2 text-base font-medium"
               />
               <button
                 type="button"
                 disabled={sending || !messageText.trim()}
                 onClick={() => void sendMessage()}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-dark text-white disabled:opacity-60"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#dce7f5] text-dark disabled:opacity-60"
               >
                 {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </button>

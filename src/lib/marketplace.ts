@@ -139,7 +139,9 @@ export function validateListingPayload(payload: ListingFormPayload): string[] {
   const errors: string[] = []
 
   if (!payload.title || payload.title.trim().length < 8) errors.push('Título deve ter pelo menos 8 caracteres.')
-  if (!payload.description || payload.description.trim().length < 20) errors.push('Descrição deve ter pelo menos 20 caracteres.')
+  if (payload.description && payload.description.trim().length > 0 && payload.description.trim().length < 20) {
+    errors.push('Descrição, quando informada, deve ter pelo menos 20 caracteres.')
+  }
   if (!payload.brand?.trim()) errors.push('Marca é obrigatória.')
   if (!payload.model?.trim()) errors.push('Modelo é obrigatório.')
   if (!payload.transmission?.trim()) errors.push('Câmbio é obrigatório.')

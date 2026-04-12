@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { LISTING_MAX_IMAGES, ListingImageInput } from '@/lib/marketplace'
+import { sanitizeListingStorageImage } from '@/lib/license-plate-blur'
 
 export async function POST(
   req: NextRequest,
@@ -52,6 +53,17 @@ export async function POST(
       sort_order: index,
       is_primary: index === 0,
     }))
+
+    for (const image of normalized) {
+      try {
+        await sanitizeListingStorageImage({
+          supabase,
+          storagePath: image.storage_path,
+        })
+      } catch (error) {
+        console.warn('[marketplace] plate blur failed for', image.storage_path, error)
+      }
+    }
 
     const { data: oldImages } = await supabase
       .from('vehicle_listing_images')
