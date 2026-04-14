@@ -5,14 +5,13 @@ import {
   ArrowRight, ArrowUpRight,
   ChevronRight, Sparkles, BrainCircuit
 } from 'lucide-react'
-import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
+import { getAllCars } from '@/lib/data-fetcher'
 import FAQSection from '@/components/layout/FAQSection'
 import HomeComparison from '@/components/home/HomeComparison'
 import BrandLogo from '@/components/brand/BrandLogo'
 import ListingCard from '@/components/marketplace/ListingCard'
 import { getLatestPublicListings, getMarketplaceDiscoverySections } from '@/lib/marketplace-server'
 import { QUICK_LINKS } from '@/lib/marketplace-seo'
-import { normalizeBrandKey, pickPreferredBrandName, slugifyBrand } from '@/lib/brand-utils'
 
 // ── Dados estáticos ─────────────────────────────────────────────────────────
 
@@ -55,31 +54,14 @@ function formatK(n: number) {
 
 export default async function HomePage() {
   const cars   = await getAllCars()
-  const grouped = groupCarsByModel(cars)
-  const modelCards = grouped.map((item) => item.representative)
   const latestListings = await getLatestPublicListings(12)
   const discovery = await getMarketplaceDiscoverySections()
   const recentListings = latestListings.slice(0, 8)
-  const popular = modelCards.filter((c) => c.isPopular || c.priceBrl > 0).slice(0, 12)
-  const electricCars = modelCards.filter((c) => c.segment === 'electric').slice(0, 8)
-  const brands = Array.from(
-    modelCards.reduce((acc, car) => {
-      const key = normalizeBrandKey(car.brand)
-      const current = acc.get(key)
-      if (current) {
-        current.count += 1
-        current.label = pickPreferredBrandName(current.label, car.brand)
-        return acc
-      }
-      acc.set(key, { key, label: car.brand, count: 1 })
-      return acc
-    }, new Map<string, { key: string; label: string; count: number }>())
-      .values(),
-  ).sort((a, b) => a.label.localeCompare(b.label, 'pt-BR'))
-  const featured = modelCards.find((c) => c.isPopular && c.image && c.priceBrl > 100_000) || modelCards[0]
-  const avgPrice = modelCards.length > 0
-    ? Math.round(modelCards.reduce((a, b) => a + b.priceBrl, 0) / modelCards.length)
-    : 0
+  const popular = cars.filter((c) => c.isPopular || c.priceBrl > 0).slice(0, 12)
+  const electricCars = cars.filter((c) => c.segment === 'electric').slice(0, 8)
+  const brands  = [...new Set(cars.map((c) => c.brand))].sort()
+  const featured = cars.find((c) => c.isPopular && c.image && c.priceBrl > 100_000) || cars[0]
+  const avgPrice = Math.round(cars.reduce((a, b) => a + b.priceBrl, 0) / cars.length)
 
   return (
     <main>
@@ -134,164 +116,13 @@ export default async function HomePage() {
       </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          § 3 — FILTER CHIPS (sticky)
-          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 90,
-          background: 'var(--color-bg)',
-          borderBottom: '1px solid var(--color-border)',
-          paddingBlock: 12,
-        }}
-      >
-        <div className="container">
-          <div
-            style={{
-              display: 'flex',
-              gap: 8,
-              overflowX: 'auto',
-              paddingBottom: 2,
-              scrollbarWidth: 'none',
-            }}
-          >
-            {FILTER_CHIPS.map((chip) => (
-              <Link
-                key={chip.id}
-                href={chip.id === 'todos' ? '/rankings' : `/rankings?segment=${chip.id}`}
-                className={`chip${chip.id === 'todos' ? ' active' : ''}`}
-                style={{ fontSize: 13 }}
-              >
-                {chip.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          § 6 — MARCAS
-          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section style={{ paddingBlock: 'clamp(48px, 7vh, 80px)' }}>
-        <div className="container">
-          <div
-            className="scroll-reveal"
-            style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 28 }}
-          >
-            <div>
-              <p className="text-eyebrow" style={{ marginBottom: 8 }}>Fabricantes</p>
-              <h2 className="text-h2">Explore por marca</h2>
-            </div>
-            <Link href="/marcas" style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-2)', display: 'flex', alignItems: 'center', gap: 4 }}>
-              Ver todas <ChevronRight style={{ width: 14, height: 14 }} />
-            </Link>
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              gap: 16,
-              overflowX: 'auto',
-              paddingBottom: 16,
-              scrollbarWidth: 'none',
-              paddingLeft: 4,
-            }}
-          >
-            {brands.slice(0, 12).map((brand) => {
-              const slug = slugifyBrand(brand.label)
-
-              const getDomain = (b: string) => {
-                const normalized = normalizeBrandKey(b)
-                const map: Record<string, string> = {
-                  'bmw': 'bmw.com',
-                  'toyota': 'toyota.com',
-                  'honda': 'honda.com',
-                  'fiat': 'fiat.com.br',
-                  'chevrolet': 'chevrolet.com',
-                  'volkswagen': 'vw.com',
-                  'vw': 'vw.com',
-                  'peugeot': 'peugeot.com',
-                  'renault': 'renault.com.br',
-                  'nissan': 'nissan.com',
-                  'hyundai': 'hyundai.com',
-                  'caoa chery': 'caoachery.com.br',
-                  'jeep': 'jeep.com',
-                  'ford': 'ford.com',
-                  'audi': 'audi.com',
-                  'porsche': 'porsche.com',
-                  'mini': 'mini.com',
-                  'byd': 'byd.com',
-                  'gwm': 'gwmbrasil.com.br',
-                  'ram': 'ram.com',
-                  'citroen': 'citroen.com',
-                }
-                return map[normalized] || `${normalized.replace(/\s+/g, '')}.com`
-              }
-
-              return (
-                <Link
-                  key={brand.key}
-                  href={`/marcas/${slug}`}
-                  className="flex-shrink-0 group relative rounded-3xl p-5 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center min-w-[140px] select-none"
-                  style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid rgba(15, 23, 42, 0.08)',
-                    boxShadow: '0 4px 14px rgba(15, 23, 42, 0.06)',
-                  }}
-                >
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 p-2"
-                    style={{
-                      backgroundColor: '#ffffff',
-                      border: '1px solid rgba(15, 23, 42, 0.08)',
-                      boxShadow: '0 3px 10px rgba(15, 23, 42, 0.08)',
-                    }}
-                  >
-                    <BrandLogo
-                      brandName={brand.label}
-                      domain={getDomain(brand.label)}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <p className="text-[13px] font-black text-dark tracking-tight uppercase text-center w-full truncate">{brand.label}</p>
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-dark/40 mt-1">{brand.count} modelo{brand.count !== 1 ? 's' : ''}</p>
-</Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {discovery.latest.length > 0 ? (
-        <section className="pb-8 pt-4">
-          <div className="container">
-            <div className="pastel-card pastel-card-lilac p-6 sm:p-8">
-              <p className="text-eyebrow">Explorar por tipo</p>
-              <h2 className="text-h2">Encontre pelo tipo de carro</h2>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {QUICK_LINKS.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="rounded-full bg-white/75 px-4 py-2 text-xs font-black uppercase tracking-wide text-dark"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           § 1.7 — SEARCH BAR (Relocated Below Grid)
           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section className="pb-16 pt-8">
         <div className="container max-w-3xl mx-auto px-4 text-center">
            <HeroSearchBar />
            <p className="text-sm font-bold text-text-secondary mt-4">
-              {modelCards.length}+ modelos listados em tempo real na Carbi
+              {cars.length}+ veículos listados em tempo real na Carbi
            </p>
         </div>
       </section>
@@ -367,6 +198,22 @@ export default async function HomePage() {
       {discovery.latest.length > 0 ? (
         <section className="pb-16">
           <div className="container space-y-10">
+            <div className="pastel-card pastel-card-lilac p-6 sm:p-8">
+              <p className="text-eyebrow">Explorar anúncios</p>
+              <h2 className="text-h2">Descubra por preço, categoria e novidades</h2>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {QUICK_LINKS.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="rounded-full bg-white/75 px-4 py-2 text-xs font-black uppercase tracking-wide text-dark"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
             {discovery.reduced.length > 0 ? (
               <div>
                 <div className="mb-3 flex items-end justify-between">
@@ -384,6 +231,42 @@ export default async function HomePage() {
           </div>
         </section>
       ) : null}
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          § 3 — FILTER CHIPS (sticky)
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 90,
+          background: 'var(--color-bg)',
+          borderBottom: '1px solid var(--color-border)',
+          paddingBlock: 12,
+        }}
+      >
+        <div className="container">
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              overflowX: 'auto',
+              paddingBottom: 2,
+              scrollbarWidth: 'none',
+            }}
+          >
+            {FILTER_CHIPS.map((chip, i) => (
+              <Link
+                key={chip.id}
+                href={chip.id === 'todos' ? '/rankings' : `/rankings?segment=${chip.id}`}
+                className={`chip${chip.id === 'todos' ? ' active' : ''}`}
+                style={{ fontSize: 13 }}
+              >
+                {chip.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           § 4 — GRID DE VEÍCULOS
@@ -430,7 +313,7 @@ export default async function HomePage() {
           {/* CTA ver mais */}
           <div style={{ textAlign: 'center', marginTop: 40 }}>
             <Link href="/rankings" className="btn btn-outline" style={{ height: 48, fontSize: 14 }}>
-              Ver todos os {modelCards.length} modelos
+              Ver todos os {cars.length} veículos
               <ArrowRight style={{ width: 15, height: 15 }} />
             </Link>
           </div>
@@ -476,9 +359,105 @@ export default async function HomePage() {
                 <CarCard key={car.id} car={car} index={i} />
               ))}
             </div>
+              ))}
+            </div>
           </div>
         </section>
       )}
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          § 6 — MARCAS
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section style={{ paddingBlock: 'clamp(48px, 7vh, 80px)' }}>
+        <div className="container">
+          <div
+            className="scroll-reveal"
+            style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 28 }}
+          >
+            <div>
+              <p className="text-eyebrow" style={{ marginBottom: 8 }}>Fabricantes</p>
+              <h2 className="text-h2">Explore por marca</h2>
+            </div>
+            <Link href="/marcas" style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-2)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              Ver todas <ChevronRight style={{ width: 14, height: 14 }} />
+            </Link>
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              gap: 16,
+              overflowX: 'auto',
+              paddingBottom: 16,
+              scrollbarWidth: 'none',
+              paddingLeft: 4, // prevent clipping
+            }}
+          >
+            {brands.slice(0, 12).map((brand) => {
+              const count = cars.filter((c) => c.brand === brand).length
+              const slug = brand.toLowerCase().replace(/\s+/g, '-')
+
+              // Domain mapping function inline
+              const getDomain = (b: string) => {
+                const map: Record<string, string> = {
+                  'bmw': 'bmw.com',
+                  'toyota': 'toyota.com',
+                  'honda': 'honda.com',
+                  'fiat': 'fiat.com.br',
+                  'chevrolet': 'chevrolet.com',
+                  'volkswagen': 'vw.com',
+                  'vw': 'vw.com',
+                  'peugeot': 'peugeot.com',
+                  'renault': 'renault.com.br',
+                  'nissan': 'nissan.com',
+                  'hyundai': 'hyundai.com',
+                  'caoa chery': 'caoachery.com.br',
+                  'jeep': 'jeep.com',
+                  'ford': 'ford.com',
+                  'audi': 'audi.com',
+                  'porsche': 'porsche.com',
+                  'mini': 'mini.com',
+                  'byd': 'byd.com',
+                  'gwm': 'gwmbrasil.com.br',
+                  'ram': 'ram.com',
+                  'citroen': 'citroen.com',
+                }
+                return map[b.toLowerCase()] || `${b.toLowerCase().replace(/\s+/g, '')}.com`
+              }
+
+              return (
+                <Link
+                  key={brand}
+                  href={`/marcas/${slug}`}
+                  className="flex-shrink-0 group relative rounded-3xl p-5 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center min-w-[140px] select-none"
+                  style={{
+                    backgroundColor: '#f5f5f7',
+                    border: '1px solid rgba(15, 23, 42, 0.08)',
+                    boxShadow: '0 6px 18px rgba(15, 23, 42, 0.05)',
+                  }}
+                >
+                  <div 
+                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 p-1.5"
+                     style={{
+                       backgroundColor: '#ffffff',
+                       border: '1px solid rgba(15, 23, 42, 0.08)',
+                       boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+                     }}
+                  >
+                     <BrandLogo 
+                       brandName={brand} 
+                       domain={getDomain(brand)} 
+                       className="w-full h-full object-contain filter mix-blend-multiply" 
+                     />
+                  </div>
+                  <p className="text-[13px] font-black text-dark tracking-tight uppercase text-center w-full truncate">{brand}</p>
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-dark/40 mt-1">{count} modelo{count !== 1 ? 's' : ''}</p>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      </section>
 
       {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           § 7 — COMPARATIVO INTERATIVO carbi
