@@ -359,8 +359,6 @@ export default async function HomePage() {
                 <CarCard key={car.id} car={car} index={i} />
               ))}
             </div>
-              ))}
-            </div>
           </div>
         </section>
       )}
