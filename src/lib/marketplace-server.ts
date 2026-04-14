@@ -1,7 +1,8 @@
-import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
+import { getSupabaseServerClient, getSupabaseAdminClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { ListingPublic } from '@/lib/marketplace'
 import { getFipePrice } from '@/lib/fipe-api'
 import { parseFipePriceToNumber } from '@/lib/marketplace'
+import { classifyVehicleCategory, classifyByFuelType } from '@/lib/vehicle-category'
 
 type ListingImageRow = {
   id: string
@@ -10,7 +11,7 @@ type ListingImageRow = {
   is_primary: boolean
 }
 
-type ListingRow = Omit<ListingPublic, 'images'> & {
+type ListingRow = Omit<ListingPublic, 'images' | 'category'> & {
   images?: ListingImageRow[] | null
 }
 
@@ -69,8 +70,13 @@ function isMissingRelationError(message?: string): boolean {
 }
 
 function normalizeTableRow(row: ListingRow): ListingPublic {
+  const category = classifyVehicleCategory(row.body_type, row.brand, row.model) 
+    || classifyByFuelType(row.fuel)
+    || null
+  
   return {
     ...row,
+    category,
     images: (row.images || []).map((image) => ({
       id: image.id,
       url: image.public_url,
@@ -468,4 +474,68 @@ export async function getListingVehicleId(listingId: string): Promise<string | n
 
   if (error || !data) return null
   return (data as { vehicle_id?: string | null }).vehicle_id || null
+}
+
+export async function getSellerInfo(sellerUserId: string): Promise<{
+  id: string
+  name: string | null
+  avatarUrl: string | null
+  memberSince: string
+  activeListings: number
+  totalListings: number
+} | null> {
+  if (!isSupabaseConfigured()) return null
+
+  const adminClient = getSupabaseAdminClient()
+  const serverClient = getSupabaseServerClient()
+
+  let user: { id: string; email: string; created_at: string; user_metadata: Record<string, unknown> | null } | null = null
+
+  if (adminClient) {
+    const authResult = await adminClient.auth.admin.getUserById(sellerUserId)
+    if (authResult.data?.user) {
+      user = {
+        id: authResult.data.user.id,
+        email: authResult.data.user.email || '',
+        created_at: authResult.data.user.created_at,
+        user_metadata: authResult.data.user.user_metadata as Record<string, unknown> | null,
+      }
+    }
+  }
+
+  const listingsResult = await serverClient
+    .from('vehicle_listings')
+    .select('id, status, created_at')
+    .eq('user_id', sellerUserId)
+
+  const listingsStats = listingsResult.data || []
+
+  if (!user && listingsStats.length === 0) return null
+
+  const activeListings = listingsStats.filter((l) => l.status === 'active').length
+  const totalListings = listingsStats.length
+
+  const memberSince = user?.created_at 
+    ? user.created_at 
+    : listingsStats.length > 0 
+      ? listingsStats.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0]?.created_at 
+      : null
+
+  const userMeta = user?.user_metadata
+  const name = userMeta?.full_name as string | null 
+    || userMeta?.name as string | null 
+    || user?.email?.split('@')[0] 
+    || null
+  const avatarUrl = userMeta?.avatar_url as string | null 
+    || userMeta?.picture as string | null
+    || null
+
+  return {
+    id: sellerUserId,
+    name,
+    avatarUrl,
+    memberSince: memberSince || new Date().toISOString(),
+    activeListings,
+    totalListings,
+  }
 }

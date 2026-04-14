@@ -26,6 +26,10 @@ export const metadata: Metadata = {
   authors: [{ name: 'Equipe carbi' }],
   creator: 'carbi',
   publisher: 'carbi Inc.',
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
   openGraph: {
     type: 'website',
     locale: 'pt_BR',

@@ -76,6 +76,7 @@ export interface ListingPublic {
   created_at: string
   updated_at: string
   price_updated_at?: string | null
+  category?: string | null
   badges?: Array<{
     key: 'new' | 'price_drop' | 'below_fipe' | 'opportunity'
     label: string
