@@ -88,7 +88,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '/carros-a-venda', label: 'Comprar', icon: ShoppingBag },
-    { href: '/anunciar-carro-bh', label: 'Vender', icon: Tag },
+    { href: '/anunciar-carro', label: 'Vender', icon: Tag },
     { href: '/comparar', label: 'Comparar', icon: GitCompare },
     { href: '/marcas', label: 'Marcas', icon: CarFront },
   ]

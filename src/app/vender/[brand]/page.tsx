@@ -28,7 +28,7 @@ export default async function VenderBrandPage({ params }: { params: Promise<{ br
 
   const data = {
     h1: `Vender ${capitalizedBrand} Rápido e Seguro`,
-    subtitle: `Anuncie seu ${capitalizedBrand} na plataforma que mais cresce em Belo Horizonte e venda sem intermediários.`,
+    subtitle: `Anuncie seu ${capitalizedBrand} na plataforma inteligente e venda sem intermediários para compradores de todo o Brasil.`,
     ctaButtonText: `Anunciar meu ${capitalizedBrand}`,
     benefits: [
       { icon: 'BadgeDollarSign', title: 'Valorização Real', description: `Saiba exatamente quanto vale seu ${capitalizedBrand} com nossa base da Tabela FIPE atualizada.` },
@@ -43,10 +43,10 @@ export default async function VenderBrandPage({ params }: { params: Promise<{ br
         content: `Para garantir o melhor valor no seu ${capitalizedBrand}, mantenha o histórico de revisões atualizado e destaque isso no seu anúncio na Carbi. Veículos desta marca são conhecidos pela durabilidade, e compradores buscam essa segurança.`
       },
       {
-        badge: 'Mercado BH',
-        title: `Procura por ${capitalizedBrand} em Belo Horizonte`,
-        subtitle: `Belo Horizonte tem uma alta demanda por modelos ${capitalizedBrand}.`,
-        content: `Modelos como o Corolla, Civic ou HB20 (dependendo da marca) são os mais buscados em BH. Ao anunciar conosco, seu ${capitalizedBrand} ganha visibilidade prioritária para quem está pesquisando na região metropolitana.`
+        badge: 'Mercado Nacional',
+        title: `Procura por ${capitalizedBrand} no Brasil`,
+        subtitle: `Existe uma alta demanda nacional por modelos ${capitalizedBrand}.`,
+        content: `Veículos da marca ${capitalizedBrand} são extremamente buscados em nosso marketplace. Ao anunciar conosco, seu carro ganha visibilidade estruturada para compradores que valorizam a procedência e o estado de conservação.`
       }
     ],
     faqs: [
@@ -56,5 +56,5 @@ export default async function VenderBrandPage({ params }: { params: Promise<{ br
     ]
   }
 
-  return <SEOPageClient data={data} ctaHref="/anunciar-carro-bh" />
+  return <SEOPageClient data={data} ctaHref="/anunciar-carro" />
 }

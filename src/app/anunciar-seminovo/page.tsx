@@ -14,5 +14,5 @@ export const metadata: Metadata = {
 }
 
 export default function AnunciarSeminovoPage() {
-  return <SEOPageClient data={data} ctaHref="/anunciar-carro-bh/fluxo" />
+  return <SEOPageClient data={data} ctaHref="/anunciar-carro/fluxo" />
 }

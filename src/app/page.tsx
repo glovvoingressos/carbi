@@ -37,7 +37,7 @@ export default async function HomePage() {
         <div className="container max-w-6xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/50 border border-black/5 px-4 py-2 rounded-full mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <span className="w-2 h-2 bg-dark rounded-full animate-pulse" />
-            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-dark/40">Marketplace de Confiança</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-dark/40">Marketplace Nacional</span>
           </div>
           
           <h1 className="text-5xl sm:text-7xl font-black text-dark tracking-[-0.04em] leading-[0.95] mb-8">
@@ -71,7 +71,7 @@ export default async function HomePage() {
               </div>
             </Link>
             
-            <Link href="/anunciar-carro-bh" className="bg-white p-8 rounded-[32px] border border-black/5 flex flex-col items-center gap-4 hover:-translate-y-1 transition-all group">
+            <Link href="/anunciar-carro" className="bg-white p-8 rounded-[32px] border border-black/5 flex flex-col items-center gap-4 hover:-translate-y-1 transition-all group">
               <div className="w-12 h-12 bg-[#f5f5f3] rounded-2xl flex items-center justify-center group-hover:bg-dark group-hover:text-white transition-colors">
                 <Tag className="w-6 h-6" />
               </div>
@@ -116,7 +116,7 @@ export default async function HomePage() {
           ) : (
             <div className="bg-white rounded-[32px] p-12 text-center border border-black/5">
               <p className="text-dark/40 font-medium mb-4">Ainda não há anúncios ativos na sua região.</p>
-              <Link href="/anunciar-carro-bh" className="bg-dark text-white px-8 py-3 rounded-full font-bold inline-flex items-center gap-2">
+              <Link href="/anunciar-carro" className="bg-dark text-white px-8 py-3 rounded-full font-bold inline-flex items-center gap-2">
                 Seja o primeiro a anunciar <PlusCircle className="w-4 h-4" />
               </Link>
             </div>
@@ -203,7 +203,7 @@ export default async function HomePage() {
                 Publique seu anúncio em menos de 2 minutos. Gratuito, rápido e 100% seguro.
               </p>
               <Link 
-                href="/anunciar-carro-bh" 
+                href="/anunciar-carro" 
                 className="bg-white text-dark h-20 px-12 rounded-full font-black text-lg uppercase tracking-widest hover:scale-105 transition-all inline-flex items-center gap-3 shadow-2xl shadow-white/5"
               >
                 Anunciar agora <ArrowRight className="w-6 h-6" />

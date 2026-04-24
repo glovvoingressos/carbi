@@ -3,7 +3,7 @@ import { Zap, ShieldCheck, Heart, Search, MessageSquare, BadgeDollarSign } from 
 export const SEO_DATA = {
   anunciar: {
     title: 'Anunciar Carro: Venda seu veículo rápido e pelo melhor preço',
-    description: 'Anuncie seu carro seminovo ou usado na Carbi. Alcance milhares de compradores em Belo Horizonte e região. Cadastro rápido, 100% seguro e sem burocracia.',
+    description: 'Anuncie seu carro seminovo ou usado na Carbi. Alcance milhares de compradores interessados. Cadastro rápido, 100% seguro e sem burocracia.',
     h1: 'Anunciar Carro Grátis em Minutos',
     subtitle: 'A plataforma inteligente para quem quer vender sem atrito e com máxima segurança.',
     benefits: [
@@ -32,33 +32,33 @@ export const SEO_DATA = {
     ]
   },
   vender: {
-    title: 'Vender Carro em Belo Horizonte: A melhor forma de negociar seu veículo',
-    description: 'Quer vender seu carro em BH? A Carbi é o portal líder em seminovos em Belo Horizonte. Venda seu veículo com segurança, rapidez e valorização real.',
-    h1: 'Venda seu Carro hoje em Belo Horizonte',
-    subtitle: 'Conectamos você aos melhores compradores de BH e Região Metropolitana.',
+    title: 'Vender Carro Online: A melhor forma de negociar seu veículo',
+    description: 'Quer vender seu carro rápido? A Carbi é o marketplace de seminovos que mais cresce no Brasil. Venda seu veículo com segurança, rapidez e valorização real.',
+    h1: 'Venda seu Carro hoje com Segurança',
+    subtitle: 'Conectamos você aos melhores compradores de todo o Brasil.',
     benefits: [
       { icon: 'BadgeDollarSign', title: 'Melhor Avaliação', description: 'Compare seu preço com a FIPE em tempo real e não perca dinheiro na negociação.' },
-      { icon: 'Search', title: 'Visibilidade Local', description: 'Foco total no mercado de Belo Horizonte, garantindo compradores próximos a você.' },
+      { icon: 'Search', title: 'Visibilidade Nacional', description: 'Seu anúncio é otimizado para ser encontrado por quem realmente quer comprar.' },
       { icon: 'MessageSquare', title: 'Negociação Direta', description: 'Fale direto com o comprador pelo nosso chat seguro, sem intermediários que diminuem seu lucro.' }
     ],
     sections: [
       {
-        badge: 'Local BH',
-        title: 'O mercado de carros em Belo Horizonte',
-        subtitle: 'BH tem um dos mercados mais aquecidos de seminovos do Brasil.',
-        content: `Vender carro em Belo Horizonte exige estratégia. Com a Carbi, seu anúncio é otimizado para buscas locais como "carros usados bh" e "seminovos belo horizonte", garantindo que as pessoas certas vejam seu veículo no momento da decisão.`
+        badge: 'Venda Direta',
+        title: 'O marketplace de carros que mais cresce',
+        subtitle: 'A Carbi redefine a experiência de compra e venda entre particulares.',
+        content: `Vender seu carro online exige confiança. Com a Carbi, seu anúncio ganha visibilidade estruturada e proteção de dados, garantindo que as pessoas certas vejam seu veículo no momento da decisão.`
       },
       {
-        badge: 'Venda Rápida',
-        title: 'Dicas para vender seu carro rápido em BH',
+        badge: 'Praticidade',
+        title: 'Dicas para vender seu carro rápido',
         subtitle: 'Tempo é dinheiro, especialmente no mercado automotivo.',
-        content: `Para uma venda rápida em BH, certifique-se de que a documentação está em dia e o IPVA pago. Mencione esses diferenciais no seu anúncio na Carbi para atrair compradores que buscam prontidão e segurança.`
+        content: `Para uma venda rápida, certifique-se de que a documentação está em dia e o IPVA pago. Mencione esses diferenciais no seu anúncio na Carbi para atrair compradores que buscam prontidão e segurança.`
       }
     ],
     faqs: [
-      { q: 'Onde anunciar meu carro em Belo Horizonte?', a: 'A Carbi é a melhor opção para anunciar em BH, pois possui foco regional e ferramentas específicas para o público mineiro.' },
-      { q: 'Qual a vantagem de vender online em BH?', a: 'A economia de tempo é gigante. Você não precisa levar o carro em agências; o comprador interessado vem até você após filtrar pela nossa plataforma.' },
-      { q: 'Como saber o valor real do meu carro em BH?', a: 'Utilizamos a base da Tabela FIPE atualizada mensalmente para te dar um norte preciso sobre o valor de mercado do seu veículo.' }
+      { q: 'Onde anunciar meu carro para vender rápido?', a: 'A Carbi é a melhor opção para anunciar online, pois possui foco em qualidade e ferramentas específicas para valorizar seu veículo.' },
+      { q: 'Qual a vantagem de vender online?', a: 'A economia de tempo é gigante. Você não precisa levar o carro em agências; o comprador interessado vem até você após filtrar pela nossa plataforma.' },
+      { q: 'Como saber o valor real do meu carro?', a: 'Utilizamos a base da Tabela FIPE atualizada mensalmente para te dar um norte preciso sobre o valor de mercado do seu veículo.' }
     ]
   }
 }

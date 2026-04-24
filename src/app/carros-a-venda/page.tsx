@@ -12,8 +12,8 @@ export async function generateMetadata({
   const sp = await searchParams
   const query = (sp.q || '').trim()
   return {
-    title: query ? `Carros à venda: ${query} | Carbi` : 'Carros à venda em BH e região | Carbi',
-    description: 'Encontre o seu próximo carro com o marketplace inteligente da Carbi. Ofertas reais em Belo Horizonte, Contagem, Betim e região metropolitana.',
+    title: query ? `Carros à venda: ${query} | Carbi` : 'Carros à venda no Brasil | Marketplace Inteligente | Carbi',
+    description: 'Encontre o seu próximo carro com o marketplace inteligente da Carbi. Ofertas reais com segurança e transparência em todo o Brasil.',
   }
 }
 
@@ -79,7 +79,7 @@ export default async function CarrosAVendaPage({
             Marketplace inteligente.
           </h1>
           <p className="mt-4 text-dark/40 font-bold text-lg">
-            Encontre o veículo perfeito entre os {result.total} anúncios ativos em BH.
+            Encontre o veículo perfeito entre os {result.total} anúncios ativos na plataforma.
           </p>
         </div>
 
