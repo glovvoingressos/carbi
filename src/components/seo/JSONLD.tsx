@@ -68,31 +68,42 @@ export function OrganizationSchema() {
 }
 
 export function VehicleSchema({ vehicle }: { vehicle: any }) {
-  const schema = {
+  // Handle both ListingPublic (with price) and CarSpec (catalog)
+  const isListing = 'price' in vehicle;
+  
+  const schema: any = {
     '@context': 'https://schema.org',
     '@type': 'Car',
     'name': `${vehicle.brand} ${vehicle.model}`,
-    'description': vehicle.description,
+    'description': vehicle.description || `Ficha técnica completa do ${vehicle.brand} ${vehicle.model} ${vehicle.year_model || ''}.`,
     'brand': {
       '@type': 'Brand',
       'name': vehicle.brand
     },
-    'modelDate': vehicle.year_model,
+    'modelDate': vehicle.year_model || vehicle.year,
     'color': vehicle.color,
-    'fuelType': vehicle.fuel,
+    'fuelType': vehicle.fuel || vehicle.engineType,
     'vehicleTransmission': vehicle.transmission,
-    'mileageFromOdometer': {
+  }
+
+  if (vehicle.mileage !== undefined) {
+    schema.mileageFromOdometer = {
       '@type': 'QuantitativeValue',
       'value': vehicle.mileage,
       'unitCode': 'KMT'
-    },
-    'offers': {
+    }
+  }
+
+  if (isListing && vehicle.price) {
+    schema.offers = {
       '@type': 'Offer',
       'price': vehicle.price,
       'priceCurrency': 'BRL',
-      'availability': 'https://schema.org/InStock'
+      'availability': 'https://schema.org/InStock',
+      'url': `https://www.carbi.com.br/anuncios/${vehicle.slug}`
     }
   }
+
   return <JSONLD data={schema} />
 }
 

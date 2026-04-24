@@ -120,7 +120,7 @@ export default async function CarDetailPage({
 
   return (
     <div className="container mx-auto px-4 pt-24 pb-8">
-      <VehicleSchema car={car} />
+      <VehicleSchema vehicle={car} />
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1 text-sm text-text-tertiary mb-6">
