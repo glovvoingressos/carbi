@@ -58,11 +58,57 @@ export function OrganizationSchema() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     'name': 'Carbi',
-    'url': 'https://carbi.com.br',
-    'logo': 'https://carbi.com.br/logo.png',
+    'url': 'https://www.carbi.com.br',
+    'logo': 'https://www.carbi.com.br/logo.png',
     'sameAs': [
       'https://instagram.com/carbi'
     ]
+  }
+  return <JSONLD data={schema} />
+}
+
+export function VehicleSchema({ vehicle }: { vehicle: any }) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Car',
+    'name': `${vehicle.brand} ${vehicle.model}`,
+    'description': vehicle.description,
+    'brand': {
+      '@type': 'Brand',
+      'name': vehicle.brand
+    },
+    'modelDate': vehicle.year_model,
+    'color': vehicle.color,
+    'fuelType': vehicle.fuel,
+    'vehicleTransmission': vehicle.transmission,
+    'mileageFromOdometer': {
+      '@type': 'QuantitativeValue',
+      'value': vehicle.mileage,
+      'unitCode': 'KMT'
+    },
+    'offers': {
+      '@type': 'Offer',
+      'price': vehicle.price,
+      'priceCurrency': 'BRL',
+      'availability': 'https://schema.org/InStock'
+    }
+  }
+  return <JSONLD data={schema} />
+}
+
+export function LocalBusinessBHTicketsSchema() {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'AutoDealer',
+    'name': 'Carbi Belo Horizonte',
+    'description': 'Maior marketplace de carros usados em Belo Horizonte. Venda seu carro com atrito zero.',
+    'url': 'https://www.carbi.com.br/carros-usados-bh',
+    'address': {
+      '@type': 'PostalAddress',
+      'addressLocality': 'Belo Horizonte',
+      'addressRegion': 'MG',
+      'addressCountry': 'BR'
+    }
   }
   return <JSONLD data={schema} />
 }
