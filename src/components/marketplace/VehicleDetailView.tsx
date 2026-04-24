@@ -10,7 +10,7 @@ import {
   Heart, MessageCircle, Phone,
   Info
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { ListingPublic } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
 import ListingImageGallery from './ListingImageGallery'
@@ -63,7 +63,7 @@ export default function VehicleDetailView({
     }
   }
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -73,14 +73,14 @@ export default function VehicleDetailView({
     }
   }
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
       y: 0,
       transition: {
         duration: 0.5,
-        ease: [0.22, 1, 0.36, 1]
+        ease: [0.16, 1, 0.3, 1]
       }
     }
   }
