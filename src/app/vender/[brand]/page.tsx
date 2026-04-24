@@ -31,9 +31,9 @@ export default async function VenderBrandPage({ params }: { params: Promise<{ br
     subtitle: `Anuncie seu ${capitalizedBrand} na plataforma que mais cresce em Belo Horizonte e venda sem intermediários.`,
     ctaButtonText: `Anunciar meu ${capitalizedBrand}`,
     benefits: [
-      { icon: BadgeDollarSign, title: 'Valorização Real', description: `Saiba exatamente quanto vale seu ${capitalizedBrand} com nossa base da Tabela FIPE atualizada.` },
-      { icon: Car, title: 'Especialista em ${capitalizedBrand}', description: `Nossa plataforma destaca os diferenciais tecnológicos e de mecânica do seu ${capitalizedBrand}.` },
-      { icon: ShieldCheck, title: 'Venda Direta', description: 'Conectamos você a compradores reais, sem lojistas que depreciam seu veículo.' }
+      { icon: 'BadgeDollarSign', title: 'Valorização Real', description: `Saiba exatamente quanto vale seu ${capitalizedBrand} com nossa base da Tabela FIPE atualizada.` },
+      { icon: 'Car', title: `Especialista em ${capitalizedBrand}`, description: `Nossa plataforma destaca os diferenciais tecnológicos e de mecânica do seu ${capitalizedBrand}.` },
+      { icon: 'ShieldCheck', title: 'Venda Direta', description: 'Conectamos você a compradores reais, sem lojistas que depreciam seu veículo.' }
     ],
     sections: [
       {

@@ -7,9 +7,9 @@ export const SEO_DATA = {
     h1: 'Anunciar Carro Grátis em Minutos',
     subtitle: 'A plataforma inteligente para quem quer vender sem atrito e com máxima segurança.',
     benefits: [
-      { icon: Zap, title: 'Anúncio Rápido', description: 'Publique seu carro em menos de 2 minutos com nosso fluxo guiado por inteligência.' },
-      { icon: ShieldCheck, title: 'Segurança Total', description: 'Chat interno criptografado para você negociar sem expor seu telefone ou e-mail.' },
-      { icon: Heart, title: 'Atrito Zero', description: 'Design focado na experiência do usuário para facilitar a jornada de quem compra e quem vende.' }
+      { icon: 'Zap', title: 'Anúncio Rápido', description: 'Publique seu carro em menos de 2 minutos com nosso fluxo guiado por inteligência.' },
+      { icon: 'ShieldCheck', title: 'Segurança Total', description: 'Chat interno criptografado para você negociar sem expor seu telefone ou e-mail.' },
+      { icon: 'Heart', title: 'Atrito Zero', description: 'Design focado na experiência do usuário para facilitar a jornada de quem compra e quem vende.' }
     ],
     sections: [
       {
@@ -37,9 +37,9 @@ export const SEO_DATA = {
     h1: 'Venda seu Carro hoje em Belo Horizonte',
     subtitle: 'Conectamos você aos melhores compradores de BH e Região Metropolitana.',
     benefits: [
-      { icon: BadgeDollarSign, title: 'Melhor Avaliação', description: 'Compare seu preço com a FIPE em tempo real e não perca dinheiro na negociação.' },
-      { icon: Search, title: 'Visibilidade Local', description: 'Foco total no mercado de Belo Horizonte, garantindo compradores próximos a você.' },
-      { icon: MessageSquare, title: 'Negociação Direta', description: 'Fale direto com o comprador pelo nosso chat seguro, sem intermediários que diminuem seu lucro.' }
+      { icon: 'BadgeDollarSign', title: 'Melhor Avaliação', description: 'Compare seu preço com a FIPE em tempo real e não perca dinheiro na negociação.' },
+      { icon: 'Search', title: 'Visibilidade Local', description: 'Foco total no mercado de Belo Horizonte, garantindo compradores próximos a você.' },
+      { icon: 'MessageSquare', title: 'Negociação Direta', description: 'Fale direto com o comprador pelo nosso chat seguro, sem intermediários que diminuem seu lucro.' }
     ],
     sections: [
       {

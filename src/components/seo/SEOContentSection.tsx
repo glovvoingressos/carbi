@@ -3,7 +3,11 @@
 import { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Check, ChevronRight, Zap, ShieldCheck, Heart, ArrowRight } from 'lucide-react'
+import { 
+  Check, ChevronRight, Zap, ShieldCheck, Heart, ArrowRight, 
+  MapPin, BadgeCheck, MessageCircle, Star, Search, Shield, 
+  Clock, BadgeDollarSign, MessageSquare, Car
+} from 'lucide-react'
 
 interface SEOSectionProps {
   title: string
@@ -99,6 +103,36 @@ export function SEOCallToAction({ title, description, buttonText, buttonHref }: 
   )
 }
 
+const ICON_MAP: Record<string, any> = {
+  MapPin,
+  BadgeCheck,
+  MessageCircle,
+  Star,
+  Zap,
+  ShieldCheck,
+  Search,
+  Shield,
+  Clock,
+  Heart,
+  BadgeDollarSign,
+  MessageSquare,
+  Car,
+  Check,
+  ChevronRight
+}
+
+function IconResolver({ icon, className }: { icon: any, className?: string }) {
+  if (!icon) return null
+  
+  if (typeof icon === 'string') {
+    const IconComponent = ICON_MAP[icon] || Zap
+    return <IconComponent className={className} />
+  }
+  
+  const IconComponent = icon
+  return <IconComponent className={className} />
+}
+
 export function BenefitGrid({ items }: { items: { icon: any, title: string, description: string }[] }) {
   return (
     <section className="py-24 bg-white">
@@ -106,7 +140,7 @@ export function BenefitGrid({ items }: { items: { icon: any, title: string, desc
         {items.map((item, idx) => (
           <div key={idx} className="bg-[#f5f5f3] rounded-[40px] p-10 border border-black/5 group hover:bg-dark transition-all duration-500">
             <div className="w-16 h-16 rounded-3xl bg-white flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
-              <item.icon className="w-8 h-8 text-dark" />
+              <IconResolver icon={item.icon} className="w-8 h-8 text-dark" />
             </div>
             <h3 className="text-2xl font-black text-dark tracking-tight mb-4 group-hover:text-white transition-colors">{item.title}</h3>
             <p className="text-lg font-bold text-dark/40 leading-relaxed group-hover:text-white/40 transition-colors">{item.description}</p>

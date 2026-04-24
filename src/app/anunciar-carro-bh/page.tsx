@@ -17,9 +17,9 @@ export default function AnunciarCarroBHPage() {
     subtitle: 'A Carbi é a plataforma oficial de quem quer vender carro em Belo Horizonte e região metropolitana sem burocracia.',
     ctaButtonText: 'Anunciar em BH agora',
     benefits: [
-      { icon: MapPin, title: 'Foco Total em BH', description: 'Seu anúncio é mostrado prioritariamente para compradores de Belo Horizonte, Contagem e Betim.' },
-      { icon: BadgeCheck, title: 'Preço Real de BH', description: 'Ajustamos as sugestões de preço com base no mercado local de Minas Gerais.' },
-      { icon: MessageCircle, title: 'Chat Seguro', description: 'Negocie com mineiros de forma segura, sem expor seus dados pessoais antes da hora.' }
+      { icon: 'MapPin', title: 'Foco Total em BH', description: 'Seu anúncio é mostrado prioritariamente para compradores de Belo Horizonte, Contagem e Betim.' },
+      { icon: 'BadgeCheck', title: 'Preço Real de BH', description: 'Ajustamos as sugestões de preço com base no mercado local de Minas Gerais.' },
+      { icon: 'MessageCircle', title: 'Chat Seguro', description: 'Negocie com mineiros de forma segura, sem expor seus dados pessoais antes da hora.' }
     ],
     sections: [
       {
