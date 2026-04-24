@@ -22,8 +22,11 @@ export default function ListingCard({ listing }: { listing: ListingPublic }) {
     preferredUrl: listing.images?.[0]?.url || null,
   })
   const hasFipe = typeof listing.fipe_price === 'number' && listing.fipe_price > 0
+  const isGoodDeal = hasFipe && Number(listing.price) <= Number(listing.fipe_price) * 0.9
+  const isVeryRecent = listing.listed_since?.includes('segundos') || listing.listed_since?.includes('minutos') || listing.listed_since?.includes('hora')
+  
   const tone = CARD_TONES[hashToIndex(listing.id, CARD_TONES.length)]
-  const mainBadge = listing.badges?.[0] || null
+  const mainBadge = isGoodDeal ? { label: 'Oportunidade' } : isVeryRecent ? { label: 'Novo' } : listing.badges?.[0] || null
 
   const infoRows = [
     { label: 'Ano/Modelo', value: `${listing.year}/${listing.year_model}` },
@@ -31,7 +34,6 @@ export default function ListingCard({ listing }: { listing: ListingPublic }) {
     { label: 'Cidade/UF', value: `${listing.city}/${listing.state}` },
     ...(hasFipe ? [{ label: 'Preço FIPE', value: formatBRL(Number(listing.fipe_price)) }] : []),
     ...(listing.listed_since ? [{ label: 'Anunciado', value: listing.listed_since }] : []),
-    ...(listing.price_updated_since ? [{ label: 'Atualizado', value: listing.price_updated_since }] : []),
   ]
 
   return (
@@ -39,10 +41,15 @@ export default function ListingCard({ listing }: { listing: ListingPublic }) {
       href={`/anuncios/${listing.slug}`}
       className="group block rounded-[34px] transition hover:-translate-y-0.5"
     >
-      <PastelSpecCard tone={tone} titleBadge={mainBadge?.label || 'Anúncio atualizado'} badgeInside>
+      <PastelSpecCard tone={tone} titleBadge={mainBadge?.label || 'Destaque'} badgeInside>
         {cover ? (
           <div className="relative aspect-square w-full overflow-hidden rounded-[30px] bg-[#e5e8ed]">
             <img src={cover} alt={listing.title} className="h-full w-full object-cover" />
+            {isGoodDeal && (
+              <div className="absolute top-4 left-4 bg-green-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
+                -{Math.round((1 - Number(listing.price) / Number(listing.fipe_price)) * 100)}% FIPE
+              </div>
+            )}
           </div>
         ) : (
           <div className="aspect-square w-full rounded-[30px] bg-[#e5e8ed] flex items-center justify-center text-xs font-bold uppercase tracking-widest text-text-tertiary">

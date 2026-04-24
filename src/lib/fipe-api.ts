@@ -1,7 +1,19 @@
 /**
- * FIPE API Integration Utility (Parallelum/Fipe Online)
- * Hierarquia obrigatória: tipo -> marca -> modelo -> ano -> versão(combustível)
+ * FIPE API Service (Parallelum v2)
+ * Robust implementation with caching and fuzzy matching
  */
+
+const BASE_URL = process.env.NEXT_PUBLIC_FIPE_API_BASE_URL || 'https://fipe.parallelum.com.br/api/v2'
+const FIPE_API_TOKEN = process.env.FIPE_API_TOKEN
+
+// Caches
+let cachedReference: string | null = null
+let refExpiresAt = 0
+const REFERENCE_TTL = 1000 * 60 * 60 // 1 hour
+
+let cachedBrands: Record<string, FipeItem[]> = {}
+let brandsExpiresAt = 0
+const BRANDS_TTL = 1000 * 60 * 60 * 24 // 24 hours
 
 export interface FipeItem {
   name: string
@@ -14,7 +26,6 @@ export interface FipeReference {
 }
 
 export interface FipeResult {
-  vehicleType: number
   price: string
   brand: string
   model: string
@@ -22,14 +33,8 @@ export interface FipeResult {
   fuel: string
   codeFipe: string
   referenceMonth: string
+  vehicleType: number
   fuelAcronym: string
-}
-
-export interface FipeYearOption extends FipeItem {
-  modelYear: number | null
-  fuelType: string
-  fuelCode: string | null
-  isZeroKm: boolean
 }
 
 export interface FipeVersionOption {
@@ -40,23 +45,10 @@ export interface FipeVersionOption {
   modelYear: number
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_FIPE_API_BASE_URL || 'https://fipe.parallelum.com.br/api/v2'
-const TOKEN = process.env.FIPE_API_TOKEN
-
-const META_TTL_MS = 12 * 60 * 60 * 1000
-const DETAIL_TTL_MS = 60 * 60 * 1000
-const REFERENCE_TTL_MS = 6 * 60 * 60 * 1000
-
-type CacheEntry = {
-  expiresAt: number
-  value: unknown
-}
-
-const responseCache = new Map<string, CacheEntry>()
-let referencesCache: { expiresAt: number; items: FipeReference[] } | null = null
-let warnedMissingToken = false
-
-function normalize(str: string): string {
+/**
+ * Normalizes strings for consistent matching
+ */
+export function normalize(str: string): string {
   if (!str) return ''
   return str
     .toLowerCase()
@@ -65,366 +57,223 @@ function normalize(str: string): string {
     .replace(/[^a-z0-9\s-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+    .replace(/\bvolkswagen\b/g, 'vw')
 }
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
+/**
+ * Base fetcher for Parallelum v2
+ */
+async function fetchFipe<T>(endpoint: string, useReference = true, type = 'cars'): Promise<T> {
+  const ref = useReference ? await getLatestReference() : null
+  const query = ref ? `?reference=${ref}` : ''
+  const url = endpoint.startsWith('/references') 
+    ? `${BASE_URL}${endpoint}${query}`
+    : `${BASE_URL}/${type}${endpoint}${query}`
 
-function extractReferenceName(value: Record<string, unknown>): string {
-  const direct = value.name
-  if (typeof direct === 'string' && direct.trim()) return direct
-  const month = value.month
-  if (typeof month === 'string' && month.trim()) return month
-  return ''
-}
-
-function sanitizeFipeItems(raw: unknown): FipeItem[] {
-  if (!Array.isArray(raw)) return []
-  return raw
-    .filter((item) => isObject(item))
-    .map((item) => ({
-      code: String(item.code ?? '').trim(),
-      name: String(item.name ?? '').trim(),
-    }))
-    .filter((item) => item.code.length > 0 && item.name.length > 0)
-}
-
-function sanitizeFipeReferences(raw: unknown): FipeReference[] {
-  if (!Array.isArray(raw)) return []
-  return raw
-    .filter((item) => isObject(item))
-    .map((item) => ({
-      code: String(item.code ?? '').trim(),
-      name: extractReferenceName(item),
-    }))
-    .filter((item) => item.code.length > 0 && item.name.length > 0)
-}
-
-function sanitizeFipeDetail(raw: unknown): FipeResult | null {
-  if (!isObject(raw)) return null
-  const required = ['price', 'brand', 'model', 'fuel', 'codeFipe', 'referenceMonth'] as const
-  for (const key of required) {
-    if (typeof raw[key] !== 'string' || !String(raw[key]).trim()) return null
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
   }
-  if (typeof raw.modelYear !== 'number') return null
-  if (typeof raw.vehicleType !== 'number') return null
-  return raw as unknown as FipeResult
-}
 
-function hasErrorPayload(raw: unknown): raw is { error: string } {
-  return isObject(raw) && typeof raw.error === 'string'
-}
-
-function hasToken(tokens: string[], token: string): boolean {
-  return tokens.includes(token)
-}
-
-function parseYearNumber(name: string): number | null {
-  const directYear = name.match(/\b(19\d{2}|20\d{2})\b/)
-  if (directYear) {
-    return parseInt(directYear[1], 10)
-  }
-  if (name.toLowerCase().includes('zero km') || parseInt(name, 10) === 32000) {
-    return new Date().getFullYear()
-  }
-  return null
-}
-
-function parseFuelFromName(name: string): string {
-  const parts = name.trim().split(/\s+/)
-  if (parts.length <= 1) return 'Não informado'
-  return parts.slice(1).join(' ')
-}
-
-function parseFuelCodeFromYearCode(code: string): string | null {
-  const match = code.match(/-(\d+)$/)
-  return match ? match[1] : null
-}
-
-function parseYearOptions(items: FipeItem[]): FipeYearOption[] {
-  return items.map((item) => {
-    const modelYear = parseYearNumber(item.name)
-    const numericPrefix = parseInt(item.name, 10)
-    const isZeroKm = item.name.toLowerCase().includes('zero km') || numericPrefix === 32000
-
-    return {
-      ...item,
-      modelYear,
-      fuelType: parseFuelFromName(item.name),
-      fuelCode: parseFuelCodeFromYearCode(item.code),
-      isZeroKm,
-    }
-  })
-}
-
-function withQuery(endpoint: string, params: Record<string, string | number | undefined>): string {
-  const search = new URLSearchParams()
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== null && String(v).length > 0) search.set(k, String(v))
-  })
-
-  const qs = search.toString()
-  if (!qs) return endpoint
-  return `${endpoint}${endpoint.includes('?') ? '&' : '?'}${qs}`
-}
-
-async function fetchFipe<T>(
-  endpoint: string,
-  opts?: { ttlMs?: number; includeReference?: boolean; referenceCode?: string }
-): Promise<T | null> {
-  const ttlMs = opts?.ttlMs ?? META_TTL_MS
-  const includeReference = opts?.includeReference ?? true
-
-  const referenceCode = includeReference
-    ? opts?.referenceCode || (await getLatestReferenceCode())
-    : undefined
-
-  const finalEndpoint = includeReference && referenceCode
-    ? withQuery(endpoint, { reference: referenceCode })
-    : endpoint
-
-  const cacheKey = `${finalEndpoint}`
-  const cached = responseCache.get(cacheKey)
-  if (cached && cached.expiresAt > Date.now()) {
-    return cached.value as T
+  if (FIPE_API_TOKEN) {
+    headers['X-Subscription-Token'] = FIPE_API_TOKEN
   }
 
   try {
-    const headers: Record<string, string> = {
-      accept: 'application/json',
-      'content-type': 'application/json',
-    }
-
-    if (TOKEN) {
-      headers['X-Subscription-Token'] = TOKEN
-    } else if (!warnedMissingToken) {
-      console.warn('FIPE API token não configurado. Defina FIPE_API_TOKEN para evitar respostas parciais.')
-      warnedMissingToken = true
-    }
-
-    const response = await fetch(`${BASE_URL}${finalEndpoint}`, {
+    const res = await fetch(url, {
       headers,
-      next: { revalidate: Math.floor(ttlMs / 1000) },
+      next: { revalidate: 3600 } // Cache for 1 hour at Next.js level
     })
 
-    if (!response.ok) {
-      console.error(`FIPE API error: ${response.status} ${response.statusText} at ${finalEndpoint}`)
-      return null
+    if (!res.ok) {
+      console.error(`FIPE API Error (${res.status}): ${url}`)
+      return [] as any
     }
 
-    const data = (await response.json()) as unknown
-    if (hasErrorPayload(data)) {
-      console.error(`FIPE API payload error at ${finalEndpoint}: ${data.error}`)
-      return null
-    }
-
-    responseCache.set(cacheKey, {
-      expiresAt: Date.now() + ttlMs,
-      value: data,
-    })
-
-    return data as T
-  } catch (err) {
-    console.error(`FIPE API fetch failed at ${finalEndpoint}:`, err)
-    return null
+    return await res.json()
+  } catch (error) {
+    console.error('FIPE Fetch Error:', error)
+    return [] as any
   }
 }
 
+/**
+ * Reference month resolution
+ */
 export async function getFipeReferences(): Promise<FipeReference[]> {
-  const now = Date.now()
-  if (referencesCache && referencesCache.expiresAt > now) {
-    return referencesCache.items
-  }
-
-  const rawReferences = await fetchFipe<unknown>('/references', {
-    ttlMs: REFERENCE_TTL_MS,
-    includeReference: false,
-  })
-  const references = sanitizeFipeReferences(rawReferences)
-
-  referencesCache = {
-    expiresAt: now + REFERENCE_TTL_MS,
-    items: references,
-  }
-
-  return references
+  const raw = await fetchFipe<any[]>('/references', false)
+  if (!Array.isArray(raw)) return []
+  return raw.map(r => ({
+    name: r.month || r.name || 'Referência desconhecida',
+    code: String(r.code)
+  }))
 }
 
-async function getLatestReferenceCode(): Promise<string | undefined> {
+export async function getLatestReference(): Promise<string | null> {
+  if (cachedReference && refExpiresAt > Date.now()) {
+    return cachedReference
+  }
+
   const refs = await getFipeReferences()
-  return refs[0]?.code
+  if (refs.length > 0) {
+    cachedReference = refs[0].code
+    refExpiresAt = Date.now() + REFERENCE_TTL
+    return cachedReference
+  }
+  
+  return null
 }
 
-export async function getFipeBrands(): Promise<FipeItem[]> {
-  const raw = await fetchFipe<unknown>('/cars/brands', { ttlMs: META_TTL_MS })
-  return sanitizeFipeItems(raw)
+/**
+ * Brands, Models and Years
+ */
+export async function getFipeBrands(type = 'cars'): Promise<FipeItem[]> {
+  if (cachedBrands[type] && brandsExpiresAt > Date.now()) {
+    return cachedBrands[type]
+  }
+
+  const brands = await fetchFipe<FipeItem[]>('/brands', false, type)
+  if (Array.isArray(brands) && brands.length > 0) {
+    cachedBrands[type] = brands
+    brandsExpiresAt = Date.now() + BRANDS_TTL
+  }
+  return brands || []
 }
 
-export async function getFipeModels(brandCode: string): Promise<FipeItem[]> {
-  const raw = await fetchFipe<unknown>(`/cars/brands/${brandCode}/models`, { ttlMs: META_TTL_MS })
-  return sanitizeFipeItems(raw)
+export async function getFipeModels(brandCode: string, type = 'cars'): Promise<FipeItem[]> {
+  return fetchFipe<FipeItem[]>(`/brands/${brandCode}/models`, true, type)
 }
 
-export async function getFipeYears(brandCode: string, modelCode: string): Promise<FipeItem[]> {
-  const raw = await fetchFipe<unknown>(`/cars/brands/${brandCode}/models/${modelCode}/years`, { ttlMs: META_TTL_MS })
-  return sanitizeFipeItems(raw)
+export async function getFipeYears(brandCode: string, modelCode: string, type = 'cars'): Promise<FipeItem[]> {
+  return fetchFipe<FipeItem[]>(`/brands/${brandCode}/models/${modelCode}/years`, true, type)
 }
 
-export async function getFipeDetailByCode(brandCode: string, modelCode: string, yearCode: string): Promise<FipeResult | null> {
-  const raw = await fetchFipe<unknown>(`/cars/brands/${brandCode}/models/${modelCode}/years/${yearCode}`, { ttlMs: DETAIL_TTL_MS })
-  return sanitizeFipeDetail(raw)
+/**
+ * Detail
+ */
+export async function getFipeDetailByCode(brandCode: string, modelCode: string, yearCode: string, type = 'cars'): Promise<FipeResult | null> {
+  const data = await fetchFipe<any>(`/brands/${brandCode}/models/${modelCode}/years/${yearCode}`, true, type)
+  
+  if (!data || !data.price) return null
+
+  return {
+    price: data.price,
+    brand: data.brand,
+    model: data.model,
+    modelYear: data.modelYear,
+    fuel: data.fuel,
+    codeFipe: data.codeFipe,
+    referenceMonth: data.referenceMonth,
+    vehicleType: data.vehicleType,
+    fuelAcronym: data.fuelAcronym,
+  }
 }
 
+/**
+ * UI Helpers
+ */
 export async function getFilteredFipeYears(brandCode: string, modelCode: string, limit = 6): Promise<number[]> {
   const rawYears = await getFipeYears(brandCode, modelCode)
-  const options = parseYearOptions(rawYears)
-
-  const years = Array.from(
-    new Set(options.map((o) => o.modelYear).filter((y): y is number => typeof y === 'number'))
-  )
-    .sort((a, b) => b - a)
-    .slice(0, limit)
-
-  return years
+  const years = rawYears.map(item => {
+    // Only match exactly 4 digits to avoid 32000 (Zero KM) or other codes
+    const match = item.name.match(/^(\d{4})\b/)
+    const y = match ? parseInt(match[1], 10) : null
+    return (y && y < 2100) ? y : null // Sanity check for year range
+  }).filter((y): y is number => y !== null)
+  
+  return Array.from(new Set(years)).sort((a, b) => b - a).slice(0, limit)
 }
 
 export async function getFipeVersionsByYear(brandCode: string, modelCode: string, year: number): Promise<FipeVersionOption[]> {
   const rawYears = await getFipeYears(brandCode, modelCode)
-  const options = parseYearOptions(rawYears)
-
-  const versions = options
-    .filter((o) => o.modelYear === year)
-    .map((o) => ({
-      code: o.code,
-      name: `${o.fuelType}`,
-      fuelType: o.fuelType,
-      fuelCode: o.fuelCode,
-      modelYear: year,
+  return rawYears
+    .filter(item => item.name.startsWith(String(year)))
+    .map(item => ({
+      code: item.code,
+      name: item.name.replace(String(year), '').trim() || 'Gasolina',
+      fuelType: item.name.replace(String(year), '').trim() || 'Gasolina',
+      fuelCode: item.code.split('-')[1] || '1',
+      modelYear: year
     }))
-    .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
-
-  // De-dup: algumas fontes podem retornar entradas repetidas por combustíveis equivalentes
-  return versions.filter((v, index, arr) => arr.findIndex((x) => x.code === v.code) === index)
-}
-
-export async function getFipeYearsByModelName(brandName: string, modelName: string, limit = 6): Promise<number[]> {
-  const brand = await resolveBrandByName(brandName)
-  if (!brand) return []
-
-  const model = await resolveModelByName(brand.code, modelName)
-  if (!model) return []
-
-  return getFilteredFipeYears(brand.code, model.code, limit)
-}
-
-async function resolveBrandByName(brandName: string): Promise<FipeItem | null> {
-  const brands = await getFipeBrands()
-  const target = normalize(brandName).replace(/\bvolkswagen\b/g, 'vw')
-  const targetTokens = target.split(' ').filter((t) => t.length >= 2)
-
-  return (
-    brands.find((b) => normalize(b.name).replace(/\bvolkswagen\b/g, 'vw') === target) ||
-    brands.find((b) => normalize(b.name).replace(/\bvolkswagen\b/g, 'vw').startsWith(target)) ||
-    brands.find((b) => {
-      const tokens = normalize(b.name).replace(/\bvolkswagen\b/g, 'vw').split(' ').filter((t) => t.length >= 2)
-      return targetTokens.every((token) => hasToken(tokens, token))
-    }) ||
-    null
-  )
-}
-
-async function resolveModelByName(brandCode: string, modelName: string, versionName?: string): Promise<FipeItem | null> {
-  const models = await getFipeModels(brandCode)
-  const target = normalize(modelName)
-  const targetTokens = target.split(' ').filter((t) => t.length >= 2)
-  const versionTokens = normalize(versionName || '')
-    .split(' ')
-    .filter((t) => t.length >= 2)
-
-  const baseCandidates = models
-    .filter((m) => {
-      const n = normalize(m.name)
-      const nTokens = n.split(' ').filter((t) => t.length >= 2)
-      const hasTarget = n === target || n.startsWith(target + ' ')
-      const hasTokens = targetTokens.every((token) => hasToken(nTokens, token))
-      return hasTarget || hasTokens
-    })
-    .map((m) => {
-      const n = normalize(m.name)
-      let score = 0
-      if (n === target) score += 100
-      if (n.startsWith(target + ' ')) score += 30
-      const nTokens = n.split(' ').filter((t) => t.length >= 2)
-      for (const token of targetTokens) {
-        if (hasToken(nTokens, token)) score += 8
-      }
-
-      score -= n.length / 3 // desempate para nome mais objetivo
-
-      for (const token of versionTokens) {
-        if (hasToken(nTokens, token)) score += 5
-      }
-
-      return { model: m, score }
-    })
-
-  if (baseCandidates.length === 0) return null
-
-  // Evita cair em versões antigas do modelo (ex: gerações 1990) quando há opções modernas.
-  const nowYear = new Date().getFullYear()
-  const candidates = await Promise.all(
-    baseCandidates.slice(0, 14).map(async (candidate) => {
-      const years = await getFilteredFipeYears(brandCode, candidate.model.code, 2)
-      const latestYear = years[0] || 0
-      let recencyScore = 0
-
-      if (latestYear === 0) recencyScore -= 30
-      else if (latestYear >= nowYear - 1) recencyScore += 80
-      else if (latestYear >= nowYear - 3) recencyScore += 50
-      else if (latestYear >= nowYear - 6) recencyScore += 20
-      else recencyScore -= 80
-
-      return {
-        model: candidate.model,
-        score: candidate.score + recencyScore,
-      }
-    })
-  )
-  
-  candidates.sort((a, b) => b.score - a.score)
-
-  return candidates[0]?.model || null
-}
-
-function chooseVersionByPreference(versions: FipeVersionOption[], versionName?: string): FipeVersionOption | null {
-  if (versions.length === 0) return null
-  if (!versionName) return versions[0]
-
-  const tokens = normalize(versionName)
-    .split(' ')
-    .filter((t) => t.length >= 2)
-
-  const scored = versions
-    .map((v) => {
-      const vName = normalize(v.name)
-      const vFuel = normalize(v.fuelType)
-      let score = 0
-      for (const token of tokens) {
-        if (vName.includes(token)) score += 10
-        if (vFuel.includes(token)) score += 10
-      }
-      return { version: v, score }
-    })
-    .sort((a, b) => b.score - a.score)
-
-  return scored[0]?.version || versions[0]
 }
 
 /**
- * Consulta determinística por hierarquia FIPE:
- * marca -> modelo -> ano -> versão (combustível)
+ * Resolvers for auto-hydration (used by [brand]/[model]/page.tsx)
  */
+
+export async function resolveBrandAndModel(brandName: string, modelName: string, type = 'cars', versionName?: string) {
+  const brands = await getFipeBrands(type)
+  const nBrand = normalize(brandName)
+  const brand = brands.find(b => normalize(b.name) === nBrand) || 
+                brands.find(b => normalize(b.name).includes(nBrand) || nBrand.includes(normalize(b.name)))
+  
+  if (!brand) return null
+
+  const models = await getFipeModels(brand.code, type)
+  const normalizedFipeBrand = normalize(brand.name)
+  const nModel = normalize(modelName).replace(normalizedFipeBrand, '').trim() // Remove brand from model name to avoid token conflict
+  const nVersion = versionName ? normalize(versionName) : ''
+  
+  const mTokens = nModel.split(' ').filter(t => t.length >= 1)
+  const vTokens = nVersion.split(' ').filter(t => t.length >= 2)
+  
+  let model: FipeItem | undefined
+
+  // 1. Strict Word Match (Model + Version)
+  if (vTokens.length > 0) {
+    model = models.find(m => {
+      const mn = normalize(m.name)
+      return mTokens.every(t => mn.includes(t)) && vTokens.every(t => mn.includes(t))
+    })
+  }
+
+  // 2. Partial Token Match (At least half of version tokens)
+  if (!model && vTokens.length > 1) {
+    model = models.find(m => {
+      const mn = normalize(m.name)
+      if (!mTokens.every(t => mn.includes(t))) return false
+      const matchCount = vTokens.filter(t => mn.includes(t)).length
+      return matchCount >= Math.ceil(vTokens.length / 2)
+    })
+  }
+
+  // 3. Exact Model Match
+  if (!model) {
+    model = models.find(m => normalize(m.name) === nModel)
+  }
+  
+  // 4. Word boundary match for model name
+  if (!model) {
+    const regex = new RegExp(`\\b${nModel}\\b`, 'i')
+    model = models.find(m => regex.test(normalize(m.name)))
+  }
+  
+  // 5. Token match for model (ignore version)
+  if (!model && mTokens.length > 0) {
+    model = models.find(m => {
+      const mn = normalize(m.name)
+      return mTokens.every(t => mn.includes(t))
+    })
+  }
+
+  // 6. Last resort: just find something that includes the first two tokens of the model
+  if (!model && mTokens.length >= 2) {
+    model = models.find(m => {
+      const mn = normalize(m.name)
+      return mn.includes(mTokens[0]) && mn.includes(mTokens[1])
+    })
+  }
+  
+  if (!model) return null
+  return { brand, model }
+}
+
+export async function getFipeYearsByModelName(brandName: string, modelName: string, limit = 6, _versionName?: string): Promise<number[]> {
+  // Ignoramos a versão para o seletor de anos para permitir que o usuário veja o histórico completo do modelo
+  const resolved = await resolveBrandAndModel(brandName, modelName, 'cars')
+  if (!resolved) return []
+  return getFilteredFipeYears(resolved.brand.code, resolved.model.code, limit)
+}
+
 export async function getFipePrice(
   brandName: string,
   modelName: string,
@@ -434,64 +283,53 @@ export async function getFipePrice(
   const targetYear = typeof year === 'number' ? year : parseInt(year, 10)
   if (!targetYear) return null
 
-  const brand = await resolveBrandByName(brandName)
-  if (!brand) return null
+  const resolved = await resolveBrandAndModel(brandName, modelName, 'cars', versionName)
+  if (!resolved) return null
 
-  const model = await resolveModelByName(brand.code, modelName, versionName)
-  if (!model) return null
+  const versions = await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, targetYear)
+  if (versions.length === 0) return null
 
-  const availableYears = await getFilteredFipeYears(brand.code, model.code, 6)
-  if (availableYears.length === 0) return null
+  let selected = versions[0]
+  if (versionName) {
+    const nv = normalize(versionName)
+    const match = versions.find(v => normalize(v.name).includes(nv)) || 
+                  versions.find(v => nv.includes(normalize(v.name)))
+    if (match) selected = match
+  }
 
-  const selectedYear = availableYears.includes(targetYear)
-    ? targetYear
-    : availableYears[0]
-
-  const versions = await getFipeVersionsByYear(brand.code, model.code, selectedYear)
-  const selectedVersion = chooseVersionByPreference(versions, versionName)
-
-  if (!selectedVersion) return null
-
-  return await getFipeDetailByCode(brand.code, model.code, selectedVersion.code)
+  return getFipeDetailByCode(resolved.brand.code, resolved.model.code, selected.code)
 }
 
-/**
- * Histórico com os últimos N anos válidos do mesmo modelo.
- * Mantém a mesma lógica de versão/combustível por correspondência de nome.
- */
 export async function getFipeHistory(
   brandName: string,
   modelName: string,
   yearsCount = 6,
   versionName?: string
 ): Promise<{ year: number; price: string; priceNum: number }[]> {
-  const brand = await resolveBrandByName(brandName)
-  if (!brand) return []
+  const resolved = await resolveBrandAndModel(brandName, modelName, 'cars', versionName)
+  if (!resolved) return []
 
-  const model = await resolveModelByName(brand.code, modelName, versionName)
-  if (!model) return []
-
-  const years = await getFilteredFipeYears(brand.code, model.code, yearsCount)
-
+  const years = await getFilteredFipeYears(resolved.brand.code, resolved.model.code, yearsCount)
+  
   const history = await Promise.all(
     years.map(async (year) => {
-      const versions = await getFipeVersionsByYear(brand.code, model.code, year)
-      const selectedVersion = chooseVersionByPreference(versions, versionName)
-      if (!selectedVersion) return null
-
-      const detail = await getFipeDetailByCode(brand.code, model.code, selectedVersion.code)
-      if (!detail) return null
-
-      const priceNum = parseFloat(detail.price.replace(/[^\d,]/g, '').replace(',', '.'))
-      if (Number.isNaN(priceNum)) return null
-
-      return {
-        year,
-        price: detail.price,
-        priceNum,
+      const versions = await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, year)
+      if (versions.length === 0) return null
+      
+      let selected = versions[0]
+      if (versionName) {
+        const nv = normalize(versionName)
+        const match = versions.find(v => normalize(v.name).includes(nv))
+        if (match) selected = match
       }
+      
+      const detail = await getFipeDetailByCode(resolved.brand.code, resolved.model.code, selected.code)
+      if (!detail) return null
+      
+      const priceNum = parseFloat(detail.price.replace(/[^\d,]/g, '').replace(',', '.'))
+      return { year, price: detail.price, priceNum }
     })
   )
 
-  return history.filter((item): item is { year: number; price: string; priceNum: number } => item !== null)
+  return history.filter((h): h is { year: number; price: string; priceNum: number } => h !== null)
 }

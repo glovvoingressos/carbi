@@ -43,7 +43,13 @@ const LOGO_MAP: Record<string, string> = {
 export default function BrandLogo({ brandName, domain, className }: BrandLogoProps) {
   const [error, setError] = useState(false)
 
-  const normalizedName = brandName.toLowerCase().trim()
+  const normalizedName = brandName
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
   const imageSrc = LOGO_MAP[normalizedName] || `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
 
   return (
@@ -53,6 +59,9 @@ export default function BrandLogo({ brandName, domain, className }: BrandLogoPro
           src={imageSrc} 
           alt={brandName} 
           className={className}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
           onError={() => setError(true)}
         />
       ) : (

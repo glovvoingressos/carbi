@@ -17,6 +17,8 @@ import {
   parseMoneyInputToNumber,
 } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
+import { enrichVehicle } from '@/lib/vehicle-enrichment'
+import { brandsAreEquivalent } from '@/lib/brand-normalization'
 
 const DRAFT_KEY = 'carbi_listing_draft_v1'
 
@@ -130,17 +132,38 @@ function inferTransmissionFromText(value: string): string {
 
 function inferEngineFromText(value: string): string {
   const n = value.trim()
-  const match = n.match(/\b\d\.\d\b/)
-  return match ? `${match[0]}${/\bturbo\b/i.test(n) ? ' Turbo' : ''}` : 'Não informado'
+  const match = n.match(/\b\d(?:[.,]\d)\b/)
+  return match ? `${match[0].replace(',', '.')}${/\bturbo\b/i.test(n) ? ' Turbo' : ''}` : 'Não informado'
 }
 
 function inferCategoryFromModel(model: string): string {
   const n = normalize(model)
   if (n.includes('suv') || n.includes('cross') || n.includes('tracker') || n.includes('compass')) return 'SUV'
+  if (n.includes('3008') || n.includes('2008') || n.includes('q3') || n.includes('q5') || n.includes('q8')) return 'SUV'
   if (n.includes('sedan') || n.includes('plus')) return 'Sedan'
   if (n.includes('toro') || n.includes('strada') || n.includes('hilux') || n.includes('ranger') || n.includes('s10')) return 'Picape'
   if (n.includes('hatch') || n.includes('onix') || n.includes('polo') || n.includes('argo') || n.includes('208')) return 'Hatch'
   return 'Não informado'
+}
+
+function extractVersionFromFipeModel(fullModelName: string, selectedModelName: string): string {
+  const full = fullModelName.trim()
+  const model = selectedModelName.trim()
+  if (!full) return ''
+  if (!model) return full
+
+  const escaped = model.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const directStrip = full.replace(new RegExp(`^${escaped}\\s*[-–]?\\s*`, 'i'), '').trim()
+  if (directStrip && directStrip.length < full.length) return directStrip
+
+  const fullNorm = normalize(full)
+  const modelNorm = normalize(model)
+  if (fullNorm === modelNorm) return ''
+  if (fullNorm.startsWith(`${modelNorm} `)) {
+    return full.slice(model.length).trim()
+  }
+
+  return full
 }
 
 function authHeader(token: string) {
@@ -165,7 +188,6 @@ export default function ListingForm() {
   const [selectedModelCode, setSelectedModelCode] = useState('')
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
   const [selectedVersionCode, setSelectedVersionCode] = useState('')
-  const [guidedStep, setGuidedStep] = useState<1 | 2 | 3 | 4>(1)
   const [fipeResult, setFipeResult] = useState<FipeResult | null>(null)
   const [catalogCars, setCatalogCars] = useState<CatalogCar[]>([])
   const [technical, setTechnical] = useState<TechnicalSnapshot>(EMPTY_TECHNICAL)
@@ -315,7 +337,6 @@ export default function ListingForm() {
     if (!selectedBrandCode) {
       setModels([])
       setSelectedModelCode('')
-      setGuidedStep(1)
       return
     }
 
@@ -343,7 +364,6 @@ export default function ListingForm() {
     if (!selectedBrandCode || !selectedModelCode) {
       setYears([])
       setSelectedYear(null)
-      setGuidedStep((prev) => (prev > 2 ? 2 : prev))
       return
     }
 
@@ -370,7 +390,6 @@ export default function ListingForm() {
       setVersions([])
       setSelectedVersionCode('')
       setFipeResult(null)
-      setGuidedStep((prev) => (prev > 3 ? 3 : prev))
       return
     }
 
@@ -391,6 +410,26 @@ export default function ListingForm() {
 
     void loadVersions()
   }, [selectedBrandCode, selectedModelCode, selectedYear])
+
+  useEffect(() => {
+    if (!selectedYear) return
+    if (versions.length === 0) {
+      setSelectedVersionCode('')
+      setFipeResult(null)
+      return
+    }
+
+    const preserved = versions.find((item) => item.code === selectedVersionCode)
+    const nextCode = preserved?.code || versions[0]?.code || ''
+    if (!nextCode || nextCode === selectedVersionCode) return
+
+    const selected = versions.find((item) => item.code === nextCode)
+    setSelectedVersionCode(nextCode)
+    setForm((prev) => ({
+      ...prev,
+      fuel: selected?.fuelType || prev.fuel,
+    }))
+  }, [selectedYear, selectedVersionCode, versions])
 
   useEffect(() => {
     if (!selectedBrandCode || !selectedModelCode || !selectedVersionCode) {
@@ -425,6 +464,17 @@ export default function ListingForm() {
   }, [selectedBrandCode, selectedModelCode, selectedVersionCode])
 
   useEffect(() => {
+    if (!fipeResult) return
+
+    const parsedVersion = extractVersionFromFipeModel(fipeResult.model || '', form.model || '')
+    setForm((prev) => ({
+      ...prev,
+      fuel: prev.fuel || fipeResult.fuel || '',
+      version: parsedVersion || prev.version,
+    }))
+  }, [fipeResult, form.model])
+
+  useEffect(() => {
     if (!form.brand || !form.model || !form.yearModel) {
       setTechnical(EMPTY_TECHNICAL)
       return
@@ -435,8 +485,19 @@ export default function ListingForm() {
     const targetVersion = normalize(form.version)
     const targetYear = Number(form.yearModel) || 0
 
+    // Matching melhorado com normalização de marcas
     const candidates = catalogCars
-      .filter((car) => normalize(car.brand || '') === targetBrand && normalize(car.model || '') === targetModel)
+      .filter((car) => {
+        const carBrand = normalize(car.brand || '')
+        const carModel = normalize(car.model || '')
+        // Matching exato
+        if (carBrand === targetBrand && carModel === targetModel) return true
+        // Matching com normalização
+        if (brandsAreEquivalent(car.brand || '', form.brand) && carModel === targetModel) return true
+        // Matching parcial de modelo
+        if (carModel === targetModel || targetModel.includes(carModel) || carModel.includes(targetModel)) return true
+        return false
+      })
       .map((car) => {
         let score = 0
         const versionNorm = normalize(car.version || '')
@@ -452,21 +513,35 @@ export default function ListingForm() {
 
     const matched = candidates[0]?.car || null
 
-    const inferredTransmission = inferTransmissionFromText(form.version || '')
-    const inferredEngine = inferEngineFromText(form.version || form.model || '')
+    // ENRIQUECIMENTO AUTOMÁTICO: Usa catálogo, inferência ou regex
+    const enriched = enrichVehicle(
+      {
+        brand: form.brand,
+        model: form.model,
+        version: form.version,
+        year: Number(form.year),
+        yearModel: Number(form.yearModel),
+      },
+      matched
+    )
+
+    const rawDetailText = [form.version, fipeResult?.model, form.model].filter(Boolean).join(' ')
+    const inferredTransmission = inferTransmissionFromText(rawDetailText)
+    const inferredEngine = inferEngineFromText(rawDetailText)
     const inferredCategory = inferCategoryFromModel(form.model || '')
 
-    const engineText = matched?.displacement?.trim() || matched?.engineType?.trim() || inferredEngine
-    const hpText = matched?.horsepower ? `${matched.horsepower} cv` : 'Não informado'
-    const torqueText = matched?.torque ? `${matched.torque} Nm` : 'Não informado'
-    const fuelText = fipeResult?.fuel?.trim() || matched?.engineType?.trim() || form.fuel || 'Não informado'
-    const transmissionText = matched?.transmission?.trim() || inferredTransmission || form.transmission || 'Não informado'
-    const hasCity = Number.isFinite(matched?.fuelEconomyCityGas as number) && (matched?.fuelEconomyCityGas as number) > 0
-    const hasRoad = Number.isFinite(matched?.fuelEconomyRoadGas as number) && (matched?.fuelEconomyRoadGas as number) > 0
+    // Hierarquia: catálogo > enriquecimento > inferência
+    const engineText = enriched.engine || inferredEngine
+    const hpText = enriched.horsepower ? `${enriched.horsepower} cv` : 'Não informado'
+    const torqueText = enriched.torque ? `${enriched.torque} Nm` : 'Não informado'
+    const fuelText = enriched.fuel || fipeResult?.fuel?.trim() || form.fuel || 'Não informado'
+    const transmissionText = enriched.transmission || inferredTransmission || form.transmission || 'Não informado'
+    const hasCity = Number.isFinite(enriched.fuelEconomyCityGas as number) && (enriched.fuelEconomyCityGas as number) > 0
+    const hasRoad = Number.isFinite(enriched.fuelEconomyRoadGas as number) && (enriched.fuelEconomyRoadGas as number) > 0
     const consumptionText = hasCity || hasRoad
-      ? `${hasCity ? `${matched?.fuelEconomyCityGas} km/l cidade` : ''}${hasCity && hasRoad ? ' • ' : ''}${hasRoad ? `${matched?.fuelEconomyRoadGas} km/l estrada` : ''}`
+      ? `${hasCity ? `${enriched.fuelEconomyCityGas} km/l cidade` : ''}${hasCity && hasRoad ? ' • ' : ''}${hasRoad ? `${enriched.fuelEconomyRoadGas} km/l estrada` : ''}`
       : 'Não informado'
-    const categoryText = matched?.category || matched?.segment || inferredCategory || form.bodyType || 'Não informado'
+    const categoryText = enriched.category || enriched.bodyType || inferredCategory || form.bodyType || 'Não informado'
 
     setTechnical({
       engine: engineText,
@@ -481,7 +556,7 @@ export default function ListingForm() {
     setForm((prev) => ({
       ...prev,
       engine: engineText === 'Não informado' ? '' : engineText,
-      horsepower: hpText === 'Não informado' ? '' : hpText.replace(/[^\d]/g, ''),
+      horsepower: enriched.horsepower ? String(enriched.horsepower) : (hpText === 'Não informado' ? '' : hpText.replace(/[^\d]/g, '')),
       fuel: fuelText === 'Não informado' ? prev.fuel : fuelText,
       transmission: transmissionText === 'Não informado' ? prev.transmission : transmissionText,
       bodyType: categoryText === 'Não informado' ? prev.bodyType : categoryText,
@@ -496,6 +571,7 @@ export default function ListingForm() {
     return Number.isFinite(parsed) ? parsed : null
   }, [fipeResult])
   const comparison = useMemo(() => getFipeComparison(priceNumber, fipeNumber), [priceNumber, fipeNumber])
+  const hasAskingPrice = form.price.trim().length > 0 && priceNumber > 0
 
   const handleInput = (field: keyof FormState, value: string) => {
     if (field === 'title') setTitleTouched(true)
@@ -560,20 +636,20 @@ export default function ListingForm() {
 
   const validateStep = (step: number): string | null => {
     if (step === 1) {
-      if (!form.brand || !form.model || !form.year || !form.yearModel || !selectedVersionCode) {
-        return 'Selecione marca, modelo, ano e versão para continuar.'
+      if (!selectedBrandCode || !selectedModelCode || !selectedYear || !form.brand || !form.model || !form.year || !form.yearModel) {
+        return 'Selecione marca, modelo e ano para continuar.'
       }
     }
 
     if (step === 2) {
-      if (!form.price || !form.mileage || !form.city || !form.state) {
-        return 'Preencha preço, quilometragem, cidade e estado.'
+      if (!form.price || !form.mileage || !form.city || !form.state || !form.description.trim()) {
+        return 'Preencha preço, quilometragem, cidade, estado e descrição.'
       }
     }
 
     if (step === 3) {
-      if (!form.price || !form.mileage || !form.city || !form.state) {
-        return 'Complete preço, quilometragem e localização antes de publicar.'
+      if (!form.price || !form.mileage || !form.city || !form.state || !form.description.trim()) {
+        return 'Complete preço, quilometragem, localização e descrição antes de publicar.'
       }
     }
 
@@ -736,27 +812,16 @@ export default function ListingForm() {
 
   const fipeBadgeClass =
     comparison.status === 'below'
-      ? 'bg-emerald-100 text-emerald-800'
+      ? 'bg-[#F2F2F7] text-dark border border-[#E8E8E8]'
       : comparison.status === 'above'
-      ? 'bg-amber-100 text-amber-800'
+      ? 'bg-[#F2F2F7] text-dark border border-[#E8E8E8]'
       : comparison.status === 'near'
-      ? 'bg-blue-100 text-blue-800'
-      : 'bg-zinc-100 text-zinc-700'
-
-  const canAdvanceGuidedStep =
-    (guidedStep === 1 && !!selectedBrandCode)
-    || (guidedStep === 2 && !!selectedModelCode)
-    || (guidedStep === 3 && !!selectedYear)
-    || (guidedStep === 4 && !!selectedVersionCode)
-
-  const goToNextGuidedStep = () => {
-    if (!canAdvanceGuidedStep) return
-    setGuidedStep((prev) => (prev < 4 ? ((prev + 1) as 1 | 2 | 3 | 4) : 4))
-  }
+      ? 'bg-[#F2F2F7] text-dark border border-[#E8E8E8]'
+      : 'bg-[#F2F2F7] text-text-secondary border border-[#E8E8E8]'
 
   if (!sessionReady) {
     return (
-      <div className="rounded-[32px] border border-border bg-white p-8 text-center">
+      <div className="bg-white rounded-[32px] border border-black/5 p-8 text-center shadow-sm">
         <Loader2 className="mx-auto h-5 w-5 animate-spin text-dark" />
         <p className="mt-2 text-sm text-text-secondary">Carregando sessão...</p>
       </div>
@@ -768,235 +833,192 @@ export default function ListingForm() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-3">
-        <div className="h-2 rounded-full bg-border/80">
+    <div className="space-y-12 pb-4">
+      <div className="space-y-4">
+        <div className="h-2 rounded-[999px] bg-[#f5f5f3]">
           <div
-            className="h-full rounded-full bg-dark transition-all"
+            className="h-full rounded-[999px] bg-dark transition-all"
             style={{ width: `${(currentStep / 3) * 100}%` }}
           />
         </div>
-        <p className="text-xs font-bold text-text-secondary">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">
           {currentStep === 1 && 'Etapa 1 de 3: Selecione seu carro'}
-          {currentStep === 2 && 'Etapa 2 de 3: Preço, km, cidade e fotos'}
+          {currentStep === 2 && 'Etapa 2 de 3: Preço, descrição e fotos'}
           {currentStep === 3 && 'Etapa 3 de 3: Revisar e publicar'}
         </p>
       </div>
 
-      <div className="rounded-2xl bg-[#f6f8fb] p-2 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-      <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-text-tertiary">
-        {[1, 2, 3].map((step) => (
-          <div
-            key={step}
-            className={`rounded-full px-3 py-2 ${currentStep === step ? 'bg-dark text-white shadow-[0_4px_14px_rgba(10,10,10,0.2)]' : 'bg-white text-text-tertiary shadow-[0_2px_10px_rgba(0,0,0,0.06)]'}`}
-          >
-            Etapa {step}
-          </div>
-        ))}
-      </div>
+      <div className="bg-white rounded-[32px] border border-black/5 p-3 shadow-sm inline-block">
+        <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">
+          {[1, 2, 3].map((step) => (
+            <div
+              key={step}
+              className={`rounded-[999px] px-5 py-2.5 transition-colors ${currentStep === step ? 'bg-dark text-white' : 'bg-[#f5f5f3] text-dark/40'}`}
+            >
+              Etapa {step}
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="rounded-[28px] bg-[#f7f9fc] p-5 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.05)] space-y-6">
+      <div className="bg-white rounded-[32px] border border-black/5 p-8 sm:p-12 shadow-sm space-y-12">
         {currentStep === 1 && (
-          <div className="space-y-4">
-            <h3 className="text-2xl font-black text-dark">Selecione seu carro</h3>
-            <p className="text-sm font-medium text-text-secondary">
-              Escolha marca, modelo, ano e versão. A ficha técnica é preenchida automaticamente.
+          <div className="space-y-6">
+            <h3 className="text-3xl font-black text-dark tracking-tight">Selecione seu carro</h3>
+            <p className="text-base font-medium text-dark/50">
+              Fluxo rápido e sem poluição: escolha marca, depois modelo, depois ano. O resto é carregado automaticamente.
             </p>
-            <div className="guided-steps">
-              <button type="button" onClick={() => setGuidedStep(1)} className={`guided-step ${selectedBrandCode ? 'is-done' : ''} ${guidedStep === 1 ? 'is-active' : ''}`}>1. Marca</button>
-              <button type="button" onClick={() => selectedBrandCode && setGuidedStep(2)} className={`guided-step ${selectedModelCode ? 'is-done' : ''} ${guidedStep === 2 ? 'is-active' : ''}`}>2. Modelo</button>
-              <button type="button" onClick={() => selectedModelCode && setGuidedStep(3)} className={`guided-step ${selectedYear ? 'is-done' : ''} ${guidedStep === 3 ? 'is-active' : ''}`}>3. Ano</button>
-              <button type="button" onClick={() => selectedYear && setGuidedStep(4)} className={`guided-step ${selectedVersionCode ? 'is-done' : ''} ${guidedStep === 4 ? 'is-active' : ''}`}>4. Versão</button>
-            </div>
-            <div className="guided-flow-card">
-              <p className="guided-flow-title">
-                {guidedStep === 1 && 'Qual é a marca do carro?'}
-                {guidedStep === 2 && 'Agora selecione o modelo'}
-                {guidedStep === 3 && 'Escolha o ano'}
-                {guidedStep === 4 && 'Selecione a versão/combustível'}
-              </p>
-              <p className="guided-flow-subtitle">
-                {guidedStep === 1 && 'Vamos usar isso para puxar dados reais da base de referência.'}
-                {guidedStep === 2 && 'Mostramos apenas os modelos disponíveis para a marca escolhida.'}
-                {guidedStep === 3 && 'Exibimos só os anos mais recentes para esse modelo.'}
-                {guidedStep === 4 && 'Cada versão tem preço de referência e ficha própria.'}
-              </p>
-
-              {guidedStep === 1 && (
-                <select className={`input guided-input ${!selectedBrandCode ? 'guided-input-empty' : ''}`} value={selectedBrandCode} onChange={(e) => {
-                  const code = e.target.value
-                  setSelectedBrandCode(code)
-                  const selected = brands.find((item) => item.code === code)
-                  handleInput('brand', selected?.name || '')
-                }}>
-                  <option value="">Selecione a marca</option>
-                  {brands.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
-                </select>
-              )}
-
-              {guidedStep === 2 && (
-                <select className={`input guided-input ${!selectedModelCode ? 'guided-input-empty' : ''}`} value={selectedModelCode} onChange={(e) => {
-                  const code = e.target.value
-                  setSelectedModelCode(code)
-                  const selected = models.find((item) => item.code === code)
-                  const rawName = selected?.name || ''
-                  handleInput('model', resolveCatalogModelName(form.brand, rawName))
-                }} disabled={!selectedBrandCode}>
-                  <option value="">Selecione o modelo</option>
-                  {models.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
-                </select>
-              )}
-
-              {guidedStep === 3 && (
-                <select className={`input guided-input ${!selectedYear ? 'guided-input-empty' : ''}`} value={selectedYear ?? ''} onChange={(e) => {
-                  const year = e.target.value ? parseInt(e.target.value, 10) : null
-                  setSelectedYear(year)
-                  const yearText = year ? String(year) : ''
-                  handleInput('year', yearText)
-                  handleInput('yearModel', yearText)
-                }} disabled={!selectedModelCode}>
-                  <option value="">Selecione o ano</option>
-                  {years.map((year) => <option key={year} value={year}>{year}</option>)}
-                </select>
-              )}
-
-              {guidedStep === 4 && (
-                <select className={`input guided-input ${!selectedVersionCode ? 'guided-input-empty' : ''}`} value={selectedVersionCode} onChange={(e) => {
-                  setSelectedVersionCode(e.target.value)
-                  const selected = versions.find((item) => item.code === e.target.value)
-                  handleInput('fuel', selected?.fuelType || '')
-                  handleInput('version', selected?.name || form.version)
-                }} disabled={!selectedYear}>
-                  <option value="">Selecione a versão</option>
-                  {versions.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
-                </select>
-              )}
-
-              <div className="mt-4 flex justify-start">
-                <button
-                  type="button"
-                  onClick={goToNextGuidedStep}
-                  disabled={!canAdvanceGuidedStep || guidedStep === 4}
-                  className="guided-continue-btn"
-                >
-                  Continuar <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-
-              <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                <div className="guided-readonly">
-                  <span>Ano fabricação</span>
-                  <strong>{selectedYear ? form.year || '-' : 'Selecione o ano'}</strong>
-                </div>
-                <div className="guided-readonly">
-                  <span>Ano/modelo</span>
-                  <strong>{selectedYear ? form.yearModel || '-' : 'Selecione o ano'}</strong>
-                </div>
-              </div>
-            </div>
-
-            <div className="soft-panel p-4 sm:p-5">
-              <p className="text-sm font-black text-dark">Ficha técnica automática</p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <div className="tech-item">
-                  <span>Motorização</span>
-                  <strong>{technical.engine}</strong>
-                </div>
-                <div className="tech-item">
-                  <span>Potência</span>
-                  <strong>{technical.horsepower}</strong>
-                </div>
-                <div className="tech-item">
-                  <span>Torque</span>
-                  <strong>{technical.torque}</strong>
-                </div>
-                <div className="tech-item">
-                  <span>Combustível</span>
-                  <strong>{technical.fuel}</strong>
-                </div>
-                <div className="tech-item">
-                  <span>Câmbio</span>
-                  <strong>{technical.transmission}</strong>
-                </div>
-                <div className="tech-item">
-                  <span>Consumo</span>
-                  <strong>{technical.consumption}</strong>
-                </div>
-                <div className="tech-item sm:col-span-2">
-                  <span>Categoria</span>
-                  <strong>{technical.category}</strong>
-                </div>
-              </div>
-            </div>
-
-            <div className="soft-panel p-4 sm:p-5">
+            <div className="bg-[#f5f5f3] rounded-2xl p-6 space-y-4 border border-black/5">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-bold text-dark">Referência FIPE</p>
-                <span className={`rounded-full px-3 py-1 text-xs font-bold ${fipeBadgeClass}`}>
-                  {comparison.status === 'below' && 'Abaixo do preço médio'}
-                  {comparison.status === 'near' && 'Próximo do preço médio'}
-                  {comparison.status === 'above' && 'Acima do preço médio'}
-                  {comparison.status === 'unknown' && 'Sem referência definida'}
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Seleção do veículo</p>
+                <span className="rounded-full bg-white border border-black/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">
+                  Sequencial
                 </span>
               </div>
-              {!selectedVersionCode ? (
-                <p className="mt-2 text-sm text-text-secondary">Complete marca, modelo, ano e versão para carregar o valor atualizado.</p>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <select
+                  className={`w-full h-14 bg-white rounded-2xl px-5 text-sm font-bold outline-none border transition-all ${!selectedBrandCode ? 'border-transparent text-dark/30' : 'border-black/5 text-dark'} focus:border-black/10 focus:shadow-sm`}
+                  value={selectedBrandCode}
+                  onChange={(e) => {
+                    const code = e.target.value
+                    setSelectedBrandCode(code)
+                    const selected = brands.find((item) => item.code === code)
+                    handleInput('brand', selected?.name || '')
+                  }}
+                >
+                  <option value="">1. Selecione a marca</option>
+                  {brands.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
+                </select>
+
+                <select
+                  className={`w-full h-14 bg-white rounded-2xl px-5 text-sm font-bold outline-none border transition-all ${!selectedModelCode ? 'border-transparent text-dark/30' : 'border-black/5 text-dark'} focus:border-black/10 focus:shadow-sm`}
+                  value={selectedModelCode}
+                  onChange={(e) => {
+                    const code = e.target.value
+                    setSelectedModelCode(code)
+                    const selected = models.find((item) => item.code === code)
+                    const rawName = selected?.name || ''
+                    handleInput('model', resolveCatalogModelName(form.brand, rawName))
+                  }}
+                  disabled={!selectedBrandCode}
+                >
+                  <option value="">2. Selecione o modelo</option>
+                  {models.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
+                </select>
+
+                <select
+                  className={`w-full h-14 bg-white rounded-2xl px-5 text-sm font-bold outline-none border transition-all ${!selectedYear ? 'border-transparent text-dark/30' : 'border-black/5 text-dark'} focus:border-black/10 focus:shadow-sm`}
+                  value={selectedYear ?? ''}
+                  onChange={(e) => {
+                    const year = e.target.value ? parseInt(e.target.value, 10) : null
+                    setSelectedYear(year)
+                    const yearText = year ? String(year) : ''
+                    handleInput('year', yearText)
+                    handleInput('yearModel', yearText)
+                  }}
+                  disabled={!selectedModelCode}
+                >
+                  <option value="">3. Selecione o ano</option>
+                  {years.map((year) => <option key={year} value={year}>{year}</option>)}
+                </select>
+              </div>
+
+              {selectedYear ? (
+                <div className="grid gap-3 sm:grid-cols-3 mt-4">
+                  <div className="bg-white rounded-xl border border-black/5 p-4 flex flex-col gap-1">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Ano fabricação</span>
+                    <strong className="text-sm text-dark">{form.year || '-'}</strong>
+                  </div>
+                  <div className="bg-white rounded-xl border border-black/5 p-4 flex flex-col gap-1">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Ano/modelo</span>
+                    <strong className="text-sm text-dark">{form.yearModel || '-'}</strong>
+                  </div>
+                  <div className="bg-white rounded-xl border border-black/5 p-4 flex flex-col gap-1 sm:col-span-1">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Versão</span>
+                    <strong className="text-sm text-dark truncate" title={form.version}>{form.version || 'Automática'}</strong>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="bg-[#f5f5f3] rounded-2xl p-6 border border-black/5">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-black text-dark">Referência FIPE</p>
+                <span className="rounded-full bg-white border border-black/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">
+                  {!hasAskingPrice && 'Preço pendente'}
+                  {hasAskingPrice && comparison.status === 'below' && 'Abaixo'}
+                  {hasAskingPrice && comparison.status === 'near' && 'Próximo'}
+                  {hasAskingPrice && comparison.status === 'above' && 'Acima'}
+                  {hasAskingPrice && comparison.status === 'unknown' && 'Sem ref.'}
+                </span>
+              </div>
+              {!selectedYear ? (
+                <p className="mt-2 text-sm text-text-secondary">Complete marca, modelo e ano para carregar os dados automáticos.</p>
               ) : fipeLoading ? (
                 <p className="mt-2 text-sm text-text-secondary">Consultando valor atualizado...</p>
               ) : fipeResult ? (
                 <div className="mt-3 grid gap-2 text-sm">
+                  <p><strong>Versão automática:</strong> {form.version || 'Não informada'}</p>
                   <p><strong>Preço FIPE:</strong> {fipeResult.price}</p>
-                  <p><strong>Seu anúncio:</strong> {priceNumber ? formatBRL(priceNumber) : 'Informe o preço'}</p>
-                  <p><strong>Diferença:</strong> {comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</p>
-                  <p><strong>Percentual:</strong> {comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</p>
+                  <p><strong>Seu anúncio:</strong> {hasAskingPrice ? formatBRL(priceNumber) : 'Informe o preço na próxima etapa'}</p>
+                  {hasAskingPrice ? (
+                    <>
+                      <p><strong>Diferença:</strong> {comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</p>
+                      <p><strong>Percentual:</strong> {comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</p>
+                    </>
+                  ) : null}
                 </div>
               ) : (
-                <p className="mt-2 text-sm text-text-secondary">Nao foi possivel carregar a referencia para essa combinacao.</p>
+                <p className="mt-2 text-sm text-text-secondary">
+                  Não foi possível carregar referência FIPE para essa combinação, mas você pode continuar normalmente.
+                </p>
               )}
             </div>
           </div>
         )}
 
         {currentStep === 2 && (
-          <div className="space-y-4">
-            <h3 className="text-2xl font-black text-dark">Preço, localização e fotos</h3>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <input className="input" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} />
-              <input className="input" placeholder="Quilometragem" value={form.mileage} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
-              <input className="input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
-              <input className="input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
+          <div className="space-y-6">
+            <h3 className="text-3xl font-black text-dark tracking-tight">Preço e descrição</h3>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <input className="w-full h-14 bg-[#f5f5f3] rounded-2xl px-5 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} />
+              <input className="w-full h-14 bg-[#f5f5f3] rounded-2xl px-5 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30" placeholder="Quilometragem" value={form.mileage} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
+              <input className="w-full h-14 bg-[#f5f5f3] rounded-2xl px-5 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
+              <input className="w-full h-14 bg-[#f5f5f3] rounded-2xl px-5 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
             </div>
 
+            <textarea className="w-full min-h-32 bg-[#f5f5f3] rounded-2xl px-5 py-4 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30 resize-none" placeholder="Descrição do veículo" value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
+            <input className="w-full h-14 bg-[#f5f5f3] rounded-2xl px-5 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30" placeholder="Opcionais (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
+
             <label
-              className="soft-panel flex min-h-[120px] cursor-pointer flex-col items-center justify-center gap-2 border border-dashed border-dark/20 p-4 text-sm font-bold text-dark"
+              className="bg-[#f5f5f3] rounded-2xl flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-2 border border-dashed border-dark/20 p-8 text-sm font-black text-dark/40 hover:bg-dark/5 transition-colors"
               onDragOver={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
               }}
               onDrop={onDropFiles}
             >
-              <ImagePlus className="h-4 w-4" />
+              <ImagePlus className="h-6 w-6 mb-2" />
               Arraste fotos ou clique para enviar ({images.length}/{LISTING_MAX_IMAGES})
-              <span className="text-xs font-medium text-text-secondary">Até 10 imagens • JPG, PNG, WEBP</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/30 mt-2">Até 10 imagens • JPG, PNG, WEBP</span>
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
             </label>
             <p className="text-xs font-semibold text-text-secondary">Você pode publicar sem foto e enviar imagens depois no painel dos seus anúncios.</p>
 
             {images.length > 0 && (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-6">
                 {images.map((image, index) => (
-                  <div key={image.previewUrl} className="soft-panel p-3">
-                    <img src={image.previewUrl} alt={`Preview ${index + 1}`} className="h-36 w-full rounded-xl object-cover" />
-                    <p className="mt-2 text-xs font-bold text-dark">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <button type="button" className="btn-icon" onClick={() => moveImage(index, -1)} disabled={index === 0}>
+                  <div key={image.previewUrl} className="bg-[#f5f5f3] rounded-2xl overflow-hidden p-3 border border-black/5">
+                    <img src={image.previewUrl} alt={`Preview ${index + 1}`} className="h-40 w-full rounded-xl object-cover" />
+                    <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
+                    <div className="mt-3 flex items-center gap-2">
+                      <button type="button" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-dark/40 hover:text-dark hover:shadow-sm transition-all border border-black/5" onClick={() => moveImage(index, -1)} disabled={index === 0}>
                         <MoveLeft className="h-4 w-4" />
                       </button>
-                      <button type="button" className="btn-icon" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1}>
+                      <button type="button" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-dark/40 hover:text-dark hover:shadow-sm transition-all border border-black/5" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1}>
                         <MoveRight className="h-4 w-4" />
                       </button>
-                      <button type="button" className="btn-icon text-red-600" onClick={() => removeImage(index)}>
+                      <button type="button" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-red-500 hover:bg-red-50 hover:text-red-600 hover:shadow-sm transition-all border border-black/5 ml-auto" onClick={() => removeImage(index)}>
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -1008,33 +1030,65 @@ export default function ListingForm() {
         )}
 
         {currentStep === 3 && (
-          <div className="space-y-4">
-            <h3 className="text-2xl font-black text-dark">Revisar e publicar</h3>
-            <div className="soft-panel p-4 sm:p-5">
-              <div className="grid gap-2 text-sm sm:grid-cols-2">
-                <p><strong>Veículo:</strong> {form.brand} {form.model} {form.version}</p>
-                <p><strong>Ano:</strong> {form.year}/{form.yearModel}</p>
-                <p><strong>Preço:</strong> {form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado'}</p>
-                <p><strong>Quilometragem:</strong> {form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Não informado'}</p>
-                <p><strong>Cidade/UF:</strong> {form.city || '-'}{form.state ? `/${form.state}` : ''}</p>
-                <p><strong>Fotos:</strong> {images.length} de {LISTING_MAX_IMAGES}</p>
+          <div className="space-y-6">
+            <h3 className="text-3xl font-black text-dark tracking-tight">Revisar e publicar</h3>
+            <div className="bg-[#f5f5f3] rounded-2xl p-6 border border-black/5">
+              <div className="grid gap-4 text-sm sm:grid-cols-2 font-medium text-dark/60">
+                <p><strong className="text-dark font-bold">Veículo:</strong> {form.brand} {form.model} {form.version}</p>
+                <p><strong className="text-dark font-bold">Ano:</strong> {form.year}/{form.yearModel}</p>
+                <p><strong className="text-dark font-bold">Preço:</strong> {form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado'}</p>
+                <p><strong className="text-dark font-bold">Quilometragem:</strong> {form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Não informado'}</p>
+                <p><strong className="text-dark font-bold">Cidade/UF:</strong> {form.city || '-'}{form.state ? `/${form.state}` : ''}</p>
+                <p><strong className="text-dark font-bold">Fotos:</strong> {images.length} de {LISTING_MAX_IMAGES}</p>
+                <p className="sm:col-span-2"><strong className="text-dark font-bold">Descrição:</strong> {form.description.trim() || 'Não informada'}</p>
               </div>
             </div>
 
-            <textarea className="input min-h-32" placeholder="Descrição (opcional, mas ajuda a vender mais rápido)" value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
-            <input className="input" placeholder="Opcionais (opcional, separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
+            <div className="bg-[#f5f5f3] rounded-2xl p-6 border border-black/5">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40 mb-4">Ficha técnica automática</p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Motorização</span>
+                  <strong className="text-sm font-bold text-dark">{technical.engine}</strong>
+                </div>
+                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Potência</span>
+                  <strong className="text-sm font-bold text-dark">{technical.horsepower}</strong>
+                </div>
+                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Torque</span>
+                  <strong className="text-sm font-bold text-dark">{technical.torque}</strong>
+                </div>
+                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Combustível</span>
+                  <strong className="text-sm font-bold text-dark">{technical.fuel}</strong>
+                </div>
+                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Câmbio</span>
+                  <strong className="text-sm font-bold text-dark">{technical.transmission}</strong>
+                </div>
+                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Consumo</span>
+                  <strong className="text-sm font-bold text-dark">{technical.consumption}</strong>
+                </div>
+                <div className="flex flex-col gap-1 sm:col-span-2">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Categoria</span>
+                  <strong className="text-sm font-bold text-dark">{technical.category}</strong>
+                </div>
+              </div>
+            </div>
 
-            <p className="text-xs text-text-tertiary">
+            <p className="text-xs font-bold text-dark/40 text-center mt-6">
               Seu contato direto não é exibido. Toda negociação acontece via chat interno da plataforma.
             </p>
           </div>
         )}
 
         {error ? (
-          <div className="rounded-2xl bg-red-50 px-4 py-3 shadow-[0_4px_16px_rgba(220,38,38,0.08)]">
-            <p className="text-sm font-semibold text-red-700">{error}</p>
+          <div className="bg-red-50 rounded-2xl border border-red-100 px-6 py-5">
+            <p className="text-sm font-bold text-red-700">{error}</p>
             {validationDetails.length > 0 ? (
-              <ul className="mt-2 space-y-1 text-xs font-medium text-red-700/90">
+              <ul className="mt-3 space-y-1.5 text-xs font-bold text-red-700/80">
                 {validationDetails.map((detail) => (
                   <li key={detail}>• {detail}</li>
                 ))}
@@ -1044,34 +1098,46 @@ export default function ListingForm() {
         ) : null}
 
         {success ? (
-          <div className="rounded-2xl bg-emerald-50 px-4 py-3 shadow-[0_4px_16px_rgba(16,185,129,0.08)]">
-            <p className="text-sm font-semibold text-emerald-700">{success}</p>
-            <Link href="/minha-conta/anuncios" className="mt-1 inline-block text-xs font-bold text-emerald-700 underline">
-              Ver meus anúncios
-            </Link>
+          <div className="bg-green-50 rounded-2xl border border-green-100 px-6 py-5">
+            <p className="text-sm font-bold text-green-700">{success}</p>
           </div>
         ) : null}
 
-        <div className="flex items-center justify-between gap-3 pt-3">
-          <button
-            type="button"
-            onClick={prevStep}
-            disabled={currentStep === 1 || saving}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-5 py-3 text-sm font-bold disabled:opacity-40"
-          >
-            <ArrowLeft className="h-4 w-4" /> Voltar
-          </button>
-
-          {currentStep < 3 ? (
-            <button type="button" onClick={nextStep} className="inline-flex items-center gap-2 rounded-full bg-dark px-6 py-3 text-sm font-black text-white">
-              Próxima etapa <ArrowRight className="h-4 w-4" />
+        <div className="mt-12 flex flex-col-reverse justify-between gap-4 sm:flex-row pt-6 border-t border-black/5">
+          {currentStep > 1 ? (
+            <button
+              type="button"
+              onClick={prevStep}
+              className="h-14 px-8 rounded-full font-bold text-dark hover:bg-[#f5f5f3] transition-colors flex items-center justify-center gap-2"
+              disabled={saving || fipeLoading}
+            >
+              <ArrowLeft className="h-5 w-5" />
+              Voltar etapa
             </button>
           ) : (
-            <button type="button" disabled={saving} onClick={handleSubmit} className="inline-flex items-center gap-2 rounded-full bg-dark px-6 py-3 text-sm font-black text-white disabled:opacity-50">
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              Publicar anúncio
-            </button>
+            <div />
           )}
+
+          <button
+            type="button"
+            onClick={currentStep === 3 ? handleSubmit : nextStep}
+            className="h-14 px-10 rounded-full bg-dark text-white font-bold hover:bg-dark/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            disabled={saving || fipeLoading}
+          >
+            {saving ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Publicando...
+              </>
+            ) : currentStep === 3 ? (
+              'Publicar anúncio'
+            ) : (
+              <>
+                Próxima etapa
+                <ArrowRight className="h-5 w-5" />
+              </>
+            )}
+          </button>
         </div>
 
         {currentStep === 3 ? (
@@ -1080,7 +1146,7 @@ export default function ListingForm() {
               type="button"
               disabled={saving}
               onClick={handleSubmit}
-              className="w-full rounded-full bg-dark px-6 py-3 text-sm font-black text-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] disabled:opacity-50"
+              className="w-full rounded-[999px] bg-dark px-6 py-4 text-sm font-black text-white shadow-sm disabled:opacity-50"
             >
               {saving ? 'Publicando...' : 'Publicar anúncio'}
             </button>
@@ -1088,213 +1154,7 @@ export default function ListingForm() {
         ) : null}
       </div>
 
-      <style jsx>{`
-        .soft-panel {
-          border-radius: 18px;
-          background: #ffffff;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
 
-        .guided-steps {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 8px;
-        }
-
-        .guided-step {
-          border-radius: 999px;
-          background: #eef2f6;
-          color: var(--color-text-3);
-          text-align: center;
-          font-size: 12px;
-          font-weight: 800;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-          padding: 10px 12px;
-          border: none;
-        }
-
-        .guided-step.is-done {
-          background: #dff7e8;
-          color: var(--color-dark);
-        }
-
-        .guided-step.is-active {
-          background: #111827;
-          color: white;
-        }
-
-        .guided-flow-card {
-          border-radius: 20px;
-          background: #f8fafc;
-          padding: 20px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .guided-flow-title {
-          font-size: 30px;
-          line-height: 1.15;
-          font-weight: 800;
-          letter-spacing: -0.01em;
-          color: #111827;
-        }
-
-        .guided-flow-subtitle {
-          margin-top: 8px;
-          font-size: 17px;
-          color: #6b7280;
-          font-weight: 500;
-        }
-
-        .guided-input {
-          margin-top: 10px;
-          border: 1px solid transparent !important;
-          border-color: transparent !important;
-          border-radius: 30px;
-          background: #eff1f3;
-          box-shadow: none;
-          height: 64px !important;
-          min-height: 64px !important;
-          padding-top: 0 !important;
-          padding-bottom: 0 !important;
-          padding-left: 16px !important;
-          padding-right: 40px !important;
-          line-height: 64px;
-          font-size: 17px;
-          font-weight: 800;
-          color: #0f172a;
-        }
-
-        .guided-input-empty {
-          color: #8f959d;
-          font-weight: 700;
-        }
-
-        .guided-continue-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          border-radius: 14px;
-          border: none;
-          background: #0a0a0a;
-          color: #fff;
-          padding: 12px 18px;
-          font-size: 16px;
-          font-weight: 700;
-          line-height: 1;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-          transition: transform 180ms ease, opacity 180ms ease;
-        }
-
-        .guided-continue-btn:disabled {
-          opacity: 0.45;
-          cursor: not-allowed;
-          box-shadow: none;
-        }
-
-        .guided-grid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 12px;
-        }
-
-        .guided-field {
-          border-radius: 18px;
-          background: #f6f8fb;
-          padding: 12px;
-        }
-
-        .guided-readonly {
-          border-radius: 18px;
-          background: #fff;
-          padding: 14px 16px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          min-height: 52px;
-          box-shadow: 0 3px 14px rgba(0, 0, 0, 0.04);
-        }
-
-        .guided-readonly span {
-          font-size: 12px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          color: var(--color-text-3);
-        }
-
-        .guided-readonly strong {
-          font-size: 15px;
-          font-weight: 800;
-          color: var(--color-dark);
-        }
-
-        .input {
-          border: 1px solid var(--color-border);
-          border-radius: 16px;
-          padding: 14px 16px;
-          min-height: 52px;
-          width: 100%;
-          background: var(--color-bg);
-          font-weight: 600;
-          font-size: 15px;
-        }
-
-        .input:focus {
-          outline: none;
-          box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.12);
-          border-color: rgba(10, 10, 10, 0.3);
-        }
-
-        .tech-item {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 10px;
-          border-radius: 14px;
-          background: #ffffff;
-          padding: 10px 12px;
-          font-size: 13px;
-          color: var(--color-text-2);
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-        }
-
-        .tech-item strong {
-          color: var(--color-dark);
-          font-size: 13px;
-          font-weight: 700;
-          text-align: right;
-        }
-
-        .btn-icon {
-          border: 1px solid var(--color-border);
-          border-radius: 999px;
-          width: 30px;
-          height: 30px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          background: white;
-        }
-
-        @media (max-width: 640px) {
-          .guided-steps {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .guided-flow-title {
-            font-size: 22px;
-          }
-
-          .guided-flow-subtitle {
-            font-size: 15px;
-          }
-
-          .guided-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
     </div>
   )
 }

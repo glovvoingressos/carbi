@@ -75,12 +75,12 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
   }
 
   return (
-    <div className={`pastel-card pastel-card-yellow ${compact ? 'p-5' : 'p-7'}`}>
+    <div className={`rounded-[30px] border border-[#E8E8E8] bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)] ${compact ? 'p-5' : 'p-7'}`}>
       <h3 className="text-xl font-black text-dark">Entre para anunciar</h3>
       <p className="text-sm text-text-secondary mt-2">Seu contato fica protegido: comprador e vendedor falam só pelo chat interno.</p>
 
       {!supabaseReady && (
-        <p className="mt-3 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800">
+        <p className="mt-3 rounded-[16px] border border-[#E8E8E8] bg-white px-3 py-2 text-sm font-semibold text-text-secondary">
           Ambiente sem Supabase configurado. O login/cadastro fica indisponível até configurar as variáveis públicas.
         </p>
       )}
@@ -92,7 +92,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Seu e-mail"
-          className="w-full rounded-2xl border border-border px-4 py-3 bg-surface focus:outline-none focus:ring-2 focus:ring-dark/20"
+          className="w-full rounded-[16px] border-[1.5px] border-transparent px-4 py-3 bg-[#F2F2F7] focus:outline-none focus:border-[var(--color-accent)]"
         />
         <input
           type="password"
@@ -101,16 +101,16 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Sua senha"
-          className="w-full rounded-2xl border border-border px-4 py-3 bg-surface focus:outline-none focus:ring-2 focus:ring-dark/20"
+          className="w-full rounded-[16px] border-[1.5px] border-transparent px-4 py-3 bg-[#F2F2F7] focus:outline-none focus:border-[var(--color-accent)]"
         />
 
         {error && <p className="text-sm text-red-600">{error}</p>}
-        {message && <p className="text-sm text-emerald-700">{message}</p>}
+        {message && <p className="text-sm text-dark">{message}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-2xl bg-[#dff7e8] text-dark border border-dark font-black py-3 disabled:opacity-60 hover:-translate-y-0.5 transition"
+          className="w-full rounded-[999px] bg-[var(--color-accent)] text-white font-black py-3 disabled:opacity-60 transition"
         >
           {loading ? 'Processando...' : mode === 'login' ? 'Entrar' : 'Criar conta'}
         </button>
@@ -123,7 +123,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
           setError(null)
           setMessage(null)
         }}
-        className="mt-4 text-sm font-bold text-dark underline"
+        className="mt-4 text-sm font-bold text-dark underline underline-offset-2"
       >
         {mode === 'login' ? 'Ainda não tenho conta' : 'Já tenho conta'}
       </button>

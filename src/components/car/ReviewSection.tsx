@@ -84,7 +84,7 @@ export default function ReviewSection({ carId }: { carId: string }) {
                 </div>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map(s => (
-                    <Star key={s} className={`w-5 h-5 ${s <= review.rating ? 'fill-[var(--color-bento-yellow)] text-[var(--color-bento-yellow)]' : 'text-dark/10'}`} />
+                    <Star key={s} className={`w-5 h-5 ${s <= review.rating ? 'fill-dark text-dark' : 'text-dark/10'}`} />
                   ))}
                 </div>
               </div>
@@ -105,13 +105,13 @@ export default function ReviewSection({ carId }: { carId: string }) {
                   </ul>
                 </div>
                 <div className="bg-[var(--color-bg)-alt] p-5 rounded-3xl border border-dark/5">
-                  <p className="text-[10px] font-black text-[var(--color-bento-red)] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                  <p className="text-[10px] font-semibold text-dark/50 uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
                      <ThumbsDown className="w-3 h-3" /> Contras
                   </p>
                   <ul className="space-y-2">
                     {review.cons.map((c, i) => (
                       <li key={i} className="text-sm font-bold text-dark flex items-start gap-2">
-                         <AlertTriangle className="w-4 h-4 text-[var(--color-bento-red)] mt-0.5 flex-shrink-0" /> {c}
+                         <AlertTriangle className="w-4 h-4 text-dark/40 mt-0.5 flex-shrink-0" /> {c}
                       </li>
                     ))}
                   </ul>
@@ -165,7 +165,7 @@ export default function ReviewSection({ carId }: { carId: string }) {
                       onClick={() => setNewReview(prev => ({ ...prev, rating: s }))}
                       className="transition-transform active:scale-95"
                     >
-                      <Star className={`w-10 h-10 ${s <= newReview.rating ? 'fill-[var(--color-bento-yellow)] text-[var(--color-bento-yellow)]' : 'text-dark/10'}`} strokeWidth={1} />
+                      <Star className={`w-10 h-10 ${s <= newReview.rating ? 'fill-dark text-dark' : 'text-dark/10'}`} strokeWidth={1} />
                     </button>
                   ))}
                 </div>
@@ -229,7 +229,7 @@ export default function ReviewSection({ carId }: { carId: string }) {
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <label className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-bento-red)]">O que te incomodou?</label>
+                    <label className="text-xs font-semibold uppercase tracking-[0.15em] text-dark/50">O que te incomodou?</label>
                     <button type="button" onClick={() => addField('cons')} className="p-1.5 bg-neutral-100 rounded-lg hover:bg-neutral-200"><Plus className="w-4 h-4 text-dark" /></button>
                   </div>
                   <div className="space-y-3">
@@ -240,7 +240,7 @@ export default function ReviewSection({ carId }: { carId: string }) {
                         value={c}
                         onChange={e => updateField('cons', i, e.target.value)}
                         placeholder="Ex: Porta-luvas pequeno"
-                        className="w-full h-12 bg-neutral-50 rounded-xl px-4 font-bold outline-none border border-dark/5 focus:border-[var(--color-bento-red)] transition-all"
+                        className="w-full h-12 bg-neutral-50 rounded-xl px-4 font-bold outline-none border border-dark/5 focus:border-dark/30 transition-all"
                       />
                     ))}
                   </div>

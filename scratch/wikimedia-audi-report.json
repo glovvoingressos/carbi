@@ -1,0 +1,75 @@
+{
+  "timestamp": "2026-04-12T18:07:11.424Z",
+  "synced": [
+    {
+      "model": "Audi A3 Sedan",
+      "year": 2024,
+      "image": "/assets/cars/audi-a3-sedan-20-performance-black-2026-v2.png",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/AUDI_A3_SEDAN_Typ_8V_China_%286%29.jpg/1920px-AUDI_A3_SEDAN_Typ_8V_China_%286%29.jpg",
+      "title": "File:AUDI A3 SEDAN Typ 8V China (6).jpg"
+    },
+    {
+      "model": "Audi RS e-tron GT",
+      "year": 2024,
+      "image": "/assets/cars/audi-rs-etron-gt-quattro-2026-v2.png",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/BAS_24%2C_Brussels_%28P1170195-RR%29.jpg/1920px-BAS_24%2C_Brussels_%28P1170195-RR%29.jpg",
+      "title": "File:BAS 24, Brussels (P1170195-RR).jpg"
+    },
+    {
+      "model": "Audi Q3",
+      "year": 2024,
+      "image": "/assets/cars/audi-q3-performance-black-20-tfsi-2026.png",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/2024_Audi_Q3_1.4_TFSI_S-Tronic%2C_06-02-2024.jpg/1920px-2024_Audi_Q3_1.4_TFSI_S-Tronic%2C_06-02-2024.jpg",
+      "title": "File:2024 Audi Q3 1.4 TFSI S-Tronic, 06-02-2024.jpg"
+    },
+    {
+      "model": "Audi Q5",
+      "year": 2024,
+      "image": "/assets/cars/audi-q5-performance-black-20-tfsi-quattro-2026.png",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/2023_Audi_Q5_2.0T_Premium_quattro%2C_10-06-2024.jpg/1920px-2023_Audi_Q5_2.0T_Premium_quattro%2C_10-06-2024.jpg",
+      "title": "File:2023 Audi Q5 2.0T Premium quattro, 10-06-2024.jpg"
+    },
+    {
+      "model": "Audi Q5 Sportback",
+      "year": 2024,
+      "image": "/assets/cars/audi-q5-sportback-performance-black-20-tfsi-quattro-2026.png",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Audi_Q5_Sportback_45_TFSI_%282024%29_%2854721710305%29.jpg/1920px-Audi_Q5_Sportback_45_TFSI_%282024%29_%2854721710305%29.jpg",
+      "title": "File:Audi Q5 Sportback 45 TFSI (2024) (54721710305).jpg"
+    },
+    {
+      "model": "Audi Q8",
+      "year": 2024,
+      "image": "/assets/cars/audi-q8-performance-black-30-tfsi-quattro-2026.png",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2023_Audi_Q8_quattro%2C_06-02-2024.jpg/1920px-2023_Audi_Q8_quattro%2C_06-02-2024.jpg",
+      "title": "File:2023 Audi Q8 quattro, 06-02-2024.jpg"
+    },
+    {
+      "model": "Audi RS5 Sportback",
+      "year": 2024,
+      "image": "/assets/cars/audi-rs5-sportback-29-tfsi-quattro-2026.png",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/21_Audi_RS5_Sportback_2.9T_quattro.jpg/1920px-21_Audi_RS5_Sportback_2.9T_quattro.jpg",
+      "title": "File:21 Audi RS5 Sportback 2.9T quattro.jpg"
+    },
+    {
+      "model": "Audi RS6 Avant",
+      "year": 2024,
+      "image": "/assets/cars/audi-rs6-avant-performance-40-tfsi-quattro-2026.png",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/2015_Audi_RS6_Avant_BS_O24.jpg/1920px-2015_Audi_RS6_Avant_BS_O24.jpg",
+      "title": "File:2015 Audi RS6 Avant BS O24.jpg"
+    }
+  ],
+  "unresolved": [
+    {
+      "model": "Audi Q3 Sportback",
+      "year": 2024,
+      "image": "/assets/cars/audi-q3-sportback-performance-black-20-tfsi-2026.png",
+      "reason": "Download HTTP 429"
+    },
+    {
+      "model": "Audi RS3 Sedan",
+      "year": 2024,
+      "image": "/assets/cars/audi-rs3-sedan-25-tfsi-quattro-2026.png",
+      "reason": "Download HTTP 429"
+    }
+  ]
+}

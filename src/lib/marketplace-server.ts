@@ -36,15 +36,21 @@ export type ListingSort =
 
 export type ListingsPageInput = {
   q?: string
-  brand?: string
-  model?: string
-  city?: string
+  brand?: string | string[]
+  model?: string | string[]
+  city?: string | string[]
   state?: string
-  bodyType?: string
-  transmission?: string
-  fuel?: string
+  bodyType?: string | string[]
+  transmission?: string | string[]
+  fuel?: string | string[]
+  color?: string | string[]
   priceMax?: number
   priceMin?: number
+  yearMin?: number
+  yearMax?: number
+  mileageMin?: number
+  mileageMax?: number
+  optionalItems?: string[]
   sort?: ListingSort
   page?: number
   pageSize?: number
@@ -420,15 +426,56 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
     .range(from, to)
 
   if (input.q) query = query.or(`brand.ilike.%${input.q}%,model.ilike.%${input.q}%,title.ilike.%${input.q}%`)
-  if (input.brand) query = query.ilike('brand', input.brand)
-  if (input.model) query = query.ilike('model', `%${input.model}%`)
-  if (input.city) query = query.ilike('city', input.city)
+  
+  if (input.brand) {
+    if (Array.isArray(input.brand)) query = query.in('brand', input.brand)
+    else query = query.ilike('brand', input.brand)
+  }
+  
+  if (input.model) {
+    if (Array.isArray(input.model)) query = query.in('model', input.model)
+    else query = query.ilike('model', `%${input.model}%`)
+  }
+  
+  if (input.city) {
+    if (Array.isArray(input.city)) query = query.in('city', input.city)
+    else query = query.ilike('city', input.city)
+  }
+  
   if (input.state) query = query.ilike('state', input.state)
-  if (input.bodyType) query = query.ilike('body_type', `%${input.bodyType}%`)
-  if (input.transmission) query = query.ilike('transmission', `%${input.transmission}%`)
-  if (input.fuel) query = query.ilike('fuel', `%${input.fuel}%`)
+  
+  if (input.bodyType) {
+    if (Array.isArray(input.bodyType)) query = query.in('body_type', input.bodyType)
+    else query = query.ilike('body_type', `%${input.bodyType}%`)
+  }
+  
+  if (input.transmission) {
+    if (Array.isArray(input.transmission)) query = query.in('transmission', input.transmission)
+    else query = query.ilike('transmission', `%${input.transmission}%`)
+  }
+  
+  if (input.fuel) {
+    if (Array.isArray(input.fuel)) query = query.in('fuel', input.fuel)
+    else query = query.ilike('fuel', `%${input.fuel}%`)
+  }
+
+  if (input.color) {
+    if (Array.isArray(input.color)) query = query.in('color', input.color)
+    else query = query.ilike('color', `%${input.color}%`)
+  }
+  
   if (typeof input.priceMin === 'number') query = query.gte('price', input.priceMin)
   if (typeof input.priceMax === 'number') query = query.lte('price', input.priceMax)
+
+  if (typeof input.yearMin === 'number') query = query.gte('year_model', input.yearMin)
+  if (typeof input.yearMax === 'number') query = query.lte('year_model', input.yearMax)
+
+  if (typeof input.mileageMin === 'number') query = query.gte('mileage', input.mileageMin)
+  if (typeof input.mileageMax === 'number') query = query.lte('mileage', input.mileageMax)
+
+  if (input.optionalItems && input.optionalItems.length > 0) {
+    query = query.contains('optional_items', input.optionalItems)
+  }
 
   query = applySort(query, sort) as typeof query
 
@@ -539,3 +586,40 @@ export async function getSellerInfo(sellerUserId: string): Promise<{
     totalListings,
   }
 }
+
+export async function getFilterOptions() {
+  if (!isSupabaseConfigured()) return null
+
+  const supabase = getSupabaseServerClient()
+
+  const [
+    { data: brandsData },
+    { data: fuelsData },
+    { data: transmissionsData },
+    { data: colorsData },
+    { data: bodyTypesData },
+    { data: optionalItemsData }
+  ] = await Promise.all([
+    supabase.from('vehicle_listings').select('brand').eq('status', 'active'),
+    supabase.from('vehicle_listings').select('fuel').eq('status', 'active'),
+    supabase.from('vehicle_listings').select('transmission').eq('status', 'active'),
+    supabase.from('vehicle_listings').select('color').eq('status', 'active'),
+    supabase.from('vehicle_listings').select('body_type').eq('status', 'active'),
+    supabase.from('vehicle_listings').select('optional_items').eq('status', 'active')
+  ])
+
+  const distinct = (arr: any[], key: string) => [...new Set(arr?.map(i => i[key]).filter(Boolean))].sort()
+
+  const allOptionals = optionalItemsData?.flatMap(i => i.optional_items || []) || []
+  const distinctOptionals = [...new Set(allOptionals)].sort()
+
+  return {
+    brands: distinct(brandsData || [], 'brand'),
+    fuels: distinct(fuelsData || [], 'fuel'),
+    transmissions: distinct(transmissionsData || [], 'transmission'),
+    colors: distinct(colorsData || [], 'color'),
+    bodyTypes: distinct(bodyTypesData || [], 'body_type'),
+    optionalItems: distinctOptionals
+  }
+}
+

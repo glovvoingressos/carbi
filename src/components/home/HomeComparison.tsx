@@ -34,15 +34,14 @@ export default function HomeComparison() {
   const carB = selected[1] ? cars.find(c => c.id === selected[1]) : null
 
   return (
-    <section style={{ paddingBlock: 'clamp(32px, 5vh, 64px)', background: 'var(--color-bg)' }}>
-      <div className="container">
-        <div
-          className="relative overflow-hidden rounded-[40px] pastel-card pastel-card-blue"
-          style={{
-            padding: 'clamp(28px, 5vw, 64px)',
-            background: 'linear-gradient(135deg, #e7f0ff 0%, #edf6ff 55%, #f3f9ff 100%)',
-          }}
-        >
+    <div className="relative w-full">
+      <div
+        className="relative overflow-hidden rounded-[40px] border border-black/5 shadow-sm"
+        style={{
+          padding: 'clamp(28px, 5vw, 64px)',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)',
+        }}
+      >
           {/* Background Glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/20 blur-[100px] rounded-full -mr-48 -mt-48 pointer-events-none" />
 
@@ -104,7 +103,7 @@ export default function HomeComparison() {
             <div className={`relative flex flex-col gap-6 ${comparison ? 'animate-in fade-in duration-700' : ''}`}>
                {comparison ? (
                   /* Summary View */
-                  <div className="pastel-card pastel-card-lilac rounded-[32px] p-6">
+                  <div className="bg-white rounded-[32px] p-6 border border-black/5 shadow-sm">
                      <div className="space-y-4">
                         <SummaryRow 
                            label="Preço" 
@@ -174,7 +173,6 @@ export default function HomeComparison() {
             </div>
           </div>
         </div>
-      </div>
 
       {/* Mini Search Overlay */}
       {searchOpen !== null && (
@@ -226,7 +224,7 @@ export default function HomeComparison() {
           </div>
         </div>
       )}
-    </section>
+    </div>
   )
 }
 
@@ -236,8 +234,8 @@ function Slot({ num, car, onClick, icon, accent = false }: any) {
          onClick={onClick}
          className="relative group transition-all duration-500 hover:-translate-y-2"
       >
-         <div className={`w-32 h-44 sm:w-44 sm:h-64 rounded-[32px] p-4 flex flex-col justify-between items-center transition-all overflow-hidden ring-1 ring-black/10 ${accent ? 'bg-[#efe9cf]' : 'bg-[#dce7fb]'}`}>
-            <div className={`w-full h-24 sm:h-32 rounded-2xl flex items-center justify-center transition-all relative overflow-hidden ${accent ? 'bg-[#e6e9ef]' : 'bg-[#edf2ff]'}`}>
+         <div className={`w-32 h-44 sm:w-44 sm:h-64 rounded-[32px] p-4 flex flex-col justify-between items-center transition-all overflow-hidden border border-black/5 bg-white`}>
+            <div className={`w-full h-24 sm:h-32 rounded-2xl flex items-center justify-center transition-all relative overflow-hidden bg-[#f5f5f3]`}>
                {car ? (
                   <CarImage id={car.id} brand={car.brand} model={car.model} year={car.year} src={car.image} className="w-full h-full" />
                ) : (
@@ -254,7 +252,7 @@ function Slot({ num, car, onClick, icon, accent = false }: any) {
                </span>
             </div>
          </div>
-         <div className={`absolute -top-3 -right-3 w-10 h-10 rounded-full flex items-center justify-center text-lg font-black shadow-lg border-2 border-dark transition-all group-hover:scale-110 z-20 ${accent ? 'bg-[var(--color-bento-yellow)] text-dark' : 'bg-dark text-white'}`}>
+         <div className={`absolute -top-3 -right-3 w-10 h-10 rounded-full flex items-center justify-center text-lg font-black shadow-lg border-2 border-dark transition-all group-hover:scale-110 z-20 ${accent ? 'bg-white border-2 border-dark text-dark' : 'bg-dark text-white'}`}>
             {num}
          </div>
       </button>
@@ -270,7 +268,7 @@ function SummaryRow({ label, icon, winner, valA, valB }: any) {
          <div className="flex-1">
             <div className="flex items-center justify-between mb-1">
                <span className="text-[10px] font-black uppercase tracking-widest text-dark/40">{label}</span>
-               <div className="flex items-center gap-1.5 px-2 py-0.5 bg-[var(--color-accent)] text-dark rounded-md text-[9px] font-black uppercase tracking-tight">
+               <div className="flex items-center gap-1.5 px-2 py-0.5 bg-dark text-white rounded-md text-[9px] font-black uppercase tracking-tight">
                   <Trophy className="w-3 h-3" /> {winner.model}
                </div>
             </div>

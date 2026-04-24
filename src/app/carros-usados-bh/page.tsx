@@ -2,9 +2,9 @@ import React from 'react'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, MapPin, CheckCircle2 } from 'lucide-react'
-import { getAllCars } from '@/lib/data-fetcher'
+import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import CarCard from '@/components/car/CarCard'
-import { LocalBusinessBHTicketsSchema } from '@/components/seo/JsonLd'
+import { LocalBusinessBHTicketsSchema } from '@/components/seo/JSONLD'
 
 export const metadata: Metadata = {
   title: 'Carros Usados em BH (Belo Horizonte) | Compra e Venda | Carbi',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 export default async function CarrosUsadosBHPage() {
   // Carrega ofertas reais do catálogo integrado
   const cars = await getAllCars();
-  const displayCars = cars.slice(0, 12);
+  const displayCars = groupCarsByModel(cars).map((item) => item.representative).slice(0, 12);
 
   return (
     <div className="bg-surface min-h-screen">
@@ -30,11 +30,11 @@ export default async function CarrosUsadosBHPage() {
       {/* Local Hero Area */}
       <section className="pt-16 pb-12 bg-white border-b border-border">
         <div className="container max-w-5xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-[var(--color-bento-yellow)] text-dark px-4 py-2 rounded-full font-black text-sm uppercase tracking-widest mb-6 border border-dark transform -rotate-2">
+          <div className="inline-flex items-center gap-2 bg-dark/8 text-dark px-4 py-2 rounded-full font-semibold text-sm uppercase tracking-widest mb-6">
             <MapPin className="w-4 h-4" /> Belo Horizonte e Região
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-dark tracking-tight mb-6">
-            O carro perfeito para você,<br className="hidden md:block" /> com a confiança que <span className="text-[var(--color-bento-red)]">BH merece.</span>
+            O carro perfeito para você,<br className="hidden md:block" /> com a confiança que <span className="text-dark">BH merece.</span>
           </h1>
           <p className="text-lg md:text-xl font-medium text-text-secondary max-w-2xl mx-auto leading-relaxed mb-8">
             Compare centenas de opções reais, confira valor atualizado na hora e não caia em furadas.
@@ -81,7 +81,7 @@ export default async function CarrosUsadosBHPage() {
         <div className="container max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-black text-dark tracking-tight">Veículos em Destaque (BH)</h2>
-            <Link href="/marcas" className="hidden md:flex items-center gap-1 font-bold text-dark hover:text-[var(--color-bento-red)] transition-colors">
+            <Link href="/marcas" className="hidden md:flex items-center gap-1 font-bold text-dark hover:text-dark/60 transition-colors">
               Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
-import { Menu, X, Search, CarFront, Home, BarChart3, GitCompare, Sparkles, ChevronRight, MessageCircle, LayoutDashboard, UserRound, LogOut } from 'lucide-react'
+import { Menu, X, Search, CarFront, Home, BarChart3, GitCompare, Sparkles, ChevronRight, MessageCircle, LayoutDashboard, UserRound, LogOut, ShoppingBag, Tag } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 export default function Navbar() {
@@ -87,15 +87,10 @@ export default function Navbar() {
   }, [accountOpen])
 
   const navLinks = [
-    { href: '/',         label: 'Início',    icon: Home },
-    { href: '/marcas',   label: 'Marcas',    icon: CarFront },
-    { href: '/comparar', label: 'Comparar',  icon: GitCompare },
-    { href: '/rankings', label: 'Rankings',  icon: BarChart3 },
-    { href: '/anunciar-carro-bh', label: 'Anunciar', icon: Sparkles },
-    { href: '/carros-a-venda', label: 'Carros à venda', icon: Sparkles },
-    { href: '/carros-usados-bh', label: 'Comprar em BH', icon: Sparkles },
-    { href: '/minha-conta/anuncios', label: 'Meus anúncios', icon: LayoutDashboard },
-    { href: '/minha-conta/conversas', label: 'Conversas', icon: MessageCircle },
+    { href: '/carros-a-venda', label: 'Comprar', icon: ShoppingBag },
+    { href: '/anunciar-carro-bh', label: 'Vender', icon: Tag },
+    { href: '/comparar', label: 'Comparar', icon: GitCompare },
+    { href: '/marcas', label: 'Marcas', icon: CarFront },
   ]
 
   const isActive = (href: string) =>
@@ -106,10 +101,10 @@ export default function Navbar() {
     const query = searchTerm.trim()
     setSearchOpen(false)
     if (!query) {
-      router.push('/rankings')
+      router.push('/carros-a-venda')
       return
     }
-    router.push(`/rankings?q=${encodeURIComponent(query)}`)
+    router.push(`/carros-a-venda?q=${encodeURIComponent(query)}`)
   }
 
   const handleSignOut = async () => {
@@ -252,7 +247,7 @@ export default function Navbar() {
                   type="button"
                   onClick={() => {
                     setSearchTerm(s)
-                    router.push(`/rankings?q=${encodeURIComponent(s)}`)
+                    router.push(`/carros-a-venda?q=${encodeURIComponent(s)}`)
                     setSearchOpen(false)
                   }}
                   className="px-6 py-3 bg-[#f4f6f8] rounded-full text-sm font-bold hover:bg-dark hover:text-white transition-all"
@@ -342,14 +337,14 @@ export default function Navbar() {
               <div className="h-px bg-black/5 mb-8" />
               <Link 
                 href="/qual-carro"
-                className="w-full flex items-center justify-between p-8 bg-[var(--color-bento-blue)] text-white rounded-[32px] hover:scale-[1.02] transition-transform group"
+                className="w-full flex items-center justify-between p-8 bg-[#1a1a1a] text-white rounded-[24px] hover:opacity-90 transition-opacity group"
               >
                 <div className="flex items-center gap-4">
-                  <Sparkles className="w-6 h-6" />
+                  <Sparkles className="w-6 h-6 text-white/70" />
                   <span className="text-xl font-heading">Qual carro é pra mim?</span>
                 </div>
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white animate-pulse group-hover:animate-none">
-                   <ChevronRight className="w-5 h-5 group-hover:text-[var(--color-bento-blue)]" />
+                <div className="w-10 h-10 bg-white/15 rounded-full flex items-center justify-center">
+                   <ChevronRight className="w-5 h-5 text-white" />
                 </div>
               </Link>
               <p className="text-center text-[12px] font-bold text-dark/20 uppercase tracking-[0.2em] pt-8">

@@ -30,6 +30,7 @@ const initialLoading: LoadingState = {
 const skeletonClass = 'h-12 w-full rounded-xl bg-slate-200/70 animate-pulse'
 
 function normalize(value: string): string {
+  if (!value) return ''
   return value
     .toLowerCase()
     .normalize('NFD')
@@ -37,21 +38,14 @@ function normalize(value: string): string {
     .replace(/[^a-z0-9\s-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+    .replace(/\bvolkswagen\b/g, 'vw')
 }
 
 function tokenize(value: string): string[] {
   return normalize(value).split(' ').filter((token) => token.length >= 2)
 }
 
-async function getLatestYearForModel(brandCode: string, modelCode: string): Promise<number> {
-  try {
-    const data = await getJson<number[]>(`/api/fipe/years?brandCode=${brandCode}&modelCode=${modelCode}`)
-    if (!Array.isArray(data) || data.length === 0) return 0
-    return data[0] || 0
-  } catch {
-    return 0
-  }
-}
+
 
 async function getJson<T>(url: string): Promise<T> {
   const response = await fetch(url)
@@ -72,6 +66,7 @@ export default function FipeCalculator({
   const [years, setYears] = useState<number[]>([])
   const [versions, setVersions] = useState<FipeVersionOption[]>([])
 
+  const [selectedType, setSelectedType] = useState('cars')
   const [selectedBrand, setSelectedBrand] = useState('')
   const [selectedModel, setSelectedModel] = useState('')
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
@@ -99,18 +94,21 @@ export default function FipeCalculator({
       setError(null)
 
       try {
-        const data = await getJson<FipeItem[]>('/api/fipe/brands')
+        const data = await getJson<FipeItem[]>(`/api/fipe/brands?type=${selectedType}`)
         if (cancelled) return
         setBrands(data)
 
-        const brandMatch = data.find((b) => {
-          const name = normalize(b.name)
-          const initial = normalize(initialBrandName)
-          return name === initial || name.includes(initial)
-        })
+        // Only auto-select if we are in 'cars' mode (default)
+        if (selectedType === 'cars') {
+          const brandMatch = data.find((b) => {
+            const name = normalize(b.name)
+            const initial = normalize(initialBrandName)
+            return name === initial || name.includes(initial)
+          })
 
-        if (brandMatch) {
-          setSelectedBrand(brandMatch.code)
+          if (brandMatch) {
+            setSelectedBrand(brandMatch.code)
+          }
         }
       } catch {
         if (!cancelled) setError('Não foi possível carregar as marcas de referência.')
@@ -119,11 +117,25 @@ export default function FipeCalculator({
       }
     }
 
+    // Reset when type changes
+    setSelectedBrand('')
+    setModels([])
+    setSelectedModel('')
+    setYears([])
+    setSelectedYear(null)
+    setVersions([])
+    setSelectedVersion('')
+    setResult(null)
+    modelsCache.current.clear()
+    yearsCache.current.clear()
+    versionsCache.current.clear()
+    detailCache.current.clear()
+
     fetchBrands()
     return () => {
       cancelled = true
     }
-  }, [initialBrandName])
+  }, [initialBrandName, selectedType])
 
   useEffect(() => {
     if (!selectedBrand) {
@@ -143,7 +155,7 @@ export default function FipeCalculator({
           const cached = modelsCache.current.get(selectedBrand) || []
           setModels(cached)
         } else {
-          const data = await getJson<FipeItem[]>(`/api/fipe/models?brandCode=${selectedBrand}`)
+          const data = await getJson<FipeItem[]>(`/api/fipe/models?brandCode=${selectedBrand}&type=${selectedType}`)
           if (cancelled) return
           modelsCache.current.set(selectedBrand, data)
           setModels(data)
@@ -166,7 +178,7 @@ export default function FipeCalculator({
           const scored = await Promise.all(
             modelCandidates.slice(0, 12).map(async (candidate) => ({
               candidate,
-              latestYear: await getLatestYearForModel(selectedBrand, candidate.code),
+              latestYear: await getJson<number[]>(`/api/fipe/years?brandCode=${selectedBrand}&modelCode=${candidate.code}&type=${selectedType}`).then(d => d[0] || 0).catch(() => 0),
             }))
           )
 
@@ -213,7 +225,7 @@ export default function FipeCalculator({
           const cached = yearsCache.current.get(cacheKey) || []
           setYears(cached)
         } else {
-          const data = await getJson<number[]>(`/api/fipe/years?brandCode=${selectedBrand}&modelCode=${selectedModel}`)
+          const data = await getJson<number[]>(`/api/fipe/years?brandCode=${selectedBrand}&modelCode=${selectedModel}&type=${selectedType}`)
           if (cancelled) return
           yearsCache.current.set(cacheKey, data)
           setYears(data)
@@ -262,7 +274,7 @@ export default function FipeCalculator({
           setVersions(cached)
         } else {
           const data = await getJson<FipeVersionOption[]>(
-            `/api/fipe/versions?brandCode=${selectedBrand}&modelCode=${selectedModel}&year=${selectedYear}`
+            `/api/fipe/versions?brandCode=${selectedBrand}&modelCode=${selectedModel}&year=${selectedYear}&type=${selectedType}`
           )
           if (cancelled) return
           versionsCache.current.set(cacheKey, data)
@@ -331,7 +343,7 @@ export default function FipeCalculator({
         }
 
         const data = await getJson<FipeResult | null>(
-          `/api/fipe/detail?brandCode=${selectedBrand}&modelCode=${selectedModel}&yearCode=${selectedVersion}`
+          `/api/fipe/detail?brandCode=${selectedBrand}&modelCode=${selectedModel}&yearCode=${selectedVersion}&type=${selectedType}`
         )
 
         if (cancelled) return
@@ -363,10 +375,30 @@ export default function FipeCalculator({
   return (
     <div className="bg-white border-2 border-dark rounded-[32px] overflow-hidden shadow-[8px_8px_0_#000] p-6 sm:p-8">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-[var(--color-bento-red)] rounded-xl flex items-center justify-center text-white shadow-[2px_2px_0_#000] border border-dark">
+        <div className="w-10 h-10 bg-[#1a1a1a] rounded-xl flex items-center justify-center text-white">
           <TrendingDown className="w-6 h-6" />
         </div>
         <h3 className="text-xl font-black uppercase tracking-tight italic">Consulta de Valor Atualizado</h3>
+      </div>
+
+      <div className="flex items-center gap-2 mb-6 p-1.5 bg-slate-50 border-2 border-dark rounded-2xl">
+        {[
+          { id: 'cars', label: 'Carros' },
+          { id: 'motorcycles', label: 'Motos' },
+          { id: 'trucks', label: 'Caminhões' },
+        ].map((type) => (
+          <button
+            key={type.id}
+            onClick={() => setSelectedType(type.id)}
+            className={`flex-1 py-2.5 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              selectedType === type.id
+                ? 'bg-dark text-white shadow-[4px_4px_0_#000]'
+                : 'text-text-tertiary hover:bg-dark/5'
+            }`}
+          >
+            {type.label}
+          </button>
+        ))}
       </div>
 
       <div className="grid gap-4 mb-8">
@@ -482,7 +514,7 @@ export default function FipeCalculator({
           </div>
 
           <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary bg-surface/50 p-3 rounded-xl border border-dashed border-dark/20">
-            <Loader2 className="w-3 h-3 text-[var(--color-bento-yellow)]" />
+            <Loader2 className="w-3 h-3 text-dark/40" />
             Referência mensal: {safeResult.referenceMonth} • Código oficial: {safeResult.codeFipe}
           </div>
         </div>

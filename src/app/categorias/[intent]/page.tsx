@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Sparkles, ArrowRight } from 'lucide-react'
-import { getAllCars } from '@/lib/data-fetcher'
+import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import CarCard from '@/components/car/CarCard'
 
 // SEO Definitions mapped to intents
@@ -83,7 +83,8 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
 
   // Fetch cars and apply intent filter
   const allCars = await getAllCars();
-  const filteredCars = allCars.filter(data.filter).slice(0, 16)
+  const groupedCars = groupCarsByModel(allCars).map((item) => item.representative)
+  const filteredCars = groupedCars.filter(data.filter).slice(0, 16)
 
   return (
     <div className="bg-surface min-h-screen">
@@ -112,7 +113,7 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
           ) : (
              <div className="text-center py-20 bg-[#f7f9fc] rounded-3xl">
                 <p className="text-xl font-bold text-dark mb-4">Nenhum carro encontrado para este critério específico no momento.</p>
-                <Link href="/qual-carro" className="text-[var(--color-bento-red)] hover:underline font-black">Refaça o teste de compatibilidade</Link>
+                <Link href="/qual-carro" className="text-[#e8e8e4] hover:underline font-black">Refaça o teste de compatibilidade</Link>
              </div>
           )}
         </div>
@@ -132,7 +133,7 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
 
 function Badge({ text }: { text: string }) {
   return (
-    <span className="inline-flex items-center rounded-md bg-[var(--color-bento-red)] px-4 py-2 text-[11px] font-black text-white uppercase tracking-widest border border-dark">
+    <span className="inline-flex items-center rounded-md bg-[#e8e8e4] px-4 py-2 text-[11px] font-black text-white uppercase tracking-widest border border-dark">
       {text}
     </span>
   )

@@ -2,11 +2,12 @@ import { ReactNode } from 'react'
 
 export type PastelTone = 'blue' | 'lime' | 'lilac' | 'gray'
 
+// All tones map to the same clean neutral — intentionally minimal
 const TONE_BG: Record<PastelTone, string> = {
-  blue: '#bfd5ff',
-  lime: '#d7ef79',
-  lilac: '#ead9ff',
-  gray: '#dfe7f6',
+  blue:  '#f5f5f3',
+  lime:  '#f5f5f3',
+  lilac: '#f5f5f3',
+  gray:  '#f5f5f3',
 }
 
 type PastelSpecCardProps = {
@@ -18,7 +19,7 @@ type PastelSpecCardProps = {
 }
 
 export function PastelSpecCard({
-  tone = 'blue',
+  tone = 'gray',
   titleBadge,
   badgeInside = false,
   className = '',
@@ -26,13 +27,12 @@ export function PastelSpecCard({
 }: PastelSpecCardProps) {
   return (
     <div
-      className={`pastel-card relative rounded-[34px] px-5 pb-6 pt-8 sm:px-6 sm:pb-7 sm:pt-9 ${className}`}
+      className={`relative rounded-[20px] px-5 pb-6 pt-8 sm:px-6 sm:pb-7 sm:pt-9 border border-black/6 ${className}`}
       style={{ backgroundColor: TONE_BG[tone] }}
     >
       {titleBadge ? (
         <div
-          className={`absolute left-4 z-20 rounded-[18px] bg-[#e6509f] px-4 py-2 text-[11px] font-black uppercase tracking-[0.1em] text-white sm:left-5 ${badgeInside ? 'top-3' : '-top-4'}`}
-          style={{ transform: badgeInside ? 'rotate(0deg)' : 'rotate(-1.4deg)' }}
+          className={`absolute left-4 z-20 rounded-full bg-dark px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white sm:left-5 ${badgeInside ? 'top-3' : '-top-3.5'}`}
         >
           {titleBadge}
         </div>
@@ -49,11 +49,11 @@ type PastelRow = {
 
 export function PastelKeyValueRows({ rows }: { rows: PastelRow[] }) {
   return (
-    <div className="space-y-3.5 sm:space-y-4">
+    <div className="space-y-3 sm:space-y-3.5">
       {rows.map((row) => (
         <div key={row.label} className="grid grid-cols-[1fr_auto] items-center gap-4">
-          <p className="text-[14px] font-bold text-dark/95">{row.label}</p>
-          <p className="text-right text-[14px] font-bold text-dark">{row.value}</p>
+          <p className="text-[13px] font-medium text-dark/50">{row.label}</p>
+          <p className="text-right text-[13px] font-semibold text-dark">{row.value}</p>
         </div>
       ))}
     </div>

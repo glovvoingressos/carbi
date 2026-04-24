@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { getAllCars } from '@/lib/data-fetcher'
+import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import CarCard from '@/components/car/CarCard'
 import { ChevronRight } from 'lucide-react'
+import { normalizeBrandKey, pickPreferredBrandName } from '@/lib/brand-utils'
 
 // Remove generateStaticParams for large database
 // export function generateStaticParams() { ... }
@@ -11,13 +12,18 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
   const brandSlug = resolved.brand
   
   const allCars = await getAllCars()
+  const normalizedBrand = normalizeBrandKey(brandSlug.replace(/-/g, ' '))
   const brandCars = allCars.filter(
-    (c) => c.brand.toLowerCase().replace(/\s+/g, '-') === brandSlug
+    (c) => normalizeBrandKey(c.brand) === normalizedBrand
   )
+  const groupedModels = groupCarsByModel(brandCars)
   
-  const realBrandName = brandCars[0]?.brand || brandSlug.replace(/-/g, ' ')
+  const realBrandName = brandCars.reduce(
+    (name, car) => pickPreferredBrandName(name, car.brand),
+    brandCars[0]?.brand || brandSlug.replace(/-/g, ' '),
+  )
 
-  if (brandCars.length === 0) {
+  if (groupedModels.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 text-center">
         <h1 className="text-xl font-bold text-text mb-2">Marca não encontrada</h1>
@@ -38,11 +44,22 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
       </nav>
 
       <h1 className="text-2xl font-bold text-text mb-1">{realBrandName}</h1>
-      <p className="text-sm text-text-secondary mb-6">{brandCars.length} modelo{brandCars.length !== 1 ? 's' : ''} disponível(is)</p>
+      <p className="text-sm text-text-secondary mb-6">
+        {groupedModels.length} modelo{groupedModels.length !== 1 ? 's' : ''} • {brandCars.length} versão{brandCars.length !== 1 ? 'ões' : ''} disponível(is)
+      </p>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        {brandCars.map((car) => (
-          <CarCard key={car.id} car={car} />
+        {groupedModels.map(({ representative, variants }) => (
+          <CarCard
+            key={`${representative.brand}-${representative.slug}`}
+            car={{
+              ...representative,
+              version:
+                variants.length > 1
+                  ? `${variants.length} versões disponíveis`
+                  : representative.version,
+            }}
+          />
         ))}
       </div>
     </div>

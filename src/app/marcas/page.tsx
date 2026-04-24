@@ -1,10 +1,25 @@
 import Link from 'next/link'
-import { getAllCars } from '@/lib/data-fetcher'
+import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import BrandLogo from '@/components/brand/BrandLogo'
+import { normalizeBrandKey, pickPreferredBrandName, slugifyBrand } from '@/lib/brand-utils'
 
 export default async function MarcasPage() {
   const cars = await getAllCars()
-  const brands = [...new Set(cars.map(c => c.brand))].sort()
+  const modelCards = groupCarsByModel(cars).map((item) => item.representative)
+  const brands = Array.from(
+    modelCards.reduce((acc, car) => {
+      const key = normalizeBrandKey(car.brand)
+      const current = acc.get(key)
+      if (current) {
+        current.count += 1
+        current.label = pickPreferredBrandName(current.label, car.brand)
+        return acc
+      }
+      acc.set(key, { key, label: car.brand, count: 1 })
+      return acc
+    }, new Map<string, { key: string; label: string; count: number }>())
+      .values(),
+  ).sort((a, b) => a.label.localeCompare(b.label, 'pt-BR'))
 
   return (
     <div>
@@ -17,11 +32,11 @@ export default async function MarcasPage() {
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {brands.map((brand, i) => {
-            const brandCars = cars.filter((c) => c.brand === brand)
-            const slug = brand.toLowerCase().replace(/\s+/g, '-')
+            const slug = slugifyBrand(brand.label)
             
             // Basic domain mapping for Clearbit Logo API
             const getDomain = (b: string) => {
+              const normalized = normalizeBrandKey(b)
               const map: Record<string, string> = {
                 'bmw': 'bmw.com',
                 'toyota': 'toyota.com',
@@ -45,7 +60,7 @@ export default async function MarcasPage() {
                 'ram': 'ram.com',
                 'citroen': 'citroen.com',
               }
-              return map[b.toLowerCase()] || `${b.toLowerCase().replace(/\s+/g, '')}.com`
+              return map[normalized] || `${normalized.replace(/\s+/g, '')}.com`
             }
 
             // Alternate colors for variety
@@ -55,7 +70,7 @@ export default async function MarcasPage() {
 
             return (
               <Link
-                key={brand}
+                key={brand.key}
                 href={`/marcas/${slug}`}
                 className="group relative pastel-card rounded-[32px] p-6 text-center transition-all hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center overflow-hidden"
                 style={{ backgroundColor: cardColors[i % cardColors.length] }}
@@ -65,16 +80,16 @@ export default async function MarcasPage() {
                   style={{ backgroundColor: bgColor }}
                 >
                   <BrandLogo 
-                    brandName={brand} 
-                    domain={getDomain(brand)} 
-                    className="w-full h-full object-contain filter drop-shadow-sm mix-blend-multiply" 
+                    brandName={brand.label} 
+                    domain={getDomain(brand.label)} 
+                    className="w-full h-full object-contain drop-shadow-sm" 
                   />
                 </div>
 
-                <p className="text-xl font-black text-dark tracking-tight relative z-10 uppercase">{brand}</p>
+                <p className="text-xl font-black text-dark tracking-tight relative z-10 uppercase">{brand.label}</p>
                 <div className="mt-3">
                    <span className="bg-white/70 text-text-secondary font-bold text-[11px] px-3 py-1 rounded-full uppercase tracking-widest relative z-10 group-hover:bg-dark group-hover:text-white transition-colors">
-                     {brandCars.length} modelo{brandCars.length !== 1 ? 's' : ''}
+                     {brand.count} modelo{brand.count !== 1 ? 's' : ''}
                    </span>
                 </div>
               </Link>

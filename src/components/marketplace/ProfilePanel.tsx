@@ -156,7 +156,7 @@ export default function ProfilePanel() {
 
   if (!sessionReady) {
     return (
-      <div className="pastel-card pastel-card-green p-8 text-center">
+      <div className="bg-white rounded-[32px] border border-black/5 p-8 text-center">
         <Loader2 className="mx-auto h-5 w-5 animate-spin text-dark" />
         <p className="mt-2 text-sm text-text-secondary">Carregando perfil...</p>
       </div>
@@ -168,50 +168,50 @@ export default function ProfilePanel() {
   }
 
   return (
-    <section className="pastel-card pastel-card-green p-5 sm:p-6">
-      <h2 className="text-2xl font-black text-dark">Perfil do usuário</h2>
-      <p className="mt-1 text-sm font-medium text-text-secondary">Atualize seu nome e sua foto. Tudo salva direto no Supabase.</p>
+    <section className="bg-white rounded-[32px] border border-black/5 p-8 sm:p-12 shadow-sm">
+      <h2 className="text-3xl font-black text-dark tracking-tight">Configurações</h2>
+      <p className="mt-2 text-lg font-medium text-dark/50">Atualize seu nome e sua foto.</p>
 
-      <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-center">
+      <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-center">
         {avatarUrl ? (
           <img
             src={avatarUrl}
             alt="Foto de perfil"
-            className="h-24 w-24 rounded-2xl bg-white object-cover"
+            className="h-28 w-28 rounded-[24px] bg-[#f5f5f3] object-cover border border-black/5"
           />
         ) : (
-          <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-[#fff8dc] text-2xl font-black text-dark">
+          <div className="flex h-28 w-28 items-center justify-center rounded-[24px] bg-[#f5f5f3] text-3xl font-black text-dark border border-black/5">
             {(fullName || email || 'U').trim().charAt(0).toUpperCase()}
           </div>
         )}
-        <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-dark bg-[#fff8dc] px-4 py-2 text-xs font-black uppercase tracking-wider text-dark">
-          <Upload className="h-3.5 w-3.5" />
+        <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full bg-dark px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-dark/90">
+          <Upload className="h-4 w-4" />
           {uploading ? 'Enviando...' : 'Trocar foto'}
           <input type="file" className="hidden" accept="image/png,image/jpeg,image/webp" onChange={handleAvatarUpload} />
         </label>
       </div>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <input
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          placeholder="Seu nome"
-          className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-dark outline-none focus:ring-2 focus:ring-dark/15"
+          placeholder="Seu nome completo"
+          className="rounded-2xl bg-[#f5f5f3] border-none px-5 py-4 text-sm font-bold text-dark outline-none focus:ring-2 focus:ring-dark/20 transition-all"
         />
         <input
           value={email}
           disabled
-          className="rounded-2xl bg-[#f1f1f1] px-4 py-3 text-sm font-semibold text-text-secondary"
+          className="rounded-2xl bg-[#f5f5f3]/50 border-none px-5 py-4 text-sm font-bold text-dark/40"
         />
       </div>
 
-      <div className="mt-4 flex items-center gap-3">
+      <div className="mt-8 flex items-center gap-3">
         <button
           onClick={saveProfile}
           disabled={saving || uploading}
-          className="rounded-full border border-dark bg-[#dff7e8] px-5 py-2 text-xs font-black uppercase tracking-wider text-dark disabled:opacity-60"
+          className="rounded-full bg-dark px-8 py-4 text-sm font-bold text-white transition-all hover:bg-dark/90 disabled:opacity-50"
         >
-          {saving ? 'Salvando...' : 'Salvar perfil'}
+          {saving ? 'Salvando...' : 'Salvar alterações'}
         </button>
       </div>
 

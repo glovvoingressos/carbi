@@ -331,7 +331,7 @@ function ComparePageContent() {
           </div>
 
           {/* Verdict */}
-          <div className="bg-[var(--color-bento-blue)] text-white rounded-[32px] p-8 md:p-10 shadow-lg relative overflow-hidden">
+          <div className="bg-dark text-white rounded-[24px] p-8 md:p-10 relative overflow-hidden">
             <div className="absolute -top-4 -right-16 md:-right-8 opacity-20">
               <ArrowLeftRight className="w-64 h-64" />
             </div>

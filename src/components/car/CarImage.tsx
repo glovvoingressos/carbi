@@ -216,7 +216,7 @@ export default function CarImage({
            </div>
            
            <div className="flex flex-col items-center gap-1.5 z-10">
-              <p className="text-[10px] sm:text-[11px] font-black text-dark uppercase tracking-[0.15em] text-center leading-tight bg-[var(--color-bento-yellow)] px-3 py-1.5 rounded rotate-[-1deg] border border-dark shadow-[2px_2px_0_#0A0A0A]">
+              <p className="text-[10px] sm:text-[11px] font-black text-dark uppercase tracking-[0.15em] text-center leading-tight bg-[#f5f5f3] px-3 py-1.5 rounded-full border border-black/10">
                 Imagem indisponível
               </p>
               <p className="text-[9px] font-bold text-dark/30 uppercase tracking-widest text-center mt-1">

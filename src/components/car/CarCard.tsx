@@ -25,16 +25,16 @@ function getDisplayRating(car: CarSpec): number {
 // ── Badge do card baseado no tipo/tags ────────────────────────────────────────
 function getCardBadge(car: CarSpec): { label: string; style: React.CSSProperties; className: string } | null {
   if (car.segment === 'electric' || car.engineType.toLowerCase().includes('elétrico')) {
-    return { label: 'ELÉTRICO', className: 'text-white font-black tracking-widest', style: { backgroundColor: 'var(--color-bento-red)', transform: 'rotate(-3deg)', padding: '4px 10px', borderRadius: '4px', border: '1px solid #000', boxShadow: '2px 2px 0px #000' } }
+    return { label: 'ELÉTRICO', className: 'text-white font-semibold tracking-wide', style: { backgroundColor: '#1a1a1a', padding: '3px 10px', borderRadius: '999px' } }
   }
   if (car.isPopular && car.latinNcap >= 5) {
     return { label: '5 ESTRELAS', className: 'text-white font-black tracking-widest', style: { backgroundColor: 'var(--color-dark)', transform: 'rotate(2deg)', padding: '4px 10px', borderRadius: '4px' } }
   }
   if (car.isPopular) {
-    return { label: 'POPULAR', className: 'text-dark font-black tracking-widest', style: { backgroundColor: 'var(--color-bento-amber)', transform: 'rotate(-2deg)', padding: '4px 10px', borderRadius: '4px', border: '1px solid #000', boxShadow: '2px 2px 0px #000' } }
+    return { label: 'POPULAR', className: 'text-dark font-semibold tracking-wide', style: { backgroundColor: '#e8e8e4', padding: '3px 10px', borderRadius: '999px' } }
   }
   if (car.tags?.includes('tecnologia') || car.tags?.includes('hibrido')) {
-    return { label: 'DESTAQUE', className: 'text-dark font-black tracking-widest', style: { backgroundColor: 'var(--color-bento-blue)', transform: 'rotate(1deg)', padding: '4px 10px', borderRadius: '4px', border: '1px solid #000', boxShadow: '-2px 2px 0px #000' } }
+    return { label: 'DESTAQUE', className: 'text-dark font-semibold tracking-wide', style: { backgroundColor: '#e8e8e4', padding: '3px 10px', borderRadius: '999px' } }
   }
   return null
 }
@@ -144,7 +144,7 @@ export default function CarCard({ car, index = 0, onCompare, isComparing = false
           </div>
 
           <button
-            className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-[14px] sm:rounded-[20px] transition-colors ${saved ? 'bg-[var(--color-bento-blue)] text-white' : 'bg-[#f4f6f8] text-[#0A0A0A]/40 hover:bg-black/5'}`}
+            className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-[14px] sm:rounded-[20px] transition-colors ${saved ? 'bg-dark text-white' : 'bg-[#f4f6f8] text-[#0A0A0A]/40 hover:bg-black/5'}`}
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()

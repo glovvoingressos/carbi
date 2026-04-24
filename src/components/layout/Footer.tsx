@@ -4,8 +4,15 @@ import { ArrowUpRight } from 'lucide-react'
 const NAV_LINKS = [
   { group: 'Plataforma', links: [
     { href: '/',         label: 'Início' },
+    { href: '/carros-a-venda', label: 'Comprar Carros' },
     { href: '/marcas',   label: 'Marcas' },
     { href: '/rankings', label: 'Rankings' },
+  ]},
+  { group: 'Vender', links: [
+    { href: '/anunciar-carro', label: 'Anunciar Carro' },
+    { href: '/vender-carro-bh', label: 'Vender Carro em BH' },
+    { href: '/anunciar-seminovo', label: 'Anunciar Seminovo' },
+    { href: '/vender-carro-rapido', label: 'Venda Rápida' },
   ]},
   { group: 'Ferramentas', links: [
     { href: '/qual-carro', label: 'Qual Carro?' },

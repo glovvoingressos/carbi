@@ -61,7 +61,7 @@ export default function AppRankingPage() {
           <Badge className="mb-6 bg-white/10 text-white border-white/20">Guia 2026 — Inteligência de Mercado</Badge>
           <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-8 leading-none">
             melhor carro para <br />
-            <span className="text-[var(--color-bento-yellow)]">aplicativo 2026</span>
+            <span className="text-white/60">aplicativo 2026</span>
           </h1>
           <p className="max-w-2xl mx-auto text-white/60 text-lg md:text-xl font-medium leading-relaxed">
             Economia por KM, custo de manutenção e ROI. Analisamos os dados técnicos dos modelos 2026 para você faturar mais e gastar menos.
@@ -72,9 +72,9 @@ export default function AppRankingPage() {
       {/* Comparisons Section */}
       <section className="py-20 px-6 container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
-           <div className="p-10 bg-[var(--color-bg)-alt] rounded-[40px] border-2 border-dark shadow-[8px_8px_0_#0A0A0A]">
+           <div className="p-10 bg-[var(--color-bg)-alt] rounded-[40px] border border-black/10">
               <div className="flex items-center gap-4 mb-6">
-                 <div className="p-3 bg-dark rounded-2xl"><Zap className="w-6 h-6 text-[var(--color-bento-yellow)]" /></div>
+                 <div className="p-3 bg-[#1a1a1a] rounded-2xl"><Zap className="w-6 h-6 text-white" /></div>
                  <h3 className="text-2xl font-black uppercase tracking-tight">Cenário Elétrico</h3>
               </div>
               <p className="text-dark/60 font-medium mb-8">
@@ -89,9 +89,9 @@ export default function AppRankingPage() {
               </ul>
            </div>
 
-           <div className="p-10 bg-white rounded-[40px] border-2 border-dark shadow-[8px_8px_0_#0A0A0A]">
+           <div className="p-10 bg-white rounded-[40px] border border-black/10">
               <div className="flex items-center gap-4 mb-6">
-                 <div className="p-3 bg-dark rounded-2xl"><DollarSign className="w-6 h-6 text-[var(--color-bento-red)]" /></div>
+                 <div className="p-3 bg-[#1a1a1a] rounded-2xl"><DollarSign className="w-6 h-6 text-white" /></div>
                  <h3 className="text-2xl font-black uppercase tracking-tight">Cenário Combustão</h3>
               </div>
               <p className="text-dark/60 font-medium mb-8">
@@ -143,7 +143,7 @@ export default function AppRankingPage() {
                          </td>
                          <td className="py-8 px-4 text-center">
                             <div className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-dark text-white rounded-full font-black">
-                               {item.roiRating} <Star className="w-3 h-3 fill-[var(--color-bento-yellow)] border-none" />
+                               {item.roiRating} <Star className="w-3 h-3 fill-white border-none" />
                             </div>
                          </td>
                          <td className="py-8 px-4 text-right">
@@ -159,7 +159,7 @@ export default function AppRankingPage() {
         </div>
 
         {/* Action Banner */}
-        <div className="bg-[var(--color-bento-blue)] rounded-[48px] p-12 md:p-20 relative overflow-hidden flex flex-col items-center text-center">
+        <div className="bg-[#1a1a1a] rounded-[48px] p-12 md:p-20 relative overflow-hidden flex flex-col items-center text-center">
             <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
                <ShieldCheck className="w-64 h-64 text-white" />
             </div>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Bricolage_Grotesque, Boldonse } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
+import { OrganizationSchema } from '@/components/seo/JSONLD'
 
 const font = Bricolage_Grotesque({
   subsets: ['latin'],
@@ -65,6 +66,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${font.variable} ${fontBoldonse.variable}`}>
       <body className={font.className} style={{ background: 'var(--color-bg)' }}>
+        <OrganizationSchema />
         <ClientShell>{children}</ClientShell>
       </body>
     </html>

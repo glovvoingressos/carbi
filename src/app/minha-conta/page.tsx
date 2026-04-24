@@ -4,51 +4,53 @@ import ProfilePanel from '@/components/marketplace/ProfilePanel'
 
 export default function MinhaContaPage() {
   return (
-    <main className="container mx-auto max-w-4xl px-4 pb-16 pt-28">
-      <section className="pastel-card p-6 sm:p-8" style={{ backgroundColor: '#edf2f7' }}>
-        <p className="text-[11px] font-black uppercase tracking-[0.16em] text-dark/60">Minha conta</p>
-        <h1 className="mt-2 text-3xl font-black text-dark sm:text-4xl">Seu painel de perfil</h1>
-        <p className="mt-2 text-base font-medium text-text-secondary">
-          Acesse seus anúncios, chats e ação rápida para publicar um novo veículo.
-        </p>
+    <main className="min-h-screen bg-[#f5f5f3] pb-16 pt-32">
+      <div className="container mx-auto max-w-4xl px-4">
+        <section className="bg-white rounded-[32px] border border-black/5 p-8 sm:p-12 shadow-sm">
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-dark/30">Minha conta</p>
+          <h1 className="mt-2 text-4xl font-black text-dark tracking-tight">Seu painel de perfil</h1>
+          <p className="mt-3 text-lg font-medium text-dark/50">
+            Acesse seus anúncios, chats e ação rápida para publicar um novo veículo.
+          </p>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <Link href="/minha-conta/anuncios" className="rounded-2xl bg-[#f6f8fb] p-4 transition hover:-translate-y-0.5">
-            <div className="flex items-center gap-2 text-dark">
-              <LayoutDashboard className="h-4 w-4" />
-              <span className="text-sm font-black">Meus anúncios</span>
-            </div>
-            <p className="mt-1 text-sm font-medium text-text-secondary">Editar fotos, preço e descrição.</p>
-          </Link>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            <Link href="/minha-conta/anuncios" className="rounded-3xl bg-[#f5f5f3] border border-black/5 p-6 transition-all hover:-translate-y-1 hover:bg-dark hover:text-white group">
+              <div className="flex items-center gap-3 text-dark group-hover:text-white transition-colors">
+                <LayoutDashboard className="h-5 w-5" />
+                <span className="text-base font-black">Meus anúncios</span>
+              </div>
+              <p className="mt-2 text-sm font-medium text-dark/50 group-hover:text-white/60 transition-colors">Editar fotos, preço e descrição.</p>
+            </Link>
 
-          <Link href="/minha-conta/conversas" className="rounded-2xl bg-[#f3f6fa] p-4 transition hover:-translate-y-0.5">
-            <div className="flex items-center gap-2 text-dark">
-              <MessageCircle className="h-4 w-4" />
-              <span className="text-sm font-black">Meus chats</span>
-            </div>
-            <p className="mt-1 text-sm font-medium text-text-secondary">Acompanhar conversas com compradores.</p>
-          </Link>
+            <Link href="/minha-conta/conversas" className="rounded-3xl bg-[#f5f5f3] border border-black/5 p-6 transition-all hover:-translate-y-1 hover:bg-dark hover:text-white group">
+              <div className="flex items-center gap-3 text-dark group-hover:text-white transition-colors">
+                <MessageCircle className="h-5 w-5" />
+                <span className="text-base font-black">Meus chats</span>
+              </div>
+              <p className="mt-2 text-sm font-medium text-dark/50 group-hover:text-white/60 transition-colors">Acompanhar conversas com compradores.</p>
+            </Link>
 
-          <Link href="/anunciar-carro-bh" className="rounded-2xl bg-[#f6f8fb] p-4 transition hover:-translate-y-0.5">
-            <div className="flex items-center gap-2 text-dark">
-              <CarFront className="h-4 w-4" />
-              <span className="text-sm font-black">Anunciar carro</span>
-            </div>
-            <p className="mt-1 text-sm font-medium text-text-secondary">Publicar novo anúncio em poucos passos.</p>
-          </Link>
+            <Link href="/anunciar-carro-bh" className="rounded-3xl bg-[#f5f5f3] border border-black/5 p-6 transition-all hover:-translate-y-1 hover:bg-dark hover:text-white group">
+              <div className="flex items-center gap-3 text-dark group-hover:text-white transition-colors">
+                <CarFront className="h-5 w-5" />
+                <span className="text-base font-black">Anunciar carro</span>
+              </div>
+              <p className="mt-2 text-sm font-medium text-dark/50 group-hover:text-white/60 transition-colors">Publicar novo anúncio em poucos passos.</p>
+            </Link>
 
-          <Link href="/entrar" className="rounded-2xl bg-[#f3f6fa] p-4 transition hover:-translate-y-0.5">
-            <div className="flex items-center gap-2 text-dark">
-              <UserRound className="h-4 w-4" />
-              <span className="text-sm font-black">Login / Segurança</span>
-            </div>
-            <p className="mt-1 text-sm font-medium text-text-secondary">Entrar ou trocar de conta.</p>
-          </Link>
+            <Link href="/entrar" className="rounded-3xl bg-[#f5f5f3] border border-black/5 p-6 transition-all hover:-translate-y-1 hover:bg-dark hover:text-white group">
+              <div className="flex items-center gap-3 text-dark group-hover:text-white transition-colors">
+                <UserRound className="h-5 w-5" />
+                <span className="text-base font-black">Login / Segurança</span>
+              </div>
+              <p className="mt-2 text-sm font-medium text-dark/50 group-hover:text-white/60 transition-colors">Entrar ou trocar de conta.</p>
+            </Link>
+          </div>
+        </section>
+
+        <div className="mt-6">
+          <ProfilePanel />
         </div>
-      </section>
-
-      <div className="mt-6">
-        <ProfilePanel />
       </div>
     </main>
   )
