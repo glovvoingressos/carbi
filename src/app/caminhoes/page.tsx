@@ -62,7 +62,7 @@ export default async function CaminhoesPage({
   const [result, filterOptions] = await Promise.all([
     fetchPublicListingsPage({
       q: query || undefined,
-      vehicleType: 'truck',
+      vehicle_type: 'truck',
       brand: sp.brand,
       fuel: sp.fuel,
       transmission: sp.transmission,
@@ -106,7 +106,6 @@ export default async function CaminhoesPage({
           initialPage={page}
           initialTotalPages={totalPages}
           filterOptions={filterOptions}
-          defaultVehicleType="truck"
         />
 
         {/* Bottom SEO Content */}
