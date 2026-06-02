@@ -212,7 +212,7 @@ export default async function CarDetailPage({
                 <p className="text-sm text-dark/60 mt-2">Publique em minutos, com fotos, contato direto e anúncio gratuito.</p>
               </div>
               <Link
-                href="/anunciar-carro-bh"
+                href="/anunciar-carro"
                 className="inline-flex items-center justify-center rounded-full bg-dark px-6 py-3 text-white font-semibold uppercase tracking-wider hover:-translate-y-1 transition-all shrink-0"
               >
                 Anunciar meu carro

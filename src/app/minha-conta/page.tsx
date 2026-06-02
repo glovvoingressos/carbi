@@ -30,7 +30,7 @@ export default function MinhaContaPage() {
               <p className="mt-2 text-sm font-medium text-dark/50 group-hover:text-white/60 transition-colors">Acompanhar conversas com compradores.</p>
             </Link>
 
-            <Link href="/anunciar-carro-bh" className="rounded-3xl bg-[#f5f5f3] border border-black/5 p-6 transition-all hover:-translate-y-1 hover:bg-dark hover:text-white group">
+            <Link href="/anunciar-carro" className="rounded-3xl bg-[#f5f5f3] border border-black/5 p-6 transition-all hover:-translate-y-1 hover:bg-dark hover:text-white group">
               <div className="flex items-center gap-3 text-dark group-hover:text-white transition-colors">
                 <CarFront className="h-5 w-5" />
                 <span className="text-base font-black">Anunciar carro</span>

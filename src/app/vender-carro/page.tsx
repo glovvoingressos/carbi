@@ -13,5 +13,5 @@ export const metadata: Metadata = {
 }
 
 export default function VenderCarroPage() {
-  return <SEOPageClient data={data} ctaHref="/anunciar-carro-bh" />
+  return <SEOPageClient data={data} ctaHref="/anunciar-carro" />
 }

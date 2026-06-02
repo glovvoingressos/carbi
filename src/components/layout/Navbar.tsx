@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
-import { Menu, X, Search, CarFront, Home, BarChart3, GitCompare, Sparkles, ChevronRight, MessageCircle, LayoutDashboard, UserRound, LogOut, ShoppingBag, Tag } from 'lucide-react'
+import { Menu, X, Search, CarFront, Home, BarChart3, GitCompare, Sparkles, ChevronRight, MessageCircle, LayoutDashboard, UserRound, LogOut, ShoppingBag, Tag, Truck } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 export default function Navbar() {
@@ -87,7 +87,8 @@ export default function Navbar() {
   }, [accountOpen])
 
   const navLinks = [
-    { href: '/carros-a-venda', label: 'Comprar', icon: ShoppingBag },
+    { href: '/carros-a-venda', label: 'Carros', icon: ShoppingBag },
+    { href: '/caminhoes', label: 'Caminhões', icon: Truck },
     { href: '/anunciar-carro', label: 'Vender', icon: Tag },
     { href: '/comparar', label: 'Comparar', icon: GitCompare },
     { href: '/marcas', label: 'Marcas', icon: CarFront },

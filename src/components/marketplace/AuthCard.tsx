@@ -52,7 +52,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
           email,
           password,
           options: {
-            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/anunciar-carro-bh` : undefined,
+            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/anunciar-carro` : undefined,
           },
         })
 

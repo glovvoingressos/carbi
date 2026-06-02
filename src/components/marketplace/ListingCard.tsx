@@ -32,9 +32,13 @@ export default function ListingCard({ listing }: { listing: ListingPublic }) {
     { label: 'Ano/Modelo', value: `${listing.year}/${listing.year_model}` },
     { label: 'Quilometragem', value: `${listing.mileage.toLocaleString('pt-BR')} km` },
     { label: 'Cidade/UF', value: `${listing.city}/${listing.state}` },
+    ...(listing.vehicle_type === 'truck' ? [
+      { label: 'Tipo', value: listing.truck_type || 'Não informado' },
+      { label: 'Carga', value: listing.load_capacity ? `${listing.load_capacity} t` : 'Não informado' },
+    ] : []),
     ...(hasFipe ? [{ label: 'Preço FIPE', value: formatBRL(Number(listing.fipe_price)) }] : []),
     ...(listing.listed_since ? [{ label: 'Anunciado', value: listing.listed_since }] : []),
-  ]
+  ].slice(0, 5)
 
   return (
     <Link

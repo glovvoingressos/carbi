@@ -13,6 +13,8 @@ import { getLatestPublicListings, getMarketplaceDiscoverySections } from '@/lib/
 import { QUICK_LINKS } from '@/lib/marketplace-seo'
 import { getAllCars } from '@/lib/data-fetcher'
 
+export const dynamic = 'force-dynamic'
+
 const LOGO_MAP: Record<string, string> = {
   Toyota:     'https://www.carlogos.org/car-logos/toyota-logo.png',
   Honda:      'https://www.carlogos.org/car-logos/honda-logo.png',
@@ -41,7 +43,7 @@ export default async function HomePage() {
           </div>
           
           <h1 className="text-5xl sm:text-7xl font-black text-dark tracking-[-0.04em] leading-[0.95] mb-8">
-            Encontre o carro ideal,<br />
+            Encontre carros e caminhões,<br />
             pelo preço justo.
           </h1>
           

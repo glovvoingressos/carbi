@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useTransition, useCallback, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { 
   Search, SlidersHorizontal, X, ChevronDown, 
   Check, Filter, ArrowUpDown, Loader2,
@@ -47,7 +47,11 @@ export default function MarketplaceClient({
 }: MarketplaceClientProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const pathname = usePathname()
   const [isPending, startTransition] = useTransition()
+
+  // --- DETECT TRUCK-ONLY PAGE ---
+  const isTruckOnlyPage = pathname === '/caminhoes'
 
   // --- STATE ---
   const [listings, setListings] = useState<ListingPublic[]>(initialListings)
@@ -60,6 +64,14 @@ export default function MarketplaceClient({
 
   // --- FILTERS STATE ---
   const [q, setQ] = useState(searchParams.get('q') || '')
+  // Inicializa com 'truck' se for página de caminhões e não houver vehicle_type na URL
+  const [selectedVehicleType, setSelectedVehicleType] = useState<string>(() => {
+    const urlVehicle = searchParams.get('vehicle_type')
+    if (isTruckOnlyPage && !urlVehicle) {
+      return 'truck'
+    }
+    return urlVehicle || ''
+  })
   const [selectedBrands, setSelectedBrands] = useState<string[]>(searchParams.getAll('brand'))
   const [availableModels, setAvailableModels] = useState<string[]>([])
   const [selectedModels, setSelectedModels] = useState<string[]>(searchParams.getAll('model'))
@@ -87,6 +99,7 @@ export default function MarketplaceClient({
     setIsSearching(true)
     const input: ListingsPageInput = {
       q: q || undefined,
+      vehicle_type: selectedVehicleType || undefined,
       brand: selectedBrands.length > 0 ? selectedBrands : undefined,
       model: selectedModels.length > 0 ? selectedModels : undefined,
       fuel: selectedFuels.length > 0 ? selectedFuels : undefined,
@@ -106,7 +119,7 @@ export default function MarketplaceClient({
       ...overrides
     }
 
-    // Update URL without reload
+    // Update URL without reload (preserva a página atual: carros ou caminhões)
     const params = new URLSearchParams()
     if (input.q) params.set('q', input.q)
     if (Array.isArray(input.brand)) input.brand.forEach(b => params.append('brand', b))
@@ -125,7 +138,7 @@ export default function MarketplaceClient({
     if (input.sort !== 'recent') params.set('ordem', input.sort!)
     if (input.page && input.page > 1) params.set('pagina', input.page.toString())
 
-    router.replace(`/carros-a-venda?${params.toString()}`, { scroll: false })
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
 
     const result = await getFilteredListings(input)
     setListings(result.items)
@@ -161,6 +174,7 @@ export default function MarketplaceClient({
 
   const clearFilters = () => {
     setQ('')
+    setSelectedVehicleType('')
     setSelectedBrands([])
     setSelectedModels([])
     setSelectedFuels([])
@@ -185,6 +199,7 @@ export default function MarketplaceClient({
 
   const activeChips = useMemo(() => {
     const chips: Array<{ label: string; onRemove: () => void }> = []
+    if (selectedVehicleType) chips.push({ label: selectedVehicleType === 'car' ? 'Carro' : 'Caminhão', onRemove: () => setSelectedVehicleType('') })
     selectedBrands.forEach(b => chips.push({ label: b, onRemove: () => toggleItem(selectedBrands, b, setSelectedBrands) }))
     selectedModels.forEach(m => chips.push({ label: m, onRemove: () => toggleItem(selectedModels, m, setSelectedModels) }))
     selectedFuels.forEach(f => chips.push({ label: f, onRemove: () => toggleItem(selectedFuels, f, setSelectedFuels) }))
@@ -195,7 +210,7 @@ export default function MarketplaceClient({
       chips.push({ label: `Até R$ ${(priceRange[1]/1000).toFixed(0)}k`, onRemove: () => setPriceRange([0, 1000000]) })
     }
     return chips
-  }, [selectedBrands, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, priceRange])
+  }, [selectedVehicleType, selectedBrands, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, priceRange])
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
@@ -214,6 +229,27 @@ export default function MarketplaceClient({
             </div>
 
             <div className="space-y-8">
+              {/* Tipo de veículo */}
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 mb-4 block">Tipo de veículo</label>
+                <div className="flex flex-wrap gap-2">
+                  {!isTruckOnlyPage && (
+                    <button 
+                      onClick={() => setSelectedVehicleType(selectedVehicleType === 'car' ? '' : 'car')}
+                      className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all ${selectedVehicleType === 'car' ? 'bg-dark text-white' : 'bg-[#f5f5f3] text-dark/40 hover:bg-black/5'}`}
+                    >
+                      Carro
+                    </button>
+                  )}
+                  <button 
+                    onClick={() => setSelectedVehicleType('truck')}
+                    className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all ${selectedVehicleType === 'truck' || isTruckOnlyPage ? 'bg-dark text-white' : 'bg-[#f5f5f3] text-dark/40 hover:bg-black/5'}`}
+                  >
+                    Caminhão
+                  </button>
+                </div>
+              </div>
+
               {/* Preço */}
               <div>
                 <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 mb-4 block">Preço (R$)</label>
@@ -366,10 +402,10 @@ export default function MarketplaceClient({
                     onChange={e => setMileageRange([0, Number(e.target.value)])}
                     className="w-full accent-dark"
                   />
-                  <div className="flex justify-between text-[10px] font-black text-dark/20 uppercase tracking-widest">
-                    <span>0 km</span>
-                    <span>{mileageRange[1].toLocaleString()} km</span>
-                  </div>
+                   <div className="flex justify-between text-[10px] font-black text-dark/20 uppercase tracking-widest">
+                     <span>0 km</span>
+                     <span>{mileageRange[1].toLocaleString('pt-BR')} km</span>
+                   </div>
                 </div>
               </div>
 
@@ -672,10 +708,10 @@ export default function MarketplaceClient({
                         onChange={e => setMileageRange([0, Number(e.target.value)])}
                         className="w-full h-2 bg-[#f5f5f3] rounded-lg appearance-none cursor-pointer accent-dark"
                       />
-                      <div className="flex justify-between font-black text-dark text-xs">
-                        <span className="text-dark/20">0 KM</span>
-                        <span>ATÉ {mileageRange[1].toLocaleString()} KM</span>
-                      </div>
+                       <div className="flex justify-between font-black text-dark text-xs">
+                         <span className="text-dark/20">0 KM</span>
+                         <span>ATÉ {mileageRange[1].toLocaleString('pt-BR')} KM</span>
+                       </div>
                     </div>
                   </div>
 

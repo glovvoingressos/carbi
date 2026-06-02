@@ -36,6 +36,7 @@ export type ListingSort =
 
 export type ListingsPageInput = {
   q?: string
+  vehicle_type?: string | string[]
   brand?: string | string[]
   model?: string | string[]
   city?: string | string[]
@@ -255,6 +256,7 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
       vehicle_id,
       title,
       description,
+      vehicle_type,
       brand,
       model,
       version,
@@ -284,6 +286,10 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
       created_at,
       updated_at,
       price_updated_at,
+      truck_type,
+      load_capacity,
+      axles,
+      truck_body_type,
       images:vehicle_listing_images(
         id,
         public_url,
@@ -386,6 +392,7 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
       vehicle_id,
       title,
       description,
+      vehicle_type,
       brand,
       model,
       version,
@@ -415,6 +422,10 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
       created_at,
       updated_at,
       price_updated_at,
+      truck_type,
+      load_capacity,
+      axles,
+      truck_body_type,
       images:vehicle_listing_images(
         id,
         public_url,
@@ -425,7 +436,20 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
     .eq('status', 'active')
     .range(from, to)
 
-  if (input.q) query = query.or(`brand.ilike.%${input.q}%,model.ilike.%${input.q}%,title.ilike.%${input.q}%`)
+  if (input.q) {
+    const q = input.q.toLowerCase()
+    const isTruckQuery = /caminh(o|ão|ões)|truck|baú|caçamba|carreta|veículo pesado/i.test(q)
+    let searchQuery = `brand.ilike.%${input.q}%,model.ilike.%${input.q}%,title.ilike.%${input.q}%`
+    if (isTruckQuery) {
+      searchQuery += `,truck_type.ilike.%${input.q}%,truck_body_type.ilike.%${input.q}%`
+    }
+    query = query.or(searchQuery)
+  }
+  
+  if (input.vehicle_type) {
+    if (Array.isArray(input.vehicle_type)) query = query.in('vehicle_type', input.vehicle_type)
+    else query = query.eq('vehicle_type', input.vehicle_type)
+  }
   
   if (input.brand) {
     if (Array.isArray(input.brand)) query = query.in('brand', input.brand)

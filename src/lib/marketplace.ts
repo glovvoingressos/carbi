@@ -14,6 +14,7 @@ export interface ListingImageInput {
 export interface ListingFormPayload {
   title: string
   description: string
+  vehicle_type: 'car' | 'truck'
   brand: string
   model: string
   version?: string
@@ -39,6 +40,11 @@ export interface ListingFormPayload {
   fipe_reference_month?: string
   fipe_price?: number | null
   structured_data?: Record<string, unknown>
+  // Truck-specific fields
+  truck_type?: string
+  load_capacity?: number | null
+  axles?: number | null
+  truck_body_type?: string
 }
 
 export interface ListingPublic {
@@ -47,6 +53,7 @@ export interface ListingPublic {
   vehicle_id?: string | null
   title: string
   description: string
+  vehicle_type: 'car' | 'truck'
   brand: string
   model: string
   version: string | null
@@ -54,7 +61,7 @@ export interface ListingPublic {
   year_model: number
   mileage: number
   price: number
-  transmission: string
+  transmission: string | string[]
   fuel: string
   color: string
   body_type: string
@@ -96,6 +103,11 @@ export interface ListingPublic {
     sort_order: number
     is_primary: boolean
   }> | null
+  // Truck-specific fields
+  truck_type?: string | null
+  load_capacity?: number | null
+  axles?: number | null
+  truck_body_type?: string | null
 }
 
 export function parseMoneyInputToNumber(value: string): number {

@@ -48,9 +48,16 @@ export default function VehicleDetailView({
   const technicalSpecs = [
     { label: 'Cor', value: listing.color },
     { label: 'Final da placa', value: listing.plate_final || 'Não informado' },
-    { label: 'Carroceria', value: listing.body_type },
+    ...(listing.vehicle_type === 'truck' ? [
+      { label: 'Tipo de caminhão', value: listing.truck_type || 'Não informado' },
+      { label: 'Capacidade de carga', value: listing.load_capacity ? `${listing.load_capacity} t` : 'Não informado' },
+      { label: 'Número de eixos', value: listing.axles ? `${listing.axles}` : 'Não informado' },
+      { label: 'Tipo de carroceria', value: listing.truck_body_type || 'Não informado' },
+    ] : [
+      { label: 'Carroceria', value: listing.body_type },
+      { label: 'Portas', value: listing.doors ? `${listing.doors} portas` : 'Não informado' },
+    ]),
     { label: 'Motor', value: listing.engine || 'Não informado' },
-    { label: 'Portas', value: listing.doors ? `${listing.doors} portas` : 'Não informado' },
     { label: 'Localização', value: `${listing.city}/${listing.state}` },
   ]
 
