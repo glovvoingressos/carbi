@@ -208,9 +208,7 @@ export default function QualCarroPage() {
           <button onClick={reset} className="flex items-center justify-center gap-2 text-sm font-medium text-text-secondary hover:text-text px-4 py-2.5 rounded-lg bg-[#f2f6fb] hover:bg-[#e9f0f7] transition-colors">
             <RotateCcw className="w-4 h-4" /> Refazer teste
           </button>
-          <Link href="/comparar" className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-bold px-5 py-2.5 rounded-lg transition-colors">
-            Comparar carros &rarr;
-          </Link>
+
         </div>
       </div>
     )

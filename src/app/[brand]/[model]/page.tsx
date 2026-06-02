@@ -7,7 +7,7 @@ import { getFipePrice, getFipeHistory, getFipeYearsByModelName } from '@/lib/fip
 import CarCard from '@/components/car/CarCard'
 import Badge from '@/components/ui/Badge'
 import {
-  Fuel, Zap, Gauge, Shield, Package, Timer, ChevronRight, ArrowLeftRight, TrendingDown, ArrowRight
+  Fuel, Zap, Gauge, Shield, Package, Timer, ChevronRight, TrendingDown, ArrowRight
 } from 'lucide-react'
 import { VehicleSchema } from '@/components/seo/JSONLD'
 import ReviewSection from '@/components/car/ReviewSection'
@@ -176,13 +176,7 @@ export default async function CarDetailPage({
                 <div className="flex flex-col sm:flex-row gap-4 mt-6 items-start sm:items-center">
                    <YearSelector currentYear={displayYear || 'Sem ano'} availableYears={availableYears} />
                    
-                   <Link href="/comparar"
-                     className="inline-flex items-center justify-between bg-dark text-white rounded-full pl-6 pr-2 py-2 transition-all hover:scale-[1.02] active:scale-[0.98] w-max gap-8">
-                     <span className="font-semibold text-[13px] tracking-wide uppercase">Comparar</span>
-                     <div className="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full text-white">
-                       <ArrowLeftRight className="w-4 h-4" />
-                     </div>
-                   </Link>
+
                 </div>
                 
                 {searchYear && (
@@ -361,9 +355,7 @@ export default async function CarDetailPage({
                <Link href="/carros-usados-bh" className="w-full sm:w-auto bg-dark text-white font-semibold px-6 py-3 rounded-full flex items-center justify-center gap-2 hover:opacity-80 hover:-translate-y-1 transition-all">
                   Ver ofertas perto de mim <ArrowRight className="w-4 h-4" />
                </Link>
-               <Link href="/comparar" className="w-full sm:w-auto text-dark font-medium px-6 py-3 rounded-full border border-black/10 flex items-center justify-center hover:-translate-y-1 transition-all">
-                  Comparar concorrentes
-               </Link>
+
             </div>
           </section>
 
@@ -390,13 +382,7 @@ export default async function CarDetailPage({
           <div className="bg-[#f7f7f5] rounded-[20px] p-6 text-dark">
             <p className="text-sm text-dark/50 font-medium mb-1">Preço Sugerido</p>
             <p className="text-4xl font-bold mb-6 tracking-[-0.04em]">{formatBRL(car.priceBrl)}</p>
-            <Link href="/comparar"
-              className="w-full flex items-center justify-between bg-dark text-white rounded-full pl-6 pr-2 py-2 transition-all hover:opacity-80">
-              <span className="font-semibold text-[14px] tracking-wide uppercase">Comparar Agora</span>
-              <div className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-white">
-                 <ArrowLeftRight className="w-5 h-5" />
-              </div>
-            </Link>
+
           </div>
         </aside>
 

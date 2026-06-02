@@ -17,7 +17,6 @@ const NAV_LINKS = [
   ]},
   { group: 'Ferramentas', links: [
     { href: '/qual-carro', label: 'Qual Carro?' },
-    { href: '/comparar',   label: 'Comparador' },
     { href: '/melhor-carro-aplicativo', label: 'Melhor Carro Uber' },
   ]},
 ]
@@ -26,42 +25,29 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer style={{ background: 'var(--color-bg)', borderTop: '1px solid var(--color-border)' }}>
-      <div className="container" style={{ paddingBlock: 'clamp(48px, 6vh, 72px)' }}>
+    <footer className="bg-white border-t border-black/5 mt-auto">
+      <div className="container py-16 md:py-24">
 
         {/* Grid 4 colunas */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-            gap: 'clamp(32px, 5vw, 64px)',
-            marginBottom: 48,
-          }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
+          
           {/* Coluna: marca */}
-          <div style={{ gridColumn: 'span 2' }} className="footer-brand-col">
-            <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', marginBottom: 16 }}>
-              <span style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.04em', textTransform: 'lowercase' }}>
+          <div className="lg:col-span-2 space-y-6">
+            <Link href="/" className="inline-flex items-center">
+              <span className="font-display text-3xl font-black text-gradient tracking-tighter hover:opacity-80 transition-opacity">
                 carbi
               </span>
             </Link>
-            <p style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--color-text-2)', maxWidth: 280 }}>
-              O guia automotivo mais completo do Brasil. Compare carros, descubra seu perfil e tome a melhor decisão de compra com dados reais.
+            <p className="text-sm leading-relaxed text-dark/60 max-w-sm">
+              O ecossistema automotivo premium do Brasil. Compare carros, descubra seu perfil e tome a melhor decisão de compra com dados oficiais e interface intuitiva.
             </p>
 
             {/* Selos / trust */}
-            <div style={{ display: 'flex', gap: 8, marginTop: 20, flexWrap: 'wrap' }}>
+            <div className="flex flex-wrap gap-2 pt-2">
               {['Dados reais', 'Atualizado hoje', 'Sem anúncios'].map((label) => (
                 <span
                   key={label}
-                  style={{
-                    fontSize: 11, fontWeight: 600,
-                    padding: '3px 10px',
-                    borderRadius: 'var(--radius-pill)',
-                    background: 'var(--color-card)',
-                    border: '1px solid var(--color-border)',
-                    color: 'var(--color-text-2)',
-                  }}
+                  className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-dark/60 bg-[#F7F8FA] border border-black/5 rounded-full"
                 >
                   {label}
                 </span>
@@ -71,31 +57,19 @@ export default function Footer() {
 
           {/* Colunas de links */}
           {NAV_LINKS.map(({ group, links }) => (
-            <div key={group}>
-              <p
-                style={{
-                  fontSize: 11, fontWeight: 700,
-                  letterSpacing: '0.07em', textTransform: 'uppercase',
-                  color: 'var(--color-text-3)', marginBottom: 16,
-                }}
-              >
+            <div key={group} className="space-y-6">
+              <h4 className="text-[11px] font-black tracking-[0.1em] uppercase text-dark/40">
                 {group}
-              </p>
-              <ul style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              </h4>
+              <ul className="flex flex-col gap-4">
                 {links.map(({ href, label }) => (
                   <li key={href}>
                     <Link
                       href={href}
-                      style={{
-                        fontSize: 14, fontWeight: 500,
-                        color: 'var(--color-text-2)',
-                        transition: 'color 150ms ease',
-                        display: 'inline-flex', alignItems: 'center', gap: 4,
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-text)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-2)' }}
+                      className="text-sm font-semibold text-dark/60 hover:text-blue-600 transition-colors inline-flex items-center gap-1 group"
                     >
                       {label}
+                      <ArrowUpRight className="w-3 h-3 opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
                     </Link>
                   </li>
                 ))}
@@ -105,23 +79,15 @@ export default function Footer() {
         </div>
 
         {/* Linha final */}
-        <div
-          style={{
-            paddingTop: 24,
-            borderTop: '1px solid var(--color-border)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 16,
-            flexWrap: 'wrap',
-          }}
-        >
-          <p style={{ fontSize: 12, color: 'var(--color-text-3)' }}>
-            © {year} carbi — Dados oficiais e comparativos inteligentes.
+        <div className="pt-8 border-t border-black/5 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs font-semibold text-dark/40">
+            © {year} carbi — Premium Automotive Experience.
           </p>
-          <p style={{ fontSize: 12, color: 'var(--color-text-3)' }}>
-            Feito com ❤️ no Brasil
-          </p>
+          <div className="flex items-center gap-6 text-xs font-semibold text-dark/40">
+            <span className="hover:text-dark transition-colors cursor-pointer">Termos</span>
+            <span className="hover:text-dark transition-colors cursor-pointer">Privacidade</span>
+            <span>Feito com ❤️ no Brasil</span>
+          </div>
         </div>
 
       </div>

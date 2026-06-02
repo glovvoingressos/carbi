@@ -146,11 +146,7 @@ export default function AppRankingPage() {
                                {item.roiRating} <Star className="w-3 h-3 fill-white border-none" />
                             </div>
                          </td>
-                         <td className="py-8 px-4 text-right">
-                            <Link href="/comparar" className="p-3 bg-white border-2 border-dark rounded-full inline-flex items-center justify-center hover:bg-dark hover:text-white transition-all">
-                               <ArrowRight className="w-6 h-6" />
-                            </Link>
-                         </td>
+                          <td className="py-8 px-4 text-right"></td>
                       </tr>
                     ))}
                  </tbody>
@@ -166,9 +162,7 @@ export default function AppRankingPage() {
             <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-8 max-w-3xl">
                Não decida antes de ver os dados técnicos.
             </h2>
-            <Link href="/comparar" className="px-12 py-6 bg-white text-dark rounded-full font-black text-xl uppercase tracking-widest shadow-[8px_8px_0_#0A0A0A] hover:translate-x-1 hover:-translate-y-1 transition-all">
-               Fazer meu Versus Agora
-            </Link>
+
         </div>
       </section>
     </main>
