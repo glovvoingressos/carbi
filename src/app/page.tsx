@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import HeroSearchBar from '@/components/ui/HeroSearchBar'
 import {
-  ArrowRight, Sparkles,
-  ShoppingBag, Tag, PlusCircle
+  ArrowRight, Sparkles, ShoppingBag, Tag, PlusCircle, Car, ShieldCheck, TrendingDown, Fuel, Gauge
 } from 'lucide-react'
 import FAQSection from '@/components/layout/FAQSection'
 import BrandLogo from '@/components/brand/BrandLogo'
@@ -12,6 +11,15 @@ import { getAllCars } from '@/lib/data-fetcher'
 
 export const dynamic = 'force-dynamic'
 
+const CATEGORIES = [
+  { label: 'SUV', icon: Car, href: '/carros-a-venda?q=SUV', color: 'bg-accent-light text-accent' },
+  { label: 'Hatch', icon: Car, href: '/carros-a-venda?q=Hatch', color: 'bg-gold-bg text-gold' },
+  { label: 'Sedan', icon: Car, href: '/carros-a-venda?q=Sedan', color: 'bg-accent-light text-accent' },
+  { label: 'Picape', icon: Car, href: '/carros-a-venda?q=Picape', color: 'bg-gold-bg text-gold' },
+  { label: 'Elétrico', icon: Fuel, href: '/carros-a-venda?q=Elétrico', color: 'bg-accent-light text-accent' },
+  { label: 'Até R$ 50k', icon: Tag, href: '/carros-a-venda?q=Até+R$+50k', color: 'bg-gold-bg text-gold' },
+]
+
 export default async function HomePage() {
   const cars = await getAllCars()
   const latestListings = await getLatestPublicListings(12)
@@ -19,110 +27,100 @@ export default async function HomePage() {
   const brands = [...new Set(cars.map((c) => c.brand))].sort().slice(0, 8)
 
   return (
-    <main className="bg-[#F7F8FA] min-h-screen pt-20">
-      {/* ── HERO SECTION ── */}
-      <section className="pt-20 pb-16 px-4 relative overflow-hidden">
-        {/* Decorative Background Elements */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[500px] bg-gradient-to-b from-blue-50 to-transparent opacity-60 pointer-events-none" />
-        <div className="absolute top-20 right-0 w-[400px] h-[400px] bg-blue-400/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute top-40 left-0 w-[300px] h-[300px] bg-violet-400/10 rounded-full blur-[100px] pointer-events-none" />
-
-        <div className="container max-w-6xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md border border-black/5 px-4 py-2 rounded-full mb-8 animate-slide-up shadow-sm">
-            <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
-            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-dark/60">O Marketplace Premium</span>
-          </div>
-          
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-heading font-black text-dark tracking-tighter leading-[1.05] mb-8 animate-slide-up" style={{ animationDelay: '100ms' }}>
-            Encontre o carro ideal,<br />
-            pelo <span className="text-gradient">preço justo.</span>
-          </h1>
-          
-          <div className="max-w-3xl mx-auto mb-16 animate-slide-up" style={{ animationDelay: '200ms' }}>
-            <HeroSearchBar />
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              {['Até 50k', 'SUVs', 'Elétricos', 'Picapes'].map(label => (
-                <Link 
-                  key={label}
-                  href={`/carros-a-venda?q=${label}`}
-                  className="px-5 py-2 bg-white border border-black/5 rounded-full text-xs font-bold text-dark/60 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm"
-                >
-                  {label}
-                </Link>
-              ))}
+    <div className="min-h-screen">
+      {/* ── HERO ── */}
+      <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
+        <div className="container relative z-10">
+          <div className="max-w-3xl mx-auto text-center mb-10">
+            <div className="inline-flex items-center gap-2 bg-accent px-4 py-1.5 rounded-full mb-6 shadow-sm">
+              <span className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-white/95">Marketplace Premium</span>
             </div>
+            <h1 className="mb-4">
+              Encontre o carro ideal,<br />
+              pelo <span className="text-text-primary font-bold">preço justo.</span>
+            </h1>
+            <p className="body-large text-text-secondary max-w-xl mx-auto mb-8">
+              Milhares de anúncios verificados com dados reais de mercado. Compare, negocie e decida com confiança.
+            </p>
+            <HeroSearchBar />
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto animate-slide-up" style={{ animationDelay: '300ms' }}>
-            <Link href="/carros-a-venda" className="bg-white p-8 rounded-[32px] border border-black/5 flex flex-col items-center gap-4 hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(15,23,42,0.06)] transition-all group">
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors text-blue-600 shadow-sm">
-                <ShoppingBag className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="font-heading font-bold text-xl text-dark">Comprar</p>
-                <p className="text-sm font-medium text-dark/50 mt-1">Explore {latestListings.length}+ anúncios</p>
-              </div>
-            </Link>
-            
-            <Link href="/anunciar-carro" className="bg-white p-8 rounded-[32px] border border-black/5 flex flex-col items-center gap-4 hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(15,23,42,0.06)] transition-all group">
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors text-blue-600 shadow-sm">
-                <Tag className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="font-heading font-bold text-xl text-dark">Vender</p>
-                <p className="text-sm font-medium text-dark/50 mt-1">Anuncie grátis em minutos</p>
-              </div>
-            </Link>
-
-
+ 
+          {/* Quick Categories */}
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 max-w-3xl mx-auto justify-center">
+            {CATEGORIES.map((cat) => {
+              const Icon = cat.icon
+              return (
+                <Link
+                  key={cat.label}
+                  href={cat.href}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-white text-sm font-medium text-text-secondary hover:bg-accent hover:text-white hover:border-transparent transition-all shrink-0`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {cat.label}
+                </Link>
+              )
+            })}
           </div>
         </div>
       </section>
 
-      {/* ── LATEST LISTINGS ── */}
-      <section className="py-20 md:py-32 bg-white relative">
-        <div className="container max-w-7xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+      {/* ── FEATURED LISTINGS ── */}
+      <section className="section-pad bg-white">
+        <div className="container">
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 mb-3">Novidades no feed</p>
-              <h2 className="text-4xl md:text-5xl font-heading font-black text-dark tracking-tighter">Recém anunciados</h2>
+              <p className="label text-accent mb-2">Novidades</p>
+              <h2>Rec&eacute;m anunciados</h2>
             </div>
-            <Link href="/carros-a-venda" className="flex items-center gap-2 text-sm font-bold text-dark/60 hover:text-blue-600 bg-[#F7F8FA] px-6 py-3 rounded-full hover:bg-blue-50 transition-colors shrink-0">
-              Ver marketplace <ArrowRight className="w-4 h-4" />
+            <Link
+              href="/carros-a-venda"
+              className="btn btn-ghost btn-sm hidden sm:inline-flex"
+            >
+              Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
           {latestListings.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {latestListings.slice(0, 8).map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}
             </div>
           ) : (
-            <div className="bg-[#F7F8FA] rounded-[32px] p-16 text-center border border-black/5">
-              <p className="text-dark/50 font-medium text-lg mb-6">Ainda não há anúncios ativos na sua região.</p>
-              <Link href="/anunciar-carro" className="bg-blue-600 text-white px-8 py-4 rounded-full font-bold inline-flex items-center gap-2 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20">
-                Seja o primeiro a anunciar <PlusCircle className="w-5 h-5" />
+            <div className="card p-12 text-center">
+              <p className="text-text-secondary font-medium mb-4">Ainda não há anúncios ativos.</p>
+              <Link href="/anunciar-carro" className="btn btn-primary inline-flex">
+                <PlusCircle className="w-4 h-4" /> Seja o primeiro a anunciar
               </Link>
             </div>
           )}
+
+          <div className="mt-6 text-center sm:hidden">
+            <Link href="/carros-a-venda" className="btn btn-secondary btn-sm inline-flex">
+              Ver todos <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* ── PRICE DROPS ── */}
       {discovery.reduced.length > 0 && (
-        <section className="py-20 md:py-32">
-          <div className="container max-w-7xl mx-auto px-4">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <section className="section-pad">
+          <div className="container">
+            <div className="flex items-end justify-between mb-8">
               <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-600 mb-3">Grandes Oportunidades</p>
-                <h2 className="text-4xl md:text-5xl font-heading font-black text-dark tracking-tighter">Baixaram de preço</h2>
+                <p className="label text-success mb-2">Oportunidades</p>
+                <h2>Baixaram de pre&ccedil;o</h2>
               </div>
-              <Link href="/carros/mais-baratos" className="flex items-center gap-2 text-sm font-bold text-dark/60 hover:text-emerald-600 bg-white border border-black/5 px-6 py-3 rounded-full hover:bg-emerald-50 transition-colors shrink-0 shadow-sm">
+              <Link
+                href="/carros/mais-baratos"
+                className="btn btn-ghost btn-sm hidden sm:inline-flex"
+              >
                 Ver todos <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {discovery.reduced.slice(0, 4).map((listing) => (
                 <ListingCard key={`drop-${listing.id}`} listing={listing} />
               ))}
@@ -131,23 +129,56 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ── VALUE PROPS ── */}
+      <section className="section-pad bg-white border-y border-border">
+        <div className="container">
+          <div className="text-center mb-10">
+            <p className="label text-accent mb-2">Por que carbi?</p>
+            <h2>A plataforma premium<br className="sm:hidden" /> para decidir com dados</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="card-elevated p-8 text-center">
+              <div className="w-12 h-12 bg-accent-light rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <ShieldCheck className="w-6 h-6 text-accent" />
+              </div>
+              <h3 className="text-lg mb-2">Dados Reais</h3>
+              <p className="text-sm text-text-secondary">Informa&ccedil;&otilde;es t&eacute;cnicas e valores baseados na Tabela FIPE e fontes oficiais.</p>
+            </div>
+            <div className="card-elevated p-8 text-center">
+              <div className="w-12 h-12 bg-accent-light rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <TrendingDown className="w-6 h-6 text-accent" />
+              </div>
+              <h3 className="text-lg mb-2">Sem An&uacute;ncios</h3>
+              <p className="text-sm text-text-secondary">Experi&ecirc;ncia limpa e focada no que realmente importa: o pr&oacute;ximo carro.</p>
+            </div>
+            <div className="card-elevated p-8 text-center">
+              <div className="w-12 h-12 bg-accent-light rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <Sparkles className="w-6 h-6 text-accent" />
+              </div>
+              <h3 className="text-lg mb-2">Atualizado Hoje</h3>
+              <p className="text-sm text-text-secondary">Dados sincronizados em tempo real com as principais fontes do mercado automotivo.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── BRANDS ── */}
-      <section className="py-24 md:py-32">
-        <div className="container max-w-6xl mx-auto px-4 text-center">
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-dark/40 mb-10">Navegue pelas principais marcas</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-6">
-            {brands.map(brand => {
+      <section className="section-pad">
+        <div className="container text-center">
+          <p className="label mb-8">Navegue por marca</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+            {brands.map((brand) => {
               const slug = brand.toLowerCase().replace(/\s+/g, '-')
               return (
-                <Link 
+                <Link
                   key={brand}
                   href={`/marcas/${slug}`}
-                  className="bg-white p-6 rounded-3xl border border-black/5 flex flex-col items-center justify-center gap-4 hover:-translate-y-2 hover:shadow-[0_12px_40px_rgba(15,23,42,0.06)] transition-all group"
+                  className="card p-5 flex flex-col items-center justify-center gap-3 hover:border-accent-light hover:bg-accent-light/30 transition-all group"
                 >
-                  <div className="w-12 h-12 bg-[#F7F8FA] rounded-2xl flex items-center justify-center p-2 group-hover:bg-blue-50 transition-colors">
-                    <BrandLogo brandName={brand} domain={`${slug}.com`} className="w-full h-full object-contain mix-blend-multiply" />
+                  <div className="w-10 h-10 bg-bg-alt rounded-xl flex items-center justify-center p-2 group-hover:bg-white transition-colors">
+                    <BrandLogo brandName={brand} domain={`${slug}.com`} className="w-full h-full object-contain opacity-60 group-hover:opacity-100 transition-opacity" />
                   </div>
-                  <span className="text-[11px] font-black uppercase tracking-wider text-dark group-hover:text-blue-600 transition-colors">{brand}</span>
+                  <span className="text-xs font-semibold text-text-tertiary group-hover:text-accent transition-colors">{brand}</span>
                 </Link>
               )
             })}
@@ -156,32 +187,22 @@ export default async function HomePage() {
       </section>
 
       {/* ── CTA SELL ── */}
-      <section className="py-24 px-4 bg-white">
-        <div className="container max-w-6xl mx-auto">
-          <div className="bg-gradient-to-br from-[#0F172A] to-[#1E293B] rounded-[40px] md:rounded-[64px] p-12 md:p-24 text-center relative overflow-hidden group shadow-[0_24px_64px_rgba(15,23,42,0.2)]">
-            {/* Modern Glow Elements */}
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[120px] -mr-64 -mt-64 group-hover:bg-blue-500/30 transition-colors duration-1000 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-violet-500/20 rounded-full blur-[100px] -ml-48 -mb-48 pointer-events-none" />
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay" />
-            
-            {/* Abstract Decorative Elements */}
-            <div className="absolute top-16 left-16 opacity-20 pointer-events-none">
-              <Sparkles className="w-16 h-16 text-blue-400 rotate-12" />
-            </div>
-
+      <section className="section-pad px-4">
+        <div className="container">
+          <div className="bg-accent rounded-3xl md:rounded-[40px] p-10 md:p-20 text-center relative overflow-hidden">
             <div className="relative z-10">
-              <h2 className="text-4xl sm:text-6xl md:text-7xl font-heading font-black text-white tracking-tighter leading-[1.05] mb-8">
+              <h2 className="text-white mb-4">
                 Venda seu carro<br />
-                com <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">atrito zero.</span>
+                com <span className="text-white underline decoration-white/20 underline-offset-4">atrito zero.</span>
               </h2>
-              <p className="text-white/60 text-lg md:text-xl font-medium mb-12 max-w-2xl mx-auto leading-relaxed">
-                Publique seu anúncio na plataforma mais moderna do Brasil em menos de 2 minutos. É gratuito, rápido e 100% seguro.
+              <p className="body-large text-white/60 max-w-lg mx-auto mb-8">
+                Publique seu an&uacute;ncio na plataforma mais moderna do Brasil em menos de 2 minutos. &Eacute; gratuito, r&aacute;pido e 100% seguro.
               </p>
-              <Link 
-                href="/anunciar-carro" 
-                className="bg-white text-dark h-16 md:h-20 px-10 md:px-14 rounded-full font-bold text-base md:text-lg uppercase tracking-widest hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all inline-flex items-center gap-3"
+              <Link
+                href="/anunciar-carro"
+                className="btn btn-lg bg-white text-text-primary hover:bg-white/90 inline-flex"
               >
-                Anunciar agora <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
+                Anunciar agora <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
           </div>
@@ -189,6 +210,6 @@ export default async function HomePage() {
       </section>
 
       <FAQSection />
-    </main>
+    </div>
   )
 }

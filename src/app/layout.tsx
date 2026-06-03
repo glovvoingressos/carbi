@@ -1,29 +1,29 @@
 import type { Metadata } from 'next'
-import { Bricolage_Grotesque, Boldonse } from 'next/font/google'
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
 import { OrganizationSchema } from '@/components/seo/JSONLD'
 
-const font = Bricolage_Grotesque({
+const font = Inter({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
 })
 
-const fontBoldonse = Boldonse({
-  weight: '400',
+const fontHeading = Plus_Jakarta_Sans({
   subsets: ['latin'],
+  weight: ['500', '600', '700', '800'],
   variable: '--font-heading',
 })
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'),
   title: {
-    default: 'carbi — Descubra e pesquise o carro certo para você',
+    default: 'carbi — O marketplace premium que entende de carro',
     template: '%s | carbi',
   },
-  description: 'A ferramenta definitiva para explorar, comparar dados técnicos e consultar valores atualizados do seu próximo carro em tempo real.',
-  keywords: ['comprar carro', 'valor atualizado carro', 'comparar carros', 'ficha técnica', 'carros usados', 'carros novos'],
+  description: 'Explore milhares de anúncios verificados, compare especificações técnicas e encontre o carro ideal com dados reais de mercado.',
+  keywords: ['comprar carro', 'anúncios de carros', 'carros usados', 'carros novos', 'tabela fipe', 'avaliação de carros'],
   authors: [{ name: 'Equipe carbi' }],
   creator: 'carbi',
   publisher: 'carbi Inc.',
@@ -36,14 +36,13 @@ export const metadata: Metadata = {
     locale: 'pt_BR',
     url: '/',
     siteName: 'carbi',
-    title: 'carbi — O motor de busca da sua próxima garagem',
-    description: 'Comparador de veículos lado a lado, valores atualizados e fichas técnicas para decisões baseadas em dados.',
-    // images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    title: 'carbi — O marketplace premium que entende de carro',
+    description: 'Milhares de anúncios verificados com dados reais de mercado. Encontre, compare e negocie o carro ideal.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'carbi — Informações Automotivas e Preços',
-    description: 'Encontre tudo sobre seu modelo de carro favorito na carbi.',
+    title: 'carbi — Marketplace Automotivo Premium',
+    description: 'Milhares de anúncios verificados com dados reais de mercado. Encontre, compare e negocie o carro ideal.',
   },
   robots: {
     index: true,
@@ -64,8 +63,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR" className={`${font.variable} ${fontBoldonse.variable}`}>
-      <body className={font.className} style={{ background: 'var(--color-bg)' }}>
+    <html lang="pt-BR" className={`${font.variable} ${fontHeading.variable}`}>
+      <body className={font.className}>
         <OrganizationSchema />
         <ClientShell>{children}</ClientShell>
       </body>

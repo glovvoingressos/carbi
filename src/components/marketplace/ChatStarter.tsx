@@ -61,17 +61,17 @@ export default function ChatStarter({ listingId }: { listingId: string }) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <button
         type="button"
         onClick={openConversation}
         disabled={loading}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-dark px-5 py-3 text-sm font-black text-white disabled:opacity-60"
+        className="inline-flex w-full h-14 items-center justify-center gap-3 rounded-2xl bg-accent text-xs font-black uppercase tracking-widest text-white hover:bg-black disabled:opacity-60 transition-colors shadow-sm"
       >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
+        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <MessageCircle className="h-5 w-5" />}
         Conversar com vendedor
       </button>
-      {error && <p className="text-xs font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-xs font-bold text-red-600 text-center">{error}</p>}
     </div>
   )
 }

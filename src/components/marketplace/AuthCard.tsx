@@ -75,24 +75,24 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
   }
 
   return (
-    <div className={`rounded-[30px] border border-[#E8E8E8] bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)] ${compact ? 'p-5' : 'p-7'}`}>
-      <h3 className="text-xl font-black text-dark">Entre para anunciar</h3>
-      <p className="text-sm text-text-secondary mt-2">Seu contato fica protegido: comprador e vendedor falam só pelo chat interno.</p>
+    <div className={`rounded-[32px] border border-border bg-white shadow-sm ${compact ? 'p-6' : 'p-10'}`}>
+      <h3 className="text-2xl font-heading font-black text-text-primary tracking-tight">Entre para anunciar</h3>
+      <p className="text-sm font-bold text-text-secondary mt-3 leading-relaxed">Seu contato fica protegido: comprador e vendedor falam só pelo chat interno.</p>
 
       {!supabaseReady && (
-        <p className="mt-3 rounded-[16px] border border-[#E8E8E8] bg-white px-3 py-2 text-sm font-semibold text-text-secondary">
+        <p className="mt-6 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-bold text-red-600 shadow-sm">
           Ambiente sem Supabase configurado. O login/cadastro fica indisponível até configurar as variáveis públicas.
         </p>
       )}
 
-      <form className="mt-5 space-y-3" onSubmit={handleSubmit}>
+      <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
         <input
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Seu e-mail"
-          className="w-full rounded-[16px] border-[1.5px] border-transparent px-4 py-3 bg-[#F2F2F7] focus:outline-none focus:border-[var(--color-accent)]"
+          className="w-full rounded-2xl border border-border px-5 py-4 bg-bg-alt text-sm font-bold text-text-primary focus:outline-none focus:border-accent focus:bg-white transition-colors"
         />
         <input
           type="password"
@@ -101,32 +101,34 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Sua senha"
-          className="w-full rounded-[16px] border-[1.5px] border-transparent px-4 py-3 bg-[#F2F2F7] focus:outline-none focus:border-[var(--color-accent)]"
+          className="w-full rounded-2xl border border-border px-5 py-4 bg-bg-alt text-sm font-bold text-text-primary focus:outline-none focus:border-accent focus:bg-white transition-colors"
         />
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {message && <p className="text-sm text-dark">{message}</p>}
+        {error && <p className="text-sm font-bold text-red-600 bg-red-50 px-4 py-3 rounded-xl border border-red-100">{error}</p>}
+        {message && <p className="text-sm font-bold text-green-700 bg-green-50 px-4 py-3 rounded-xl border border-green-100">{message}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-[999px] bg-[var(--color-accent)] text-white font-black py-3 disabled:opacity-60 transition"
+          className="w-full h-14 rounded-2xl bg-accent text-white text-xs font-black uppercase tracking-widest disabled:opacity-60 hover:bg-black transition-colors shadow-sm mt-4"
         >
           {loading ? 'Processando...' : mode === 'login' ? 'Entrar' : 'Criar conta'}
         </button>
       </form>
 
-      <button
-        type="button"
-        onClick={() => {
-          setMode((prev) => (prev === 'login' ? 'signup' : 'login'))
-          setError(null)
-          setMessage(null)
-        }}
-        className="mt-4 text-sm font-bold text-dark underline underline-offset-2"
-      >
-        {mode === 'login' ? 'Ainda não tenho conta' : 'Já tenho conta'}
-      </button>
+      <div className="mt-6 text-center">
+        <button
+          type="button"
+          onClick={() => {
+            setMode((prev) => (prev === 'login' ? 'signup' : 'login'))
+            setError(null)
+            setMessage(null)
+          }}
+          className="text-xs font-black uppercase tracking-widest text-text-tertiary hover:text-accent transition-colors"
+        >
+          {mode === 'login' ? 'Ainda não tenho conta' : 'Já tenho conta'}
+        </button>
+      </div>
     </div>
   )
 }

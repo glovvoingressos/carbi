@@ -27,7 +27,7 @@ const initialLoading: LoadingState = {
   detail: false,
 }
 
-const skeletonClass = 'h-12 w-full rounded-xl bg-slate-200/70 animate-pulse'
+const skeletonClass = 'h-12 w-full rounded-xl bg-bg-alt animate-pulse'
 
 function normalize(value: string): string {
   if (!value) return ''
@@ -373,15 +373,15 @@ export default function FipeCalculator({
   const safeResult = hasValidResult ? result : null
 
   return (
-    <div className="bg-white border-2 border-dark rounded-[32px] overflow-hidden shadow-[8px_8px_0_#000] p-6 sm:p-8">
+    <div className="card-elevated p-6 sm:p-8 bg-card border border-border">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-[#1a1a1a] rounded-xl flex items-center justify-center text-white">
-          <TrendingDown className="w-6 h-6" />
+        <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-white">
+          <TrendingDown className="w-5 h-5 text-white" />
         </div>
-        <h3 className="text-xl font-black uppercase tracking-tight italic">Consulta de Valor Atualizado</h3>
+        <h3 className="text-xl font-display text-text-primary tracking-tight">Consulta de Valor Atualizado</h3>
       </div>
 
-      <div className="flex items-center gap-2 mb-6 p-1.5 bg-slate-50 border-2 border-dark rounded-2xl">
+      <div className="flex items-center gap-1.5 mb-6 p-1.5 bg-bg-alt rounded-2xl">
         {[
           { id: 'cars', label: 'Carros' },
           { id: 'motorcycles', label: 'Motos' },
@@ -390,10 +390,10 @@ export default function FipeCalculator({
           <button
             key={type.id}
             onClick={() => setSelectedType(type.id)}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold tracking-wide transition-all duration-200 ${
               selectedType === type.id
-                ? 'bg-dark text-white shadow-[4px_4px_0_#000]'
-                : 'text-text-tertiary hover:bg-dark/5'
+                ? 'bg-card text-text-primary shadow-xs font-bold'
+                : 'text-text-secondary hover:bg-card-hover/50'
             }`}
           >
             {type.label}
@@ -402,15 +402,15 @@ export default function FipeCalculator({
       </div>
 
       <div className="grid gap-4 mb-8">
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-1">Marca</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold tracking-wider text-text-secondary uppercase ml-1">Marca</label>
           {loading.brands ? (
             <div className={skeletonClass} />
           ) : (
             <select
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
-              className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer"
+              className="w-full input font-semibold cursor-pointer appearance-none bg-bg-alt border-none"
             >
               <option value="">Selecione a Marca</option>
               {brands.map((b) => (
@@ -420,8 +420,8 @@ export default function FipeCalculator({
           )}
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-1">Modelo</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold tracking-wider text-text-secondary uppercase ml-1">Modelo</label>
           {loading.models ? (
             <div className={skeletonClass} />
           ) : (
@@ -429,7 +429,7 @@ export default function FipeCalculator({
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
               disabled={!selectedBrand}
-              className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer disabled:opacity-50"
+              className="w-full input font-semibold cursor-pointer appearance-none bg-bg-alt border-none disabled:opacity-50"
             >
               <option value="">Selecione o Modelo</option>
               {models.map((m) => (
@@ -439,8 +439,8 @@ export default function FipeCalculator({
           )}
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-1">Ano Modelo</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold tracking-wider text-text-secondary uppercase ml-1">Ano Modelo</label>
           {loading.years ? (
             <div className={skeletonClass} />
           ) : (
@@ -448,7 +448,7 @@ export default function FipeCalculator({
               value={selectedYear ?? ''}
               onChange={(e) => setSelectedYear(e.target.value ? parseInt(e.target.value, 10) : null)}
               disabled={!selectedModel}
-              className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer disabled:opacity-50"
+              className="w-full input font-semibold cursor-pointer appearance-none bg-bg-alt border-none disabled:opacity-50"
             >
               <option value="">Selecione o Ano</option>
               {years.map((year) => (
@@ -461,8 +461,8 @@ export default function FipeCalculator({
           )}
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-1">Versão / Combustível</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold tracking-wider text-text-secondary uppercase ml-1">Versão / Combustível</label>
           {loading.versions ? (
             <div className={skeletonClass} />
           ) : (
@@ -470,7 +470,7 @@ export default function FipeCalculator({
               value={selectedVersion}
               onChange={(e) => setSelectedVersion(e.target.value)}
               disabled={!selectedYear}
-              className="w-full bg-surface border-2 border-dark rounded-xl px-4 py-3 font-bold text-dark focus:ring-0 appearance-none cursor-pointer disabled:opacity-50"
+              className="w-full input font-semibold cursor-pointer appearance-none bg-bg-alt border-none disabled:opacity-50"
             >
               <option value="">Selecione a Versão</option>
               {versions.map((version) => (
@@ -484,44 +484,44 @@ export default function FipeCalculator({
       </div>
 
       {error && (
-        <div className="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+        <div className="mb-4 rounded-xl border border-danger/20 bg-danger/5 px-4 py-3 text-sm font-semibold text-danger">
           {error}
         </div>
       )}
 
       {loading.detail && (
-        <div className="pt-6 border-t-2 border-dark border-dashed">
-          <div className="h-9 w-56 rounded bg-slate-200/80 animate-pulse" />
+        <div className="pt-6 border-t border-border border-dashed">
+          <div className="h-9 w-56 rounded bg-bg-alt animate-pulse" />
         </div>
       )}
 
       {!loading.detail && safeResult && hasAllFilters ? (
-        <div className="space-y-4 pt-6 border-t-2 border-dark border-dashed">
+        <div className="space-y-4 pt-6 border-t border-border border-dashed">
           <div>
-            <p className="text-[11px] text-text-tertiary uppercase font-black tracking-widest mb-1.5">Preço FIPE</p>
-            <p className="text-4xl font-black text-dark tracking-[-0.05em]">{safeResult.price}</p>
+            <p className="text-xs text-text-secondary uppercase font-semibold tracking-wider mb-1.5">Preço FIPE</p>
+            <p className="text-4xl font-display text-text-primary tracking-tight">{safeResult.price}</p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-3 text-xs font-bold">
-            <div className="bg-surface border border-dark/20 rounded-xl px-3 py-2">
-              <span className="text-text-tertiary uppercase tracking-wider">Ano Selecionado</span>
-              <p className="text-dark mt-1">{selectedYear}</p>
+            <div className="bg-bg-alt rounded-xl px-3 py-2 border border-border">
+              <span className="text-text-secondary uppercase tracking-wider text-[10px]">Ano Selecionado</span>
+              <p className="text-text-primary mt-0.5 font-semibold">{selectedYear}</p>
             </div>
-            <div className="bg-surface border border-dark/20 rounded-xl px-3 py-2">
-              <span className="text-text-tertiary uppercase tracking-wider">Combustível</span>
-              <p className="text-dark mt-1">{selectedVersionObj?.fuelType || safeResult.fuel}</p>
+            <div className="bg-bg-alt rounded-xl px-3 py-2 border border-border">
+              <span className="text-text-secondary uppercase tracking-wider text-[10px]">Combustível</span>
+              <p className="text-text-primary mt-0.5 font-semibold">{selectedVersionObj?.fuelType || safeResult.fuel}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary bg-surface/50 p-3 rounded-xl border border-dashed border-dark/20">
-            <Loader2 className="w-3 h-3 text-dark/40" />
-            Referência mensal: {safeResult.referenceMonth} • Código oficial: {safeResult.codeFipe}
+          <div className="flex items-center gap-2 text-[10px] font-semibold text-text-secondary bg-bg-alt/40 p-3 rounded-xl border border-dashed border-border">
+            <Loader2 className="w-3 h-3 text-text-tertiary animate-spin" />
+            <span>Referência mensal: {safeResult.referenceMonth} • Código oficial: {safeResult.codeFipe}</span>
           </div>
         </div>
       ) : null}
 
       {!loading.detail && !hasValidResult && (
-        <div className="pt-6 text-center text-text-tertiary font-bold italic border-t-2 border-dark border-dashed">
+        <div className="pt-6 text-center text-sm font-medium text-text-secondary border-t border-border border-dashed">
           Selecione marca, modelo, ano e versão para consultar o valor atualizado.
         </div>
       )}

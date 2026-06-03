@@ -1,10 +1,13 @@
 'use client'
 
 import { useEffect, useCallback } from 'react'
+import { usePathname } from 'next/navigation'
 import Navbar from './Navbar'
 import Footer from './Footer'
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+
   const observeElements = useCallback(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -28,11 +31,10 @@ export default function ClientShell({ children }: { children: React.ReactNode })
   useEffect(() => {
     const observer = observeElements()
 
-    // Re-observe on DOM mutations (route changes)
     const mutationObserver = new MutationObserver(() => {
       observeElements()
     })
-    
+
     mutationObserver.observe(document.body, {
       childList: true,
       subtree: true,
@@ -42,14 +44,14 @@ export default function ClientShell({ children }: { children: React.ReactNode })
       observer.disconnect()
       mutationObserver.disconnect()
     }
-  }, [observeElements])
+  }, [pathname, observeElements])
 
   return (
     <>
       <Navbar />
-      <div style={{ minHeight: '100vh' }}>
+      <main style={{ minHeight: '100vh', paddingBottom: '56px' }} className="md:pb-0">
         {children}
-      </div>
+      </main>
       <Footer />
     </>
   )

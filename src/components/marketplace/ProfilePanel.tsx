@@ -156,8 +156,8 @@ export default function ProfilePanel() {
 
   if (!sessionReady) {
     return (
-      <div className="bg-white rounded-[32px] border border-black/5 p-8 text-center">
-        <Loader2 className="mx-auto h-5 w-5 animate-spin text-dark" />
+      <div className="card p-8 text-center bg-card border border-border">
+        <Loader2 className="mx-auto h-5 w-5 animate-spin text-accent" />
         <p className="mt-2 text-sm text-text-secondary">Carregando perfil...</p>
       </div>
     )
@@ -168,55 +168,61 @@ export default function ProfilePanel() {
   }
 
   return (
-    <section className="bg-white rounded-[32px] border border-black/5 p-8 sm:p-12 shadow-sm">
-      <h2 className="text-3xl font-black text-dark tracking-tight">Configurações</h2>
-      <p className="mt-2 text-lg font-medium text-dark/50">Atualize seu nome e sua foto.</p>
+    <section className="card-elevated p-8 sm:p-12 shadow-sm border border-border bg-card">
+      <h2 className="text-3xl font-display text-text-primary tracking-tight">Configurações</h2>
+      <p className="mt-2 text-base text-text-secondary">Atualize seu nome e sua foto de perfil.</p>
 
       <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-center">
         {avatarUrl ? (
           <img
             src={avatarUrl}
             alt="Foto de perfil"
-            className="h-28 w-28 rounded-[24px] bg-[#f5f5f3] object-cover border border-black/5"
+            className="h-28 w-28 rounded-xl bg-bg-alt object-cover border border-border"
           />
         ) : (
-          <div className="flex h-28 w-28 items-center justify-center rounded-[24px] bg-[#f5f5f3] text-3xl font-black text-dark border border-black/5">
+          <div className="flex h-28 w-28 items-center justify-center rounded-xl bg-bg-alt text-3xl font-display text-text-primary border border-border">
             {(fullName || email || 'U').trim().charAt(0).toUpperCase()}
           </div>
         )}
-        <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full bg-dark px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-dark/90">
-          <Upload className="h-4 w-4" />
-          {uploading ? 'Enviando...' : 'Trocar foto'}
+        <label className="inline-flex cursor-pointer items-center gap-2 btn btn-secondary text-sm h-11 px-5">
+          <Upload className="h-4 w-4 text-text-primary" />
+          <span className="font-semibold text-text-primary">{uploading ? 'Enviando...' : 'Trocar foto'}</span>
           <input type="file" className="hidden" accept="image/png,image/jpeg,image/webp" onChange={handleAvatarUpload} />
         </label>
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        <input
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          placeholder="Seu nome completo"
-          className="rounded-2xl bg-[#f5f5f3] border-none px-5 py-4 text-sm font-bold text-dark outline-none focus:ring-2 focus:ring-dark/20 transition-all"
-        />
-        <input
-          value={email}
-          disabled
-          className="rounded-2xl bg-[#f5f5f3]/50 border-none px-5 py-4 text-sm font-bold text-dark/40"
-        />
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-bold tracking-wider text-text-secondary uppercase">Nome Completo</label>
+          <input
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Seu nome completo"
+            className="input font-semibold"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-bold tracking-wider text-text-tertiary uppercase">E-mail</label>
+          <input
+            value={email}
+            disabled
+            className="input font-semibold opacity-60 cursor-not-allowed bg-bg-alt/50"
+          />
+        </div>
       </div>
 
       <div className="mt-8 flex items-center gap-3">
         <button
           onClick={saveProfile}
           disabled={saving || uploading}
-          className="rounded-full bg-dark px-8 py-4 text-sm font-bold text-white transition-all hover:bg-dark/90 disabled:opacity-50"
+          className="btn btn-primary px-8 disabled:opacity-50"
         >
           {saving ? 'Salvando...' : 'Salvar alterações'}
         </button>
       </div>
 
-      {error ? <p className="mt-3 text-sm font-semibold text-red-600">{error}</p> : null}
-      {success ? <p className="mt-3 text-sm font-semibold text-emerald-700">{success}</p> : null}
+      {error ? <p className="mt-4 text-sm font-semibold text-danger">{error}</p> : null}
+      {success ? <p className="mt-4 text-sm font-semibold text-success">{success}</p> : null}
     </section>
   )
 }

@@ -862,50 +862,38 @@ export default function ListingForm() {
   }
 
   return (
-    <div className="space-y-12 pb-4">
-      <div className="space-y-4">
-        <div className="h-2 rounded-[999px] bg-[#f5f5f3]">
+    <div className="space-y-8 pb-4 max-w-3xl mx-auto">
+      <div className="space-y-3">
+        <div className="h-1.5 bg-bg-alt rounded-full overflow-hidden">
           <div
-            className="h-full rounded-[999px] bg-dark transition-all"
+            className="h-full bg-accent rounded-full transition-all duration-500"
             style={{ width: `${(currentStep / 3) * 100}%` }}
           />
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">
+        <p className="label text-accent">
           {currentStep === 1 && 'Etapa 1 de 3: Selecione seu carro'}
           {currentStep === 2 && 'Etapa 2 de 3: Preço, descrição e fotos'}
           {currentStep === 3 && 'Etapa 3 de 3: Revisar e publicar'}
         </p>
       </div>
 
-      <div className="bg-white rounded-[32px] border border-black/5 p-3 shadow-sm inline-block">
-        <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">
-          {[1, 2, 3].map((step) => (
-            <div
-              key={step}
-              className={`rounded-[999px] px-5 py-2.5 transition-colors ${currentStep === step ? 'bg-dark text-white' : 'bg-[#f5f5f3] text-dark/40'}`}
-            >
-              Etapa {step}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-white rounded-[32px] border border-black/5 p-8 sm:p-12 shadow-sm space-y-12">
+      <div className="card p-6 sm:p-8 space-y-8">
         {currentStep === 1 && (
           <div className="space-y-6">
-            <h3 className="text-3xl font-black text-dark tracking-tight">Selecione seu veículo</h3>
-            <p className="text-base font-medium text-dark/50">
-              Primeiro, escolha o tipo de veículo. Depois, selecione marca, modelo e ano. O resto é carregado automaticamente.
-            </p>
-            <div className="bg-[#f5f5f3] rounded-2xl p-6 space-y-4 border border-black/5">
+            <div>
+              <h3 className="text-xl font-heading font-bold text-text-primary mb-2">Selecione seu veículo</h3>
+              <p className="text-sm text-text-secondary">
+                Escolha o tipo de veículo, depois marca, modelo e ano. O restante é automático.
+              </p>
+            </div>
+            
+            <div className="bg-bg-alt rounded-xl p-5 space-y-4">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Tipo de veículo</p>
-                <span className="rounded-full bg-white border border-black/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">
-                  Obrigatório
-                </span>
+                <p className="label text-accent">Tipo de veículo</p>
+                <span className="badge badge-accent text-[10px]">Obrigatório</span>
               </div>
               <select
-                className="w-full h-14 bg-white rounded-2xl px-5 text-sm font-bold outline-none border border-black/5 text-dark focus:border-black/10 focus:shadow-sm"
+                className="input"
                 value={form.vehicle_type}
                 onChange={(e) => handleInput('vehicle_type', e.target.value)}
               >
@@ -913,16 +901,15 @@ export default function ListingForm() {
                 <option value="truck">Caminhão</option>
               </select>
             </div>
-            <div className="bg-[#f5f5f3] rounded-2xl p-6 space-y-4 border border-black/5">
+
+            <div className="bg-bg-alt rounded-xl p-5 space-y-4">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Seleção do veículo</p>
-                <span className="rounded-full bg-white border border-black/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">
-                  Sequencial
-                </span>
+                <p className="label text-accent">Seleção do veículo</p>
+                <span className="badge badge-neutral text-[10px]">Sequencial</span>
               </div>
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-3">
                 <select
-                  className={`w-full h-14 bg-white rounded-2xl px-5 text-sm font-bold outline-none border transition-all ${!selectedBrandCode ? 'border-transparent text-dark/30' : 'border-black/5 text-dark'} focus:border-black/10 focus:shadow-sm`}
+                  className="input"
                   value={selectedBrandCode}
                   onChange={(e) => {
                     const code = e.target.value
@@ -936,7 +923,7 @@ export default function ListingForm() {
                 </select>
 
                 <select
-                  className={`w-full h-14 bg-white rounded-2xl px-5 text-sm font-bold outline-none border transition-all ${!selectedModelCode ? 'border-transparent text-dark/30' : 'border-black/5 text-dark'} focus:border-black/10 focus:shadow-sm`}
+                  className="input"
                   value={selectedModelCode}
                   onChange={(e) => {
                     const code = e.target.value
@@ -952,16 +939,15 @@ export default function ListingForm() {
                 </select>
 
                 <select
-                  className={`w-full h-14 bg-white rounded-2xl px-5 text-sm font-bold outline-none border transition-all ${!selectedYear ? 'border-transparent text-dark/30' : 'border-black/5 text-dark'} focus:border-black/10 focus:shadow-sm`}
+                  className="input"
                   value={selectedYear ?? ''}
                   onChange={(e) => {
-                    const year = e.target.value ? parseInt(e.target.value, 10) : null
-                    setSelectedYear(year)
-                    const yearText = year ? String(year) : ''
-                    handleInput('year', yearText)
-                    handleInput('yearModel', yearText)
+                    const code = e.target.value
+                    setSelectedYear(Number(code))
+                    setSelectedVersionCode('')
+                    handleInput('year', code)
+                    handleInput('yearModel', code)
                   }}
-                  disabled={!selectedModelCode}
                 >
                   <option value="">3. Selecione o ano</option>
                   {years.map((year) => <option key={year} value={year}>{year}</option>)}
@@ -969,27 +955,28 @@ export default function ListingForm() {
               </div>
 
               {selectedYear ? (
-                <div className="grid gap-3 sm:grid-cols-3 mt-4">
-                  <div className="bg-white rounded-xl border border-black/5 p-4 flex flex-col gap-1">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Ano fabricação</span>
-                    <strong className="text-sm text-dark">{form.year || '-'}</strong>
+                <div className="grid gap-4 sm:grid-cols-3 mt-6">
+                  <div className="bg-bg-alt rounded-xl p-4 flex flex-col gap-1">
+                    <span className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wider">Ano fab.</span>
+                    <strong className="text-sm text-text-primary">{form.year || '-'}</strong>
                   </div>
-                  <div className="bg-white rounded-xl border border-black/5 p-4 flex flex-col gap-1">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Ano/modelo</span>
-                    <strong className="text-sm text-dark">{form.yearModel || '-'}</strong>
+                  <div className="bg-bg-alt rounded-xl p-4 flex flex-col gap-1">
+                    <span className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wider">Ano/modelo</span>
+                    <strong className="text-sm text-text-primary">{form.yearModel || '-'}</strong>
                   </div>
-                  <div className="bg-white rounded-xl border border-black/5 p-4 flex flex-col gap-1 sm:col-span-1">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Versão</span>
-                    <strong className="text-sm text-dark truncate" title={form.version}>{form.version || 'Automática'}</strong>
+                  <div className="bg-bg-alt rounded-xl p-4 flex flex-col gap-1">
+                    <span className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wider">Versão</span>
+                    <strong className="text-sm text-text-primary truncate" title={form.version}>{form.version || 'Automática'}</strong>
                   </div>
                 </div>
               ) : null}
             </div>
 
-            <div className="bg-[#f5f5f3] rounded-2xl p-6 border border-black/5">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-black text-dark">Referência FIPE</p>
-                <span className="rounded-full bg-white border border-black/5 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">
+            <div className="bg-white rounded-[24px] p-8 border border-border shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-bg-alt rounded-bl-full -z-10" />
+              <div className="flex items-center justify-between gap-3 mb-6">
+                <p className="text-lg font-heading font-black text-text-primary">Referência FIPE</p>
+                <span className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest shadow-sm ${hasAskingPrice && comparison.status === 'below' ? 'bg-green-50 text-green-600 border-green-100' : hasAskingPrice && comparison.status === 'above' ? 'bg-red-50 text-red-600 border-red-100' : hasAskingPrice && comparison.status === 'near' ? 'bg-orange-50 text-orange-600 border-orange-100' : 'bg-bg-alt text-text-secondary border-border'}`}>
                   {!hasAskingPrice && 'Preço pendente'}
                   {hasAskingPrice && comparison.status === 'below' && 'Abaixo'}
                   {hasAskingPrice && comparison.status === 'near' && 'Próximo'}
@@ -998,23 +985,23 @@ export default function ListingForm() {
                 </span>
               </div>
               {!selectedYear ? (
-                <p className="mt-2 text-sm text-text-secondary">Complete marca, modelo e ano para carregar os dados automáticos.</p>
+                <p className="text-sm font-medium text-text-secondary/70 bg-bg-alt p-4 rounded-xl border border-border">Complete marca, modelo e ano para carregar os dados automáticos.</p>
               ) : fipeLoading ? (
-                <p className="mt-2 text-sm text-text-secondary">Consultando valor atualizado...</p>
+                <p className="text-sm font-medium text-accent bg-bg-alt p-4 rounded-xl border border-border flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Consultando valor atualizado...</p>
               ) : fipeResult ? (
-                <div className="mt-3 grid gap-2 text-sm">
-                  <p><strong>Versão automática:</strong> {form.version || 'Não informada'}</p>
-                  <p><strong>Preço FIPE:</strong> {fipeResult.price}</p>
-                  <p><strong>Seu anúncio:</strong> {hasAskingPrice ? formatBRL(priceNumber) : 'Informe o preço na próxima etapa'}</p>
+                <div className="grid gap-3 text-sm font-medium text-text-secondary">
+                  <div className="flex justify-between items-center py-2 border-b border-border"><span className="text-text-tertiary">Versão automática:</span> <strong className="text-text-primary">{form.version || 'Não informada'}</strong></div>
+                  <div className="flex justify-between items-center py-2 border-b border-border"><span className="text-text-tertiary">Preço FIPE:</span> <strong className="text-text-primary">{fipeResult.price}</strong></div>
+                  <div className="flex justify-between items-center py-2 border-b border-border"><span className="text-text-tertiary">Seu anúncio:</span> <strong className="text-text-primary">{hasAskingPrice ? formatBRL(priceNumber) : 'Informe o preço na próxima etapa'}</strong></div>
                   {hasAskingPrice ? (
                     <>
-                      <p><strong>Diferença:</strong> {comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</p>
-                      <p><strong>Percentual:</strong> {comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</p>
+                      <div className="flex justify-between items-center py-2 border-b border-border"><span className="text-text-tertiary">Diferença:</span> <strong className="text-text-primary">{comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</strong></div>
+                      <div className="flex justify-between items-center py-2"><span className="text-text-tertiary">Percentual:</span> <strong className="text-text-primary">{comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</strong></div>
                     </>
                   ) : null}
                 </div>
               ) : (
-                <p className="mt-2 text-sm text-text-secondary">
+                <p className="text-sm font-medium text-orange-600 bg-orange-50 p-4 rounded-xl border border-orange-100">
                   Não foi possível carregar referência FIPE para essa combinação, mas você pode continuar normalmente.
                 </p>
               )}
@@ -1023,59 +1010,67 @@ export default function ListingForm() {
         )}
 
         {currentStep === 2 && (
-          <div className="space-y-6">
-            <h3 className="text-3xl font-black text-dark tracking-tight">Preço e descrição</h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <input className="w-full h-14 bg-[#f5f5f3] rounded-2xl px-5 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} />
-              <input className="w-full h-14 bg-[#f5f5f3] rounded-2xl px-5 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30" placeholder="Quilometragem" value={form.mileage} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
-              <input className="w-full h-14 bg-[#f5f5f3] rounded-2xl px-5 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
-              <input className="w-full h-14 bg-[#f5f5f3] rounded-2xl px-5 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-heading font-bold text-text-primary mb-2">Preço e descrição</h3>
+              <p className="text-sm text-text-secondary">
+                Preencha os detalhes para atrair mais compradores.
+              </p>
+            </div>
+            
+            <div className="grid gap-3 sm:grid-cols-2">
+              <input className="input" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} />
+              <input className="input" placeholder="Quilometragem" value={form.mileage} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
+              <input className="input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
+              <input className="input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
             </div>
 
-            <textarea className="w-full min-h-32 bg-[#f5f5f3] rounded-2xl px-5 py-4 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30 resize-none" placeholder="Descrição do veículo" value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
-            <input className="w-full h-14 bg-[#f5f5f3] rounded-2xl px-5 text-sm font-bold outline-none border border-transparent focus:border-black/10 focus:bg-white transition-all placeholder:text-dark/30" placeholder="Opcionais (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
+            <textarea className="input min-h-[120px] py-3 resize-none leading-relaxed" placeholder="Descrição do veículo... Destaque os pontos fortes, manutenções recentes e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
+            <input className="input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
 
             {form.vehicle_type === 'truck' && (
-              <div className="bg-[#f5f5f3] rounded-2xl p-6 space-y-4 border border-black/5">
-                <p className="text-sm font-black text-dark">Informações específicas do caminhão</p>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <input className="w-full h-14 bg-white rounded-2xl px-5 text-sm font-bold outline-none border border-black/5 focus:border-black/10 focus:shadow-sm placeholder:text-dark/30" placeholder="Tipo de caminhão (ex: Baú, Caçamba)" value={form.truck_type} onChange={(e) => handleInput('truck_type', e.target.value)} />
-                  <input className="w-full h-14 bg-white rounded-2xl px-5 text-sm font-bold outline-none border border-black/5 focus:border-black/10 focus:shadow-sm placeholder:text-dark/30" placeholder="Capacidade de carga (toneladas)" value={form.load_capacity} onChange={(e) => handleInput('load_capacity', e.target.value.replace(/[^0-9.]/g, ''))} />
-                  <input className="w-full h-14 bg-white rounded-2xl px-5 text-sm font-bold outline-none border border-black/5 focus:border-black/10 focus:shadow-sm placeholder:text-dark/30" placeholder="Número de eixos" value={form.axles} onChange={(e) => handleInput('axles', e.target.value.replace(/\D/g, ''))} />
-                  <input className="w-full h-14 bg-white rounded-2xl px-5 text-sm font-bold outline-none border border-black/5 focus:border-black/10 focus:shadow-sm placeholder:text-dark/30" placeholder="Tipo de carroceria" value={form.truck_body_type} onChange={(e) => handleInput('truck_body_type', e.target.value)} />
+              <div className="card p-5 space-y-4">
+                <h4 className="text-sm font-bold text-text-primary">Informações do Caminhão</h4>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <input className="input" placeholder="Tipo (ex: Baú, Caçamba)" value={form.truck_type} onChange={(e) => handleInput('truck_type', e.target.value)} />
+                  <input className="input" placeholder="Capacidade (toneladas)" value={form.load_capacity} onChange={(e) => handleInput('load_capacity', e.target.value.replace(/[^0-9.]/g, ''))} />
+                  <input className="input" placeholder="Nº de eixos" value={form.axles} onChange={(e) => handleInput('axles', e.target.value.replace(/\D/g, ''))} />
+                  <input className="input" placeholder="Tipo de carroceria" value={form.truck_body_type} onChange={(e) => handleInput('truck_body_type', e.target.value)} />
                 </div>
               </div>
             )}
 
             <label
-              className="bg-[#f5f5f3] rounded-2xl flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-2 border border-dashed border-dark/20 p-8 text-sm font-black text-dark/40 hover:bg-dark/5 transition-colors"
+              className="card border-2 border-dashed border-border p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-text-secondary hover:border-accent hover:bg-accent-light/30 transition-all group"
               onDragOver={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
               }}
               onDrop={onDropFiles}
             >
-              <ImagePlus className="h-6 w-6 mb-2" />
-              Arraste fotos ou clique para enviar ({images.length}/{LISTING_MAX_IMAGES})
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/30 mt-2">Até 10 imagens • JPG, PNG, WEBP</span>
+              <div className="w-14 h-14 rounded-full bg-bg-alt flex items-center justify-center group-hover:scale-110 transition-transform">
+                <ImagePlus className="h-6 w-6 text-accent" />
+              </div>
+              <span className="text-sm text-text-primary mt-1">Arraste fotos ou clique ({images.length}/{LISTING_MAX_IMAGES})</span>
+              <span className="badge badge-accent text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens</span>
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
             </label>
-            <p className="text-xs font-semibold text-text-secondary">Você pode publicar sem foto e enviar imagens depois no painel dos seus anúncios.</p>
+            <p className="text-xs text-text-tertiary text-center">Você pode publicar sem foto e enviar depois no painel.</p>
 
             {images.length > 0 && (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-6">
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8">
                 {images.map((image, index) => (
-                  <div key={image.previewUrl} className="bg-[#f5f5f3] rounded-2xl overflow-hidden p-3 border border-black/5">
-                    <img src={image.previewUrl} alt={`Preview ${index + 1}`} className="h-40 w-full rounded-xl object-cover" />
-                    <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
-                    <div className="mt-3 flex items-center gap-2">
-                      <button type="button" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-dark/40 hover:text-dark hover:shadow-sm transition-all border border-black/5" onClick={() => moveImage(index, -1)} disabled={index === 0}>
+                  <div key={image.previewUrl} className="bg-white rounded-[24px] overflow-hidden p-3 border border-border shadow-sm hover:shadow-md transition-shadow">
+                    <img src={image.previewUrl} alt={`Preview ${index + 1}`} className="h-44 w-full rounded-[16px] object-cover" />
+                    <p className="mt-4 px-2 text-[10px] font-black uppercase tracking-widest text-text-secondary">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
+                    <div className="mt-3 flex items-center gap-2 px-2 pb-1">
+                      <button type="button" className="w-10 h-10 rounded-xl bg-bg-alt flex items-center justify-center text-text-secondary hover:text-accent hover:bg-bg-alt/80 transition-colors" onClick={() => moveImage(index, -1)} disabled={index === 0}>
                         <MoveLeft className="h-4 w-4" />
                       </button>
-                      <button type="button" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-dark/40 hover:text-dark hover:shadow-sm transition-all border border-black/5" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1}>
+                      <button type="button" className="w-10 h-10 rounded-xl bg-bg-alt flex items-center justify-center text-text-secondary hover:text-accent hover:bg-bg-alt/80 transition-colors" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1}>
                         <MoveRight className="h-4 w-4" />
                       </button>
-                      <button type="button" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-red-500 hover:bg-red-50 hover:text-red-600 hover:shadow-sm transition-all border border-black/5 ml-auto" onClick={() => removeImage(index)}>
+                      <button type="button" className="w-10 h-10 rounded-xl bg-bg-alt flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors ml-auto" onClick={() => removeImage(index)}>
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -1087,65 +1082,77 @@ export default function ListingForm() {
         )}
 
         {currentStep === 3 && (
-          <div className="space-y-6">
-            <h3 className="text-3xl font-black text-dark tracking-tight">Revisar e publicar</h3>
-            <div className="bg-[#f5f5f3] rounded-2xl p-6 border border-black/5">
-              <div className="grid gap-4 text-sm sm:grid-cols-2 font-medium text-dark/60">
-                <p><strong className="text-dark font-bold">Veículo:</strong> {form.brand} {form.model} {form.version}</p>
-                <p><strong className="text-dark font-bold">Ano:</strong> {form.year}/{form.yearModel}</p>
-                <p><strong className="text-dark font-bold">Preço:</strong> {form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado'}</p>
-                <p><strong className="text-dark font-bold">Quilometragem:</strong> {form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Não informado'}</p>
-                <p><strong className="text-dark font-bold">Cidade/UF:</strong> {form.city || '-'}{form.state ? `/${form.state}` : ''}</p>
-                <p><strong className="text-dark font-bold">Fotos:</strong> {images.length} de {LISTING_MAX_IMAGES}</p>
-                <p className="sm:col-span-2"><strong className="text-dark font-bold">Descrição:</strong> {form.description.trim() || 'Não informada'}</p>
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-heading font-bold text-text-primary mb-2">Revisar e publicar</h3>
+              <p className="text-sm text-text-secondary">
+                Confira os detalhes antes de finalizar.
+              </p>
+            </div>
+            
+            <div className="card p-5 relative overflow-hidden">
+              <p className="label text-accent mb-4">Informações</p>
+              <div className="grid gap-4 text-sm sm:grid-cols-2">
+                <div className="flex flex-col gap-0.5 border-b border-border pb-2"><span className="text-xs text-text-tertiary">Veículo</span><strong className="text-sm text-text-primary">{form.brand} {form.model} {form.version}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-border pb-2"><span className="text-xs text-text-tertiary">Ano</span><strong className="text-sm text-text-primary">{form.year}/{form.yearModel}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-border pb-2"><span className="text-xs text-text-tertiary">Preço</span><strong className="text-sm text-text-primary">{form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado'}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-border pb-2"><span className="text-xs text-text-tertiary">Quilometragem</span><strong className="text-sm text-text-primary">{form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Não informado'}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-border pb-2"><span className="text-xs text-text-tertiary">Cidade/UF</span><strong className="text-sm text-text-primary">{form.city || '-'}{form.state ? `/${form.state}` : ''}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-border pb-2"><span className="text-xs text-text-tertiary">Fotos</span><strong className="text-sm text-text-primary">{images.length} de {LISTING_MAX_IMAGES}</strong></div>
+                <div className="sm:col-span-2 flex flex-col gap-2 mt-1"><span className="text-xs text-text-tertiary">Descrição</span><p className="text-sm text-text-primary bg-bg-alt p-4 rounded-xl leading-relaxed">{form.description.trim() || 'Não informada'}</p></div>
               </div>
             </div>
 
-            <div className="bg-[#f5f5f3] rounded-2xl p-6 border border-black/5">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40 mb-4">Ficha técnica automática</p>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Motorização</span>
-                  <strong className="text-sm font-bold text-dark">{technical.engine}</strong>
+            <div className="card p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="w-7 h-7 rounded-full bg-accent-light flex items-center justify-center text-accent font-bold text-[10px]">AI</span>
+                <p className="label">Ficha técnica automática</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="bg-bg-alt rounded-xl p-3 flex flex-col gap-0.5">
+                  <span className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wider">Motor</span>
+                  <strong className="text-sm font-semibold text-text-primary">{technical.engine}</strong>
                 </div>
-                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Potência</span>
-                  <strong className="text-sm font-bold text-dark">{technical.horsepower}</strong>
+                <div className="bg-bg-alt rounded-xl p-3 flex flex-col gap-0.5">
+                  <span className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wider">Potência</span>
+                  <strong className="text-sm font-semibold text-text-primary">{technical.horsepower}</strong>
                 </div>
-                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Torque</span>
-                  <strong className="text-sm font-bold text-dark">{technical.torque}</strong>
+                <div className="bg-bg-alt rounded-xl p-3 flex flex-col gap-0.5">
+                  <span className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wider">Torque</span>
+                  <strong className="text-sm font-semibold text-text-primary">{technical.torque}</strong>
                 </div>
-                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Combustível</span>
-                  <strong className="text-sm font-bold text-dark">{technical.fuel}</strong>
+                <div className="bg-bg-alt rounded-xl p-3 flex flex-col gap-0.5">
+                  <span className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wider">Combustível</span>
+                  <strong className="text-sm font-semibold text-text-primary">{technical.fuel}</strong>
                 </div>
-                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Câmbio</span>
-                  <strong className="text-sm font-bold text-dark">{technical.transmission}</strong>
+                <div className="bg-bg-alt rounded-xl p-3 flex flex-col gap-0.5">
+                  <span className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wider">Câmbio</span>
+                  <strong className="text-sm font-bold text-text-primary">{technical.transmission}</strong>
                 </div>
-                <div className="flex flex-col gap-1 border-b border-black/5 pb-3">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Consumo</span>
-                  <strong className="text-sm font-bold text-dark">{technical.consumption}</strong>
+                <div className="bg-bg-alt rounded-xl p-3 flex flex-col gap-0.5 lg:col-span-2">
+                  <span className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wider">Consumo</span>
+                  <strong className="text-sm font-bold text-text-primary">{technical.consumption}</strong>
                 </div>
-                <div className="flex flex-col gap-1 sm:col-span-2">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-dark/40">Categoria</span>
-                  <strong className="text-sm font-bold text-dark">{technical.category}</strong>
+                <div className="bg-bg-alt rounded-xl p-3 flex flex-col gap-0.5">
+                  <span className="text-[10px] font-semibold text-text-tertiary uppercase tracking-wider">Categoria</span>
+                  <strong className="text-sm font-bold text-text-primary">{technical.category}</strong>
                 </div>
               </div>
             </div>
 
-            <p className="text-xs font-bold text-dark/40 text-center mt-6">
-              Seu contato direto não é exibido. Toda negociação acontece via chat interno da plataforma.
-            </p>
+            <div className="bg-green-50 border border-green-100 rounded-2xl p-4 flex items-center justify-center text-center">
+              <p className="text-xs font-bold text-green-700">
+                Seu contato direto não é exibido. Toda negociação acontece via chat seguro da plataforma.
+              </p>
+            </div>
           </div>
         )}
 
         {error ? (
-          <div className="bg-red-50 rounded-2xl border border-red-100 px-6 py-5">
-            <p className="text-sm font-bold text-red-700">{error}</p>
+          <div className="bg-red-50 rounded-[24px] border border-red-100 p-6 shadow-sm">
+            <p className="text-sm font-bold text-red-600">{error}</p>
             {validationDetails.length > 0 ? (
-              <ul className="mt-3 space-y-1.5 text-xs font-bold text-red-700/80">
+              <ul className="mt-3 space-y-1.5 text-xs font-bold text-red-600/80 bg-white/50 p-4 rounded-xl">
                 {validationDetails.map((detail) => (
                   <li key={detail}>• {detail}</li>
                 ))}
@@ -1155,21 +1162,21 @@ export default function ListingForm() {
         ) : null}
 
         {success ? (
-          <div className="bg-green-50 rounded-2xl border border-green-100 px-6 py-5">
-            <p className="text-sm font-bold text-green-700">{success}</p>
+          <div className="bg-green-50 rounded-[24px] border border-green-100 p-6 shadow-sm text-center">
+            <p className="text-base font-black text-green-600">{success}</p>
           </div>
         ) : null}
 
-        <div className="mt-12 flex flex-col-reverse justify-between gap-4 sm:flex-row pt-6 border-t border-black/5">
+        <div className="mt-8 flex flex-col-reverse justify-between gap-3 sm:flex-row pt-6 border-t border-border">
           {currentStep > 1 ? (
             <button
               type="button"
               onClick={prevStep}
-              className="h-14 px-8 rounded-full font-bold text-dark hover:bg-[#f5f5f3] transition-colors flex items-center justify-center gap-2"
+              className="btn btn-secondary btn-sm"
               disabled={saving || fipeLoading}
             >
-              <ArrowLeft className="h-5 w-5" />
-              Voltar etapa
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
             </button>
           ) : (
             <div />
@@ -1178,12 +1185,12 @@ export default function ListingForm() {
           <button
             type="button"
             onClick={currentStep === 3 ? handleSubmit : nextStep}
-            className="h-14 px-10 rounded-full bg-dark text-white font-bold hover:bg-dark/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            className="btn btn-primary"
             disabled={saving || fipeLoading}
           >
             {saving ? (
               <>
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Publicando...
               </>
             ) : currentStep === 3 ? (
@@ -1191,19 +1198,19 @@ export default function ListingForm() {
             ) : (
               <>
                 Próxima etapa
-                <ArrowRight className="h-5 w-5" />
+                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </button>
         </div>
 
         {currentStep === 3 ? (
-          <div className="fixed inset-x-0 bottom-3 z-30 px-4 sm:hidden">
+          <div className="fixed inset-x-0 bottom-20 z-30 px-4 sm:hidden">
             <button
               type="button"
               disabled={saving}
               onClick={handleSubmit}
-              className="w-full rounded-[999px] bg-dark px-6 py-4 text-sm font-black text-white shadow-sm disabled:opacity-50"
+              className="btn btn-primary w-full shadow-lg"
             >
               {saving ? 'Publicando...' : 'Publicar anúncio'}
             </button>

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-type BadgeVariant = 'dark' | 'green' | 'highlight' | 'subtle'
+type BadgeVariant = 'neutral' | 'accent' | 'success' | 'warning' | 'danger' | 'gold'
 
 interface BadgeProps {
   children: ReactNode
@@ -8,13 +8,15 @@ interface BadgeProps {
   className?: string
 }
 
-export default function Badge({ children, variant = 'subtle', className = '' }: BadgeProps) {
-  const cls: Record<BadgeVariant, string> = {
-    dark: 'badge-dark',
-    green: 'badge-green',
-    highlight: 'tag-highlight',
-    subtle: 'badge-subtle',
-  }
+const VARIANT_CLASS: Record<BadgeVariant, string> = {
+  neutral: 'badge-neutral',
+  accent: 'badge-accent',
+  success: 'badge-success',
+  warning: 'badge-warning',
+  danger: 'badge-danger',
+  gold: 'badge-gold',
+}
 
-  return <span className={`${cls[variant]} ${className}`}>{children}</span>
+export default function Badge({ children, variant = 'neutral', className = '' }: BadgeProps) {
+  return <span className={`badge ${VARIANT_CLASS[variant]} ${className}`}>{children}</span>
 }

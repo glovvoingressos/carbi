@@ -251,8 +251,8 @@ export default function ConversationInbox() {
 
   if (!ready) {
     return (
-      <div className="pastel-card pastel-card-green p-8 text-center">
-        <Loader2 className="mx-auto h-5 w-5 animate-spin" />
+      <div className="bg-white rounded-[32px] border border-border p-20 text-center shadow-sm">
+        <Loader2 className="mx-auto h-8 w-8 animate-spin text-accent" />
       </div>
     )
   }
@@ -262,89 +262,114 @@ export default function ConversationInbox() {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
-      <aside className="pastel-card p-3" style={{ backgroundColor: '#edf2f7' }}>
-        <h3 className="px-2 py-1 text-lg font-bold text-dark">Conversas</h3>
-        {loadingConversations ? <p className="p-2 text-sm text-text-secondary">Carregando...</p> : null}
+    <div className="grid gap-8 lg:grid-cols-[380px_1fr] h-[calc(100vh-180px)] min-h-[600px]">
+      <aside className="bg-white rounded-[32px] border border-border p-6 shadow-sm flex flex-col h-full overflow-hidden">
+        <h3 className="text-2xl font-heading font-black text-text-primary tracking-tight mb-6">Conversas</h3>
+        {loadingConversations ? <p className="text-sm font-bold text-text-tertiary mb-4">Carregando...</p> : null}
 
-        <div className="mt-2 space-y-2">
+        <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-2">
           {conversations.map((conversation) => (
             <button
               key={conversation.id}
               type="button"
               onClick={() => setSelectedId(conversation.id)}
-              className={`w-full rounded-2xl px-3 py-2 text-left transition ${
-                selectedId === conversation.id ? 'bg-[#e5ebf3]' : 'bg-white/85 hover:bg-white'
+              className={`w-full rounded-[24px] p-4 text-left transition-all border ${
+                selectedId === conversation.id ? 'bg-accent border-accent text-white shadow-sm' : 'bg-bg-alt border-transparent hover:border-accent hover:bg-bg-alt/80'
               }`}
             >
-              <p className="line-clamp-1 text-base font-semibold text-dark">{conversation.vehicle_listings_public.title}</p>
-              <p className="text-sm font-medium text-text-secondary">{formatBRL(Number(conversation.vehicle_listings_public.price))}</p>
-              <p className="line-clamp-1 text-sm text-text-tertiary">{conversation.last_message_preview || 'Conversa iniciada.'}</p>
+              <p className={`line-clamp-1 text-base font-heading font-black tracking-tight ${selectedId === conversation.id ? 'text-white' : 'text-text-primary'}`}>{conversation.vehicle_listings_public.title}</p>
+              <p className={`text-sm font-bold mt-1 ${selectedId === conversation.id ? 'text-white/80' : 'text-text-secondary'}`}>{formatBRL(Number(conversation.vehicle_listings_public.price))}</p>
+              <p className={`line-clamp-1 text-xs font-medium mt-3 ${selectedId === conversation.id ? 'text-white/70' : 'text-text-tertiary'}`}>{conversation.last_message_preview || 'Conversa iniciada.'}</p>
             </button>
           ))}
 
           {conversations.length === 0 && !loadingConversations ? (
-            <p className="p-2 text-sm text-text-secondary">Você ainda não possui conversas.</p>
+            <div className="text-center p-8 bg-bg-alt rounded-[24px] border border-border">
+              <p className="text-sm font-bold text-text-tertiary">Você ainda não possui conversas.</p>
+            </div>
           ) : null}
         </div>
       </aside>
 
-      <section className="pastel-card p-4" style={{ backgroundColor: '#f1f4f8' }}>
+      <section className="bg-white rounded-[32px] border border-border shadow-sm flex flex-col h-full overflow-hidden relative">
         {!selectedConversation ? (
-          <p className="text-sm text-text-secondary">Selecione uma conversa para começar.</p>
+          <div className="flex-1 flex items-center justify-center p-8 text-center bg-bg-alt m-4 rounded-[24px]">
+            <p className="text-lg font-bold text-text-tertiary">Selecione uma conversa para começar.</p>
+          </div>
         ) : (
           <>
-            <div className="mb-3 border-b border-border pb-3">
-              <p className="text-xl font-semibold text-dark">{selectedConversation.vehicle_listings_public.title}</p>
-              <p className="text-base font-medium text-text-secondary">
+            <div className="px-8 py-6 border-b border-border bg-white z-10">
+              <p className="text-2xl font-heading font-black text-text-primary tracking-tight">{selectedConversation.vehicle_listings_public.title}</p>
+              <p className="text-sm font-bold text-text-secondary mt-1">
                 {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} • {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
               </p>
             </div>
 
-            <div className="h-[360px] space-y-2 overflow-y-auto rounded-2xl bg-white/75 p-3">
-              {loadingMessages ? <p className="text-sm text-text-secondary">Carregando mensagens...</p> : null}
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-base leading-relaxed ${
-                    message.sender_user_id === myUserId
-                      ? 'ml-auto bg-white text-[#0f172a] shadow-[0_4px_14px_rgba(15,23,42,0.08)]'
-                      : 'bg-white text-dark shadow-[0_4px_14px_rgba(15,23,42,0.08)]'
-                  }`}
-                >
-                  <p>{message.message}</p>
-                  <p className="mt-1 text-[11px] text-[#475569]/80">{new Date(message.created_at).toLocaleString('pt-BR')}</p>
-                </div>
-              ))}
+            <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-bg-alt custom-scrollbar">
+              {loadingMessages ? <p className="text-sm font-bold text-text-tertiary text-center">Carregando mensagens...</p> : null}
+              {messages.map((message) => {
+                const isMine = message.sender_user_id === myUserId
+                return (
+                  <div
+                    key={message.id}
+                    className={`max-w-[80%] rounded-[24px] px-6 py-4 text-base font-medium shadow-sm ${
+                      isMine
+                        ? 'ml-auto bg-accent text-white rounded-br-none shadow-sm'
+                        : 'bg-white text-text-primary rounded-bl-none border border-border'
+                    }`}
+                  >
+                    <p className="leading-relaxed">{message.message}</p>
+                    <p className={`mt-2 text-[10px] font-bold uppercase tracking-widest ${isMine ? 'text-white/60' : 'text-text-tertiary'}`}>{new Date(message.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+                  </div>
+                )
+              })}
             </div>
 
-            <div className="mt-3 flex items-center gap-2">
-              <input
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    void sendMessage()
-                  }
-                }}
-                placeholder="Digite sua mensagem"
-                className="flex-1 rounded-full border border-border bg-white px-4 py-2 text-base font-medium"
-              />
-              <button
-                type="button"
-                disabled={sending || !messageText.trim()}
-                onClick={() => void sendMessage()}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#dce7f5] text-dark disabled:opacity-60"
-              >
-                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              </button>
+            <div className="p-6 bg-white border-t border-border">
+              <div className="flex items-center gap-4 bg-bg-alt rounded-[24px] p-2 border border-border focus-within:border-accent focus-within:bg-white transition-all shadow-sm">
+                <input
+                  value={messageText}
+                  onChange={(e) => setMessageText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      void sendMessage()
+                    }
+                  }}
+                  placeholder="Digite sua mensagem..."
+                  className="flex-1 bg-transparent px-4 py-3 text-sm font-bold text-text-primary outline-none placeholder:text-text-tertiary"
+                />
+                <button
+                  type="button"
+                  disabled={sending || !messageText.trim()}
+                  onClick={() => void sendMessage()}
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-white hover:bg-black disabled:opacity-50 disabled:hover:bg-accent transition-colors shadow-sm mr-1"
+                >
+                  {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                </button>
+              </div>
             </div>
           </>
         )}
 
-        {error && <p className="mt-2 text-xs font-semibold text-red-600">{error}</p>}
+        {error && <p className="absolute top-4 right-4 bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-xl text-xs font-bold z-50 shadow-sm">{error}</p>}
       </section>
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(15, 23, 42, 0.1);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(15, 23, 42, 0.2);
+        }
+      `}</style>
     </div>
   )
 }

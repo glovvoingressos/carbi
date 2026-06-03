@@ -499,8 +499,8 @@ export default function MyListingsDashboard() {
           {loadingListings ? (
             [1,2,3].map(i => <div key={i} className="min-w-[200px] lg:w-full h-24 bg-white rounded-3xl animate-pulse flex-shrink-0" />)
           ) : listings.length === 0 ? (
-            <div className="w-full p-8 text-center bg-white rounded-3xl border border-black/5">
-              <p className="text-sm font-bold text-dark/30">Nenhum anúncio encontrado.</p>
+            <div className="w-full p-8 text-center bg-white rounded-3xl border border-border">
+              <p className="text-sm font-bold text-text-tertiary">Nenhum anúncio encontrado.</p>
             </div>
           ) : (
             listings.map((l) => (
@@ -509,12 +509,12 @@ export default function MyListingsDashboard() {
                 onClick={() => setSelectedId(l.id)}
                 className={`min-w-[240px] lg:w-full group text-left p-3 lg:p-4 rounded-3xl border transition-all flex-shrink-0 ${
                   selectedId === l.id 
-                    ? 'bg-dark border-dark text-white shadow-xl shadow-dark/20' 
-                    : 'bg-white border-black/5 text-dark hover:border-black/20'
+                    ? 'bg-accent border-accent text-white shadow-xl shadow-accent/20' 
+                    : 'bg-white border-border text-text-primary hover:border-accent'
                 }`}
               >
                 <div className="flex gap-3">
-                  <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl bg-black/5 overflow-hidden flex-shrink-0">
+                  <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl bg-bg-alt overflow-hidden flex-shrink-0">
                     {l.images?.[0] ? (
                       <img src={l.images[0].public_url} className="w-full h-full object-cover" alt="" />
                     ) : (
@@ -549,13 +549,13 @@ export default function MyListingsDashboard() {
               className="space-y-8"
             >
               {/* Toolbar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-6 rounded-[32px] border border-black/5 shadow-sm sticky top-24 z-20">
+              <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-6 rounded-[32px] border border-border shadow-sm sticky top-24 z-20">
                 <div className="flex items-center gap-4">
                   <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-colors ${
-                    saveStatus === 'saving' ? 'bg-blue-50 text-blue-500' :
+                    saveStatus === 'saving' ? 'bg-bg-alt text-text-primary' :
                     saveStatus === 'saved' ? 'bg-green-50 text-green-500' :
                     saveStatus === 'error' ? 'bg-red-50 text-red-500' :
-                    'bg-black/5 text-dark/30'
+                    'bg-bg-alt text-text-tertiary'
                   }`}>
                     {saveStatus === 'saving' ? <Loader2 className="w-3 h-3 animate-spin" /> : 
                      saveStatus === 'saved' ? <Check className="w-3 h-3" /> :
@@ -571,7 +571,7 @@ export default function MyListingsDashboard() {
                   <button
                     onClick={() => saveListing(false)}
                     disabled={!isDirty || saveStatus === 'saving'}
-                    className="h-12 px-8 rounded-full bg-dark text-white text-xs font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:hover:scale-100 flex items-center gap-2"
+                    className="btn btn-primary btn-sm px-8"
                   >
                     <Save className="w-4 h-4" />
                     Salvar Agora
@@ -579,7 +579,7 @@ export default function MyListingsDashboard() {
                   <button
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="h-12 w-12 rounded-full border border-red-100 flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors"
+                    className="h-12 w-12 rounded-full border border-danger flex items-center justify-center text-danger hover:bg-danger/10 transition-colors"
                     title="Excluir Anúncio"
                   >
                     {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
@@ -591,50 +591,50 @@ export default function MyListingsDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 
                 {/* --- Section: Basic --- */}
-                <div className="bg-white p-8 rounded-[40px] border border-black/5 shadow-sm space-y-6">
+                <div className="bg-white p-8 rounded-[40px] border border-border shadow-sm space-y-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center text-dark"><Info className="w-5 h-5" /></div>
+                    <div className="w-10 h-10 rounded-2xl bg-bg-alt flex items-center justify-center text-accent"><Info className="w-5 h-5" /></div>
                     <h3 className="font-black text-lg">Informações Básicas</h3>
                   </div>
                   
                   <div className="space-y-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">Título do Anúncio</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">Título do Anúncio</label>
                       <input 
                         autoFocus
-                        className={`w-full h-14 px-6 rounded-2xl bg-[#f5f7f9] border-2 transition-all font-bold text-dark focus:outline-none ${errors.title ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-dark/10'}`}
+                        className={`w-full h-14 px-6 rounded-2xl bg-bg-alt border-2 transition-all font-bold text-text-primary focus:outline-none ${errors.title ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-accent'}`}
                         value={formData.title || ''}
                         onChange={(e) => updateField('title', e.target.value)}
                         placeholder="Ex: Toyota Corolla 2.0 XEi 2024"
                       />
                       {errors.title && <p className="text-[10px] font-bold text-red-500 ml-4">{errors.title}</p>}
                     </div>
-
+ 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">Ano Fabricação</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">Ano Fabricação</label>
                         <input 
                           type="number"
-                          className="w-full h-14 px-6 rounded-2xl bg-[#f5f7f9] border-transparent border-2 focus:border-dark/10 transition-all font-bold text-dark focus:outline-none"
+                          className="w-full h-14 px-6 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-bold text-text-primary focus:outline-none"
                           value={formData.year || ''}
                           onChange={(e) => updateField('year', Number(e.target.value))}
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">Ano Modelo</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">Ano Modelo</label>
                         <input 
                           type="number"
-                          className="w-full h-14 px-6 rounded-2xl bg-[#f5f7f9] border-transparent border-2 focus:border-dark/10 transition-all font-bold text-dark focus:outline-none"
+                          className="w-full h-14 px-6 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-bold text-text-primary focus:outline-none"
                           value={formData.year_model || ''}
                           onChange={(e) => updateField('year_model', Number(e.target.value))}
                         />
                       </div>
                     </div>
-
+ 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">Status do Anúncio</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">Status do Anúncio</label>
                       <select
-                        className="w-full h-14 px-6 rounded-2xl bg-[#f5f7f9] border-transparent border-2 focus:border-dark/10 transition-all font-bold text-dark focus:outline-none appearance-none"
+                        className="w-full h-14 px-6 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-bold text-text-primary focus:outline-none appearance-none cursor-pointer"
                         value={formData.status || 'active'}
                         onChange={(e) => updateField('status', e.target.value)}
                       >
@@ -648,17 +648,17 @@ export default function MyListingsDashboard() {
                 </div>
 
                 {/* --- Section: Price & Location --- */}
-                <div className="bg-white p-8 rounded-[40px] border border-black/5 shadow-sm space-y-6">
+                <div className="bg-white p-8 rounded-[40px] border border-border shadow-sm space-y-6">
                    <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center text-dark"><BadgeDollarSign className="w-5 h-5" /></div>
+                    <div className="w-10 h-10 rounded-2xl bg-bg-alt flex items-center justify-center text-accent"><BadgeDollarSign className="w-5 h-5" /></div>
                     <h3 className="font-black text-lg">Preço e Localização</h3>
                   </div>
 
                   <div className="space-y-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">Valor de Venda (R$)</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">Valor de Venda (R$)</label>
                       <input 
-                        className={`w-full h-14 px-6 rounded-2xl bg-[#f5f7f9] border-2 transition-all font-bold text-dark focus:outline-none text-2xl ${errors.price ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-dark/10'}`}
+                        className={`w-full h-14 px-6 rounded-2xl bg-bg-alt border-2 transition-all font-bold text-text-primary focus:outline-none text-2xl ${errors.price ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-accent'}`}
                         value={formData.price || ''}
                         onChange={(e) => updateField('price', e.target.value)}
                       />
@@ -667,17 +667,17 @@ export default function MyListingsDashboard() {
 
                     <div className="grid grid-cols-[1fr_80px] gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">Cidade</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">Cidade</label>
                         <input 
-                          className="w-full h-14 px-6 rounded-2xl bg-[#f5f7f9] border-transparent border-2 focus:border-dark/10 transition-all font-bold text-dark focus:outline-none"
+                          className="w-full h-14 px-6 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-bold text-text-primary focus:outline-none"
                           value={formData.city || ''}
                           onChange={(e) => updateField('city', e.target.value)}
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">UF</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">UF</label>
                         <input 
-                          className="w-full h-14 px-6 rounded-2xl bg-[#f5f7f9] border-transparent border-2 focus:border-dark/10 transition-all font-bold text-dark focus:outline-none text-center"
+                          className="w-full h-14 px-6 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-bold text-text-primary focus:outline-none text-center"
                           value={formData.state || ''}
                           maxLength={2}
                           onChange={(e) => updateField('state', e.target.value.toUpperCase())}
@@ -686,10 +686,10 @@ export default function MyListingsDashboard() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">KM Atual</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">KM Atual</label>
                       <input 
                         type="number"
-                        className={`w-full h-14 px-6 rounded-2xl bg-[#f5f7f9] border-2 transition-all font-bold text-dark focus:outline-none ${errors.mileage ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-dark/10'}`}
+                        className={`w-full h-14 px-6 rounded-2xl bg-bg-alt border-2 transition-all font-bold text-text-primary focus:outline-none ${errors.mileage ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-accent'}`}
                         value={formData.mileage || ''}
                         onChange={(e) => updateField('mileage', Number(e.target.value))}
                       />
@@ -699,17 +699,17 @@ export default function MyListingsDashboard() {
                 </div>
 
                 {/* --- Section: Details --- */}
-                <div className="bg-white p-8 rounded-[40px] border border-black/5 shadow-sm space-y-6 md:col-span-2">
+                <div className="bg-white p-8 rounded-[40px] border border-border shadow-sm space-y-6 md:col-span-2">
                    <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center text-dark"><Car className="w-5 h-5" /></div>
+                    <div className="w-10 h-10 rounded-2xl bg-bg-alt flex items-center justify-center text-accent"><Car className="w-5 h-5" /></div>
                     <h3 className="font-black text-lg">Especificações Técnicas</h3>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">Câmbio</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">Câmbio</label>
                       <select 
-                        className="w-full h-12 px-4 rounded-xl bg-[#f5f7f9] font-bold text-dark focus:outline-none border-none"
+                        className="w-full h-12 px-4 rounded-xl bg-bg-alt font-bold text-text-primary focus:outline-none border-none cursor-pointer"
                         value={formData.transmission || ''}
                         onChange={(e) => updateField('transmission', e.target.value)}
                       >
@@ -720,9 +720,9 @@ export default function MyListingsDashboard() {
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">Combustível</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">Combustível</label>
                       <select 
-                        className="w-full h-12 px-4 rounded-xl bg-[#f5f7f9] font-bold text-dark focus:outline-none border-none"
+                        className="w-full h-12 px-4 rounded-xl bg-bg-alt font-bold text-text-primary focus:outline-none border-none cursor-pointer"
                         value={formData.fuel || ''}
                         onChange={(e) => updateField('fuel', e.target.value)}
                       >
@@ -735,17 +735,17 @@ export default function MyListingsDashboard() {
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">Cor</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">Cor</label>
                       <input 
-                        className="w-full h-12 px-4 rounded-xl bg-[#f5f7f9] font-bold text-dark focus:outline-none border-none"
+                        className="w-full h-12 px-4 rounded-xl bg-bg-alt font-bold text-text-primary focus:outline-none border-none"
                         value={formData.color || ''}
                         onChange={(e) => updateField('color', e.target.value)}
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">Final da Placa</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">Final da Placa</label>
                       <input 
-                        className="w-full h-12 px-4 rounded-xl bg-[#f5f7f9] font-bold text-dark focus:outline-none border-none text-center"
+                        className="w-full h-12 px-4 rounded-xl bg-bg-alt font-bold text-text-primary focus:outline-none border-none text-center"
                         value={formData.plate_final || ''}
                         maxLength={1}
                         onChange={(e) => updateField('plate_final', e.target.value)}
@@ -754,10 +754,10 @@ export default function MyListingsDashboard() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-dark/30 ml-4">Chassi (VIN) - Opcional</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-text-tertiary ml-4">Chassi (VIN) - Opcional</label>
                     <div className="relative group">
                       <input 
-                        className="w-full h-14 px-6 pr-40 rounded-2xl bg-[#f5f7f9] border-transparent border-2 focus:border-dark/10 transition-all font-mono font-bold text-dark focus:outline-none"
+                        className="w-full h-14 px-6 pr-40 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-mono font-bold text-text-primary focus:outline-none"
                         value={formData.vin || ''}
                         maxLength={17}
                         placeholder="17 caracteres"
@@ -766,26 +766,26 @@ export default function MyListingsDashboard() {
                       <button 
                         onClick={handleBlurPlates}
                         disabled={isBlurring}
-                        className="absolute right-2 top-2 bottom-2 px-4 bg-white rounded-xl text-[10px] font-black uppercase tracking-widest text-dark/60 hover:text-dark hover:bg-black/5 transition-all flex items-center gap-2 border border-black/5 shadow-sm"
+                        className="absolute right-2 top-2 bottom-2 px-4 bg-white rounded-xl text-[10px] font-black uppercase tracking-widest text-text-secondary hover:text-text-primary hover:bg-black/5 transition-all flex items-center gap-2 border border-border shadow-sm"
                       >
                         {isBlurring ? <Loader2 className="w-3 h-3 animate-spin" /> : <ScanSearch className="w-3 h-3" />}
                         Borrar Placas AI
                       </button>
                     </div>
-                    <p className="text-[10px] text-dark/30 font-medium ml-4 mt-2">Dica: Adicionar o VIN ajuda a comprovar a procedência e acelera a venda.</p>
+                    <p className="text-[10px] text-text-tertiary font-medium ml-4 mt-2">Dica: Adicionar o VIN ajuda a comprovar a procedência e acelera a venda.</p>
                   </div>
                 </div>
 
                 {/* --- Section: Description --- */}
-                <div className="bg-white p-8 rounded-[40px] border border-black/5 shadow-sm space-y-6 md:col-span-2">
+                <div className="bg-white p-8 rounded-[40px] border border-border shadow-sm space-y-6 md:col-span-2">
                    <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center text-dark"><MessageSquare className="w-5 h-5" /></div>
+                    <div className="w-10 h-10 rounded-2xl bg-bg-alt flex items-center justify-center text-accent"><MessageSquare className="w-5 h-5" /></div>
                     <h3 className="font-black text-lg">Descrição do Veículo</h3>
                   </div>
                   
                   <div className="space-y-1.5">
                     <textarea 
-                      className={`w-full min-h-[200px] p-6 rounded-[24px] bg-[#f5f7f9] border-2 transition-all font-bold text-dark focus:outline-none leading-relaxed ${errors.description ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-dark/10'}`}
+                      className={`w-full min-h-[200px] p-6 rounded-[24px] bg-bg-alt border-2 transition-all font-bold text-text-primary focus:outline-none leading-relaxed ${errors.description ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-accent'}`}
                       value={formData.description || ''}
                       onChange={(e) => updateField('description', e.target.value)}
                       placeholder="Descreva o estado de conservação, revisões, pneus, opcionais e tudo que valoriza seu carro..."
@@ -794,26 +794,26 @@ export default function MyListingsDashboard() {
                       {errors.description ? (
                         <p className="text-[10px] font-bold text-red-500">{errors.description}</p>
                       ) : (
-                        <p className="text-[10px] text-dark/30 font-medium italic">Seja transparente para evitar visitas frustradas.</p>
+                        <p className="text-[10px] text-text-tertiary font-medium italic">Seja transparente para evitar visitas frustradas.</p>
                       )}
-                      <p className="text-[10px] text-dark/30 font-bold uppercase tracking-widest">{(formData.description || '').length} chars</p>
+                      <p className="text-[10px] text-text-tertiary font-bold uppercase tracking-widest">{(formData.description || '').length} chars</p>
                     </div>
                   </div>
                 </div>
 
                 {/* --- Section: Photos --- */}
-                <div className="bg-white p-8 rounded-[40px] border border-black/5 shadow-sm space-y-8 md:col-span-2">
+                <div className="bg-white p-8 rounded-[40px] border border-border shadow-sm space-y-8 md:col-span-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center text-dark"><ImageIcon className="w-5 h-5" /></div>
+                      <div className="w-10 h-10 rounded-2xl bg-bg-alt flex items-center justify-center text-accent"><ImageIcon className="w-5 h-5" /></div>
                       <div>
                         <h3 className="font-black text-lg leading-tight">Fotos do Anúncio</h3>
-                        <p className="text-xs font-bold text-dark/30 mt-0.5">Arraste para reordenar. A primeira é a principal.</p>
+                        <p className="text-xs font-bold text-text-tertiary mt-0.5">Arraste para reordenar. A primeira é a principal.</p>
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-3">
-                      <label className="h-12 px-6 rounded-full bg-black/5 hover:bg-black/10 text-dark text-xs font-black uppercase tracking-widest flex items-center gap-2 cursor-pointer transition-all">
+                      <label className="h-12 px-6 rounded-full bg-bg-alt hover:bg-bg-alt/80 text-text-primary text-xs font-black uppercase tracking-widest flex items-center gap-2 cursor-pointer transition-all border border-border">
                         <Upload className="w-4 h-4" />
                         Adicionar
                         <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
@@ -821,7 +821,7 @@ export default function MyListingsDashboard() {
                       <button 
                         onClick={syncImages}
                         disabled={!isDirty || isUploading}
-                        className="h-12 px-8 rounded-full bg-dark text-white text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all disabled:opacity-20"
+                        className="btn btn-primary btn-sm px-8"
                       >
                         {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         Salvar Fotos
@@ -830,9 +830,9 @@ export default function MyListingsDashboard() {
                   </div>
 
                   {localImages.length === 0 ? (
-                    <div className="p-20 text-center border-2 border-dashed border-black/5 rounded-[32px] bg-[#fcfdfe]">
-                       <ImageIcon className="w-12 h-12 text-dark/10 mx-auto mb-4" />
-                       <p className="text-sm font-bold text-dark/40">Seu anúncio está sem fotos.</p>
+                    <div className="p-20 text-center border-2 border-dashed border-border rounded-[32px] bg-bg-alt/25">
+                       <ImageIcon className="w-12 h-12 text-text-tertiary/20 mx-auto mb-4" />
+                       <p className="text-sm font-bold text-text-tertiary">Seu anúncio está sem fotos.</p>
                     </div>
                   ) : (
                     <Reorder.Group 
@@ -845,18 +845,18 @@ export default function MyListingsDashboard() {
                         <Reorder.Item 
                           key={img.id} 
                           value={img}
-                          className="relative aspect-square rounded-3xl overflow-hidden group cursor-grab active:cursor-grabbing border border-black/5 bg-black/5"
+                          className="relative aspect-square rounded-3xl overflow-hidden group cursor-grab active:cursor-grabbing border border-border bg-bg-alt"
                         >
                           <img src={img.previewUrl} className="w-full h-full object-cover select-none" alt="" />
                           
-                          <div className="absolute inset-0 bg-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
                             <div className="flex justify-between items-start">
                               <div className="bg-white/90 p-1.5 rounded-lg shadow-sm">
-                                <GripVertical className="w-4 h-4 text-dark/40" />
+                                <GripVertical className="w-4 h-4 text-text-tertiary" />
                               </div>
                               <button 
                                 onClick={() => removeImage(img.id)}
-                                className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+                                className="w-8 h-8 bg-danger text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg border border-danger/10"
                               >
                                 <X className="w-4 h-4" />
                               </button>
@@ -865,7 +865,7 @@ export default function MyListingsDashboard() {
                             <button 
                               onClick={() => setPrimary(img.id)}
                               className={`w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                                img.is_primary ? 'bg-green-500 text-white' : 'bg-white text-dark hover:bg-[#f5f5f3]'
+                                img.is_primary ? 'bg-success text-white font-bold' : 'bg-white text-text-primary hover:bg-bg-alt'
                               }`}
                             >
                               {img.is_primary ? 'Capa' : 'Definir Capa'}
@@ -873,13 +873,13 @@ export default function MyListingsDashboard() {
                           </div>
                           
                           {img.is_primary && (
-                            <div className="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
+                            <div className="absolute top-3 left-3 bg-success text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
                               <Star className="w-3 h-3 fill-current" /> Capa
                             </div>
                           )}
                           
                           {!img.isExisting && (
-                            <div className="absolute top-3 right-3 bg-blue-500 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg">
+                            <div className="absolute top-3 right-3 bg-accent text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg">
                               Novo
                             </div>
                           )}
@@ -892,10 +892,10 @@ export default function MyListingsDashboard() {
               </div>
             </motion.div>
           ) : (
-            <div className="bg-white rounded-[48px] p-20 text-center border border-black/5 shadow-sm flex flex-col items-center">
-              <div className="w-24 h-24 bg-black/5 rounded-full flex items-center justify-center mb-8"><Car className="w-10 h-10 text-dark/20" /></div>
-              <h2 className="text-3xl font-black text-dark tracking-tight">Selecione um anúncio</h2>
-              <p className="mt-4 text-lg font-medium text-dark/40 max-w-sm">Escolha um dos seus veículos ao lado para editar detalhes, fotos e preço.</p>
+            <div className="bg-white rounded-[48px] p-20 text-center border border-border shadow-sm flex flex-col items-center">
+              <div className="w-24 h-24 bg-bg-alt rounded-full flex items-center justify-center mb-8"><Car className="w-10 h-10 text-text-tertiary" /></div>
+              <h2 className="text-3xl font-black text-text-primary tracking-tight">Selecione um anúncio</h2>
+              <p className="mt-4 text-lg font-medium text-text-secondary max-w-sm">Escolha um dos seus veículos ao lado para editar detalhes, fotos e preço.</p>
             </div>
           )}
         </AnimatePresence>
