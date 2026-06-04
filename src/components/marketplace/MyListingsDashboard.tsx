@@ -99,6 +99,12 @@ export default function MyListingsDashboard() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isBlurring, setIsBlurring] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
+  const [pendingUploads, setPendingUploads] = useState(0)
+  const [imageError, setImageError] = useState<string | null>(null)
+  const [isDraggingPhotos, setIsDraggingPhotos] = useState(false)
+
+  const syncImagesTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const dragCounter = useRef(0)
 
   const selectedListing = useMemo(
     () => listings.find((listing) => listing.id === selectedId) || null,
@@ -319,26 +325,54 @@ export default function MyListingsDashboard() {
 
   // --- Image Handling ---
   const handleImageSelect = (fileList: FileList | null) => {
-    if (!fileList) return
+    if (!fileList || fileList.length === 0) return
     const next: UploadImageItem[] = [...localImages]
+    const accepted: File[] = []
+    const rejected: { name: string; reason: string }[] = []
 
     Array.from(fileList).forEach((file) => {
-      if (next.length >= LISTING_MAX_IMAGES) return
-      if (!LISTING_ALLOWED_TYPES.includes(file.type)) return
-      if (file.size > LISTING_MAX_IMAGE_SIZE_MB * 1024 * 1024) return
-      
+      if (next.length >= LISTING_MAX_IMAGES) {
+        rejected.push({ name: file.name, reason: `Limite de ${LISTING_MAX_IMAGES} fotos atingido` })
+        return
+      }
+      if (!LISTING_ALLOWED_TYPES.includes(file.type)) {
+        rejected.push({ name: file.name, reason: 'Formato não suportado (use JPG, PNG ou WEBP)' })
+        return
+      }
+      if (file.size > LISTING_MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+        rejected.push({ name: file.name, reason: `Maior que ${LISTING_MAX_IMAGE_SIZE_MB}MB` })
+        return
+      }
       next.push({
         id: `new-${Math.random().toString(36).substr(2, 9)}`,
         file,
         previewUrl: URL.createObjectURL(file),
         isExisting: false,
         is_primary: next.length === 0,
-        sort_order: next.length
+        sort_order: next.length,
       })
+      accepted.push(file)
     })
 
-    setLocalImages(next)
-    setIsDirty(true)
+    if (accepted.length > 0) {
+      setLocalImages(next)
+      setIsDirty(true)
+      setPendingUploads(accepted.length)
+      setImageError(null)
+      scheduleAutoSync()
+    }
+
+    if (rejected.length > 0) {
+      setImageError(rejected.map(r => `${r.name}: ${r.reason}`).join(' • '))
+      setTimeout(() => setImageError(null), 6000)
+    }
+  }
+
+  const scheduleAutoSync = () => {
+    if (syncImagesTimer.current) clearTimeout(syncImagesTimer.current)
+    syncImagesTimer.current = setTimeout(() => {
+      syncImages()
+    }, 700)
   }
 
   const removeImage = (id: string) => {
@@ -352,6 +386,7 @@ export default function MyListingsDashboard() {
       }))
     })
     setIsDirty(true)
+    scheduleAutoSync()
   }
 
   const setPrimary = (id: string) => {
@@ -367,12 +402,50 @@ export default function MyListingsDashboard() {
       return sorted
     })
     setIsDirty(true)
+    scheduleAutoSync()
+  }
+
+  const handlePhotosDragEnter = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter.current += 1
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDraggingPhotos(true)
+    }
+  }
+
+  const handlePhotosDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter.current -= 1
+    if (dragCounter.current <= 0) {
+      dragCounter.current = 0
+      setIsDraggingPhotos(false)
+    }
+  }
+
+  const handlePhotosDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handlePhotosDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter.current = 0
+    setIsDraggingPhotos(false)
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleImageSelect(e.dataTransfer.files)
+      e.dataTransfer.clearData()
+    }
   }
 
   const syncImages = async () => {
     if (!selectedListing) return
+    if (isUploading) return
     setIsUploading(true)
     setGlobalError(null)
+    setImageError(null)
 
     try {
       const supabase = getSupabaseBrowserClient()
@@ -398,7 +471,11 @@ export default function MyListingsDashboard() {
             .from('vehicle-listings')
             .upload(storagePath, item.file, { upsert: false, contentType: item.file.type })
 
-          if (uploadError) throw new Error(`Falha no upload: ${uploadError.message}`)
+          if (uploadError) {
+            // Remove the failed item from local state so user can retry
+            setLocalImages(prev => prev.filter(img => img.id !== item.id))
+            throw new Error(`Falha no upload de "${item.file.name}": ${uploadError.message}`)
+          }
 
           const { data: urlData } = supabase.storage.from('vehicle-listings').getPublicUrl(storagePath)
           finalImages.push({
@@ -407,6 +484,7 @@ export default function MyListingsDashboard() {
             sort_order: i,
             is_primary: i === 0,
           })
+          setPendingUploads(prev => Math.max(0, prev - 1))
         }
       }
 
@@ -415,14 +493,20 @@ export default function MyListingsDashboard() {
         headers: authHeader(session.access_token),
         body: JSON.stringify({ images: finalImages }),
       })
-      
-      if (!response.ok) throw new Error('Falha ao salvar ordem/fotos')
-      
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}))
+        throw new Error(payload.error || 'Falha ao salvar ordem/fotos')
+      }
+
       setSaveStatus('saved')
       setIsDirty(false)
+      setPendingUploads(0)
       await loadListings()
     } catch (err) {
-      setGlobalError(err instanceof Error ? err.message : 'Erro ao atualizar fotos')
+      const msg = err instanceof Error ? err.message : 'Erro ao atualizar fotos'
+      setGlobalError(msg)
+      setImageError(msg)
     } finally {
       setIsUploading(false)
     }
@@ -478,8 +562,8 @@ export default function MyListingsDashboard() {
   if (!sessionReady) {
     return (
       <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-2xl border border-black/5">
-        <Loader2 className="h-8 w-8 animate-spin text-dark/20" />
-        <p className="mt-4 font-bold text-dark/40">Carregando sua garagem...</p>
+        <Loader2 className="h-8 w-8 animate-spin text-[#0A0A0A]" />
+        <p className="mt-4 font-bold text-[#0A0A0A]">Carregando sua garagem...</p>
       </div>
     )
   }
@@ -492,15 +576,15 @@ export default function MyListingsDashboard() {
       {/* --- Sidebar: Listings List --- */}
       <aside className="space-y-4 lg:sticky lg:top-32">
         <div className="flex items-center justify-between px-2">
-          <h3 className="text-sm font-black uppercase tracking-widest text-dark/30">Anúncios ({listings.length})</h3>
+          <h3 className="text-sm font-black uppercase tracking-widest text-[#0A0A0A]">Anúncios ({listings.length})</h3>
         </div>
         
         <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto pb-4 lg:pb-0 pr-2 custom-scrollbar no-scrollbar-mobile">
           {loadingListings ? (
             [1,2,3].map(i => <div key={i} className="min-w-[200px] lg:w-full h-24 bg-white rounded-3xl animate-pulse flex-shrink-0" />)
           ) : listings.length === 0 ? (
-            <div className="w-full p-8 text-center bg-white rounded-3xl border border-border">
-              <p className="text-sm font-bold text-text-tertiary">Nenhum anúncio encontrado.</p>
+            <div className="w-full p-8 text-center bg-white rounded-3xl border border-[#EAEAE8]">
+              <p className="text-sm font-bold text-[#A3A3A3]">Nenhum anúncio encontrado.</p>
             </div>
           ) : (
             listings.map((l) => (
@@ -509,12 +593,12 @@ export default function MyListingsDashboard() {
                 onClick={() => setSelectedId(l.id)}
                 className={`min-w-[240px] lg:w-full group text-left p-3 lg:p-4 rounded-3xl border transition-all flex-shrink-0 ${
                   selectedId === l.id 
-                    ? 'bg-accent border-accent text-white shadow-xl shadow-accent/20' 
-                    : 'bg-white border-border text-text-primary hover:border-accent'
+                    ? 'bg-[#10B981] border-[#10B981] text-white shadow-xl ' 
+                    : 'bg-white border-[#EAEAE8] text-[#0A0A0A] hover:border-[#10B981]'
                 }`}
               >
                 <div className="flex gap-3">
-                  <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl bg-bg-alt overflow-hidden flex-shrink-0">
+                  <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl bg-[#FAFAF9] overflow-hidden flex-shrink-0">
                     {l.images?.[0] ? (
                       <img src={l.images[0].public_url} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
                     ) : (
@@ -522,10 +606,10 @@ export default function MyListingsDashboard() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-black tracking-tight truncate text-sm lg:text-base ${selectedId === l.id ? 'text-white' : 'text-dark'}`}>
+                    <p className={`font-black tracking-tight truncate text-sm lg:text-base ${selectedId === l.id ? 'text-white' : 'text-[#0A0A0A]'}`}>
                       {l.title}
                     </p>
-                    <p className={`text-[10px] lg:text-xs font-bold mt-0.5 lg:mt-1 ${selectedId === l.id ? 'text-white/60' : 'text-dark/40'}`}>
+                    <p className={`text-[10px] lg:text-xs font-bold mt-0.5 lg:mt-1 ${selectedId === l.id ? 'text-white/60' : 'text-[#0A0A0A]'}`}>
                       {formatBRL(l.price)}
                     </p>
                   </div>
@@ -549,13 +633,13 @@ export default function MyListingsDashboard() {
               className="space-y-8"
             >
               {/* Toolbar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-border shadow-sm sticky top-24 z-20">
+              <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-[#EAEAE8] shadow-sm sticky top-24 z-20">
                 <div className="flex items-center gap-4">
                   <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-colors ${
-                    saveStatus === 'saving' ? 'bg-bg-alt text-text-primary' :
+                    saveStatus === 'saving' ? 'bg-[#FAFAF9] text-[#0A0A0A]' :
                     saveStatus === 'saved' ? 'bg-green-50 text-green-500' :
                     saveStatus === 'error' ? 'bg-red-50 text-red-500' :
-                    'bg-bg-alt text-text-tertiary'
+                    'bg-[#FAFAF9] text-[#A3A3A3]'
                   }`}>
                     {saveStatus === 'saving' ? <Loader2 className="w-3 h-3 animate-spin" /> : 
                      saveStatus === 'saved' ? <Check className="w-3 h-3" /> :
@@ -591,18 +675,18 @@ export default function MyListingsDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 
                 {/* --- Section: Basic --- */}
-                <div className="bg-white p-8 rounded-2xl border border-border shadow-sm space-y-6">
+                <div className="bg-white p-8 rounded-2xl border border-[#EAEAE8] shadow-sm space-y-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-2xl bg-bg-alt flex items-center justify-center text-accent"><Info className="w-5 h-5" /></div>
+                    <div className="w-10 h-10 rounded-2xl bg-[#FAFAF9] flex items-center justify-center text-[#10B981]"><Info className="w-5 h-5" /></div>
                     <h3 className="font-black text-lg">Informações Básicas</h3>
                   </div>
                   
                   <div className="space-y-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">Título do Anúncio</label>
+                      <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Título do Anúncio</label>
                       <input 
                         autoFocus
-                        className={`w-full h-14 px-6 rounded-2xl bg-bg-alt border-2 transition-all font-bold text-text-primary focus:outline-none ${errors.title ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-accent'}`}
+                        className={`w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-2 transition-all font-bold text-[#0A0A0A] focus:outline-none ${errors.title ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-[#10B981]'}`}
                         value={formData.title || ''}
                         onChange={(e) => updateField('title', e.target.value)}
                         placeholder="Ex: Toyota Corolla 2.0 XEi 2024"
@@ -612,19 +696,19 @@ export default function MyListingsDashboard() {
  
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">Ano Fabricação</label>
+                        <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Ano Fabricação</label>
                         <input 
                           type="number"
-                          className="w-full h-14 px-6 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-bold text-text-primary focus:outline-none"
+                          className="w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-transparent border-2 focus:border-[#10B981] transition-all font-bold text-[#0A0A0A] focus:outline-none"
                           value={formData.year || ''}
                           onChange={(e) => updateField('year', Number(e.target.value))}
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">Ano Modelo</label>
+                        <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Ano Modelo</label>
                         <input 
                           type="number"
-                          className="w-full h-14 px-6 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-bold text-text-primary focus:outline-none"
+                          className="w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-transparent border-2 focus:border-[#10B981] transition-all font-bold text-[#0A0A0A] focus:outline-none"
                           value={formData.year_model || ''}
                           onChange={(e) => updateField('year_model', Number(e.target.value))}
                         />
@@ -632,9 +716,9 @@ export default function MyListingsDashboard() {
                     </div>
  
                     <div className="space-y-1.5">
-                      <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">Status do Anúncio</label>
+                      <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Status do Anúncio</label>
                       <select
-                        className="w-full h-14 px-6 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-bold text-text-primary focus:outline-none appearance-none cursor-pointer"
+                        className="w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-transparent border-2 focus:border-[#10B981] transition-all font-bold text-[#0A0A0A] focus:outline-none appearance-none cursor-pointer"
                         value={formData.status || 'active'}
                         onChange={(e) => updateField('status', e.target.value)}
                       >
@@ -648,17 +732,17 @@ export default function MyListingsDashboard() {
                 </div>
 
                 {/* --- Section: Price & Location --- */}
-                <div className="bg-white p-8 rounded-2xl border border-border shadow-sm space-y-6">
+                <div className="bg-white p-8 rounded-2xl border border-[#EAEAE8] shadow-sm space-y-6">
                    <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-2xl bg-bg-alt flex items-center justify-center text-accent"><BadgeDollarSign className="w-5 h-5" /></div>
+                    <div className="w-10 h-10 rounded-2xl bg-[#FAFAF9] flex items-center justify-center text-[#10B981]"><BadgeDollarSign className="w-5 h-5" /></div>
                     <h3 className="font-black text-lg">Preço e Localização</h3>
                   </div>
 
                   <div className="space-y-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">Valor de Venda (R$)</label>
+                      <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Valor de Venda (R$)</label>
                       <input 
-                        className={`w-full h-14 px-6 rounded-2xl bg-bg-alt border-2 transition-all font-bold text-text-primary focus:outline-none text-2xl ${errors.price ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-accent'}`}
+                        className={`w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-2 transition-all font-bold text-[#0A0A0A] focus:outline-none text-2xl ${errors.price ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-[#10B981]'}`}
                         value={formData.price || ''}
                         onChange={(e) => updateField('price', e.target.value)}
                       />
@@ -667,17 +751,17 @@ export default function MyListingsDashboard() {
 
                     <div className="grid grid-cols-[1fr_80px] gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">Cidade</label>
+                        <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Cidade</label>
                         <input 
-                          className="w-full h-14 px-6 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-bold text-text-primary focus:outline-none"
+                          className="w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-transparent border-2 focus:border-[#10B981] transition-all font-bold text-[#0A0A0A] focus:outline-none"
                           value={formData.city || ''}
                           onChange={(e) => updateField('city', e.target.value)}
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">UF</label>
+                        <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">UF</label>
                         <input 
-                          className="w-full h-14 px-6 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-bold text-text-primary focus:outline-none text-center"
+                          className="w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-transparent border-2 focus:border-[#10B981] transition-all font-bold text-[#0A0A0A] focus:outline-none text-center"
                           value={formData.state || ''}
                           maxLength={2}
                           onChange={(e) => updateField('state', e.target.value.toUpperCase())}
@@ -686,10 +770,10 @@ export default function MyListingsDashboard() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">KM Atual</label>
+                      <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">KM Atual</label>
                       <input 
                         type="number"
-                        className={`w-full h-14 px-6 rounded-2xl bg-bg-alt border-2 transition-all font-bold text-text-primary focus:outline-none ${errors.mileage ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-accent'}`}
+                        className={`w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-2 transition-all font-bold text-[#0A0A0A] focus:outline-none ${errors.mileage ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-[#10B981]'}`}
                         value={formData.mileage || ''}
                         onChange={(e) => updateField('mileage', Number(e.target.value))}
                       />
@@ -699,17 +783,17 @@ export default function MyListingsDashboard() {
                 </div>
 
                 {/* --- Section: Details --- */}
-                <div className="bg-white p-8 rounded-2xl border border-border shadow-sm space-y-6 md:col-span-2">
+                <div className="bg-white p-8 rounded-2xl border border-[#EAEAE8] shadow-sm space-y-6 md:col-span-2">
                    <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-2xl bg-bg-alt flex items-center justify-center text-accent"><Car className="w-5 h-5" /></div>
+                    <div className="w-10 h-10 rounded-2xl bg-[#FAFAF9] flex items-center justify-center text-[#10B981]"><Car className="w-5 h-5" /></div>
                     <h3 className="font-black text-lg">Especificações Técnicas</h3>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">Câmbio</label>
+                      <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Câmbio</label>
                       <select 
-                        className="w-full h-12 px-4 rounded-xl bg-bg-alt font-bold text-text-primary focus:outline-none border-none cursor-pointer"
+                        className="w-full h-12 px-4 rounded-xl bg-[#FAFAF9] font-bold text-[#0A0A0A] focus:outline-none border-none cursor-pointer"
                         value={formData.transmission || ''}
                         onChange={(e) => updateField('transmission', e.target.value)}
                       >
@@ -720,9 +804,9 @@ export default function MyListingsDashboard() {
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">Combustível</label>
+                      <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Combustível</label>
                       <select 
-                        className="w-full h-12 px-4 rounded-xl bg-bg-alt font-bold text-text-primary focus:outline-none border-none cursor-pointer"
+                        className="w-full h-12 px-4 rounded-xl bg-[#FAFAF9] font-bold text-[#0A0A0A] focus:outline-none border-none cursor-pointer"
                         value={formData.fuel || ''}
                         onChange={(e) => updateField('fuel', e.target.value)}
                       >
@@ -735,17 +819,17 @@ export default function MyListingsDashboard() {
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">Cor</label>
+                      <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Cor</label>
                       <input 
-                        className="w-full h-12 px-4 rounded-xl bg-bg-alt font-bold text-text-primary focus:outline-none border-none"
+                        className="w-full h-12 px-4 rounded-xl bg-[#FAFAF9] font-bold text-[#0A0A0A] focus:outline-none border-none"
                         value={formData.color || ''}
                         onChange={(e) => updateField('color', e.target.value)}
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">Final da Placa</label>
+                      <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Final da Placa</label>
                       <input 
-                        className="w-full h-12 px-4 rounded-xl bg-bg-alt font-bold text-text-primary focus:outline-none border-none text-center"
+                        className="w-full h-12 px-4 rounded-xl bg-[#FAFAF9] font-bold text-[#0A0A0A] focus:outline-none border-none text-center"
                         value={formData.plate_final || ''}
                         maxLength={1}
                         onChange={(e) => updateField('plate_final', e.target.value)}
@@ -754,10 +838,10 @@ export default function MyListingsDashboard() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium uppercase tracking-wider text-text-tertiary ml-4">Chassi (VIN) - Opcional</label>
+                    <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Chassi (VIN) - Opcional</label>
                     <div className="relative group">
                       <input 
-                        className="w-full h-14 px-6 pr-40 rounded-2xl bg-bg-alt border-transparent border-2 focus:border-accent transition-all font-mono font-bold text-text-primary focus:outline-none"
+                        className="w-full h-14 px-6 pr-40 rounded-2xl bg-[#FAFAF9] border-transparent border-2 focus:border-[#10B981] transition-all font-mono font-bold text-[#0A0A0A] focus:outline-none"
                         value={formData.vin || ''}
                         maxLength={17}
                         placeholder="17 caracteres"
@@ -766,26 +850,26 @@ export default function MyListingsDashboard() {
                       <button 
                         onClick={handleBlurPlates}
                         disabled={isBlurring}
-                        className="absolute right-2 top-2 bottom-2 px-4 bg-white rounded-xl text-xs font-medium uppercase tracking-wider text-text-secondary hover:text-text-primary hover:bg-black/5 transition-all flex items-center gap-2 border border-border shadow-sm"
+                        className="absolute right-2 top-2 bottom-2 px-4 bg-white rounded-xl text-xs font-medium uppercase tracking-wider text-[#525252] hover:text-[#0A0A0A] hover:bg-black/5 transition-all flex items-center gap-2 border border-[#EAEAE8] shadow-sm"
                       >
                         {isBlurring ? <Loader2 className="w-3 h-3 animate-spin" /> : <ScanSearch className="w-3 h-3" />}
                         Borrar Placas AI
                       </button>
                     </div>
-                    <p className="text-[10px] text-text-tertiary font-medium ml-4 mt-2">Dica: Adicionar o VIN ajuda a comprovar a procedência e acelera a venda.</p>
+                    <p className="text-[10px] text-[#A3A3A3] font-medium ml-4 mt-2">Dica: Adicionar o VIN ajuda a comprovar a procedência e acelera a venda.</p>
                   </div>
                 </div>
 
                 {/* --- Section: Description --- */}
-                <div className="bg-white p-8 rounded-2xl border border-border shadow-sm space-y-6 md:col-span-2">
+                <div className="bg-white p-8 rounded-2xl border border-[#EAEAE8] shadow-sm space-y-6 md:col-span-2">
                    <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-2xl bg-bg-alt flex items-center justify-center text-accent"><MessageSquare className="w-5 h-5" /></div>
+                    <div className="w-10 h-10 rounded-2xl bg-[#FAFAF9] flex items-center justify-center text-[#10B981]"><MessageSquare className="w-5 h-5" /></div>
                     <h3 className="font-black text-lg">Descrição do Veículo</h3>
                   </div>
                   
                   <div className="space-y-1.5">
                     <textarea 
-                      className={`w-full min-h-[200px] p-6 rounded-2xl bg-bg-alt border-2 transition-all font-bold text-text-primary focus:outline-none leading-relaxed ${errors.description ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-accent'}`}
+                      className={`w-full min-h-[200px] p-6 rounded-2xl bg-[#FAFAF9] border-2 transition-all font-bold text-[#0A0A0A] focus:outline-none leading-relaxed ${errors.description ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-[#10B981]'}`}
                       value={formData.description || ''}
                       onChange={(e) => updateField('description', e.target.value)}
                       placeholder="Descreva o estado de conservação, revisões, pneus, opcionais e tudo que valoriza seu carro..."
@@ -794,31 +878,39 @@ export default function MyListingsDashboard() {
                       {errors.description ? (
                         <p className="text-[10px] font-bold text-red-500">{errors.description}</p>
                       ) : (
-                        <p className="text-[10px] text-text-tertiary font-medium italic">Seja transparente para evitar visitas frustradas.</p>
+                        <p className="text-[10px] text-[#A3A3A3] font-medium italic">Seja transparente para evitar visitas frustradas.</p>
                       )}
-                      <p className="text-[10px] text-text-tertiary font-bold uppercase tracking-widest">{(formData.description || '').length} chars</p>
+                      <p className="text-[10px] text-[#A3A3A3] font-bold uppercase tracking-widest">{(formData.description || '').length} chars</p>
                     </div>
                   </div>
                 </div>
 
                 {/* --- Section: Photos --- */}
-                <div className="bg-white p-8 rounded-2xl border border-border shadow-sm space-y-8 md:col-span-2">
+                <div
+                  className={`bg-white p-8 rounded-2xl border shadow-sm space-y-8 md:col-span-2 transition-colors ${
+                    isDraggingPhotos ? 'border-[#10B981] bg-[#ECFDF5]/30' : 'border-[#EAEAE8]'
+                  }`}
+                  onDragEnter={handlePhotosDragEnter}
+                  onDragLeave={handlePhotosDragLeave}
+                  onDragOver={handlePhotosDragOver}
+                  onDrop={handlePhotosDrop}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-bg-alt flex items-center justify-center text-accent"><ImageIcon className="w-5 h-5" /></div>
+                      <div className="w-10 h-10 rounded-2xl bg-[#FAFAF9] flex items-center justify-center text-[#10B981]"><ImageIcon className="w-5 h-5" /></div>
                       <div>
                         <h3 className="font-black text-lg leading-tight">Fotos do Anúncio</h3>
-                        <p className="text-xs font-bold text-text-tertiary mt-0.5">Arraste para reordenar. A primeira é a principal.</p>
+                        <p className="text-xs font-bold text-[#A3A3A3] mt-0.5">Arraste para reordenar. A primeira é a principal.</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-3">
-                      <label className="h-12 px-6 rounded-full bg-bg-alt hover:bg-bg-alt/80 text-text-primary text-xs font-black uppercase tracking-widest flex items-center gap-2 cursor-pointer transition-all border border-border">
+                      <label className="h-12 px-6 rounded-full bg-[#FAFAF9] hover:bg-[#EAEAE8] text-[#0A0A0A] text-xs font-black uppercase tracking-widest flex items-center gap-2 cursor-pointer transition-all border border-[#EAEAE8]">
                         <Upload className="w-4 h-4" />
                         Adicionar
-                        <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
+                        <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { handleImageSelect(e.target.files); e.target.value = '' }} />
                       </label>
-                      <button 
+                      <button
                         onClick={syncImages}
                         disabled={!isDirty || isUploading}
                         className="btn btn-primary btn-sm px-8"
@@ -829,16 +921,43 @@ export default function MyListingsDashboard() {
                     </div>
                   </div>
 
-                  {localImages.length === 0 ? (
-                    <div className="p-20 text-center border-2 border-dashed border-border rounded-2xl bg-bg-alt/25">
-                       <ImageIcon className="w-12 h-12 text-text-tertiary/20 mx-auto mb-4" />
-                       <p className="text-sm font-bold text-text-tertiary">Seu anúncio está sem fotos.</p>
+                  {(isUploading || pendingUploads > 0) && (
+                    <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#ECFDF5] border border-[#10B981]/20 text-[13px] text-[#0A0A0A]">
+                      <Loader2 className="w-4 h-4 animate-spin text-[#10B981]" strokeWidth={1.75} />
+                      <span className="font-medium tracking-tight">
+                        {isUploading ? 'Enviando fotos para o servidor…' : `${pendingUploads} foto(s) prontas para upload…`}
+                      </span>
                     </div>
+                  )}
+
+                  {imageError && (
+                    <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-[12px] text-red-700">
+                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" strokeWidth={1.75} />
+                      <span className="font-medium tracking-tight">{imageError}</span>
+                    </div>
+                  )}
+
+                  {localImages.length === 0 ? (
+                    <label className="block p-20 text-center border-2 border-dashed border-[#EAEAE8] rounded-2xl bg-[#FAFAF9] cursor-pointer hover:border-[#10B981] hover:bg-[#ECFDF5]/30 transition-colors">
+                      <ImageIcon className="w-12 h-12 text-[#A3A3A3] mx-auto mb-4" />
+                      <p className="text-sm font-bold text-[#0A0A0A] mb-1">Arraste fotos aqui ou clique para selecionar</p>
+                      <p className="text-xs text-[#A3A3A3]">JPG, PNG ou WEBP • até {LISTING_MAX_IMAGES} fotos • máx {LISTING_MAX_IMAGE_SIZE_MB}MB cada</p>
+                      <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { handleImageSelect(e.target.files); e.target.value = '' }} />
+                    </label>
                   ) : (
-                    <Reorder.Group 
-                      axis="x" 
-                      values={localImages} 
-                      onReorder={(next) => { setLocalImages(next); setIsDirty(true); }}
+                    <Reorder.Group
+                      axis="x"
+                      values={localImages}
+                      onReorder={(next) => {
+                        const reordered = next.map((img, idx) => ({
+                          ...img,
+                          sort_order: idx,
+                          is_primary: idx === 0,
+                        }))
+                        setLocalImages(reordered)
+                        setIsDirty(true)
+                        scheduleAutoSync()
+                      }}
                       className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"
                     >
                       {localImages.map((img) => (
@@ -852,7 +971,7 @@ export default function MyListingsDashboard() {
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
                             <div className="flex justify-between items-start">
                               <div className="bg-white/90 p-1.5 rounded-lg shadow-sm">
-                                <GripVertical className="w-4 h-4 text-text-tertiary" />
+                                <GripVertical className="w-4 h-4 text-[#A3A3A3]" />
                               </div>
                               <button 
                                 onClick={() => removeImage(img.id)}
@@ -865,7 +984,7 @@ export default function MyListingsDashboard() {
                             <button 
                               onClick={() => setPrimary(img.id)}
                               className={`w-full py-2 rounded-xl text-xs font-medium uppercase tracking-wider transition-all ${
-                                img.is_primary ? 'bg-success text-white font-bold' : 'bg-white text-text-primary hover:bg-bg-alt'
+                                img.is_primary ? 'bg-success text-white font-bold' : 'bg-white text-[#0A0A0A] hover:bg-[#FAFAF9]'
                               }`}
                             >
                               {img.is_primary ? 'Capa' : 'Definir Capa'}
@@ -879,7 +998,7 @@ export default function MyListingsDashboard() {
                           )}
                           
                           {!img.isExisting && (
-                            <div className="absolute top-3 right-3 bg-accent text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg">
+                            <div className="absolute top-3 right-3 bg-[#10B981] text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg">
                               Novo
                             </div>
                           )}
@@ -892,10 +1011,10 @@ export default function MyListingsDashboard() {
               </div>
             </motion.div>
           ) : (
-            <div className="bg-white rounded-[48px] p-20 text-center border border-border shadow-sm flex flex-col items-center">
-              <div className="w-24 h-24 bg-bg-alt rounded-full flex items-center justify-center mb-8"><Car className="w-10 h-10 text-text-tertiary" /></div>
-              <h2 className="text-3xl font-black text-text-primary tracking-tight">Selecione um anúncio</h2>
-              <p className="mt-4 text-lg font-medium text-text-secondary max-w-sm">Escolha um dos seus veículos ao lado para editar detalhes, fotos e preço.</p>
+            <div className="bg-white rounded-[48px] p-20 text-center border border-[#EAEAE8] shadow-sm flex flex-col items-center">
+              <div className="w-24 h-24 bg-[#FAFAF9] rounded-full flex items-center justify-center mb-8"><Car className="w-10 h-10 text-[#A3A3A3]" /></div>
+              <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tight">Selecione um anúncio</h2>
+              <p className="mt-4 text-lg font-medium text-[#525252] max-w-sm">Escolha um dos seus veículos ao lado para editar detalhes, fotos e preço.</p>
             </div>
           )}
         </AnimatePresence>
