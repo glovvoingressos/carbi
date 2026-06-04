@@ -132,12 +132,12 @@ export default function QualCarroPage() {
     const topResult = results[0]
     return (
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-        <p className="text-sm font-medium text-primary mb-1">Resultado</p>
-        <h1 className="text-2xl font-bold text-text mb-6">Sua recomenda&ccedil;&atilde;o</h1>
+        <p className="text-sm font-medium text-[#10B981] mb-1">Resultado</p>
+        <h1 className="text-2xl font-bold text-[#0A0A0A] mb-6">Sua recomenda&ccedil;&atilde;o</h1>
 
         {/* Top pick */}
-        <div className="pastel-card pastel-card-blue rounded-xl p-5 mb-4">
-          <p className="text-xs font-medium text-primary uppercase tracking-wider mb-2">Mais recomendado</p>
+        <div className="bg-[#FAFAF9] rounded-[32px] p-5 mb-4">
+          <p className="text-xs font-medium text-[#10B981] uppercase tracking-wider mb-2">Mais recomendado</p>
           <div className="flex items-center gap-4">
             <CarImage
               id={topResult.car.id}
@@ -150,13 +150,13 @@ export default function QualCarroPage() {
               className="w-20 h-20 sm:w-28 sm:h-28 rounded-lg"
             />
             <div className="flex-1 min-w-0">
-              <h2 className="font-bold text-text">{topResult.car.brand} {topResult.car.model}</h2>
+              <h2 className="font-bold text-[#0A0A0A]">{topResult.car.brand} {topResult.car.model}</h2>
               <p className="text-xs text-[#525252]">{topResult.car.version} &middot; {topResult.car.year}</p>
-              <p className="text-lg font-bold text-primary mt-1">{formatBRL(topResult.car.priceBrl)}</p>
+              <p className="text-lg font-bold text-[#10B981] mt-1">{formatBRL(topResult.car.priceBrl)}</p>
             </div>
             <Link
               href={`/${topResult.car.brand.toLowerCase().replace(/\s+/g, '-')}/${topResult.car.slug}`}
-              className="text-sm font-medium text-primary hover:underline flex-shrink-0"
+              className="text-sm font-medium text-[#10B981] hover:underline flex-shrink-0"
             >
               Ver detalhes &rarr;
             </Link>
@@ -166,7 +166,7 @@ export default function QualCarroPage() {
         {/* Other picks */}
         <div className="space-y-2 mb-8">
           {results.slice(1).map((result, i) => (
-            <div key={result.car.id} className="bg-[#f7f9fc] rounded-xl p-4 flex items-center gap-3 transition-colors">
+            <div key={result.car.id} className="bg-[#FAFAF9] rounded-xl p-4 flex items-center gap-3 transition-colors">
               <span className="text-xs font-bold text-[#A3A3A3] w-6 text-center">{i + 2}</span>
               <CarImage
                 id={result.car.id}
@@ -179,16 +179,16 @@ export default function QualCarroPage() {
                 className="w-12 h-12 rounded hidden sm:block"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-text">{result.car.brand} {result.car.model}</p>
+                <p className="text-sm font-semibold text-[#0A0A0A]">{result.car.brand} {result.car.model}</p>
                 <p className="text-xs text-[#525252]">{result.car.version}</p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-bold text-primary">{formatBRL(result.car.priceBrl)}</p>
+                <p className="text-sm font-bold text-[#10B981]">{formatBRL(result.car.priceBrl)}</p>
                 <p className="text-xs text-[#525252]">Match {Math.round(result.score)}%</p>
               </div>
               <Link
                 href={`/${result.car.brand.toLowerCase().replace(/\s+/g, '-')}/${result.car.slug}`}
-                className="text-xs font-medium text-primary hover:underline flex-shrink-0"
+                className="text-xs font-medium text-[#10B981] hover:underline flex-shrink-0"
               >
                 Ver &rarr;
               </Link>
@@ -197,8 +197,8 @@ export default function QualCarroPage() {
         </div>
 
         {/* Summary */}
-        <div className="bg-[#f7f9fc] rounded-xl p-5 mb-6">
-          <h3 className="text-sm font-semibold text-text mb-2">Seu perfil</h3>
+        <div className="bg-[#FAFAF9] rounded-xl p-5 mb-6">
+          <h3 className="text-sm font-semibold text-[#0A0A0A] mb-2">Seu perfil</h3>
           <ul className="text-xs text-[#525252] space-y-1">
             {answers.orcamento && <li>Orçamento: {answers.orcamento.label}</li>}
             {answers.usos.length > 0 && <li>Uso: {answers.usos.join(', ')}</li>}
@@ -209,7 +209,7 @@ export default function QualCarroPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <button onClick={reset} className="flex items-center justify-center gap-2 text-sm font-medium text-[#525252] hover:text-text px-4 py-2.5 rounded-lg bg-[#f2f6fb] hover:bg-[#e9f0f7] transition-colors">
+          <button onClick={reset} className="flex items-center justify-center gap-2 text-sm font-medium text-[#525252] hover:text-[#0A0A0A] px-4 py-2.5 rounded-lg bg-[#FAFAF9] hover:bg-[#F4F4F2] transition-colors">
             <RotateCcw className="w-4 h-4" /> Refazer teste
           </button>
 
@@ -222,7 +222,7 @@ export default function QualCarroPage() {
   return (
     <div className="max-w-xl mx-auto px-4 sm:px-6 py-8">
       {catalogLoading && (
-        <div className="mb-4 flex items-center justify-center gap-2 rounded-xl bg-[#f7f9fc] px-4 py-3 text-sm font-semibold text-[#525252]">
+        <div className="mb-4 flex items-center justify-center gap-2 rounded-xl bg-[#FAFAF9] px-4 py-3 text-sm font-semibold text-[#525252]">
           <Loader2 className="h-4 w-4 animate-spin" /> Carregando catálogo...
         </div>
       )}
@@ -234,25 +234,25 @@ export default function QualCarroPage() {
       {/* Progress */}
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm font-medium text-[#A3A3A3]">Passo {step + 1} de {steps.length}</p>
-        <p className="text-sm font-medium text-primary">{steps[step]}</p>
+        <p className="text-sm font-medium text-[#10B981]">{steps[step]}</p>
       </div>
-      <div className="w-full bg-border rounded-full h-1.5 mb-8">
-        <div className="bg-primary h-1.5 rounded-full transition-all duration-300" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
+      <div className="w-full bg-[#EAEAE8] rounded-full h-1.5 mb-8">
+        <div className="bg-[#10B981] h-1.5 rounded-full transition-all duration-300" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
       </div>
 
-      <div className="pastel-card pastel-card-lilac rounded-xl p-5 sm:p-6">
+      <div className="bg-[#FAFAF9] rounded-[32px] p-5 sm:p-6">
         {/* Step 0: Budget */}
         {step === 0 && (
           <>
-            <h2 className="text-lg font-bold text-text mb-4">Qual &eacute; seu orçamento?</h2>
+            <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">Qual &eacute; seu orçamento?</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {orcamentos.map((o) => (
                 <button key={o.label}
                   onClick={() => setAnswers((prev) => ({ ...prev, orcamento: o }))}
                   className={`p-3.5 rounded-lg text-left text-sm font-medium transition-all ${
                     answers.orcamento?.label === o.label
-                      ? 'bg-primary-light border-2 border-primary text-primary'
-                      : 'border border-[#EAEAE8] hover:border-primary/30 text-[#525252] bg-white'
+                      ? 'bg-[#ECFDF5] border-2 border-[#10B981] text-[#10B981]'
+                      : 'border border-[#EAEAE8] hover:border-[#10B981]/30 text-[#525252] bg-white'
                   }`}
                 >
                   {o.label}
@@ -265,7 +265,7 @@ export default function QualCarroPage() {
         {/* Step 1: Usage */}
         {step === 1 && (
           <>
-            <h2 className="text-lg font-bold text-text mb-1">Para que voc&ecirc; vai usar o carro?</h2>
+            <h2 className="text-lg font-bold text-[#0A0A0A] mb-1">Para que voc&ecirc; vai usar o carro?</h2>
             <p className="text-xs text-[#525252] mb-4">Pode marcar mais de um.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {usos.map((u) => (
@@ -276,8 +276,8 @@ export default function QualCarroPage() {
                   }))}
                   className={`p-3.5 rounded-lg text-left text-sm font-medium transition-all ${
                     answers.usos.includes(u)
-                      ? 'bg-primary-light border-2 border-primary text-primary'
-                      : 'border border-[#EAEAE8] hover:border-primary/30 text-[#525252] bg-white'
+                      ? 'bg-[#ECFDF5] border-2 border-[#10B981] text-[#10B981]'
+                      : 'border border-[#EAEAE8] hover:border-[#10B981]/30 text-[#525252] bg-white'
                   }`}
                 >
                   {u}
@@ -290,15 +290,15 @@ export default function QualCarroPage() {
         {/* Step 2: Passengers */}
         {step === 2 && (
           <>
-            <h2 className="text-lg font-bold text-text mb-4">Quantas pessoas vão no carro?</h2>
+            <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">Quantas pessoas vão no carro?</h2>
             <div className="grid grid-cols-2 gap-2">
               {passageiros.map((p) => (
                 <button key={p}
                   onClick={() => setAnswers((prev) => ({ ...prev, passageiros: p }))}
                   className={`p-3.5 rounded-lg text-center text-sm font-medium transition-all ${
                     answers.passageiros === p
-                      ? 'bg-primary-light border-2 border-primary text-primary'
-                      : 'border border-[#EAEAE8] hover:border-primary/30 text-[#525252] bg-white'
+                      ? 'bg-[#ECFDF5] border-2 border-[#10B981] text-[#10B981]'
+                      : 'border border-[#EAEAE8] hover:border-[#10B981]/30 text-[#525252] bg-white'
                   }`}
                 >
                   {p}
@@ -311,7 +311,7 @@ export default function QualCarroPage() {
         {/* Step 3: Priority */}
         {step === 3 && (
           <>
-            <h2 className="text-lg font-bold text-text mb-1">O que é mais importante?</h2>
+            <h2 className="text-lg font-bold text-[#0A0A0A] mb-1">O que é mais importante?</h2>
             <p className="text-xs text-[#525252] mb-4">Selecione sua prioridade principal.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {prioridades.map((p) => (
@@ -319,8 +319,8 @@ export default function QualCarroPage() {
                   onClick={() => setAnswers((prev) => ({ ...prev, prioridade: p.id }))}
                   className={`p-3.5 rounded-lg text-left text-sm font-medium transition-all ${
                     answers.prioridade === p.id
-                      ? 'bg-primary-light border-2 border-primary text-primary'
-                      : 'border border-[#EAEAE8] hover:border-primary/30 text-[#525252] bg-white'
+                      ? 'bg-[#ECFDF5] border-2 border-[#10B981] text-[#10B981]'
+                      : 'border border-[#EAEAE8] hover:border-[#10B981]/30 text-[#525252] bg-white'
                   }`}
                 >
                   {p.label}
@@ -333,15 +333,15 @@ export default function QualCarroPage() {
         {/* Step 4: Type */}
         {step === 4 && (
           <>
-            <h2 className="text-lg font-bold text-text mb-4">Pref&ecirc;rencia por tipo?</h2>
+            <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">Pref&ecirc;rencia por tipo?</h2>
             <div className="flex flex-wrap gap-2">
               {tipos.map((t) => (
                 <button key={t}
                   onClick={() => setAnswers((prev) => ({ ...prev, tipo: t }))}
                   className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition-all ${
                     answers.tipo === t
-                      ? 'bg-primary-light border-primary text-primary'
-                      : 'border-[#EAEAE8] hover:border-primary/30 text-[#525252] bg-white'
+                      ? 'bg-[#ECFDF5] border-[#10B981] text-[#10B981]'
+                      : 'border-[#EAEAE8] hover:border-[#10B981]/30 text-[#525252] bg-white'
                   }`}
                 >
                   {t}
@@ -355,14 +355,14 @@ export default function QualCarroPage() {
         <div className="flex justify-between mt-6 pt-4 border-t border-[#EAEAE8]">
           <button onClick={prev} disabled={step === 0}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium ${
-              step === 0 ? 'text-[#A3A3A3]' : 'text-[#525252] hover:bg-surface'
+              step === 0 ? 'text-[#A3A3A3]' : 'text-[#525252] hover:bg-[#FAFAF9]'
             }`}
           >
             <ArrowLeft className="w-4 h-4" /> Voltar
           </button>
           <button
             onClick={next}
-            className="flex items-center gap-1.5 bg-primary hover:bg-primary-hover text-white px-5 py-2 rounded-lg text-sm font-bold transition-colors"
+            className="flex items-center gap-1.5 bg-[#10B981] hover:bg-[#0D9F6E] text-white px-5 py-2 rounded-lg text-sm font-bold transition-colors"
           >
             {step === steps.length - 1 ? 'Ver resultado' : 'Avançar'} <ArrowRight className="w-4 h-4" />
           </button>

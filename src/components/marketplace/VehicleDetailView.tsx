@@ -394,7 +394,7 @@ export default function VehicleDetailView({
       )}
 
       {/* ── MOBILE STICKY CTA ── */}
-      <div className="lg:hidden fixed inset-x-0 bottom-0 z-50 bg-white/95 backdrop-blur-xl border-t border-[#EAEAE8] p-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
+      <div className="lg:hidden fixed inset-x-0 bottom-0 z-[60] bg-white/95 backdrop-blur-xl border-t border-[#EAEAE8] p-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <p className="text-[18px] font-semibold text-[#0A0A0A] tracking-tight truncate">

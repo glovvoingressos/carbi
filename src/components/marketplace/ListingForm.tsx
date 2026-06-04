@@ -850,7 +850,7 @@ export default function ListingForm() {
 
   if (!sessionReady) {
     return (
-      <div className="bg-white rounded-2xl border border-black/5 p-8 text-center shadow-sm">
+      <div className="bg-white rounded-2xl border border-[#EAEAE8] p-8 text-center shadow-sm">
         <Loader2 className="mx-auto h-5 w-5 animate-spin text-[#0A0A0A]" />
         <p className="mt-2 text-sm text-[#525252]">Carregando sessão...</p>
       </div>

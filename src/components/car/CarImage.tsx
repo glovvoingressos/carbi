@@ -175,7 +175,7 @@ export default function CarImage({
 
   return (
     <div 
-      className={`relative overflow-hidden bg-[#eef2f5] dark:bg-neutral-900 ${className}`}
+      className={`relative overflow-hidden bg-bg-muted dark:bg-neutral-900 ${className}`}
       style={{
         ...style,
         aspectRatio,
@@ -207,7 +207,7 @@ export default function CarImage({
 
       {/* Premium Fallback UI (Se tudo falhar) */}
       {hasFinalError && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-[#eef2f5] to-[#dde4e9]">
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-bg-muted to-border">
            <div className="relative mb-3 flex items-center justify-center">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/50 backdrop-blur-md border border-[#0A0A0A]/5 rounded-full absolute animate-pulse" />
               <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white border-2 border-[#0A0A0A] shadow-[4px_4px_0_#0A0A0A] rounded-xl flex items-center justify-center text-[#0A0A0A] rotate-[2deg] z-10">
@@ -216,7 +216,7 @@ export default function CarImage({
            </div>
            
            <div className="flex flex-col items-center gap-1.5 z-10">
-              <p className="text-[10px] sm:text-[11px] font-black text-[#0A0A0A] uppercase tracking-[0.15em] text-center leading-tight bg-[#f5f5f3] px-3 py-1.5 rounded-full border border-black/10">
+              <p className="text-[10px] sm:text-[11px] font-black text-[#0A0A0A] uppercase tracking-[0.15em] text-center leading-tight bg-[#f5f5f3] px-3 py-1.5 rounded-full border border-[#EAEAE8]">
                 Imagem indisponível
               </p>
               <p className="text-[9px] font-bold text-[#A3A3A3] uppercase tracking-widest text-center mt-1">

@@ -72,7 +72,7 @@ export default async function CarrosAVendaPage({
       <div className="container mx-auto max-w-7xl px-4">
         {/* Header Section */}
         <div className="mb-12">
-          <div className="inline-flex items-center gap-2 bg-white/50 border border-black/5 px-3 py-1 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-white/50 border border-[#EAEAE8] px-3 py-1 rounded-full mb-4">
             <span className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">Marketplace</span>
           </div>
           <h1 className="text-4xl sm:text-6xl font-black text-[#0A0A0A] tracking-tight leading-[0.95]">
@@ -93,7 +93,7 @@ export default async function CarrosAVendaPage({
 
         {/* Bottom SEO Content */}
         <div className="mt-32">
-          <section className="bg-white rounded-[48px] p-12 sm:p-20 border border-black/5 shadow-sm">
+          <section className="bg-white rounded-[48px] p-12 sm:p-20 border border-[#EAEAE8] shadow-sm">
             <h2 className="text-3xl sm:text-5xl font-black text-[#0A0A0A] tracking-tight mb-8">Compre seu próximo carro com segurança</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div className="space-y-6">

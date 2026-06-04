@@ -24,7 +24,7 @@ export default function SEOPageClient({ data, ctaHref }: SEOPageClientProps) {
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#FAFAF9] text-[#A3A3A3] text-[10px] font-black uppercase tracking-widest mb-8">
               Atrito Zero • Marketplace Inteligente
             </span>
-            <h1 className="text-5xl sm:text-[110px] font-black text-[#0A0A0A] tracking-tighter leading-[0.85] mb-12">
+            <h1 className="text-4xl sm:text-5xl md:text-[110px] font-black text-[#0A0A0A] tracking-tighter leading-[0.85] mb-12">
               {data.h1}
             </h1>
             <p className="text-xl sm:text-2xl font-bold text-[#A3A3A3] max-w-3xl mx-auto mb-16 leading-relaxed">
@@ -33,13 +33,13 @@ export default function SEOPageClient({ data, ctaHref }: SEOPageClientProps) {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <Link 
                 href={ctaHref}
-                className="h-24 px-16 rounded-full bg-[#0A0A0A] text-white text-lg font-black uppercase tracking-widest flex items-center justify-center hover:scale-105 transition-all shadow-2xl shadow-dark/20 group"
+                className="h-24 px-16 rounded-full bg-[#0A0A0A] text-white text-lg font-black uppercase tracking-widest flex items-center justify-center hover:scale-105 transition-all shadow-2xl shadow-black/20 group"
               >
                 {data.ctaButtonText || 'Começar agora'} <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </Link>
               <a 
                 href="#detalhes" 
-                className="h-24 px-16 rounded-full bg-white border border-black/5 text-[#0A0A0A] text-lg font-black uppercase tracking-widest flex items-center justify-center hover:bg-[#f5f5f3] transition-all"
+                className="h-24 px-16 rounded-full bg-white border border-[#EAEAE8] text-[#0A0A0A] text-lg font-black uppercase tracking-widest flex items-center justify-center hover:bg-[#f5f5f3] transition-all"
               >
                 Saber mais
               </a>

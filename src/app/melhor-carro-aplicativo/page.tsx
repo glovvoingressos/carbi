@@ -59,7 +59,7 @@ export default function AppRankingPage() {
         
         <div className="container relative z-10">
           <Badge className="mb-6 bg-white/10 text-white border-white/20">Guia 2026 — Inteligência de Mercado</Badge>
-          <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-8 leading-none">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter mb-8 leading-none">
             melhor carro para <br />
             <span className="text-white/60">aplicativo 2026</span>
           </h1>
@@ -109,7 +109,7 @@ export default function AppRankingPage() {
 
         {/* The Ranking Table */}
         <div className="mb-24">
-           <h2 className="text-4xl font-black text-[#0A0A0A] mb-12 tracking-tight flex items-center gap-4">
+           <h2 className="text-3xl sm:text-4xl font-black text-[#0A0A0A] mb-12 tracking-tight flex items-center gap-4">
               <span className="w-12 h-12 bg-[#0A0A0A] text-white rounded-2xl flex items-center justify-center">#</span> 
               Ranking carbi — Eficiência 2026
            </h2>

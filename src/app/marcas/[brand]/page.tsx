@@ -26,9 +26,9 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
   if (groupedModels.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 text-center">
-        <h1 className="text-xl font-bold text-text mb-2">Marca não encontrada</h1>
+        <h1 className="text-xl font-bold text-[#0A0A0A] mb-2">Marca não encontrada</h1>
         <p className="text-sm text-[#525252] mb-6">Não foi possível encontrar a marca solicitada.</p>
-        <Link href="/marcas" className="text-sm text-primary hover:underline font-medium">&larr; Ver todas as marcas</Link>
+        <Link href="/marcas" className="text-sm text-[#10B981] hover:underline font-medium">&larr; Ver todas as marcas</Link>
       </div>
     )
   }
@@ -36,14 +36,14 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
       <nav className="flex items-center gap-1 text-sm text-[#A3A3A3] mb-6">
-        <Link href="/" className="hover:text-text transition-colors">Home</Link>
+        <Link href="/" className="hover:text-[#0A0A0A] transition-colors">Home</Link>
         <ChevronRight className="w-3.5 h-3.5" />
-        <Link href="/marcas" className="hover:text-text transition-colors">Marcas</Link>
+        <Link href="/marcas" className="hover:text-[#0A0A0A] transition-colors">Marcas</Link>
         <ChevronRight className="w-3.5 h-3.5" />
-        <span className="text-text font-medium">{realBrandName}</span>
+        <span className="text-[#0A0A0A] font-medium">{realBrandName}</span>
       </nav>
 
-      <h1 className="text-2xl font-bold text-text mb-1">{realBrandName}</h1>
+      <h1 className="text-2xl font-bold text-[#0A0A0A] mb-1">{realBrandName}</h1>
       <p className="text-sm text-[#525252] mb-6">
         {groupedModels.length} modelo{groupedModels.length !== 1 ? 's' : ''} • {brandCars.length} versão{brandCars.length !== 1 ? 'ões' : ''} disponível(is)
       </p>

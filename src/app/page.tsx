@@ -194,7 +194,7 @@ export default async function HomePage() {
                   <div className="aspect-[4/3] w-full rounded-xl bg-gradient-to-br from-white/[0.06] to-white/[0.02] overflow-hidden mb-4 flex items-center justify-center border border-white/[0.06]">
                     <div className="text-center">
                       <Car className="w-14 h-14 text-white/15 mx-auto mb-2" strokeWidth={1} />
-                      <p className="text-[11px] text-white/20 tracking-tight">Foto do veículo</p>
+                      <p className="text-[11px] text-white/40 tracking-tight">Foto do veículo</p>
                     </div>
                   </div>
 

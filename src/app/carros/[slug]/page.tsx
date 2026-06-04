@@ -62,7 +62,7 @@ export default async function CarrosSeoPage({
       <div className="container mx-auto max-w-6xl px-4">
         {/* Header Section */}
         <div className="mb-12">
-          <div className="inline-flex items-center gap-2 bg-white/50 border border-black/5 px-3 py-1 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-white/50 border border-[#EAEAE8] px-3 py-1 rounded-full mb-4">
             <span className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">Marketplace SEO</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-black text-[#0A0A0A] tracking-tight leading-none">
@@ -78,14 +78,14 @@ export default async function CarrosSeoPage({
             <a
               key={link.href}
               href={link.href}
-              className="px-5 py-2 bg-white border border-black/5 rounded-full text-xs font-bold text-[#525252] hover:text-[#0A0A0A] hover:border-black/10 transition-all shadow-sm"
+              className="px-5 py-2 bg-white border border-[#EAEAE8] rounded-full text-xs font-bold text-[#525252] hover:text-[#0A0A0A] hover:border-[#EAEAE8] transition-all shadow-sm"
             >
               {link.label}
             </a>
           ))}
         </div>
 
-        <div className="bg-white rounded-[32px] p-4 border border-black/5 mb-10 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="bg-white rounded-[32px] p-4 border border-[#EAEAE8] mb-10 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
           <form action={`/carros/${slug}`} method="get" className="flex items-center gap-3 w-full md:w-auto">
             <select
               name="ordem"
@@ -118,16 +118,16 @@ export default async function CarrosSeoPage({
               <div className="mt-16 flex items-center justify-center gap-4">
                 <a
                   href={`/carros/${slug}?ordem=${sort}&pagina=${Math.max(page - 1, 1)}`}
-                  className={`w-14 h-14 rounded-full flex items-center justify-center border transition-all ${page <= 1 ? 'pointer-events-none border-transparent text-[#0A0A0A]/10' : 'border-black/5 bg-white text-[#0A0A0A] hover:border-black/20 shadow-sm'}`}
+                  className={`w-14 h-14 rounded-full flex items-center justify-center border transition-all ${page <= 1 ? 'pointer-events-none border-transparent text-[#0A0A0A]/10' : 'border-[#EAEAE8] bg-white text-[#0A0A0A] hover:border-black/20 shadow-sm'}`}
                 >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </a>
-                <div className="px-6 h-14 bg-white rounded-full border border-black/5 flex items-center shadow-sm">
+                <div className="px-6 h-14 bg-white rounded-full border border-[#EAEAE8] flex items-center shadow-sm">
                   <span className="font-black text-[#0A0A0A] tracking-widest">{page} / {totalPages}</span>
                 </div>
                 <a
                   href={`/carros/${slug}?ordem=${sort}&pagina=${Math.min(page + 1, totalPages)}`}
-                  className={`w-14 h-14 rounded-full flex items-center justify-center border transition-all ${page >= totalPages ? 'pointer-events-none border-transparent text-[#0A0A0A]/10' : 'border-black/5 bg-white text-[#0A0A0A] hover:border-black/20 shadow-sm'}`}
+                  className={`w-14 h-14 rounded-full flex items-center justify-center border transition-all ${page >= totalPages ? 'pointer-events-none border-transparent text-[#0A0A0A]/10' : 'border-[#EAEAE8] bg-white text-[#0A0A0A] hover:border-black/20 shadow-sm'}`}
                 >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                 </a>
@@ -135,7 +135,7 @@ export default async function CarrosSeoPage({
             )}
           </>
         ) : (
-          <div className="bg-white rounded-[40px] p-20 text-center border border-black/5 mt-8">
+          <div className="bg-white rounded-[40px] p-20 text-center border border-[#EAEAE8] mt-8">
             <h2 className="text-2xl font-black text-[#0A0A0A] mb-2">Nenhum veículo encontrado</h2>
             <p className="text-[#A3A3A3] font-bold">Tente ajustar seus filtros ou buscar por outro termo.</p>
           </div>

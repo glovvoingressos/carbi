@@ -87,7 +87,7 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
   const filteredCars = groupedCars.filter(data.filter).slice(0, 16)
 
   return (
-    <div className="bg-surface min-h-screen">
+    <div className="bg-[#FAFAF9] min-h-screen">
       {/* Intent Hero */}
       <section className="bg-[#0A0A0A] text-white pt-24 pb-16 relative overflow-hidden">
         <div className="container max-w-5xl mx-auto px-4 relative z-10 text-center">
@@ -111,7 +111,7 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
               ))}
             </div>
           ) : (
-             <div className="text-center py-20 bg-[#f7f9fc] rounded-3xl">
+             <div className="text-center py-20 bg-[#FAFAF9] rounded-3xl">
                 <p className="text-xl font-bold text-[#0A0A0A] mb-4">Nenhum carro encontrado para este critério específico no momento.</p>
                 <Link href="/qual-carro" className="text-[#10B981] hover:underline font-semibold">Refaça o teste de compatibilidade</Link>
              </div>

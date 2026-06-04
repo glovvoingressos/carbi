@@ -41,7 +41,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="text-2xl font-heading text-text tracking-wide">Rankings</h1>
+      <h1 className="text-2xl font-heading text-[#0A0A0A] tracking-wide">Rankings</h1>
       <p className="text-sm text-[#525252] mt-1">
         {activeProfile
           ? `Ranking por ${activeProfile.label.toLowerCase()}`
@@ -61,8 +61,8 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
             <Link key={p.id} href={`/rankings?profile=${p.id}`}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 sortByProfile === p.id
-                  ? 'bg-primary text-white'
-                  : 'bg-[#f3f6fb] text-[#525252] hover:bg-[#edf2f8] hover:text-primary'
+                  ? 'bg-[#10B981] text-white'
+                  : 'bg-[#f3f6fb] text-[#525252] hover:bg-[#edf2f8] hover:text-[#10B981]'
               }`}
             >
               {p.label}
@@ -78,8 +78,8 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
             <Link key={r.id} href={`/rankings?priceRange=${r.id}`}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 sortByPrice === r.id
-                  ? 'bg-primary text-white'
-                  : 'bg-[#f3f6fb] text-[#525252] hover:bg-[#edf2f8] hover:text-primary'
+                  ? 'bg-[#10B981] text-white'
+                  : 'bg-[#f3f6fb] text-[#525252] hover:bg-[#edf2f8] hover:text-[#10B981]'
               }`}
             >
               {r.label}
@@ -96,16 +96,16 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
 
           return (
             <div key={car.id} className={`${index === 0 && sortByProfile ? 'ring-2 ring-primary' : ''} rounded-xl`}>
-              <div className={`${index === 0 && sortByProfile ? 'bg-[#f7f9fc] ring-1 ring-inset ring-transparent rounded-xl' : ''}`}>
+              <div className={`${index === 0 && sortByProfile ? 'bg-[#FAFAF9] ring-1 ring-inset ring-transparent rounded-xl' : ''}`}>
                 <CarCard car={car} />
                 {index === 0 && sortByProfile && (
-                  <div className="bg-primary-light rounded-b-xl border border-t-0 border-primary/20 px-4 py-3 -mt-2">
+                  <div className="bg-[#ECFDF5] rounded-b-xl border border-t-0 border-[#10B981] px-4 py-3 -mt-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold text-text">Destaque do ranking</span>
-                      <span className="text-xs text-primary font-medium">Score: {Math.round(score ?? 0)}</span>
+                      <span className="text-sm font-bold text-[#0A0A0A]">Destaque do ranking</span>
+                      <span className="text-xs text-[#10B981] font-medium">Score: {Math.round(score ?? 0)}</span>
                     </div>
-                    <div className="w-full bg-border rounded-full h-1.5 mt-1.5">
-                      <div className="bg-primary h-1.5 rounded-full" style={{ width: `${Math.round(score ?? 0)}%` }} />
+                    <div className="w-full bg-[#EAEAE8] rounded-full h-1.5 mt-1.5">
+                      <div className="bg-[#10B981] h-1.5 rounded-full" style={{ width: `${Math.round(score ?? 0)}%` }} />
                     </div>
                   </div>
                 )}
@@ -115,7 +115,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
         })}
       </div>
       {rankedCars.length === 0 && (
-        <div className="mt-8 rounded-xl bg-[#f7f9fc] p-6 text-sm font-semibold text-[#525252]">
+        <div className="mt-8 rounded-xl bg-[#FAFAF9] p-6 text-sm font-semibold text-[#525252]">
           Nenhum resultado encontrado para a busca atual.
         </div>
       )}

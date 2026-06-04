@@ -562,7 +562,7 @@ export default function MyListingsDashboard() {
 
   if (!sessionReady) {
     return (
-      <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-2xl border border-black/5">
+      <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-2xl border border-[#EAEAE8]">
         <Loader2 className="h-8 w-8 animate-spin text-[#0A0A0A]" />
         <p className="mt-4 font-bold text-[#0A0A0A]">Carregando sua garagem...</p>
       </div>
