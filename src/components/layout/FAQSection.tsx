@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { Plus } from 'lucide-react'
 
 const faqs = [
   { q: "O que é o carbi?", a: "O carbi é uma plataforma premium de inteligência automotiva. Você compara valor de mercado, dados técnicos e avaliações para tomar decisões mais seguras na compra e venda." },
@@ -13,44 +13,41 @@ const faqs = [
 ]
 
 export default function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
-    <section className="section-pad bg-bg-alt">
-      <div className="container max-w-3xl mx-auto">
+    <section className="py-20 md:py-28">
+      <div className="container max-w-3xl">
         <div className="text-center mb-12">
-          <p className="label text-accent mb-3">Suporte & Dúvidas</p>
-          <h2>Perguntas Frequentes</h2>
+          <p className="eyebrow mb-3">Suporte</p>
+          <h2 className="text-balance">Perguntas frequentes</h2>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="bg-white border border-[#EAEAE8] rounded-2xl overflow-hidden divide-y divide-[#EAEAE8]">
           {faqs.map((faq, i) => {
             const isOpen = openIndex === i
 
             return (
-              <div
-                key={i}
-                className={`card overflow-hidden transition-all duration-300 ${
-                  isOpen ? 'border-accent-light shadow-sm' : 'hover:shadow-sm'
-                }`}
-              >
+              <div key={i}>
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : i)}
-                  className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4"
+                  className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 hover:bg-[#FAFAF9] transition-colors"
                 >
-                  <span className={`text-sm font-semibold transition-colors ${isOpen ? 'text-accent' : 'text-text-primary'}`}>
+                  <span className="text-[15px] font-medium text-[#0A0A0A] tracking-tight">
                     {faq.q}
                   </span>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${isOpen ? 'bg-accent-light' : 'bg-bg-alt'}`}>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180 text-accent' : 'text-text-tertiary'}`} />
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                    isOpen ? 'bg-[#0A0A0A] text-white rotate-45' : 'bg-[#FAFAF9] text-[#0A0A0A]'
+                  }`}>
+                    <Plus className="w-3.5 h-3.5" strokeWidth={2} />
                   </div>
                 </button>
                 <div
-                  className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                  className={`grid transition-all duration-300 ease-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
                 >
                   <div className="overflow-hidden">
                     <div className="px-5 md:px-6 pb-5 md:pb-6 pt-0">
-                      <p className="text-sm leading-relaxed text-text-secondary">
+                      <p className="text-[14px] leading-relaxed text-[#525252]">
                         {faq.a}
                       </p>
                     </div>

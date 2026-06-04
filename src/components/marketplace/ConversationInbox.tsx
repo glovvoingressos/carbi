@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Send, Loader2 } from 'lucide-react'
+import { Send, Loader2, MessageSquare } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
@@ -58,7 +58,7 @@ export default function ConversationInbox() {
     if (!supabaseReady) {
       setReady(true)
       setAuthenticated(false)
-      setError('Chat indisponível: Supabase não configurado no ambiente.')
+      setError('Chat indisponível.')
       return
     }
 
@@ -66,9 +66,7 @@ export default function ConversationInbox() {
 
     const init = async () => {
       const supabase = getSupabaseBrowserClient()
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      const { data: { session } } = await supabase.auth.getSession()
 
       setAuthenticated(!!session)
       setToken(session?.access_token || null)
@@ -84,25 +82,17 @@ export default function ConversationInbox() {
     }
 
     void init()
-
-    return () => {
-      unsubscribe?.()
-    }
+    return () => { unsubscribe?.() }
   }, [supabaseReady])
 
   const fetchConversations = async (accessToken: string) => {
     setLoadingConversations(true)
     try {
       const response = await fetch('/api/marketplace/conversations', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
       })
       const payload = await response.json()
-      if (!response.ok) {
-        throw new Error(payload.error || 'Falha ao carregar conversas.')
-      }
-
+      if (!response.ok) throw new Error(payload.error || 'Falha ao carregar conversas.')
       setConversations(payload)
       if (!selectedId && payload.length > 0) {
         setSelectedId(payload[0].id)
@@ -118,22 +108,15 @@ export default function ConversationInbox() {
     setLoadingMessages(true)
     try {
       const response = await fetch(`/api/marketplace/conversations/${conversationId}/messages`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
       })
       const payload = await response.json()
-      if (!response.ok) {
-        throw new Error(payload.error || 'Falha ao carregar mensagens.')
-      }
-
+      if (!response.ok) throw new Error(payload.error || 'Falha ao carregar mensagens.')
       setMessages(payload)
 
       await fetch(`/api/marketplace/conversations/${conversationId}/read`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
       })
     } catch (messageError) {
       setError(messageError instanceof Error ? messageError.message : 'Falha ao carregar mensagens.')
@@ -155,64 +138,27 @@ export default function ConversationInbox() {
   useEffect(() => {
     if (!token || !myUserId || !selectedId || !supabaseReady) return
     const supabase = getSupabaseBrowserClient()
-
     const messageChannel = supabase
       .channel(`messages:${selectedId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'conversation_messages',
-          filter: `conversation_id=eq.${selectedId}`,
-        },
-        () => {
-          void fetchMessages(token, selectedId)
-        },
-      )
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversation_messages', filter: `conversation_id=eq.${selectedId}` },
+        () => { void fetchMessages(token, selectedId) })
       .subscribe()
-
-    return () => {
-      void supabase.removeChannel(messageChannel)
-    }
+    return () => { void supabase.removeChannel(messageChannel) }
   }, [token, myUserId, selectedId, supabaseReady])
 
   useEffect(() => {
     if (!token || !myUserId || !supabaseReady) return
     const supabase = getSupabaseBrowserClient()
-
     const sellerChannel = supabase
       .channel(`conversations:seller:${myUserId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'conversations',
-          filter: `seller_user_id=eq.${myUserId}`,
-        },
-        () => {
-          void fetchConversations(token)
-        },
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations', filter: `seller_user_id=eq.${myUserId}` },
+        () => { void fetchConversations(token) })
       .subscribe()
-
     const buyerChannel = supabase
       .channel(`conversations:buyer:${myUserId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'conversations',
-          filter: `buyer_user_id=eq.${myUserId}`,
-        },
-        () => {
-          void fetchConversations(token)
-        },
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations', filter: `buyer_user_id=eq.${myUserId}` },
+        () => { void fetchConversations(token) })
       .subscribe()
-
     return () => {
       void supabase.removeChannel(sellerChannel)
       void supabase.removeChannel(buyerChannel)
@@ -221,24 +167,16 @@ export default function ConversationInbox() {
 
   const sendMessage = async () => {
     if (!token || !selectedId || !messageText.trim()) return
-
     setSending(true)
     setError(null)
-
     try {
       const response = await fetch(`/api/marketplace/conversations/${selectedId}/messages`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: messageText }),
       })
       const payload = await response.json()
-      if (!response.ok) {
-        throw new Error(payload.error || 'Falha ao enviar mensagem.')
-      }
-
+      if (!response.ok) throw new Error(payload.error || 'Falha ao enviar mensagem.')
       setMessageText('')
       await fetchMessages(token, selectedId)
       await fetchConversations(token)
@@ -251,8 +189,8 @@ export default function ConversationInbox() {
 
   if (!ready) {
     return (
-      <div className="bg-white rounded-[32px] border border-border p-20 text-center shadow-sm">
-        <Loader2 className="mx-auto h-8 w-8 animate-spin text-accent" />
+      <div className="bg-white border border-[#EAEAE8] rounded-2xl p-20 text-center">
+        <Loader2 className="mx-auto h-6 w-6 animate-spin text-[#0A0A0A]" />
       </div>
     )
   }
@@ -262,71 +200,109 @@ export default function ConversationInbox() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[380px_1fr] h-[calc(100vh-180px)] min-h-[600px]">
-      <aside className="bg-white rounded-[32px] border border-border p-6 shadow-sm flex flex-col h-full overflow-hidden">
-        <h3 className="text-2xl font-heading font-black text-text-primary tracking-tight mb-6">Conversas</h3>
-        {loadingConversations ? <p className="text-sm font-bold text-text-tertiary mb-4">Carregando...</p> : null}
+    <div className="grid gap-5 lg:grid-cols-[360px_1fr] h-[calc(100vh-180px)] min-h-[600px]">
+      {/* Sidebar */}
+      <aside className="bg-white border border-[#EAEAE8] rounded-2xl flex flex-col h-full overflow-hidden">
+        <div className="p-5 border-b border-[#EAEAE8]">
+          <h2 className="text-[17px] font-semibold tracking-tight text-[#0A0A0A]">Conversas</h2>
+        </div>
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          {loadingConversations && conversations.length === 0 ? (
+            <div className="p-8 text-center text-[13px] text-[#A3A3A3]">Carregando...</div>
+          ) : null}
 
-        <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-2">
-          {conversations.map((conversation) => (
-            <button
-              key={conversation.id}
-              type="button"
-              onClick={() => setSelectedId(conversation.id)}
-              className={`w-full rounded-[24px] p-4 text-left transition-all border ${
-                selectedId === conversation.id ? 'bg-accent border-accent text-white shadow-sm' : 'bg-bg-alt border-transparent hover:border-accent hover:bg-bg-alt/80'
-              }`}
-            >
-              <p className={`line-clamp-1 text-base font-heading font-black tracking-tight ${selectedId === conversation.id ? 'text-white' : 'text-text-primary'}`}>{conversation.vehicle_listings_public.title}</p>
-              <p className={`text-sm font-bold mt-1 ${selectedId === conversation.id ? 'text-white/80' : 'text-text-secondary'}`}>{formatBRL(Number(conversation.vehicle_listings_public.price))}</p>
-              <p className={`line-clamp-1 text-xs font-medium mt-3 ${selectedId === conversation.id ? 'text-white/70' : 'text-text-tertiary'}`}>{conversation.last_message_preview || 'Conversa iniciada.'}</p>
-            </button>
-          ))}
+          <div className="p-2 space-y-1">
+            {conversations.map((conversation) => {
+              const isActive = selectedId === conversation.id
+              return (
+                <button
+                  key={conversation.id}
+                  type="button"
+                  onClick={() => setSelectedId(conversation.id)}
+                  className={`w-full rounded-xl p-3 text-left transition-colors ${
+                    isActive ? 'bg-[#FAFAF9]' : 'hover:bg-[#FAFAF9]'
+                  }`}
+                >
+                  <div className="flex items-start gap-2.5">
+                    {conversation.is_unread && !isActive && (
+                      <span className="w-1.5 h-1.5 mt-2 rounded-full bg-[#10B981] shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-semibold text-[#0A0A0A] tracking-tight line-clamp-1">
+                        {conversation.vehicle_listings_public.title}
+                      </p>
+                      <p className="text-[12px] text-[#525252] mt-0.5 tracking-tight">
+                        {formatBRL(Number(conversation.vehicle_listings_public.price))}
+                      </p>
+                      <p className="text-[12px] text-[#A3A3A3] mt-1.5 line-clamp-1 tracking-tight">
+                        {conversation.last_message_preview || 'Conversa iniciada.'}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
 
           {conversations.length === 0 && !loadingConversations ? (
-            <div className="text-center p-8 bg-bg-alt rounded-[24px] border border-border">
-              <p className="text-sm font-bold text-text-tertiary">Você ainda não possui conversas.</p>
+            <div className="m-4 p-8 text-center bg-[#FAFAF9] rounded-xl">
+              <MessageSquare className="w-8 h-8 text-[#A3A3A3] mx-auto mb-3" strokeWidth={1.5} />
+              <p className="text-[13px] text-[#525252]">Você ainda não possui conversas.</p>
             </div>
           ) : null}
         </div>
       </aside>
 
-      <section className="bg-white rounded-[32px] border border-border shadow-sm flex flex-col h-full overflow-hidden relative">
+      {/* Conversation panel */}
+      <section className="bg-white border border-[#EAEAE8] rounded-2xl flex flex-col h-full overflow-hidden relative">
         {!selectedConversation ? (
-          <div className="flex-1 flex items-center justify-center p-8 text-center bg-bg-alt m-4 rounded-[24px]">
-            <p className="text-lg font-bold text-text-tertiary">Selecione uma conversa para começar.</p>
+          <div className="flex-1 flex items-center justify-center p-8 text-center">
+            <div>
+              <MessageSquare className="w-10 h-10 text-[#A3A3A3] mx-auto mb-3" strokeWidth={1.5} />
+              <p className="text-[15px] text-[#525252]">Selecione uma conversa para começar.</p>
+            </div>
           </div>
         ) : (
           <>
-            <div className="px-8 py-6 border-b border-border bg-white z-10">
-              <p className="text-2xl font-heading font-black text-text-primary tracking-tight">{selectedConversation.vehicle_listings_public.title}</p>
-              <p className="text-sm font-bold text-text-secondary mt-1">
-                {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} • {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
+            <div className="px-6 py-5 border-b border-[#EAEAE8] bg-white">
+              <p className="text-[16px] font-semibold text-[#0A0A0A] tracking-tight">
+                {selectedConversation.vehicle_listings_public.title}
+              </p>
+              <p className="text-[12px] text-[#525252] mt-0.5 tracking-tight">
+                {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} · {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
               </p>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-bg-alt custom-scrollbar">
-              {loadingMessages ? <p className="text-sm font-bold text-text-tertiary text-center">Carregando mensagens...</p> : null}
-              {messages.map((message) => {
-                const isMine = message.sender_user_id === myUserId
-                return (
-                  <div
-                    key={message.id}
-                    className={`max-w-[80%] rounded-[24px] px-6 py-4 text-base font-medium shadow-sm ${
-                      isMine
-                        ? 'ml-auto bg-accent text-white rounded-br-none shadow-sm'
-                        : 'bg-white text-text-primary rounded-bl-none border border-border'
-                    }`}
-                  >
-                    <p className="leading-relaxed">{message.message}</p>
-                    <p className={`mt-2 text-[10px] font-bold uppercase tracking-widest ${isMine ? 'text-white/60' : 'text-text-tertiary'}`}>{new Date(message.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
-                  </div>
-                )
-              })}
+            <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
+              {loadingMessages && messages.length === 0 ? (
+                <p className="text-[13px] text-[#A3A3A3] text-center mt-8">Carregando mensagens...</p>
+              ) : null}
+              <div className="space-y-3">
+                {messages.map((message) => {
+                  const isMine = message.sender_user_id === myUserId
+                  return (
+                    <div
+                      key={message.id}
+                      className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                        isMine
+                          ? 'bg-[#0A0A0A] text-white rounded-br-md'
+                          : 'bg-[#FAFAF9] text-[#0A0A0A] rounded-bl-md'
+                      }`}>
+                        <p className="text-[14px] leading-relaxed tracking-tight">{message.message}</p>
+                        <p className={`mt-1 text-[10px] tracking-tight ${isMine ? 'text-white/50' : 'text-[#A3A3A3]'}`}>
+                          {new Date(message.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
 
-            <div className="p-6 bg-white border-t border-border">
-              <div className="flex items-center gap-4 bg-bg-alt rounded-[24px] p-2 border border-border focus-within:border-accent focus-within:bg-white transition-all shadow-sm">
+            <div className="p-4 bg-white border-t border-[#EAEAE8]">
+              <div className="flex items-center gap-2 bg-white border border-[#EAEAE8] rounded-full pl-5 pr-1.5 py-1.5 focus-within:border-[#0A0A0A] transition-colors">
                 <input
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
@@ -337,39 +313,27 @@ export default function ConversationInbox() {
                     }
                   }}
                   placeholder="Digite sua mensagem..."
-                  className="flex-1 bg-transparent px-4 py-3 text-sm font-bold text-text-primary outline-none placeholder:text-text-tertiary"
+                  className="flex-1 bg-transparent px-1 py-2 text-[14px] text-[#0A0A0A] outline-none placeholder:text-[#A3A3A3] tracking-tight"
                 />
                 <button
                   type="button"
                   disabled={sending || !messageText.trim()}
                   onClick={() => void sendMessage()}
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-white hover:bg-black disabled:opacity-50 disabled:hover:bg-accent transition-colors shadow-sm mr-1"
+                  className="w-9 h-9 rounded-full bg-[#0A0A0A] text-white hover:bg-[#1F1F1F] disabled:opacity-30 transition-colors flex items-center justify-center"
                 >
-                  {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                  {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" strokeWidth={1.75} />}
                 </button>
               </div>
             </div>
           </>
         )}
 
-        {error && <p className="absolute top-4 right-4 bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-xl text-xs font-bold z-50 shadow-sm">{error}</p>}
+        {error && (
+          <div className="absolute top-4 right-4 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] px-3 py-2 rounded-lg text-[12px] tracking-tight z-50">
+            {error}
+          </div>
+        )}
       </section>
-
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(15, 23, 42, 0.1);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(15, 23, 42, 0.2);
-        }
-      `}</style>
     </div>
   )
 }

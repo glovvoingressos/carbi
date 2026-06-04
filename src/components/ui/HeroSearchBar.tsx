@@ -93,14 +93,14 @@ export default function HeroSearchBar() {
   }
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto z-50" ref={containerRef}>
+    <div className="relative w-full max-w-2xl mx-auto z-50" ref={containerRef}>
       <form onSubmit={handleSubmit}>
         <div
-          className={`flex items-center bg-white border border-border rounded-2xl px-5 py-1.5 transition-all duration-300 shadow-sm
-            ${isOpen ? 'rounded-b-none shadow-md' : 'hover:shadow-md'}
-          `}
+          className={`flex items-center bg-white border border-[#EAEAE8] rounded-full pl-5 pr-2 py-2 transition-all duration-200 ${
+            isOpen ? 'rounded-b-none border-b-transparent' : 'hover:border-[#D4D4D4]'
+          }`}
         >
-          <Search className="w-5 h-5 text-text-tertiary mr-3 shrink-0" />
+          <Search className="w-[18px] h-[18px] text-[#A3A3A3] mr-3 shrink-0" strokeWidth={1.75} />
           <input
             type="text"
             value={query}
@@ -111,22 +111,22 @@ export default function HeroSearchBar() {
             onKeyDown={handleKeyDown}
             onFocus={() => query.length >= 2 && setIsOpen(true)}
             placeholder="Busque por marca ou modelo..."
-            className="flex-1 bg-transparent border-none outline-none text-text-primary font-medium placeholder:text-text-tertiary py-3 text-base"
+            className="flex-1 bg-transparent border-none outline-none text-[#0A0A0A] placeholder:text-[#A3A3A3] py-2 text-[15px] tracking-tight"
           />
 
           {query && (
             <button
               type="button"
               onClick={() => { setQuery(''); setSuggestions([]); setIsOpen(false) }}
-              className="p-1.5 hover:bg-bg-alt rounded-full mr-1.5 transition-colors"
+              className="p-1.5 hover:bg-[#F4F4F2] rounded-full mr-1 transition-colors"
             >
-              <X className="w-4 h-4 text-text-tertiary" />
+              <X className="w-4 h-4 text-[#A3A3A3]" />
             </button>
           )}
 
           <button
             type="submit"
-            className="btn btn-primary btn-sm hidden sm:inline-flex"
+            className="btn btn-primary btn-sm"
           >
             Buscar
           </button>
@@ -134,58 +134,58 @@ export default function HeroSearchBar() {
       </form>
 
       {isOpen && (
-        <div className="absolute top-full left-0 w-full bg-white border border-t-0 border-border rounded-b-2xl shadow-xl overflow-hidden animate-fade-in">
-          <div className="max-h-[400px] overflow-y-auto">
+        <div className="absolute top-full left-0 w-full bg-white border border-t-0 border-[#EAEAE8] rounded-b-2xl shadow-lg overflow-hidden animate-fade-in">
+          <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
             {loading && suggestions.length === 0 ? (
-              <div className="p-8 flex flex-col items-center justify-center text-text-tertiary">
-                <Loader2 className="w-6 h-6 animate-spin mb-2" />
-                <p className="text-sm font-medium">Buscando...</p>
+              <div className="p-8 flex flex-col items-center justify-center text-[#A3A3A3]">
+                <Loader2 className="w-5 h-5 animate-spin mb-2" />
+                <p className="text-[13px] font-medium tracking-tight">Buscando...</p>
               </div>
             ) : suggestions.length > 0 ? (
               <div className="py-2">
-                <p className="px-5 py-2 text-xs font-semibold text-text-tertiary uppercase tracking-wider">Sugestões</p>
+                <p className="px-5 py-2 eyebrow">Sugestões</p>
                 {suggestions.map((s, i) => (
                   <button
                     key={s.brandSlug + '-' + s.slug}
                     onClick={() => handleSelect(s)}
                     onMouseEnter={() => setActiveIndex(i)}
-                    className={`w-full flex items-center px-5 py-3 gap-3 transition-colors text-left
-                      ${activeIndex === i ? 'bg-bg-alt' : 'bg-transparent'}
-                    `}
+                    className={`w-full flex items-center px-5 py-2.5 gap-3 transition-colors text-left ${
+                      activeIndex === i ? 'bg-[#FAFAF9]' : 'bg-transparent'
+                    }`}
                   >
-                    <div className="w-14 h-10 bg-bg-alt rounded-lg flex items-center justify-center overflow-hidden border border-border shrink-0">
+                    <div className="w-12 h-9 bg-[#FAFAF9] rounded-lg flex items-center justify-center overflow-hidden border border-[#EAEAE8] shrink-0">
                       {s.image ? (
-                        <img src={s.image} alt={s.model} className="w-full h-full object-contain p-1" />
+                        <img src={s.image} alt={s.model} className="w-full h-full object-contain p-0.5" />
                       ) : (
-                        <Car className="w-5 h-5 text-text-tertiary" />
+                        <Car className="w-4 h-4 text-[#A3A3A3]" strokeWidth={1.5} />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-text-primary truncate">
-                        <span className="text-text-tertiary font-normal mr-1">{s.brand}</span>
+                      <p className="text-[14px] font-medium text-[#0A0A0A] truncate tracking-tight">
+                        <span className="text-[#A3A3A3] font-normal mr-1">{s.brand}</span>
                         {s.model}
                       </p>
-                      <p className="text-xs text-text-tertiary">{s.year} &bull; {s.price ? `R$ ${s.price.toLocaleString('pt-BR')}` : 'Consulte'}</p>
+                      <p className="text-[12px] text-[#A3A3A3] tracking-tight">{s.year}{s.price ? ` · R$ ${s.price.toLocaleString('pt-BR')}` : ''}</p>
                     </div>
-                    <ArrowRight className={`w-4 h-4 transition-all shrink-0 ${activeIndex === i ? 'text-accent translate-x-0.5' : 'text-text-tertiary opacity-0'}`} />
+                    <ArrowRight className={`w-4 h-4 transition-all shrink-0 ${activeIndex === i ? 'text-[#0A0A0A] translate-x-0.5' : 'text-[#EAEAE8]'}`} strokeWidth={1.75} />
                   </button>
                 ))}
 
                 <button
                   onClick={() => router.push(`/rankings?q=${encodeURIComponent(query)}`)}
-                  className="w-full py-3.5 px-5 text-sm font-semibold text-accent hover:bg-bg-alt flex items-center justify-between border-t border-border mt-1"
+                  className="w-full py-3 px-5 text-[13px] font-medium text-[#0A0A0A] hover:bg-[#FAFAF9] flex items-center justify-between border-t border-[#EAEAE8] mt-1"
                 >
                   <span className="flex items-center gap-2">
-                    <Search className="w-4 h-4" />
+                    <Search className="w-4 h-4" strokeWidth={1.75} />
                     Ver todos para &ldquo;{query}&rdquo;
                   </span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4" strokeWidth={1.75} />
                 </button>
               </div>
             ) : (
-              <div className="p-8 text-center text-text-tertiary">
-                <p className="text-sm font-medium mb-1">Nenhum veículo encontrado</p>
-                <p className="text-xs">Tente buscar por marca, modelo ou segmento.</p>
+              <div className="p-8 text-center text-[#A3A3A3]">
+                <p className="text-[14px] font-medium mb-1 text-[#0A0A0A]">Nenhum resultado encontrado</p>
+                <p className="text-[12px]">Tente buscar por marca, modelo ou segmento.</p>
               </div>
             )}
           </div>

@@ -50,23 +50,19 @@ function extractYoutubeId(urlOrId: string): string | null {
 
   try {
     const parsed = new URL(trimmed)
-
     if (parsed.hostname.includes('youtu.be')) {
       const id = parsed.pathname.replace('/', '')
       return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : null
     }
-
     if (parsed.hostname.includes('youtube.com')) {
       const v = parsed.searchParams.get('v')
       if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v
-
       const embedMatch = parsed.pathname.match(/\/embed\/([a-zA-Z0-9_-]{11})/)
       if (embedMatch) return embedMatch[1]
     }
   } catch {
     return null
   }
-
   return null
 }
 
@@ -81,12 +77,7 @@ export default function VideoReviews({ brand, model, year }: VideoReviewsProps) 
       .map((video) => {
         const id = extractYoutubeId(video.url)
         return id
-          ? {
-              ...video,
-              id,
-              embedUrl: `https://www.youtube.com/embed/${id}`,
-              watchUrl: `https://www.youtube.com/watch?v=${id}`,
-            }
+          ? { ...video, id, embedUrl: `https://www.youtube.com/embed/${id}`, watchUrl: `https://www.youtube.com/watch?v=${id}` }
           : null
       })
       .filter((video): video is NormalizedVideoReview => video !== null)
@@ -94,46 +85,41 @@ export default function VideoReviews({ brand, model, year }: VideoReviewsProps) 
   }, [model])
 
   return (
-    <section className="mt-16 sm:mt-24">
+    <section className="py-12">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#FF0000] rounded-xl flex items-center justify-center text-white shadow-[2px_2px_0_#000]">
-            <PlayCircle className="w-6 h-6" />
+          <div className="w-10 h-10 bg-[#FF0000] rounded-xl flex items-center justify-center text-white">
+            <PlayCircle className="w-5 h-5" strokeWidth={1.5} />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight italic">
-            Vez dos Experts
-          </h2>
+          <h2 className="text-balance">Vez dos experts</h2>
         </div>
         <a
           href={searchUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-text-tertiary hover:text-dark transition-colors"
+          className="hidden sm:inline-flex items-center gap-1.5 text-[13px] text-[#525252] hover:text-[#0A0A0A] transition-colors"
         >
-          Ver mais no YouTube <ExternalLink className="w-3 h-3" />
+          Ver mais no YouTube <ExternalLink className="w-3.5 h-3.5" strokeWidth={1.75} />
         </a>
       </div>
 
       {videos.length === 0 ? (
-        <div className="pastel-card pastel-card-yellow rounded-[24px] p-6">
-          <p className="text-sm font-bold text-dark mb-2">Não encontramos vídeos validados para este modelo.</p>
+        <div className="bg-white border border-[#EAEAE8] rounded-2xl p-6">
+          <p className="text-[14px] text-[#0A0A0A] mb-2">Não encontramos vídeos validados para este modelo.</p>
           <a
             href={searchUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-text-tertiary hover:text-dark"
+            className="inline-flex items-center gap-1.5 text-[13px] text-[#0A0A0A] hover:opacity-70"
           >
-            Abrir busca no YouTube <ExternalLink className="w-3 h-3" />
+            Abrir busca no YouTube <ExternalLink className="w-3.5 h-3.5" strokeWidth={1.75} />
           </a>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {videos.slice(0, 4).map((video) => (
-            <div
-              key={video.id}
-              className="group relative pastel-card pastel-card-blue rounded-[24px] overflow-hidden transition-transform hover:-translate-y-1"
-            >
-              <div className="aspect-video relative bg-dark/5 overflow-hidden">
+            <div key={video.id} className="bg-white border border-[#EAEAE8] rounded-2xl overflow-hidden">
+              <div className="aspect-video relative bg-[#FAFAF9] overflow-hidden">
                 <iframe
                   src={video.embedUrl}
                   title={video.title}
@@ -152,16 +138,14 @@ export default function VideoReviews({ brand, model, year }: VideoReviewsProps) 
                 className="block p-4"
                 aria-label={`Assistir no YouTube: ${video.title}`}
               >
-                <h3 className="font-bold text-sm leading-tight mb-2 line-clamp-2 min-h-[40px]">
+                <h3 className="text-[14px] font-semibold text-[#0A0A0A] leading-tight mb-2 line-clamp-2 min-h-[40px] tracking-tight">
                   {video.title}
                 </h3>
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-dark/5 rounded-full flex items-center justify-center">
-                    <Play className="w-2.5 h-2.5 text-dark" />
+                  <div className="w-5 h-5 bg-[#FAFAF9] rounded-full flex items-center justify-center">
+                    <Play className="w-2.5 h-2.5 text-[#0A0A0A]" strokeWidth={2} />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-text-tertiary">
-                    {video.channel}
-                  </span>
+                  <span className="text-[11px] text-[#A3A3A3] tracking-tight">{video.channel}</span>
                 </div>
               </a>
             </div>

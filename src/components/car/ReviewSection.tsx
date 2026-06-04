@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Star, Plus, X, MessageSquare, ThumbsUp, ThumbsDown, Camera, Check, AlertTriangle } from 'lucide-react'
-import Badge from '@/components/ui/Badge'
+import { Star, ThumbsUp, ThumbsDown, MessageSquare, Check, AlertTriangle, X, Camera, Plus } from 'lucide-react'
 
 interface Review {
   id: string
@@ -15,9 +14,8 @@ interface Review {
   date: string
 }
 
-export default function ReviewSection({ carId }: { carId: string }) {
+export default function ReviewSection({ carId: _carId }: { carId: string }) {
   const [reviews, setReviews] = useState<Review[]>([])
-
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [newReview, setNewReview] = useState({
     userName: '',
@@ -41,7 +39,7 @@ export default function ReviewSection({ carId }: { carId: string }) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (newReview.rating === 0) return alert('Por favor, selecione uma nota!')
-    
+
     const review: Review = {
       id: Math.random().toString(),
       userName: newReview.userName || 'Anônimo',
@@ -52,66 +50,63 @@ export default function ReviewSection({ carId }: { carId: string }) {
       photos: newReview.photos ? [newReview.photos] : [],
       date: 'Agora'
     }
-    
+
     setReviews([review, ...reviews])
     setIsFormOpen(false)
     setNewReview({ userName: '', rating: 0, pros: [''], cons: [''], comment: '', photos: '' })
   }
 
   return (
-    <section className="mt-20 mb-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+    <section className="py-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
-          <h2 className="text-4xl font-black text-dark tracking-tighter uppercase mb-2">Voz do Dono</h2>
-          <p className="text-lg text-dark/50 font-medium">Quem dirige todo dia sabe o que o carro entrega.</p>
+          <p className="eyebrow mb-2">Voz do dono</p>
+          <h2 className="text-balance">Quem dirige todo dia sabe o que o carro entrega.</h2>
         </div>
-        <button 
-          onClick={() => setIsFormOpen(true)}
-          className="px-8 py-4 bg-dark text-white rounded-full font-black uppercase tracking-widest shadow-[6px_6px_0_#94E2CD] hover:-translate-y-1 transition-all active:translate-y-0"
-        >
+        <button onClick={() => setIsFormOpen(true)} className="btn btn-primary">
           Dar minha opinião
         </button>
       </div>
 
       {reviews.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {reviews.map(review => (
-            <div key={review.id} className="bg-white border-2 border-dark rounded-[40px] p-8 shadow-[8px_8px_0_#0A0A0A] flex flex-col">
-              <div className="flex items-center justify-between mb-6">
+            <div key={review.id} className="bg-white border border-[#EAEAE8] rounded-2xl p-6 flex flex-col">
+              <div className="flex items-center justify-between mb-5">
                 <div>
-                  <p className="font-black text-xl uppercase tracking-tight">{review.userName}</p>
-                  <p className="text-xs font-bold text-dark/30 uppercase tracking-widest">{review.date}</p>
+                  <p className="text-[15px] font-semibold text-[#0A0A0A] tracking-tight">{review.userName}</p>
+                  <p className="text-[11px] text-[#A3A3A3] tracking-tight">{review.date}</p>
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-0.5">
                   {[1, 2, 3, 4, 5].map(s => (
-                    <Star key={s} className={`w-5 h-5 ${s <= review.rating ? 'fill-dark text-dark' : 'text-dark/10'}`} />
+                    <Star key={s} className={`w-4 h-4 ${s <= review.rating ? 'fill-[#FACC15] text-[#FACC15]' : 'text-[#EAEAE8]'}`} strokeWidth={1.5} />
                   ))}
                 </div>
               </div>
 
-              <p className="text-dark/70 font-medium mb-8 leading-relaxed italic">"{review.comment}"</p>
+              <p className="text-[15px] text-[#525252] mb-6 leading-relaxed">"{review.comment}"</p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-                <div className="bg-[var(--color-bg)-alt] p-5 rounded-3xl border border-dark/5">
-                  <p className="text-[10px] font-black text-[#00D632] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                     <ThumbsUp className="w-3 h-3" /> Prós
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                <div className="bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8]">
+                  <p className="eyebrow text-[#10B981] mb-3 flex items-center gap-1.5">
+                    <ThumbsUp className="w-3 h-3" /> Prós
                   </p>
                   <ul className="space-y-2">
                     {review.pros.map((p, i) => (
-                      <li key={i} className="text-sm font-bold text-dark flex items-start gap-2">
-                         <Check className="w-4 h-4 text-[#00D632] mt-0.5 flex-shrink-0" /> {p}
+                      <li key={i} className="text-[13px] text-[#0A0A0A] flex items-start gap-2">
+                        <Check className="w-3.5 h-3.5 text-[#10B981] mt-0.5 flex-shrink-0" strokeWidth={2.5} /> {p}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="bg-[var(--color-bg)-alt] p-5 rounded-3xl border border-dark/5">
-                  <p className="text-[10px] font-semibold text-dark/50 uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
-                     <ThumbsDown className="w-3 h-3" /> Contras
+                <div className="bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8]">
+                  <p className="eyebrow mb-3 flex items-center gap-1.5">
+                    <ThumbsDown className="w-3 h-3" /> Contras
                   </p>
                   <ul className="space-y-2">
                     {review.cons.map((c, i) => (
-                      <li key={i} className="text-sm font-bold text-dark flex items-start gap-2">
-                         <AlertTriangle className="w-4 h-4 text-dark/40 mt-0.5 flex-shrink-0" /> {c}
+                      <li key={i} className="text-[13px] text-[#0A0A0A] flex items-start gap-2">
+                        <AlertTriangle className="w-3.5 h-3.5 text-[#A3A3A3] mt-0.5 flex-shrink-0" strokeWidth={2} /> {c}
                       </li>
                     ))}
                   </ul>
@@ -119,9 +114,9 @@ export default function ReviewSection({ carId }: { carId: string }) {
               </div>
 
               {review.photos.length > 0 && (
-                <div className="flex gap-3 overflow-x-auto pb-2">
+                <div className="flex gap-2 overflow-x-auto pb-1">
                   {review.photos.map((p, i) => (
-                    <img key={i} src={p} alt="Review" className="w-32 h-24 object-cover rounded-2xl border-2 border-dark shadow-sm flex-shrink-0" />
+                    <img key={i} src={p} alt="Review" className="w-24 h-20 object-cover rounded-xl border border-[#EAEAE8] flex-shrink-0" />
                   ))}
                 </div>
               )}
@@ -129,129 +124,126 @@ export default function ReviewSection({ carId }: { carId: string }) {
           ))}
         </div>
       ) : (
-        <div className="bg-white border-2 border-dark border-dashed rounded-[40px] p-12 text-center group cursor-pointer hover:bg-neutral-50 transition-colors" onClick={() => setIsFormOpen(true)}>
-          <div className="w-20 h-20 bg-neutral-100 rounded-[32px] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-            <MessageSquare className="w-10 h-10 text-dark/20" />
+        <div
+          className="bg-white border-2 border-dashed border-[#EAEAE8] rounded-2xl p-12 text-center cursor-pointer hover:bg-[#FAFAF9] transition-colors"
+          onClick={() => setIsFormOpen(true)}
+        >
+          <div className="w-14 h-14 bg-[#FAFAF9] rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <MessageSquare className="w-6 h-6 text-[#A3A3A3]" strokeWidth={1.5} />
           </div>
-          <h3 className="text-2xl font-black uppercase tracking-tight mb-2">Faça a primeira avaliação!</h3>
-          <p className="text-dark/50 font-medium max-w-sm mx-auto">Você é dono deste carro ou já dirigiu muito? Compartilhe sua experiência real com a comunidade.</p>
+          <h3 className="text-[18px] font-semibold text-[#0A0A0A] tracking-tight mb-2">Faça a primeira avaliação</h3>
+          <p className="text-[14px] text-[#525252] max-w-sm mx-auto">
+            Você é dono deste carro ou já dirigiu muito? Compartilhe sua experiência real.
+          </p>
         </div>
       )}
 
-      {/* Modal de Formulário */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-dark/40 backdrop-blur-md animate-in fade-in" onClick={() => setIsFormOpen(false)} />
-          <div className="relative w-full max-w-2xl bg-white rounded-[48px] shadow-2xl border-4 border-dark overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
-            <div className="bg-dark p-8 flex items-center justify-between text-white">
-              <h3 className="text-3xl font-black uppercase tracking-tighter">Sua Opinião Vale Muito</h3>
-              <button 
-                onClick={() => setIsFormOpen(false)}
-                className="p-3 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
-              >
-                <X className="w-6 h-6" />
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 animate-fade-in" onClick={() => setIsFormOpen(false)} />
+          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden animate-scale-in max-h-[90vh] flex flex-col">
+            <div className="p-6 border-b border-[#EAEAE8] flex items-center justify-between">
+              <h3 className="text-[18px] font-semibold text-[#0A0A0A] tracking-tight">Sua opinião vale muito</h3>
+              <button onClick={() => setIsFormOpen(false)} className="btn-icon">
+                <X className="w-5 h-5" strokeWidth={1.75} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-8 md:p-12 overflow-y-auto custom-scrollbar flex-1 space-y-8">
-              {/* Rating */}
+            <form onSubmit={handleSubmit} className="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-6">
               <div>
-                <label className="block text-xs font-black uppercase tracking-[0.2em] text-dark/40 mb-4">Nota Geral</label>
-                <div className="flex gap-2">
+                <label className="block text-[12px] font-medium text-[#525252] mb-2 tracking-tight">Nota geral</label>
+                <div className="flex gap-1.5">
                   {[1, 2, 3, 4, 5].map(s => (
-                    <button 
-                      type="button"
-                      key={s} 
-                      onClick={() => setNewReview(prev => ({ ...prev, rating: s }))}
-                      className="transition-transform active:scale-95"
-                    >
-                      <Star className={`w-10 h-10 ${s <= newReview.rating ? 'fill-dark text-dark' : 'text-dark/10'}`} strokeWidth={1} />
+                    <button type="button" key={s} onClick={() => setNewReview(prev => ({ ...prev, rating: s }))}>
+                      <Star className={`w-8 h-8 ${s <= newReview.rating ? 'fill-[#FACC15] text-[#FACC15]' : 'text-[#EAEAE8]'}`} strokeWidth={1.5} />
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-[0.2em] text-dark/40 mb-4">Seu Nome</label>
-                  <input 
-                    type="text" 
+                  <label className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">Seu nome</label>
+                  <input
+                    type="text"
                     value={newReview.userName}
                     onChange={e => setNewReview(prev => ({ ...prev, userName: e.target.value }))}
                     placeholder="Ex: João Silva"
-                    className="w-full h-14 bg-neutral-100 rounded-2xl px-6 font-bold outline-none border-2 border-transparent focus:border-dark transition-all"
+                    className="input"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-[0.2em] text-dark/40 mb-4">Link da Foto (URL)</label>
+                  <label className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">Link da foto (URL)</label>
                   <div className="relative">
-                     <Camera className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-dark/30" />
-                     <input 
-                       type="text" 
-                       value={newReview.photos}
-                       onChange={e => setNewReview(prev => ({ ...prev, photos: e.target.value }))}
-                       placeholder="https://..."
-                       className="w-full h-14 bg-neutral-100 rounded-2xl pl-12 pr-6 font-bold outline-none border-2 border-transparent focus:border-dark transition-all"
-                     />
+                    <Camera className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3]" strokeWidth={1.75} />
+                    <input
+                      type="text"
+                      value={newReview.photos}
+                      onChange={e => setNewReview(prev => ({ ...prev, photos: e.target.value }))}
+                      placeholder="https://..."
+                      className="input pl-10"
+                    />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase tracking-[0.2em] text-dark/40 mb-4">Experiência Geral</label>
-                <textarea 
+                <label className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">Experiência geral</label>
+                <textarea
                   value={newReview.comment}
                   onChange={e => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
-                  placeholder="Conte-nos como é dirigir esse carro no dia a dia..."
+                  placeholder="Conte como é dirigir esse carro no dia a dia..."
                   rows={4}
-                  className="w-full bg-neutral-100 rounded-3xl p-6 font-bold outline-none border-2 border-transparent focus:border-dark transition-all resize-none"
+                  className="input py-3"
+                  style={{ minHeight: '100px' }}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <label className="text-xs font-black uppercase tracking-[0.2em] text-[#00D632]">O que você amou?</label>
-                    <button type="button" onClick={() => addField('pros')} className="p-1.5 bg-neutral-100 rounded-lg hover:bg-neutral-200"><Plus className="w-4 h-4 text-dark" /></button>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[12px] font-medium text-[#10B981] tracking-tight">O que você amou?</label>
+                    <button type="button" onClick={() => addField('pros')} className="btn-icon !w-7 !h-7 bg-[#FAFAF9]">
+                      <Plus className="w-3.5 h-3.5" strokeWidth={1.75} />
+                    </button>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {newReview.pros.map((p, i) => (
-                      <input 
+                      <input
                         key={i}
                         type="text"
                         value={p}
                         onChange={e => updateField('pros', i, e.target.value)}
                         placeholder="Ex: Baixo consumo"
-                        className="w-full h-12 bg-neutral-50 rounded-xl px-4 font-bold outline-none border border-dark/5 focus:border-[#00D632] transition-all"
+                        className="input"
                       />
                     ))}
                   </div>
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <label className="text-xs font-semibold uppercase tracking-[0.15em] text-dark/50">O que te incomodou?</label>
-                    <button type="button" onClick={() => addField('cons')} className="p-1.5 bg-neutral-100 rounded-lg hover:bg-neutral-200"><Plus className="w-4 h-4 text-dark" /></button>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[12px] font-medium text-[#525252] tracking-tight">O que te incomodou?</label>
+                    <button type="button" onClick={() => addField('cons')} className="btn-icon !w-7 !h-7 bg-[#FAFAF9]">
+                      <Plus className="w-3.5 h-3.5" strokeWidth={1.75} />
+                    </button>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {newReview.cons.map((c, i) => (
-                      <input 
+                      <input
                         key={i}
                         type="text"
                         value={c}
                         onChange={e => updateField('cons', i, e.target.value)}
                         placeholder="Ex: Porta-luvas pequeno"
-                        className="w-full h-12 bg-neutral-50 rounded-xl px-4 font-bold outline-none border border-dark/5 focus:border-dark/30 transition-all"
+                        className="input"
                       />
                     ))}
                   </div>
                 </div>
               </div>
 
-              <button 
-                type="submit"
-                className="w-full py-6 bg-dark text-white rounded-full font-black uppercase tracking-[0.3em] shadow-[8px_8px_0_#94E2CD] hover:translate-x-1 hover:-translate-y-1 transition-all active:translate-y-0 active:translate-x-0 active:shadow-none"
-              >
-                Publicar Avaliação
+              <button type="submit" className="btn btn-primary btn-lg w-full">
+                Publicar avaliação
               </button>
             </form>
           </div>

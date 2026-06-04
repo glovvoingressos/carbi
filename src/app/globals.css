@@ -272,6 +272,14 @@ p {
   color: var(--color-text-tertiary);
 }
 
+.label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
 /* ━━━━━━━━━━ ANIMATIONS ━━━━━━━━━━ */
 
 @keyframes fadeIn {
@@ -597,6 +605,11 @@ p {
   -webkit-backdrop-filter: blur(12px);
   color: var(--color-text-primary);
   border-color: var(--color-border);
+}
+
+.badge-brand {
+  background: var(--color-trust-bg);
+  color: var(--color-trust);
 }
 
 /* ━━━━━━━━━━ SKELETON ━━━━━━━━━━ */

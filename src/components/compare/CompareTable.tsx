@@ -3,182 +3,109 @@ import type { CarSpec } from '@/data/cars'
 import { formatBRL } from '@/data/cars'
 import CarImage from '@/components/car/CarImage'
 
-interface CompareRowProps {
-  label: string
-  values: (string | number)[]
-  lowerIsBetter?: boolean
-  unit?: string
-  highlightWinner?: boolean | null
-}
-
-function CompareRow({ label, values, lowerIsBetter, unit = '', highlightWinner = true }: CompareRowProps) {
-  return (
-    <div className="grid border-b border-border/60 hover:bg-bg-alt/30 transition-colors">
-      <div className="flex items-center px-4 py-3 bg-bg-alt/70 font-semibold text-xs text-text-secondary uppercase tracking-wider col-span-1">
-        {label}
-      </div>
-      <div className="grid grid-cols-1 gap-3 px-4 py-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {values.map((val, i) => {
-          const numVals = values
-            .map((v) => (typeof v === 'number' ? v : parseFloat(String(v).replace(/[^\d.,-]/g, ''))))
-            .filter((n) => !isNaN(n))
-          const isWinner = highlightWinner && typeof val === 'number' && numVals.length > 1;
-          return (
-            <span
-              key={i}
-              className={`text-center text-sm ${
-                isWinner === true ? 'font-semibold text-success bg-success/10 px-2.5 py-0.5 rounded-full' : 'text-text-primary'
-              }`}
-            >
-              {typeof val === 'number' ? val.toLocaleString('pt-BR') + unit : val}
-            </span>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
 interface CompareTableProps {
   cars: CarSpec[]
   winners: Record<string, string>
 }
 
+function WinnerPill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ECFDF5] text-[#10B981] text-[13px] font-medium tracking-tight">
+      <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+      {children}
+    </span>
+  )
+}
+
 export default function CompareTable({ cars, winners }: CompareTableProps) {
+  const rows: Array<{ label: string; render: (car: CarSpec) => React.ReactNode; winner?: string }> = [
+    {
+      label: 'Preço',
+      winner: winners.priceBrl,
+      render: (car) => formatBRL(car.priceBrl),
+    },
+    {
+      label: 'Motor',
+      render: (car) => `${car.engineType} ${car.displacement} ${car.turbo ? 'Turbo' : ''}`.trim(),
+    },
+    {
+      label: 'Potência',
+      winner: winners.horsepower,
+      render: (car) => `${car.horsepower} cv`,
+    },
+    {
+      label: 'Torque',
+      winner: winners.torque,
+      render: (car) => `${car.torque} Nm`,
+    },
+    {
+      label: 'Transmissão',
+      render: (car) => car.transmission,
+    },
+    {
+      label: 'Consumo (cidade)',
+      winner: winners.fuelEconomyCityGas,
+      render: (car) => `${car.fuelEconomyCityGas} km/l`,
+    },
+    {
+      label: '0-100 km/h',
+      render: (car) => `${car.acceleration0100}s`,
+    },
+    {
+      label: 'Porta-malas',
+      winner: winners.trunkCapacity,
+      render: (car) => `${car.trunkCapacity} L`,
+    },
+    {
+      label: 'Airbags',
+      winner: winners.airbagsCount,
+      render: (car) => `${car.airbagsCount}`,
+    },
+    {
+      label: 'Latin NCAP',
+      winner: winners.latinNcap,
+      render: (car) => car.latinNcap > 0 ? `${car.latinNcap} estrelas` : 'Não testado',
+    },
+  ]
+
   return (
     <div className="overflow-x-auto">
       {/* Header */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6 px-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
         {cars.map((car) => {
           const brandSlug = car.brand.toLowerCase().replace(/\s+/g, '-')
           return (
-            <Link href={`/${brandSlug}/${car.slug}`} className="card p-4 text-center hover:shadow-md transition-all duration-200" key={car.id}>
-              <div className="w-full h-28 rounded-xl mb-3 overflow-hidden bg-bg-alt border border-border">
-                <CarImage
-                  id={car.id}
-                  brand={car.brand}
-                  model={car.model}
-                  year={car.year}
-                  src={car.image}
-                  className="w-full h-full object-cover"
-                />
+            <Link href={`/${brandSlug}/${car.slug}`} key={car.id} className="bg-white border border-[#EAEAE8] rounded-2xl p-4 hover:border-[#0A0A0A] transition-colors">
+              <div className="w-full h-28 rounded-xl mb-3 overflow-hidden bg-[#FAFAF9] border border-[#EAEAE8]">
+                <CarImage id={car.id} brand={car.brand} model={car.model} year={car.year} src={car.image} className="w-full h-full object-cover" />
               </div>
-              <h3 className="font-bold text-sm text-text-primary">{car.brand} {car.model}</h3>
-              <p className="text-xs text-text-secondary mt-0.5">{car.version}</p>
-              <p className="text-accent font-display font-bold text-sm mt-2">{formatBRL(car.priceBrl)}</p>
+              <h3 className="text-[14px] font-semibold text-[#0A0A0A] tracking-tight">{car.brand} {car.model}</h3>
+              <p className="text-[12px] text-[#A3A3A3] mt-0.5">{car.version}</p>
+              <p className="text-[15px] font-semibold text-[#0A0A0A] mt-2 tracking-tight">{formatBRL(car.priceBrl)}</p>
             </Link>
           )
         })}
       </div>
 
-      {/* Table rows */}
-      <div className="bg-card rounded-2xl border border-border divide-y divide-border/60 overflow-hidden shadow-sm">
-        {/* Price */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 hover:bg-bg-alt/30 transition-colors">
-          <div className="flex items-center px-4 py-3 bg-bg-alt/70 font-semibold text-xs text-text-secondary uppercase tracking-wider">Preço</div>
-          {cars.map((car) => {
-            const isWinner = winners.priceBrl === car.id
-            return (
-              <div key={car.id} className={`flex justify-center items-center px-4 py-3 text-sm ${isWinner ? 'font-semibold text-success bg-success/10 rounded-lg m-1' : 'text-text-primary'}`}>
-                {formatBRL(car.priceBrl)}
-                {isWinner && <span className="text-xs ml-1.5 font-bold">(menor)</span>}
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Motor */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 hover:bg-bg-alt/30 transition-colors">
-          <div className="flex items-center px-4 py-3 bg-bg-alt/70 font-semibold text-xs text-text-secondary uppercase tracking-wider">Motor</div>
-          {cars.map((car) => (
-            <div key={car.id} className="flex justify-center items-center px-4 py-3 text-sm text-text-primary">
-              {car.engineType} {car.displacement} {car.turbo ? 'Turbo' : ''}
+      {/* Table */}
+      <div className="bg-white border border-[#EAEAE8] rounded-2xl overflow-hidden divide-y divide-[#EAEAE8]">
+        {rows.map((row) => (
+          <div key={row.label} className="grid grid-cols-1 md:grid-cols-[200px_repeat(3,_1fr)] lg:grid-cols-[200px_repeat(4,_1fr)] hover:bg-[#FAFAF9] transition-colors">
+            <div className="px-4 py-4 flex items-center">
+              <span className="eyebrow">{row.label}</span>
             </div>
-          ))}
-        </div>
-
-        {/* Potência */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 hover:bg-bg-alt/30 transition-colors">
-          <div className="flex items-center px-4 py-3 bg-bg-alt/70 font-semibold text-xs text-text-secondary uppercase tracking-wider">Potência</div>
-          {cars.map((car) => {
-            const isWinner = winners.horsepower === car.id
-            return (
-              <div key={car.id} className={`flex justify-center items-center px-4 py-3 text-sm ${isWinner ? 'font-semibold text-success bg-success/10 rounded-lg m-1' : 'text-text-primary'}`}>
-                {car.horsepower} cv
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Torque */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 hover:bg-bg-alt/30 transition-colors">
-          <div className="flex items-center px-4 py-3 bg-bg-alt/70 font-semibold text-xs text-text-secondary uppercase tracking-wider">Torque</div>
-          {cars.map((car) => (
-            <div key={car.id} className={`flex justify-center items-center px-4 py-3 text-sm ${winners.torque === car.id ? 'font-semibold text-success bg-success/10 rounded-lg m-1' : 'text-text-primary'}`}>
-              {car.torque} Nm
+            <div className="col-span-full md:col-span-3 lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+              {cars.map((car) => {
+                const isWinner = row.winner === car.id
+                return (
+                  <div key={car.id} className="px-4 py-4 flex items-center justify-start md:justify-center text-[14px] text-[#0A0A0A] tracking-tight">
+                    {isWinner ? <WinnerPill>{row.render(car)}</WinnerPill> : row.render(car)}
+                  </div>
+                )
+              })}
             </div>
-          ))}
-        </div>
-
-        {/* Transmissão */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 hover:bg-bg-alt/30 transition-colors">
-          <div className="flex items-center px-4 py-3 bg-bg-alt/70 font-semibold text-xs text-text-secondary uppercase tracking-wider">Transmissão</div>
-          {cars.map((car) => (
-            <div key={car.id} className="flex justify-center items-center px-4 py-3 text-sm text-text-primary">
-              {car.transmission}
-            </div>
-          ))}
-        </div>
-
-        {/* Consumo */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 hover:bg-bg-alt/30 transition-colors">
-          <div className="flex items-center px-4 py-3 bg-bg-alt/70 font-semibold text-xs text-text-secondary uppercase tracking-wider">Consumo (cidade)</div>
-          {cars.map((car) => (
-            <div key={car.id} className={`flex justify-center items-center px-4 py-3 text-sm ${winners.fuelEconomyCityGas === car.id ? 'font-semibold text-success bg-success/10 rounded-lg m-1' : 'text-text-primary'}`}>
-              {car.fuelEconomyCityGas} km/l
-            </div>
-          ))}
-        </div>
-
-        {/* 0-100 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 hover:bg-bg-alt/30 transition-colors">
-          <div className="flex items-center px-4 py-3 bg-bg-alt/70 font-semibold text-xs text-text-secondary uppercase tracking-wider">0-100 km/h</div>
-          {cars.map((car) => (
-            <div key={car.id} className="flex justify-center items-center px-4 py-3 text-sm text-text-primary">
-              {car.acceleration0100}s
-            </div>
-          ))}
-        </div>
-
-        {/* Porta-malas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 hover:bg-bg-alt/30 transition-colors">
-          <div className="flex items-center px-4 py-3 bg-bg-alt/70 font-semibold text-xs text-text-secondary uppercase tracking-wider">Porta-malas</div>
-          {cars.map((car) => (
-            <div key={car.id} className={`flex justify-center items-center px-4 py-3 text-sm ${winners.trunkCapacity === car.id ? 'font-semibold text-success bg-success/10 rounded-lg m-1' : 'text-text-primary'}`}>
-              {car.trunkCapacity} L
-            </div>
-          ))}
-        </div>
-
-        {/* Airbags */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 hover:bg-bg-alt/30 transition-colors">
-          <div className="flex items-center px-4 py-3 bg-bg-alt/70 font-semibold text-xs text-text-secondary uppercase tracking-wider">Airbags</div>
-          {cars.map((car) => (
-            <div key={car.id} className={`flex justify-center items-center px-4 py-3 text-sm ${winners.airbagsCount === car.id ? 'font-semibold text-success bg-success/10 rounded-lg m-1' : 'text-text-primary'}`}>
-              {car.airbagsCount}
-            </div>
-          ))}
-        </div>
-
-        {/* Latin NCAP */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 hover:bg-bg-alt/30 transition-colors">
-          <div className="flex items-center px-4 py-3 bg-bg-alt/70 font-semibold text-xs text-text-secondary uppercase tracking-wider">Latin NCAP</div>
-          {cars.map((car) => (
-            <div key={car.id} className={`flex justify-center items-center px-4 py-3 text-sm ${winners.latinNcap === car.id ? 'font-semibold text-success bg-success/10 rounded-lg m-1' : 'text-text-primary'}`}>
-              {car.latinNcap > 0 ? `${car.latinNcap} estrelas` : 'Não testado'}
-            </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   )

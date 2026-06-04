@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Loader2, TrendingDown } from 'lucide-react'
+import { Loader2, TrendingDown, AlertCircle, Info, Car, Bike, Truck, Check } from 'lucide-react'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
 
 interface FipeCalculatorProps {
@@ -27,7 +27,13 @@ const initialLoading: LoadingState = {
   detail: false,
 }
 
-const skeletonClass = 'h-12 w-full rounded-xl bg-bg-alt animate-pulse'
+const skeletonClass = 'h-12 w-full rounded-xl bg-[#FAFAF9] animate-pulse border border-[#EAEAE8]'
+
+const VEHICLE_TYPES = [
+  { id: 'cars', label: 'Carros', icon: Car },
+  { id: 'motorcycles', label: 'Motos', icon: Bike },
+  { id: 'trucks', label: 'Caminhões', icon: Truck },
+] as const
 
 function normalize(value: string): string {
   if (!value) return ''
@@ -45,14 +51,35 @@ function tokenize(value: string): string[] {
   return normalize(value).split(' ').filter((token) => token.length >= 2)
 }
 
-
-
 async function getJson<T>(url: string): Promise<T> {
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error(`Falha ao consultar ${url}: ${response.status}`)
   }
   return response.json()
+}
+
+interface FieldShellProps {
+  label: string
+  hint?: string
+  loading?: boolean
+  children: React.ReactNode
+  valid?: boolean
+}
+
+function FieldShell({ label, hint, loading, children, valid }: FieldShellProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between px-1">
+        <label className="eyebrow">{label}</label>
+        {valid && !loading && (
+          <Check className="w-3.5 h-3.5 text-[#10B981]" strokeWidth={2.5} />
+        )}
+      </div>
+      {loading ? <div className={skeletonClass} /> : children}
+      {hint && <p className="text-[11px] text-[#A3A3A3] tracking-tight px-1">{hint}</p>}
+    </div>
+  )
 }
 
 export default function FipeCalculator({
@@ -98,7 +125,6 @@ export default function FipeCalculator({
         if (cancelled) return
         setBrands(data)
 
-        // Only auto-select if we are in 'cars' mode (default)
         if (selectedType === 'cars') {
           const brandMatch = data.find((b) => {
             const name = normalize(b.name)
@@ -117,7 +143,6 @@ export default function FipeCalculator({
       }
     }
 
-    // Reset when type changes
     setSelectedBrand('')
     setModels([])
     setSelectedModel('')
@@ -373,155 +398,144 @@ export default function FipeCalculator({
   const safeResult = hasValidResult ? result : null
 
   return (
-    <div className="card-elevated p-6 sm:p-8 bg-card border border-border">
+    <div className="bg-white border border-[#EAEAE8] rounded-2xl p-6 sm:p-8">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-white">
-          <TrendingDown className="w-5 h-5 text-white" />
+        <div className="w-10 h-10 bg-[#0A0A0A] rounded-xl flex items-center justify-center text-white">
+          <TrendingDown className="w-5 h-5" strokeWidth={1.5} />
         </div>
-        <h3 className="text-xl font-display text-text-primary tracking-tight">Consulta de Valor Atualizado</h3>
+        <div>
+          <h3 className="text-[18px] font-semibold text-[#0A0A0A] tracking-tight">Consulta de valor atualizado</h3>
+          <p className="text-[12px] text-[#A3A3A3] tracking-tight">Tabela FIPE — referência mensal oficial</p>
+        </div>
       </div>
 
-      <div className="flex items-center gap-1.5 mb-6 p-1.5 bg-bg-alt rounded-2xl">
-        {[
-          { id: 'cars', label: 'Carros' },
-          { id: 'motorcycles', label: 'Motos' },
-          { id: 'trucks', label: 'Caminhões' },
-        ].map((type) => (
-          <button
-            key={type.id}
-            onClick={() => setSelectedType(type.id)}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold tracking-wide transition-all duration-200 ${
-              selectedType === type.id
-                ? 'bg-card text-text-primary shadow-xs font-bold'
-                : 'text-text-secondary hover:bg-card-hover/50'
-            }`}
+      <div className="flex items-center gap-1 p-1 bg-[#FAFAF9] border border-[#EAEAE8] rounded-full mb-6">
+        {VEHICLE_TYPES.map((type) => {
+          const Icon = type.icon
+          const isActive = selectedType === type.id
+          return (
+            <button
+              key={type.id}
+              onClick={() => setSelectedType(type.id)}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-full text-[12px] font-medium transition-colors tracking-tight ${
+                isActive ? 'bg-white text-[#0A0A0A] shadow-xs' : 'text-[#525252] hover:text-[#0A0A0A]'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" strokeWidth={1.75} />
+              {type.label}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="grid gap-4 mb-2">
+        <FieldShell label="Marca" loading={loading.brands} valid={Boolean(selectedBrand)}>
+          <select
+            value={selectedBrand}
+            onChange={(e) => setSelectedBrand(e.target.value)}
+            className="input cursor-pointer"
           >
-            {type.label}
-          </button>
-        ))}
-      </div>
+            <option value="">Selecione a marca</option>
+            {brands.map((b) => (
+              <option key={b.code} value={b.code}>{b.name}</option>
+            ))}
+          </select>
+        </FieldShell>
 
-      <div className="grid gap-4 mb-8">
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold tracking-wider text-text-secondary uppercase ml-1">Marca</label>
-          {loading.brands ? (
-            <div className={skeletonClass} />
-          ) : (
-            <select
-              value={selectedBrand}
-              onChange={(e) => setSelectedBrand(e.target.value)}
-              className="w-full input font-semibold cursor-pointer appearance-none bg-bg-alt border-none"
-            >
-              <option value="">Selecione a Marca</option>
-              {brands.map((b) => (
-                <option key={b.code} value={b.code}>{b.name}</option>
-              ))}
-            </select>
-          )}
-        </div>
+        <FieldShell label="Modelo" loading={loading.models} valid={Boolean(selectedModel)}>
+          <select
+            value={selectedModel}
+            onChange={(e) => setSelectedModel(e.target.value)}
+            disabled={!selectedBrand}
+            className="input cursor-pointer disabled:opacity-50"
+          >
+            <option value="">Selecione o modelo</option>
+            {models.map((m) => (
+              <option key={m.code} value={m.code}>{m.name}</option>
+            ))}
+          </select>
+        </FieldShell>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold tracking-wider text-text-secondary uppercase ml-1">Modelo</label>
-          {loading.models ? (
-            <div className={skeletonClass} />
-          ) : (
-            <select
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-              disabled={!selectedBrand}
-              className="w-full input font-semibold cursor-pointer appearance-none bg-bg-alt border-none disabled:opacity-50"
-            >
-              <option value="">Selecione o Modelo</option>
-              {models.map((m) => (
-                <option key={m.code} value={m.code}>{m.name}</option>
-              ))}
-            </select>
-          )}
-        </div>
+        <FieldShell
+          label="Ano modelo"
+          loading={loading.years}
+          valid={Boolean(selectedYear)}
+          hint={years.length > 0 ? 'Exibindo somente os 6 anos mais recentes.' : undefined}
+        >
+          <select
+            value={selectedYear ?? ''}
+            onChange={(e) => setSelectedYear(e.target.value ? parseInt(e.target.value, 10) : null)}
+            disabled={!selectedModel}
+            className="input cursor-pointer disabled:opacity-50"
+          >
+            <option value="">Selecione o ano</option>
+            {years.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </FieldShell>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold tracking-wider text-text-secondary uppercase ml-1">Ano Modelo</label>
-          {loading.years ? (
-            <div className={skeletonClass} />
-          ) : (
-            <select
-              value={selectedYear ?? ''}
-              onChange={(e) => setSelectedYear(e.target.value ? parseInt(e.target.value, 10) : null)}
-              disabled={!selectedModel}
-              className="w-full input font-semibold cursor-pointer appearance-none bg-bg-alt border-none disabled:opacity-50"
-            >
-              <option value="">Selecione o Ano</option>
-              {years.map((year) => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          )}
-          {years.length > 0 && (
-            <p className="text-[10px] text-text-tertiary font-semibold ml-1">Exibindo somente os 6 anos mais recentes.</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold tracking-wider text-text-secondary uppercase ml-1">Versão / Combustível</label>
-          {loading.versions ? (
-            <div className={skeletonClass} />
-          ) : (
-            <select
-              value={selectedVersion}
-              onChange={(e) => setSelectedVersion(e.target.value)}
-              disabled={!selectedYear}
-              className="w-full input font-semibold cursor-pointer appearance-none bg-bg-alt border-none disabled:opacity-50"
-            >
-              <option value="">Selecione a Versão</option>
-              {versions.map((version) => (
-                <option key={version.code} value={version.code}>
-                  {version.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
+        <FieldShell label="Versão / combustível" loading={loading.versions} valid={Boolean(selectedVersion)}>
+          <select
+            value={selectedVersion}
+            onChange={(e) => setSelectedVersion(e.target.value)}
+            disabled={!selectedYear}
+            className="input cursor-pointer disabled:opacity-50"
+          >
+            <option value="">Selecione a versão</option>
+            {versions.map((version) => (
+              <option key={version.code} value={version.code}>
+                {version.name}
+              </option>
+            ))}
+          </select>
+        </FieldShell>
       </div>
 
       {error && (
-        <div className="mb-4 rounded-xl border border-danger/20 bg-danger/5 px-4 py-3 text-sm font-semibold text-danger">
+        <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700 tracking-tight">
+          <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" strokeWidth={1.75} />
           {error}
         </div>
       )}
 
       {loading.detail && (
-        <div className="pt-6 border-t border-border border-dashed">
-          <div className="h-9 w-56 rounded bg-bg-alt animate-pulse" />
+        <div className="pt-6 mt-6 border-t border-dashed border-[#EAEAE8]">
+          <div className="h-9 w-56 rounded-xl bg-[#FAFAF9] animate-pulse" />
+          <div className="h-3 w-32 rounded-lg bg-[#FAFAF9] animate-pulse mt-3" />
         </div>
       )}
 
-      {!loading.detail && safeResult && hasAllFilters ? (
-        <div className="space-y-4 pt-6 border-t border-border border-dashed">
+      {!loading.detail && safeResult && hasAllFilters && (
+        <div className="space-y-5 pt-6 mt-6 border-t border-dashed border-[#EAEAE8]">
           <div>
-            <p className="text-xs text-text-secondary uppercase font-semibold tracking-wider mb-1.5">Preço FIPE</p>
-            <p className="text-4xl font-display text-text-primary tracking-tight">{safeResult.price}</p>
+            <p className="eyebrow mb-1.5">Preço FIPE</p>
+            <p className="text-[40px] font-semibold text-[#0A0A0A] tracking-tight leading-none">{safeResult.price}</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-3 text-xs font-bold">
-            <div className="bg-bg-alt rounded-xl px-3 py-2 border border-border">
-              <span className="text-text-secondary uppercase tracking-wider text-[10px]">Ano Selecionado</span>
-              <p className="text-text-primary mt-0.5 font-semibold">{selectedYear}</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-[#FAFAF9] rounded-xl px-4 py-3 border border-[#EAEAE8]">
+              <p className="eyebrow mb-1">Ano selecionado</p>
+              <p className="text-[15px] font-semibold text-[#0A0A0A] tracking-tight">{selectedYear}</p>
             </div>
-            <div className="bg-bg-alt rounded-xl px-3 py-2 border border-border">
-              <span className="text-text-secondary uppercase tracking-wider text-[10px]">Combustível</span>
-              <p className="text-text-primary mt-0.5 font-semibold">{selectedVersionObj?.fuelType || safeResult.fuel}</p>
+            <div className="bg-[#FAFAF9] rounded-xl px-4 py-3 border border-[#EAEAE8]">
+              <p className="eyebrow mb-1">Combustível</p>
+              <p className="text-[15px] font-semibold text-[#0A0A0A] tracking-tight">{selectedVersionObj?.fuelType || safeResult.fuel}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-[10px] font-semibold text-text-secondary bg-bg-alt/40 p-3 rounded-xl border border-dashed border-border">
-            <Loader2 className="w-3 h-3 text-text-tertiary animate-spin" />
-            <span>Referência mensal: {safeResult.referenceMonth} • Código oficial: {safeResult.codeFipe}</span>
+          <div className="flex items-start gap-2.5 text-[11px] text-[#525252] bg-[#FAFAF9] p-3 rounded-xl border border-dashed border-[#EAEAE8] tracking-tight">
+            <Info className="w-3.5 h-3.5 text-[#A3A3A3] mt-0.5 flex-shrink-0" strokeWidth={1.75} />
+            <span>
+              Referência mensal: <span className="font-medium text-[#0A0A0A]">{safeResult.referenceMonth}</span>
+              {' '}• Código FIPE: <span className="font-medium text-[#0A0A0A]">{safeResult.codeFipe}</span>
+            </span>
           </div>
         </div>
-      ) : null}
+      )}
 
       {!loading.detail && !hasValidResult && (
-        <div className="pt-6 text-center text-sm font-medium text-text-secondary border-t border-border border-dashed">
+        <div className="pt-6 mt-6 border-t border-dashed border-[#EAEAE8] text-center text-[13px] text-[#525252] tracking-tight">
           Selecione marca, modelo, ano e versão para consultar o valor atualizado.
         </div>
       )}

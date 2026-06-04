@@ -65,8 +65,8 @@ export default function BrandLogo({ brandName, domain, className }: BrandLogoPro
           onError={() => setError(true)}
         />
       ) : (
-        <div className="flex items-center justify-center w-full h-full bg-white rounded-lg shadow-inner">
-           <span className="font-black text-xl text-dark uppercase tracking-tighter opacity-80 scale-110">
+        <div className="flex items-center justify-center w-full h-full bg-[#FAFAF9] rounded-2xl">
+           <span className="font-semibold text-[18px] text-[#0A0A0A] uppercase tracking-tight">
             {brandName.charAt(0)}
           </span>
         </div>

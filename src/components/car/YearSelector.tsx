@@ -18,7 +18,6 @@ export default function YearSelector({ currentYear, availableYears }: YearSelect
   const handleYearChange = (year: number) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('year', String(year))
-    
     setIsOpen(false)
     startTransition(() => {
       router.push(`?${params.toString()}`, { scroll: false })
@@ -30,36 +29,29 @@ export default function YearSelector({ currentYear, availableYears }: YearSelect
 
   return (
     <div className="relative">
-      <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-dark/30 mb-2 block ml-1">
-        Trocar Ano Modelo
-      </label>
-      
-      <button 
+      <label className="eyebrow mb-2 block">Trocar ano modelo</label>
+      <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={isPending}
-        className={`flex items-center justify-between w-full sm:w-48 bg-white border border-black/10 rounded-2xl px-5 py-3 transition-all duration-300
-          ${isOpen ? 'ring-2 ring-black/5 border-black/20 shadow-lg' : 'hover:border-black/20 hover:bg-[#fcfcfb]'}
-          ${isPending ? 'opacity-50 cursor-wait' : ''}
-        `}
+        className={`flex items-center justify-between w-full sm:w-48 h-12 bg-white border rounded-full px-5 transition-colors ${
+          isOpen ? 'border-[#0A0A0A]' : 'border-[#EAEAE8] hover:border-[#D4D4D4]'
+        } ${isPending ? 'opacity-50 cursor-wait' : ''}`}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {isPending ? (
-            <Loader2 className="w-4 h-4 text-dark/20 animate-spin" />
+            <Loader2 className="w-4 h-4 text-[#A3A3A3] animate-spin" />
           ) : (
-            <Calendar className="w-4 h-4 text-dark/20" />
+            <Calendar className="w-4 h-4 text-[#A3A3A3]" strokeWidth={1.75} />
           )}
-          <span className="font-bold text-dark text-sm">{currentYearDisplay}</span>
+          <span className="text-[14px] font-medium text-[#0A0A0A] tracking-tight">{currentYearDisplay}</span>
         </div>
-        <ChevronDown className={`w-3.5 h-3.5 text-dark/40 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-3.5 h-3.5 text-[#A3A3A3] transition-transform ${isOpen ? 'rotate-180' : ''}`} strokeWidth={2} />
       </button>
 
       {isOpen && (
         <>
-          <div 
-            className="fixed inset-0 z-[110]" 
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-black/10 rounded-2xl shadow-2xl z-[120] max-h-64 overflow-y-auto scrollbar-hide py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="fixed inset-0 z-[110]" onClick={() => setIsOpen(false)} />
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#EAEAE8] rounded-2xl shadow-lg z-[120] max-h-64 overflow-y-auto custom-scrollbar py-2 animate-fade-in">
             {availableYears.length > 0 ? (
               availableYears.map((year) => {
                 const isSelected = year === yearNumber
@@ -67,17 +59,17 @@ export default function YearSelector({ currentYear, availableYears }: YearSelect
                   <button
                     key={year}
                     onClick={() => handleYearChange(year)}
-                    className={`w-full flex items-center justify-between px-5 py-3 text-left text-sm font-bold transition-colors ${
-                      isSelected ? 'bg-[#f5f5f3] text-dark' : 'hover:bg-[#f9f9f8] text-dark/60 hover:text-dark'
+                    className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-[14px] font-medium tracking-tight transition-colors ${
+                      isSelected ? 'bg-[#FAFAF9] text-[#0A0A0A]' : 'text-[#525252] hover:bg-[#FAFAF9] hover:text-[#0A0A0A]'
                     }`}
                   >
                     <span>{year}</span>
-                    {isSelected && <Check className="w-4 h-4 text-dark/40" />}
+                    {isSelected && <Check className="w-4 h-4 text-[#0A0A0A]" strokeWidth={2} />}
                   </button>
                 )
               })
             ) : (
-              <div className="px-5 py-4 text-xs text-dark/40 font-medium">
+              <div className="px-4 py-3 text-[12px] text-[#A3A3A3]">
                 Nenhum outro ano disponível
               </div>
             )}

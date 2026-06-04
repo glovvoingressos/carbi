@@ -6,7 +6,7 @@ import { MessageCircle, Loader2 } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
 
-export default function ChatStarter({ listingId }: { listingId: string }) {
+export default function ChatStarter({ listingId, fullWidth = true }: { listingId: string; fullWidth?: boolean }) {
   const supabaseReady = isSupabaseBrowserConfigured()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -19,13 +19,11 @@ export default function ChatStarter({ listingId }: { listingId: string }) {
 
     try {
       if (!supabaseReady) {
-        throw new Error('Chat indisponível: Supabase não configurado no ambiente.')
+        throw new Error('Chat indisponível.')
       }
 
       const supabase = getSupabaseBrowserClient()
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      const { data: { session } } = await supabase.auth.getSession()
 
       if (!session?.access_token) {
         setShowAuth(true)
@@ -44,9 +42,7 @@ export default function ChatStarter({ listingId }: { listingId: string }) {
       })
 
       const payload = await response.json()
-      if (!response.ok) {
-        throw new Error(payload.error || 'Não foi possível iniciar a conversa.')
-      }
+      if (!response.ok) throw new Error(payload.error || 'Não foi possível iniciar a conversa.')
 
       router.push(`/minha-conta/conversas?conversation=${payload.conversationId}`)
     } catch (chatError) {
@@ -61,17 +57,17 @@ export default function ChatStarter({ listingId }: { listingId: string }) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <button
         type="button"
         onClick={openConversation}
         disabled={loading}
-        className="inline-flex w-full h-14 items-center justify-center gap-3 rounded-2xl bg-accent text-xs font-black uppercase tracking-widest text-white hover:bg-black disabled:opacity-60 transition-colors shadow-sm"
+        className={`btn btn-primary ${fullWidth ? 'w-full' : ''}`}
       >
-        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <MessageCircle className="h-5 w-5" />}
+        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" strokeWidth={1.75} />}
         Conversar com vendedor
       </button>
-      {error && <p className="text-xs font-bold text-red-600 text-center">{error}</p>}
+      {error && <p className="text-[12px] text-[#DC2626] text-center tracking-tight">{error}</p>}
     </div>
   )
 }
