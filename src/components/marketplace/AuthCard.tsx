@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { ArrowRight, Mail, Lock } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 interface Props {
@@ -23,7 +25,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!supabaseReady) {
-      setError('Autenticação indisponível: configure NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY.')
+      setError('Autenticação indisponível.')
       return
     }
     setLoading(true)
@@ -75,48 +77,84 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
   }
 
   return (
-    <div className={`rounded-[32px] border border-border bg-white shadow-sm ${compact ? 'p-6' : 'p-10'}`}>
-      <h3 className="text-2xl font-heading font-black text-text-primary tracking-tight">Entre para anunciar</h3>
-      <p className="text-sm font-bold text-text-secondary mt-3 leading-relaxed">Seu contato fica protegido: comprador e vendedor falam só pelo chat interno.</p>
+    <div className={`bg-white border border-[#EAEAE8] rounded-2xl ${compact ? 'p-6' : 'p-8 md:p-10'}`}>
+      <h2 className="text-[24px] md:text-[28px] font-semibold tracking-tight text-[#0A0A0A] text-balance">
+        {mode === 'login' ? 'Entre na sua conta' : 'Crie sua conta'}
+      </h2>
+      <p className="mt-2 text-[15px] text-[#525252] tracking-tight text-pretty">
+        {mode === 'login'
+          ? 'Acesse para gerenciar seus anúncios e conversas.'
+          : 'Comece a anunciar em menos de 2 minutos, é gratuito.'}
+      </p>
 
       {!supabaseReady && (
-        <p className="mt-6 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-bold text-red-600 shadow-sm">
-          Ambiente sem Supabase configurado. O login/cadastro fica indisponível até configurar as variáveis públicas.
-        </p>
+        <div className="mt-6 p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-xl">
+          <p className="text-[13px] text-[#DC2626] tracking-tight">
+            Ambiente sem Supabase configurado. Login indisponível.
+          </p>
+        </div>
       )}
 
       <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Seu e-mail"
-          className="w-full rounded-2xl border border-border px-5 py-4 bg-bg-alt text-sm font-bold text-text-primary focus:outline-none focus:border-accent focus:bg-white transition-colors"
-        />
-        <input
-          type="password"
-          required
-          minLength={6}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Sua senha"
-          className="w-full rounded-2xl border border-border px-5 py-4 bg-bg-alt text-sm font-bold text-text-primary focus:outline-none focus:border-accent focus:bg-white transition-colors"
-        />
+        <div>
+          <label htmlFor="email" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
+            E-mail
+          </label>
+          <div className="relative">
+            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3]" strokeWidth={1.75} />
+            <input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="voce@email.com"
+              className="w-full h-12 pl-11 pr-4 bg-white border border-[#EAEAE8] rounded-xl text-[14px] tracking-tight outline-none focus:border-[#0A0A0A] transition-colors"
+            />
+          </div>
+        </div>
 
-        {error && <p className="text-sm font-bold text-red-600 bg-red-50 px-4 py-3 rounded-xl border border-red-100">{error}</p>}
-        {message && <p className="text-sm font-bold text-green-700 bg-green-50 px-4 py-3 rounded-xl border border-green-100">{message}</p>}
+        <div>
+          <label htmlFor="password" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
+            Senha
+          </label>
+          <div className="relative">
+            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3]" strokeWidth={1.75} />
+            <input
+              id="password"
+              type="password"
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Mínimo 6 caracteres"
+              className="w-full h-12 pl-11 pr-4 bg-white border border-[#EAEAE8] rounded-xl text-[14px] tracking-tight outline-none focus:border-[#0A0A0A] transition-colors"
+            />
+          </div>
+        </div>
+
+        {error && (
+          <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl">
+            <p className="text-[13px] text-[#DC2626] tracking-tight">{error}</p>
+          </div>
+        )}
+        {message && (
+          <div className="p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl">
+            <p className="text-[13px] text-[#10B981] tracking-tight">{message}</p>
+          </div>
+        )}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-14 rounded-2xl bg-accent text-white text-xs font-black uppercase tracking-widest disabled:opacity-60 hover:bg-black transition-colors shadow-sm mt-4"
+          className="btn btn-primary btn-lg w-full"
         >
           {loading ? 'Processando...' : mode === 'login' ? 'Entrar' : 'Criar conta'}
+          {!loading && <ArrowRight className="w-4 h-4" strokeWidth={2} />}
         </button>
       </form>
 
-      <div className="mt-6 text-center">
+      <div className="mt-6 pt-6 border-t border-[#EAEAE8] text-center">
         <button
           type="button"
           onClick={() => {
@@ -124,11 +162,22 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
             setError(null)
             setMessage(null)
           }}
-          className="text-xs font-black uppercase tracking-widest text-text-tertiary hover:text-accent transition-colors"
+          className="text-[14px] text-[#525252] hover:text-[#0A0A0A] transition-colors"
         >
-          {mode === 'login' ? 'Ainda não tenho conta' : 'Já tenho conta'}
+          {mode === 'login' ? (
+            <>Não tem conta? <span className="text-[#0A0A0A] font-medium">Criar conta</span></>
+          ) : (
+            <>Já tem conta? <span className="text-[#0A0A0A] font-medium">Entrar</span></>
+          )}
         </button>
       </div>
+
+      <p className="mt-6 text-[11px] text-[#A3A3A3] tracking-tight text-center">
+        Ao continuar, você concorda com nossos{' '}
+        <Link href="#" className="underline underline-offset-2 hover:text-[#0A0A0A]">Termos</Link>
+        {' '}e{' '}
+        <Link href="#" className="underline underline-offset-2 hover:text-[#0A0A0A]">Privacidade</Link>.
+      </p>
     </div>
   )
 }

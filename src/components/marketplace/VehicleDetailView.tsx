@@ -2,15 +2,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { 
-  TrendingDown, TrendingUp, Calendar, 
-  MapPin, Gauge, Fuel, Zap, 
+import {
+  TrendingDown, TrendingUp, Calendar,
+  MapPin, Gauge, Fuel, Zap,
   Settings2, ShieldCheck, Check,
-  ChevronDown, ChevronUp, Share2,
-  Heart, MessageCircle, Phone,
-  Info
+  Share2, Heart, MessageCircle, Phone,
+  Info, ArrowRight,
 } from 'lucide-react'
-import { motion, AnimatePresence, Variants } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import { ListingPublic } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
 import ListingImageGallery from './ListingImageGallery'
@@ -67,6 +66,8 @@ export default function VehicleDetailView({
         title: listing.title,
         url: window.location.href,
       })
+    } else {
+      navigator.clipboard?.writeText(window.location.href)
     }
   }
 
@@ -74,415 +75,336 @@ export default function VehicleDetailView({
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+      transition: { staggerChildren: 0.05 }
     }
   }
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    hidden: { opacity: 0, y: 12 },
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.5,
-        ease: [0.16, 1, 0.3, 1]
-      }
+      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
     }
   }
 
+  const isGoodDeal = comparison.status === 'below'
+
   return (
-    <motion.div 
+    <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="flex flex-col gap-6"
+      className="bg-white min-h-screen"
     >
-      {/* 1. Header Section */}
-      <motion.div variants={itemVariants} className="bg-white rounded-[32px] border border-border p-8 sm:p-12 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-          <div className="flex-1">
-            <div className="flex flex-wrap gap-2 mb-4">
-              {listing.badges?.map(badge => (
-                <span key={badge.key} className="bg-bg-alt text-text-primary border border-border text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+      {/* ── HEADER ── */}
+      <motion.section variants={itemVariants} className="container pt-8 pb-6">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {listing.badges?.slice(0, 3).map(badge => (
+                <span key={badge.key} className="badge badge-neutral">
                   {badge.label}
                 </span>
               ))}
-              {comparison.status === 'below' && (
-                <span className="bg-green-50 text-green-600 border border-green-100 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
-                  Abaixo da FIPE
-                </span>
-              )}
-              {listing.mileage < 30000 && (
-                <span className="bg-bg-alt text-text-secondary border border-border text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
-                  Baixa KM
+              {isGoodDeal && (
+                <span className="badge badge-trust">
+                  {comparison.diffPercent && Math.abs(comparison.diffPercent).toFixed(0)}% abaixo da FIPE
                 </span>
               )}
             </div>
-            <h1 className="text-4xl sm:text-6xl font-heading font-black text-text-primary tracking-tight leading-[0.9]">
+            <h1 className="text-balance">
               {listing.brand} {listing.model}
             </h1>
-            <p className="mt-4 text-xl font-bold text-text-secondary">
-              {listing.version || 'Versão Standard'} • {listing.year}/{listing.year_model}
+            <p className="mt-2 text-[15px] text-[#525252] tracking-tight">
+              {listing.version || 'Versão Standard'} · {listing.year}/{listing.year_model} · {listing.city}, {listing.state}
             </p>
-            <div className="mt-6 flex items-center gap-2 text-text-tertiary font-bold">
-              <MapPin className="w-4 h-4" />
-              <span>{listing.city}, {listing.state}</span>
-            </div>
           </div>
-
-          <div className="flex flex-col md:items-end gap-4">
-            <div className="text-right">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent mb-1">Preço especial</p>
-              <p className="text-4xl sm:text-6xl font-black text-text-primary tracking-tighter">
-                {formatBRL(Number(listing.price))}
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button 
-                onClick={handleShare}
-                className="w-12 h-12 rounded-full border border-border bg-bg-alt flex items-center justify-center text-text-secondary hover:text-accent hover:border-accent transition-all shadow-sm"
-              >
-                <Share2 className="w-5 h-5" />
-              </button>
-              <button 
-                onClick={() => setIsFavorite(!isFavorite)}
-                className={`w-12 h-12 rounded-full border shadow-sm flex items-center justify-center transition-all ${isFavorite ? 'bg-red-50 border-red-200 text-red-500' : 'border-border bg-bg-alt text-text-secondary hover:text-red-500 hover:border-red-200'}`}
-              >
-                <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-              </button>
-            </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleShare}
+              className="btn-icon"
+              aria-label="Compartilhar"
+            >
+              <Share2 className="w-[18px] h-[18px]" strokeWidth={1.75} />
+            </button>
+            <button
+              onClick={() => setIsFavorite(!isFavorite)}
+              className="btn-icon"
+              aria-label="Favoritar"
+            >
+              <Heart
+                className={`w-[18px] h-[18px] ${isFavorite ? 'fill-[#DC2626] text-[#DC2626]' : ''}`}
+                strokeWidth={1.75}
+              />
+            </button>
           </div>
         </div>
-      </motion.div>
+      </motion.section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
-        <div className="space-y-8">
-          {/* 2. Gallery */}
-          <motion.div variants={itemVariants} className="bg-white rounded-[32px] border border-black/5 p-4 sm:p-6 shadow-sm overflow-hidden">
-            <ListingImageGallery 
-              images={listing.images?.map(img => img.url) || []} 
-              title={listing.title} 
+      {/* ── GALLERY + SIDEBAR ── */}
+      <motion.section variants={itemVariants} className="container pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 lg:gap-8">
+          <div>
+            <ListingImageGallery
+              images={listing.images?.map(img => img.url) || []}
+              title={listing.title}
             />
-          </motion.div>
+          </div>
 
-          {/* 3. Card Principal (Specs) */}
-          <motion.div variants={itemVariants} className="bg-white rounded-[32px] border border-border p-8 sm:p-12 shadow-sm">
-            <div className="flex items-center gap-4 mb-10">
-              <div className="w-12 h-12 rounded-2xl bg-bg-alt flex items-center justify-center">
-                <Info className="w-6 h-6 text-accent" />
-              </div>
-              <h2 className="text-3xl font-heading font-black text-text-primary tracking-tight">Ficha do veículo</h2>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-              {mainSpecs.map(spec => (
-                <div key={spec.label} className="bg-bg-alt rounded-[24px] p-6 border border-border group hover:border-accent transition-colors">
-                  <spec.icon className="w-6 h-6 text-text-tertiary mb-4 group-hover:text-accent transition-colors" />
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-text-secondary mb-1">{spec.label}</p>
-                  <p className="text-sm font-black text-text-primary">{spec.value}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
-              {technicalSpecs.map(spec => (
-                <div key={spec.label} className="flex items-center justify-between py-4 border-b border-border last:sm:border-b last:border-b-0 group">
-                  <span className="text-sm font-bold text-text-secondary/70 group-hover:text-text-primary transition-colors">{spec.label}</span>
-                  <span className="text-sm font-black text-text-primary">{spec.value}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Technical Specs from Enrichment */}
-          {enrichment && (
-            <motion.div variants={itemVariants} className="bg-white rounded-[32px] border border-border p-8 sm:p-12 shadow-sm">
-              <div className="flex items-center gap-4 mb-10">
-                <div className="w-12 h-12 rounded-2xl bg-bg-alt flex items-center justify-center">
-                  <Settings2 className="w-6 h-6 text-accent" />
-                </div>
-                <h2 className="text-3xl font-heading font-black text-text-primary tracking-tight">Especificações técnicas</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                {enrichment.powertrain && (
-                  <div>
-                    <h3 className="text-[10px] font-black uppercase tracking-widest text-accent mb-6 bg-bg-alt inline-block px-3 py-1 rounded-full border border-border">Motor e Performance</h3>
-                    <div className="space-y-4">
-                      {enrichment.powertrain.engine && (
-                        <div className="flex justify-between border-b border-border pb-4">
-                          <span className="text-sm font-bold text-text-secondary/70">Motor</span>
-                          <span className="text-sm font-black text-text-primary">{enrichment.powertrain.engine}</span>
-                        </div>
-                      )}
-                      {enrichment.powertrain.horsepower && (
-                        <div className="flex justify-between border-b border-border pb-4">
-                          <span className="text-sm font-bold text-text-secondary/70">Potência</span>
-                          <span className="text-sm font-black text-text-primary">{enrichment.powertrain.horsepower} cv</span>
-                        </div>
-                      )}
-                      {enrichment.powertrain.transmission && (
-                        <div className="flex justify-between border-b border-border pb-4">
-                          <span className="text-sm font-bold text-text-secondary/70">Transmissão</span>
-                          <span className="text-sm font-black text-text-primary">{enrichment.powertrain.transmission}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-                
-                {enrichment.dimensions && (
-                  <div>
-                    <h3 className="text-[10px] font-black uppercase tracking-widest text-accent mb-6 bg-bg-alt inline-block px-3 py-1 rounded-full border border-border">Dimensões e Capacidade</h3>
-                    <div className="space-y-4">
-                      {enrichment.dimensions.cargoCapacity && (
-                        <div className="flex justify-between border-b border-border pb-4">
-                          <span className="text-sm font-bold text-text-secondary/70">Porta-malas</span>
-                          <span className="text-sm font-black text-text-primary">{enrichment.dimensions.cargoCapacity}L</span>
-                        </div>
-                      )}
-                      {enrichment.dimensions.curbWeight && (
-                        <div className="flex justify-between border-b border-border pb-4">
-                          <span className="text-sm font-bold text-text-secondary/70">Peso</span>
-                          <span className="text-sm font-black text-text-primary">{enrichment.dimensions.curbWeight} kg</span>
-                        </div>
-                      )}
-                      {enrichment.dimensions.length && (
-                        <div className="flex justify-between border-b border-border pb-4">
-                          <span className="text-sm font-bold text-text-secondary/70">Comprimento</span>
-                          <span className="text-sm font-black text-text-primary">{enrichment.dimensions.length} mm</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Recalls */}
-          {enrichment?.recalls?.count > 0 && (
-            <motion.div variants={itemVariants} className="bg-red-50 rounded-[32px] border border-red-100 p-8 sm:p-12 shadow-sm">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center text-red-600 shadow-sm shadow-red-500/20">
-                  <Info className="w-6 h-6" />
-                </div>
-                <h2 className="text-3xl font-heading font-black text-red-900 tracking-tight">Avisos de Recall</h2>
-              </div>
-              <div className="space-y-6">
-                {enrichment.recalls.items.slice(0, 2).map((recall: any, idx: number) => (
-                  <div key={idx} className="bg-white rounded-3xl p-6 border border-red-100 shadow-sm">
-                    <p className="font-black text-red-900 mb-2">{recall.title}</p>
-                    <p className="text-sm font-bold text-red-800/70 leading-relaxed">
-                      {recall.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* 7. Card Opcionais */}
-          {listing.optional_items?.length > 0 && (
-            <motion.div variants={itemVariants} className="bg-white rounded-[32px] border border-border p-8 sm:p-12 shadow-sm">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-bg-alt flex items-center justify-center">
-                  <Settings2 className="w-6 h-6 text-accent" />
-                </div>
-                <h2 className="text-3xl font-heading font-black text-text-primary tracking-tight">Opcionais e acessórios</h2>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                {listing.optional_items.map(item => (
-                  <div key={item} className="bg-bg-alt border border-border px-5 py-3 rounded-2xl flex items-center gap-3 group hover:border-accent hover:bg-white transition-all shadow-sm hover:shadow-md">
-                    <Check className="w-4 h-4 text-text-tertiary group-hover:text-accent transition-colors" />
-                    <span className="text-sm font-bold text-text-secondary group-hover:text-text-primary">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* 6. Card Descrição */}
-          {listing.description && (
-            <motion.div variants={itemVariants} className="bg-white rounded-[32px] border border-border p-8 sm:p-12 shadow-sm">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-bg-alt flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-accent" />
-                </div>
-                <h2 className="text-3xl font-heading font-black text-text-primary tracking-tight">Descrição do anunciante</h2>
-              </div>
-              <div className={`relative ${!showFullDescription && listing.description.length > 500 ? 'max-h-64 overflow-hidden' : ''}`}>
-                <p className="text-base sm:text-lg font-medium text-text-secondary leading-relaxed whitespace-pre-wrap">
-                  {listing.description}
-                </p>
-                {!showFullDescription && listing.description.length > 500 && (
-                  <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent" />
-                )}
-              </div>
-              {listing.description.length > 500 && (
-                <button 
-                  onClick={() => setShowFullDescription(!showFullDescription)}
-                  className="mt-6 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-accent hover:text-accent-dark transition-colors"
-                >
-                  {showFullDescription ? (
-                    <>Ver menos <ChevronUp className="w-4 h-4" /></>
-                  ) : (
-                    <>Ver descrição completa <ChevronDown className="w-4 h-4" /></>
-                  )}
-                </button>
-              )}
-            </motion.div>
-          )}
-
-          {/* 8. Informações Adicionais */}
-          <motion.div variants={itemVariants} className="bg-white rounded-[32px] border border-border p-8 sm:p-12 shadow-sm">
-             <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-bg-alt flex items-center justify-center">
-                  <ShieldCheck className="w-6 h-6 text-accent" />
-                </div>
-                <h2 className="text-3xl font-heading font-black text-text-primary tracking-tight">Informações adicionais</h2>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center shadow-sm shadow-green-500/10">
-                      <Check className="w-5 h-5 text-green-600" />
-                    </div>
-                    <span className="text-base font-bold text-text-secondary">IPVA 2024 Pago</span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center shadow-sm shadow-green-500/10">
-                      <Check className="w-5 h-5 text-green-600" />
-                    </div>
-                    <span className="text-base font-bold text-text-secondary">Veículo Licenciado</span>
-                  </div>
-                </div>
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center shadow-sm shadow-green-500/10">
-                      <Check className="w-5 h-5 text-green-600" />
-                    </div>
-                    <span className="text-base font-bold text-text-secondary">Possui Manual e Chave Reserva</span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center shadow-sm shadow-green-500/10">
-                      <Check className="w-5 h-5 text-green-600" />
-                    </div>
-                    <span className="text-base font-bold text-text-secondary">Aceita Troca</span>
-                  </div>
-                </div>
-              </div>
-          </motion.div>
-        </div>
-
-        <aside className="space-y-6">
-          {/* 4. Card Preço & FIPE */}
-          <motion.div variants={itemVariants} className="bg-white rounded-[32px] border border-border p-8 shadow-sm sticky top-32">
-            <div className="mb-8">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-tertiary mb-2">Valor do anúncio</p>
-              <p className="text-5xl font-black text-text-primary tracking-tighter">
+          {/* ── Sticky Price & Seller Card ── */}
+          <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
+            <div className="bg-white border border-[#EAEAE8] rounded-2xl p-6">
+              <p className="eyebrow mb-2">Preço</p>
+              <p className="text-[44px] font-semibold tracking-tight text-[#0A0A0A] leading-none">
                 {formatBRL(Number(listing.price))}
               </p>
-            </div>
 
-            <div className="bg-bg-alt rounded-[24px] p-6 border border-border">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-text-secondary">Tabela FIPE</span>
-                <span className="text-base font-black text-text-primary">{listing.fipe_price ? formatBRL(Number(listing.fipe_price)) : '---'}</span>
-              </div>
-              
-              {comparison.status !== 'unknown' && (
-                <div className={`flex items-center gap-3 p-4 rounded-2xl shadow-sm ${
-                  comparison.status === 'below' ? 'bg-white border border-green-100 text-green-600' :
-                  comparison.status === 'near' ? 'bg-white border border-orange-100 text-orange-600' :
-                  'bg-white border border-red-100 text-red-600'
-                }`}>
-                  {comparison.status === 'below' ? <TrendingDown className="w-5 h-5" /> : <TrendingUp className="w-5 h-5" />}
-                  <span className="text-xs font-black uppercase tracking-widest">
-                    {comparison.status === 'below' ? 'Abaixo da FIPE' : 
-                     comparison.status === 'near' ? 'Na média da FIPE' : 'Acima da FIPE'}
-                  </span>
+              {/* FIPE comparison */}
+              {listing.fipe_price && (
+                <div className="mt-5 pt-5 border-t border-[#EAEAE8]">
+                  <div className="flex items-center justify-between text-[13px] mb-3">
+                    <span className="text-[#525252]">Tabela FIPE</span>
+                    <span className="text-[#0A0A0A] font-medium">{formatBRL(Number(listing.fipe_price))}</span>
+                  </div>
+                  {comparison.status !== 'unknown' && (
+                    <div className={`flex items-center gap-2 text-[13px] font-medium ${
+                      comparison.status === 'below' ? 'text-[#10B981]' :
+                      comparison.status === 'near' ? 'text-[#F59E0B]' :
+                      'text-[#DC2626]'
+                    }`}>
+                      {comparison.status === 'below' ? <TrendingDown className="w-4 h-4" strokeWidth={2} /> : <TrendingUp className="w-4 h-4" strokeWidth={2} />}
+                      {comparison.status === 'below' ? 'Abaixo da FIPE' :
+                       comparison.status === 'near' ? 'Na média da FIPE' : 'Acima da FIPE'}
+                    </div>
+                  )}
+                  {listing.fipe_reference_month && (
+                    <p className="mt-2 text-[11px] text-[#A3A3A3] tracking-tight">
+                      Referência: {listing.fipe_reference_month}
+                    </p>
+                  )}
                 </div>
               )}
-              {listing.fipe_reference_month && (
-                <p className="mt-4 text-[10px] font-bold text-text-tertiary text-center uppercase tracking-widest">
-                  Ref: {listing.fipe_reference_month}
-                </p>
-              )}
-            </div>
 
-            {/* 5. Card Vendedor */}
-            <div className="mt-8 pt-8 border-t border-border">
-              <div className="flex items-center gap-4 mb-6">
-                {sellerInfo?.avatarUrl ? (
-                  <img 
-                    src={sellerInfo.avatarUrl} 
-                    alt={sellerInfo.name} 
-                    className="w-16 h-16 rounded-2xl object-cover border border-border shadow-sm" 
-                  />
-                ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-bg-alt flex items-center justify-center border border-border text-accent shadow-sm">
-                    <Zap className="w-8 h-8 fill-current" />
-                  </div>
-                )}
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-accent mb-1">Vendedor Parceiro</p>
-                  <p className="text-xl font-heading font-black text-text-primary tracking-tight leading-none mb-2">{sellerInfo?.name || 'Particular'}</p>
-                  <div className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-green-500" />
-                    <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">Perfil Verificado</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
+              {/* Actions */}
+              <div className="mt-6 space-y-2.5">
                 <ChatStarter listingId={listing.id} />
-                <button className="w-full h-14 bg-white border border-border rounded-2xl flex items-center justify-center gap-3 text-xs font-black uppercase tracking-widest text-text-primary hover:bg-bg-alt hover:border-text-secondary shadow-sm transition-all">
-                  <Phone className="w-5 h-5 text-text-secondary" /> Mostrar Telefone
+                <button className="btn btn-secondary w-full">
+                  <Phone className="w-4 h-4" strokeWidth={1.75} /> Ver telefone
                 </button>
               </div>
-              
-              <div className="mt-6 text-center">
-                <p className="text-[10px] font-bold text-text-tertiary uppercase tracking-widest">
-                  Anunciando desde {new Date(sellerInfo?.memberSince || Date.now()).getFullYear()}
-                </p>
-              </div>
             </div>
-          </motion.div>
-        </aside>
-      </div>
 
-      {/* 9. Área de Carros Semelhantes */}
-      {relatedListings.length > 0 && (
-        <motion.section variants={itemVariants} className="mt-20 pt-20 border-t border-border">
-          <div className="flex items-center justify-between mb-10">
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-accent mb-2">Marketplace Premium</p>
-              <h2 className="text-4xl font-heading font-black text-text-primary tracking-tight">Veículos semelhantes</h2>
+            {/* Seller card */}
+            <div className="bg-white border border-[#EAEAE8] rounded-2xl p-6">
+              <p className="eyebrow mb-3">Vendedor</p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-[#FAFAF9] flex items-center justify-center text-[#0A0A0A]">
+                  {sellerInfo?.avatarUrl ? (
+                    <img src={sellerInfo.avatarUrl} alt={sellerInfo.name} className="w-full h-full rounded-full object-cover" />
+                  ) : (
+                    <span className="text-[15px] font-semibold">
+                      {(sellerInfo?.name || 'P').charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-semibold text-[#0A0A0A] tracking-tight truncate">
+                    {sellerInfo?.name || 'Particular'}
+                  </p>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" strokeWidth={2} />
+                    <span className="text-[11px] text-[#525252] tracking-tight">Perfil verificado</span>
+                  </div>
+                </div>
+              </div>
+              <p className="mt-4 text-[11px] text-[#A3A3A3] tracking-tight">
+                Anunciando desde {new Date(sellerInfo?.memberSince || Date.now()).getFullYear()}
+              </p>
             </div>
-            <Link href="/carros-a-venda" className="btn btn-secondary px-6 py-3">
-              Ver todos
+          </aside>
+        </div>
+      </motion.section>
+
+      {/* ── MAIN SPECS ── */}
+      <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+        <h2 className="text-balance mb-8">Visão geral</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#EAEAE8] border border-[#EAEAE8] rounded-2xl overflow-hidden">
+          {mainSpecs.map(spec => {
+            const Icon = spec.icon
+            return (
+              <div key={spec.label} className="bg-white p-6">
+                <Icon className="w-5 h-5 text-[#0A0A0A] mb-3" strokeWidth={1.5} />
+                <p className="eyebrow mb-1">{spec.label}</p>
+                <p className="text-[15px] font-semibold text-[#0A0A0A] tracking-tight">{spec.value}</p>
+              </div>
+            )
+          })}
+        </div>
+      </motion.section>
+
+      {/* ── TECHNICAL SPECS ── */}
+      <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+        <h2 className="text-balance mb-8">Ficha técnica</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0 max-w-4xl">
+          {technicalSpecs.map(spec => (
+            <div key={spec.label} className="flex items-center justify-between py-4 border-b border-[#EAEAE8]">
+              <span className="text-[14px] text-[#525252] tracking-tight">{spec.label}</span>
+              <span className="text-[14px] font-medium text-[#0A0A0A] tracking-tight">{spec.value}</span>
+            </div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* ── ENRICHMENT (SPECS) ── */}
+      {enrichment && (
+        <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+          <h2 className="text-balance mb-8">Especificações técnicas</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl">
+            {enrichment.powertrain && (
+              <div>
+                <p className="eyebrow mb-4">Motor e performance</p>
+                <div className="space-y-0">
+                  {enrichment.powertrain.engine && (
+                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
+                      <span className="text-[14px] text-[#525252]">Motor</span>
+                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.powertrain.engine}</span>
+                    </div>
+                  )}
+                  {enrichment.powertrain.horsepower && (
+                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
+                      <span className="text-[14px] text-[#525252]">Potência</span>
+                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.powertrain.horsepower} cv</span>
+                    </div>
+                  )}
+                  {enrichment.powertrain.transmission && (
+                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
+                      <span className="text-[14px] text-[#525252]">Transmissão</span>
+                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.powertrain.transmission}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            {enrichment.dimensions && (
+              <div>
+                <p className="eyebrow mb-4">Dimensões e capacidade</p>
+                <div className="space-y-0">
+                  {enrichment.dimensions.cargoCapacity && (
+                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
+                      <span className="text-[14px] text-[#525252]">Porta-malas</span>
+                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.dimensions.cargoCapacity}L</span>
+                    </div>
+                  )}
+                  {enrichment.dimensions.curbWeight && (
+                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
+                      <span className="text-[14px] text-[#525252]">Peso</span>
+                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.dimensions.curbWeight} kg</span>
+                    </div>
+                  )}
+                  {enrichment.dimensions.length && (
+                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
+                      <span className="text-[14px] text-[#525252]">Comprimento</span>
+                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.dimensions.length} mm</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.section>
+      )}
+
+      {/* ── OPTIONALS ── */}
+      {listing.optional_items?.length > 0 && (
+        <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+          <h2 className="text-balance mb-8">Opcionais e acessórios</h2>
+          <div className="flex flex-wrap gap-2">
+            {listing.optional_items.map(item => (
+              <div key={item} className="inline-flex items-center gap-2 px-4 py-2 bg-[#FAFAF9] border border-[#EAEAE8] rounded-full">
+                <Check className="w-3.5 h-3.5 text-[#0A0A0A]" strokeWidth={2.5} />
+                <span className="text-[13px] font-medium text-[#0A0A0A] tracking-tight">{item}</span>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+      )}
+
+      {/* ── DESCRIPTION ── */}
+      {listing.description && (
+        <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+          <h2 className="text-balance mb-6">Descrição do anunciante</h2>
+          <div className={`relative ${!showFullDescription && listing.description.length > 500 ? 'max-h-72 overflow-hidden' : ''}`}>
+            <p className="text-[16px] text-[#525252] leading-relaxed whitespace-pre-wrap text-pretty">
+              {listing.description}
+            </p>
+            {!showFullDescription && listing.description.length > 500 && (
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+            )}
+          </div>
+          {listing.description.length > 500 && (
+            <button
+              onClick={() => setShowFullDescription(!showFullDescription)}
+              className="mt-5 text-[14px] font-medium text-[#0A0A0A] hover:opacity-70 transition-opacity"
+            >
+              {showFullDescription ? 'Ver menos' : 'Ver descrição completa →'}
+            </button>
+          )}
+        </motion.section>
+      )}
+
+      {/* ── RECALLS ── */}
+      {enrichment?.recalls?.count > 0 && (
+        <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-[#FEF2F2] rounded-xl flex items-center justify-center">
+              <Info className="w-5 h-5 text-[#DC2626]" strokeWidth={1.75} />
+            </div>
+            <h2>Avisos de recall</h2>
+          </div>
+          <div className="space-y-3">
+            {enrichment.recalls.items.slice(0, 2).map((recall: any, idx: number) => (
+              <div key={idx} className="border border-[#FECACA] bg-[#FEF2F2] rounded-2xl p-5">
+                <p className="font-semibold text-[#0A0A0A] mb-1.5 tracking-tight">{recall.title}</p>
+                <p className="text-[14px] text-[#525252] leading-relaxed">{recall.description}</p>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+      )}
+
+      {/* ── RELATED ── */}
+      {relatedListings.length > 0 && (
+        <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="eyebrow mb-2">Veículos semelhantes</p>
+              <h2 className="text-balance">Você também pode gostar</h2>
+            </div>
+            <Link href="/carros-a-venda" className="hidden sm:inline-flex items-center gap-1.5 text-[14px] font-medium text-[#0A0A0A] hover:opacity-70">
+              Ver todos <ArrowRight className="w-4 h-4" strokeWidth={2} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {relatedListings.map(item => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {relatedListings.slice(0, 4).map(item => (
               <ListingCard key={item.id} listing={item} />
             ))}
           </div>
         </motion.section>
       )}
 
-      {/* Mobile Floating CTA */}
-      <div className="lg:hidden fixed inset-x-0 bottom-0 z-50 p-6 bg-white/90 backdrop-blur-xl border-t border-border shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <div className="max-w-md mx-auto flex gap-4">
-          <button className="btn btn-primary flex-1">
-            Tenho Interesse
-          </button>
-          <button className="w-14 h-14 bg-bg-alt text-text-secondary rounded-2xl flex items-center justify-center border border-border hover:text-accent hover:border-accent transition-colors shadow-sm">
-            <MessageCircle className="w-6 h-6" />
-          </button>
+      {/* ── MOBILE STICKY CTA ── */}
+      <div className="lg:hidden fixed inset-x-0 bottom-0 z-50 bg-white/95 backdrop-blur-xl border-t border-[#EAEAE8] p-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-[18px] font-semibold text-[#0A0A0A] tracking-tight truncate">
+              {formatBRL(Number(listing.price))}
+            </p>
+            {isGoodDeal && (
+              <p className="text-[11px] text-[#10B981] font-medium tracking-tight">Abaixo da FIPE</p>
+            )}
+          </div>
+          <ChatStarter listingId={listing.id} />
         </div>
       </div>
     </motion.div>

@@ -3,14 +3,26 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
-import { Menu, X, Search, CarFront, Sparkles, ChevronRight, MessageCircle, LayoutDashboard, UserRound, LogOut, ShoppingBag, Tag, Truck, Home, Heart } from 'lucide-react'
+import {
+  Menu, X, Search, CarFront, Sparkles, ChevronRight,
+  MessageCircle, LayoutDashboard, UserRound, LogOut,
+  ShoppingBag, Tag, Truck, Home,
+} from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 const BOTTOM_NAV = [
   { href: '/', label: 'Início', icon: Home },
-  { href: '/carros-a-venda', label: 'Comprar', icon: Search },
-  { href: '/anunciar-carro', label: 'Vender', icon: Tag },
+  { href: '/carros-a-venda', label: 'Buscar', icon: Search },
+  { href: '/anunciar-carro', label: 'Anunciar', icon: Tag },
   { href: '/marcas', label: 'Marcas', icon: CarFront },
+]
+
+const PRIMARY_NAV = [
+  { href: '/carros-a-venda', label: 'Comprar' },
+  { href: '/caminhoes', label: 'Caminhões' },
+  { href: '/anunciar-carro', label: 'Vender' },
+  { href: '/marcas', label: 'Marcas' },
+  { href: '/qual-carro', label: 'Qual carro?' },
 ]
 
 export default function Navbar() {
@@ -29,7 +41,7 @@ export default function Navbar() {
   const accountRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handle = () => setScrolled(window.scrollY > 20)
+    const handle = () => setScrolled(window.scrollY > 12)
     window.addEventListener('scroll', handle, { passive: true })
     handle()
     return () => window.removeEventListener('scroll', handle)
@@ -48,8 +60,6 @@ export default function Navbar() {
   useEffect(() => {
     if (!supabaseReady) {
       setSessionReady(true)
-      setIsAuthenticated(false)
-      setUserEmail('')
       return
     }
 
@@ -86,12 +96,16 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', onClickOutside)
   }, [accountOpen])
 
-  const navLinks = [
-    { href: '/carros-a-venda', label: 'Comprar', icon: ShoppingBag, desc: 'Explore anúncios' },
-    { href: '/caminhoes', label: 'Caminhões', icon: Truck, desc: 'Veículos pesados' },
-    { href: '/anunciar-carro', label: 'Vender', icon: Tag, desc: 'Anuncie grátis' },
-    { href: '/marcas', label: 'Marcas', icon: CarFront, desc: 'Navegue por marca' },
-  ]
+  useEffect(() => {
+    if (drawerOpen || searchOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [drawerOpen, searchOpen])
 
   const isActive = (href: string) => href === '/' ? pathname === '/' : pathname.startsWith(href)
 
@@ -112,20 +126,19 @@ export default function Navbar() {
     await supabase.auth.signOut()
     setAccountOpen(false)
     setDrawerOpen(false)
-    router.push('/entrar')
+    router.push('/')
   }
 
-  const userLabel = userEmail ? userEmail.split('@')[0] : 'Minha conta'
+  const userLabel = userEmail ? userEmail.split('@')[0] : 'Entrar'
   const isHome = pathname === '/'
-  const showScrolled = scrolled || !isHome
 
   return (
     <>
-      {/* ── TOP NAVBAR ── */}
+      {/* ── TOP NAV ── */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          showScrolled
-            ? 'bg-white border-b border-border shadow-xs'
+          scrolled || !isHome
+            ? 'bg-white/80 backdrop-blur-xl border-b border-[#EAEAE8]'
             : 'bg-transparent'
         }`}
         style={{ height: 'var(--navbar-height)' }}
@@ -134,106 +147,118 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             href="/"
-            className="font-display text-2xl text-text-primary hover:opacity-70 transition-opacity"
+            className="flex items-center gap-2 text-[#0A0A0A] hover:opacity-70 transition-opacity"
+            aria-label="carbi"
           >
-            carbi
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 17L7 8H17L19 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M4 17H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              <circle cx="8" cy="19" r="1.5" fill="currentColor"/>
+              <circle cx="16" cy="19" r="1.5" fill="currentColor"/>
+              <path d="M7 12H17" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.5"/>
+            </svg>
+            <span className="text-[17px] font-semibold tracking-tight">carbi</span>
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => {
+          <nav className="hidden lg:flex items-center gap-1">
+            {PRIMARY_NAV.map((link) => {
               const active = isActive(link.href)
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-3.5 py-2 text-[14px] font-medium tracking-tight rounded-full transition-colors ${
                     active
-                      ? 'bg-bg-alt text-text-primary'
-                      : 'text-text-secondary hover:text-text-primary hover:bg-bg-alt'
+                      ? 'text-[#0A0A0A]'
+                      : 'text-[#525252] hover:text-[#0A0A0A]'
                   }`}
                 >
                   {link.label}
                 </Link>
               )
             })}
-          </div>
+          </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <button
               onClick={() => setSearchOpen(true)}
-              className="btn-icon hidden md:flex"
+              className="btn-icon hidden sm:flex"
               aria-label="Buscar"
             >
-              <Search className="w-4 h-4" />
+              <Search className="w-[18px] h-[18px]" strokeWidth={1.75} />
             </button>
 
-            {sessionReady ? (
-              isAuthenticated ? (
-                <div className="relative hidden md:block" ref={accountRef}>
-                  <button
-                    onClick={() => setAccountOpen((prev) => !prev)}
-                    className="btn-sm btn-secondary"
-                  >
-                    <UserRound className="w-4 h-4" />
-                    <span className="max-w-[100px] truncate">{userLabel}</span>
-                  </button>
-
-                  {accountOpen && (
-                    <div className="absolute right-0 top-12 w-56 card-elevated p-1.5 animate-scale-in z-50">
-                      <Link href="/minha-conta" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-bg-alt transition-colors">
-                        <UserRound className="w-4 h-4" /> Meu perfil
-                      </Link>
-                      <Link href="/minha-conta/anuncios" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-bg-alt transition-colors">
-                        <LayoutDashboard className="w-4 h-4" /> Meus anúncios
-                      </Link>
-                      <Link href="/minha-conta/conversas" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-bg-alt transition-colors">
-                        <MessageCircle className="w-4 h-4" /> Meus chats
-                      </Link>
-                      <div className="divider my-1" />
-                      <button
-                        onClick={handleSignOut}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-danger hover:bg-red-50 transition-colors"
-                      >
-                        <LogOut className="w-4 h-4" /> Sair
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Link
-                  href="/entrar"
-                  className="hidden md:inline-flex btn-sm btn-secondary"
+            {sessionReady && (
+              <div className="relative hidden sm:block" ref={accountRef}>
+                <button
+                  onClick={() => setAccountOpen((prev) => !prev)}
+                  className="btn-icon"
+                  aria-label="Conta"
                 >
-                  <UserRound className="w-4 h-4" />
-                  Entrar
-                </Link>
-              )
-            ) : null}
+                  <UserRound className="w-[18px] h-[18px]" strokeWidth={1.75} />
+                </button>
+
+                {accountOpen && (
+                  <div className="absolute right-0 top-12 w-64 bg-white border border-[#EAEAE8] rounded-2xl p-2 shadow-lg animate-scale-in z-50 origin-top-right">
+                    {isAuthenticated ? (
+                      <>
+                        <div className="px-3 py-2.5 mb-1 border-b border-[#EAEAE8]">
+                          <p className="text-[11px] text-[#A3A3A3] tracking-wide uppercase font-medium">Conectado</p>
+                          <p className="text-sm font-medium text-[#0A0A0A] truncate mt-0.5">{userEmail}</p>
+                        </div>
+                        <Link href="/minha-conta" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#525252] hover:text-[#0A0A0A] hover:bg-[#F4F4F2] transition-colors">
+                          <UserRound className="w-4 h-4" strokeWidth={1.75} /> Meu perfil
+                        </Link>
+                        <Link href="/minha-conta/anuncios" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#525252] hover:text-[#0A0A0A] hover:bg-[#F4F4F2] transition-colors">
+                          <LayoutDashboard className="w-4 h-4" strokeWidth={1.75} /> Meus anúncios
+                        </Link>
+                        <Link href="/minha-conta/conversas" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#525252] hover:text-[#0A0A0A] hover:bg-[#F4F4F2] transition-colors">
+                          <MessageCircle className="w-4 h-4" strokeWidth={1.75} /> Conversas
+                        </Link>
+                        <div className="my-1 border-t border-[#EAEAE8]" />
+                        <button
+                          onClick={handleSignOut}
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#DC2626] hover:bg-[#FEF2F2] transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" strokeWidth={1.75} /> Sair
+                        </button>
+                      </>
+                    ) : (
+                      <Link
+                        href="/entrar"
+                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#0A0A0A] hover:bg-[#F4F4F2] transition-colors"
+                      >
+                        <UserRound className="w-4 h-4" strokeWidth={1.75} /> Entrar ou cadastrar
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <Link
+              href="/anunciar-carro"
+              className="hidden md:inline-flex btn btn-primary btn-sm ml-1"
+            >
+              Anunciar grátis
+            </Link>
 
             <button
               onClick={() => setDrawerOpen(true)}
-              className="btn-icon md:hidden"
+              className="btn-icon lg:hidden ml-1"
               aria-label="Menu"
             >
-              <Menu className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => setDrawerOpen(true)}
-              className="hidden md:inline-flex btn-sm btn-primary"
-            >
-              <Menu className="w-4 h-4" />
-              Menu
+              <Menu className="w-[18px] h-[18px]" strokeWidth={1.75} />
             </button>
           </div>
         </div>
       </header>
 
       {/* ── MOBILE BOTTOM NAV ── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-sm border-t border-border">
-        <div className="flex items-center justify-around h-14">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-xl border-t border-[#EAEAE8] pb-[env(safe-area-inset-bottom)]">
+        <div className="flex items-center justify-around h-16">
           {BOTTOM_NAV.map((item) => {
             const Icon = item.icon
             const active = isActive(item.href)
@@ -241,171 +266,161 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-lg transition-colors min-h-0 ${
-                  active ? 'text-text-primary' : 'text-text-tertiary'
+                className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+                  active ? 'text-[#0A0A0A]' : 'text-[#A3A3A3]'
                 }`}
               >
-                <Icon className="w-5 h-5" />
-                <span className="text-[10px] font-semibold leading-none">{item.label}</span>
+                <Icon className="w-[22px] h-[22px]" strokeWidth={active ? 2 : 1.75} />
+                <span className="text-[10px] font-medium tracking-tight">{item.label}</span>
               </Link>
             )
           })}
           <button
-            onClick={() => setSearchOpen(true)}
-            className="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-lg text-text-tertiary transition-colors min-h-0"
+            onClick={() => setAccountOpen((prev) => !prev)}
+            className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+              accountOpen ? 'text-[#0A0A0A]' : 'text-[#A3A3A3]'
+            }`}
+            aria-label="Conta"
           >
-            <Search className="w-5 h-5" />
-            <span className="text-[10px] font-semibold leading-none">Buscar</span>
+            <UserRound className="w-[22px] h-[22px]" strokeWidth={accountOpen ? 2 : 1.75} />
+            <span className="text-[10px] font-medium tracking-tight">Conta</span>
           </button>
         </div>
       </nav>
 
       {/* ── SEARCH OVERLAY ── */}
       {searchOpen && (
-        <div className="fixed inset-0 z-[1000] bg-white/98 animate-fade-in flex flex-col items-center pt-24 px-6">
-          <div className="w-full max-w-2xl">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-xl font-heading font-bold">O que você procura?</h2>
-              <button
-                onClick={() => setSearchOpen(false)}
-                className="btn-icon"
-              >
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-[1000] bg-white/98 backdrop-blur-xl animate-fade-in">
+          <div className="container pt-8">
+            <div className="flex items-center justify-between mb-12">
+              <Link href="/" className="flex items-center gap-2">
+                <span className="text-[17px] font-semibold tracking-tight text-[#0A0A0A]">carbi</span>
+              </Link>
+              <button onClick={() => setSearchOpen(false)} className="btn-icon" aria-label="Fechar">
+                <X className="w-5 h-5" strokeWidth={1.75} />
               </button>
             </div>
-            <form onSubmit={handleSearchSubmit} className="mb-8">
-              <div className="relative">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-text-tertiary" />
-                <input
-                  ref={searchRef}
-                  type="search"
-                  placeholder="Marca, modelo ou palavra-chave..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="input input-lg pl-14"
-                />
-              </div>
-              <button
-                type="submit"
-                className="btn btn-primary btn-lg w-full mt-4"
-              >
-                Pesquisar Veículos
-              </button>
-            </form>
-            <div>
-              <p className="label mb-3">Buscas frequentes</p>
-              <div className="flex flex-wrap gap-2">
-                {['SUV', 'Elétrico', 'Hatch', 'Sedan', 'Picape', 'Até R$ 50k'].map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => {
-                      router.push(`/carros-a-venda?q=${encodeURIComponent(s)}`)
-                      setSearchOpen(false)
-                    }}
-                    className="badge badge-neutral cursor-pointer hover:bg-accent hover:text-white transition-colors"
-                  >
-                    {s}
-                  </button>
-                ))}
+            <div className="max-w-2xl mx-auto pt-8">
+              <h2 className="text-2xl font-semibold tracking-tight mb-8 text-[#0A0A0A]">O que você procura?</h2>
+              <form onSubmit={handleSearchSubmit}>
+                <div className="relative">
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#A3A3A3]" strokeWidth={1.75} />
+                  <input
+                    ref={searchRef}
+                    type="search"
+                    placeholder="Marca, modelo ou palavra-chave..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="input input-lg pl-14 text-lg"
+                    autoComplete="off"
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary btn-lg w-full mt-4">
+                  Buscar veículos
+                </button>
+              </form>
+              <div className="mt-10">
+                <p className="eyebrow mb-4">Buscas populares</p>
+                <div className="flex flex-wrap gap-2">
+                  {['SUV', 'Elétrico', 'Hatch', 'Sedan', 'Picape', 'Até R$ 50k', 'Automático', 'Baixa km'].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => {
+                        router.push(`/carros-a-venda?q=${encodeURIComponent(s)}`)
+                        setSearchOpen(false)
+                      }}
+                      className="badge badge-outline cursor-pointer hover:bg-[#0A0A0A] hover:text-white hover:border-[#0A0A0A] transition-colors"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── DRAWER MENU ── */}
+      {/* ── DRAWER MENU (mobile) ── */}
       {drawerOpen && (
-        <div className="fixed inset-0 z-[1000] flex justify-end">
+        <div className="fixed inset-0 z-[1000] lg:hidden">
           <div
-            className="absolute inset-0 bg-black/20 animate-fade-in"
+            className="absolute inset-0 bg-black/30 animate-fade-in"
             onClick={() => setDrawerOpen(false)}
           />
-          <aside className="relative w-full max-w-md h-full bg-[#FAFAF5] shadow-2xl p-6 flex flex-col animate-slide-in-right overflow-y-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <Link href="/" className="font-display text-2xl text-text-primary">
-                carbi
-              </Link>
-              <button
-                onClick={() => setDrawerOpen(false)}
-                className="btn-icon bg-white"
-              >
-                <X className="w-4 h-4" />
+          <aside className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-white shadow-xl animate-slide-in-right overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-[#EAEAE8] px-6 h-16 flex items-center justify-between">
+              <span className="text-[17px] font-semibold tracking-tight text-[#0A0A0A]">Menu</span>
+              <button onClick={() => setDrawerOpen(false)} className="btn-icon" aria-label="Fechar">
+                <X className="w-5 h-5" strokeWidth={1.75} />
               </button>
             </div>
 
-            {/* Account Section */}
-            <div className="card p-4 mb-6">
+            <div className="p-6">
               {isAuthenticated ? (
-                <div className="space-y-3">
-                  <p className="label">Minha Conta</p>
-                  <p className="text-sm font-semibold text-text-primary truncate">{userEmail}</p>
-                  <div className="flex gap-2">
-                    <Link href="/minha-conta" className="btn-sm btn-primary">
-                      Painel
-                    </Link>
-                    <button onClick={handleSignOut} className="btn-sm btn-ghost text-danger">
-                      Sair
-                    </button>
-                  </div>
+                <div className="mb-6 pb-6 border-b border-[#EAEAE8]">
+                  <p className="eyebrow mb-1">Conectado</p>
+                  <p className="text-sm font-medium text-[#0A0A0A] truncate">{userEmail}</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  <p className="label">Minha Conta</p>
-                  <p className="text-sm text-text-secondary">Faça login para gerenciar seus anúncios.</p>
-                  <Link href="/entrar" className="btn-sm btn-primary inline-flex">
-                    Entrar na plataforma
-                  </Link>
-                </div>
+                <Link
+                  href="/entrar"
+                  className="btn btn-primary w-full mb-6"
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  Entrar ou cadastrar
+                </Link>
               )}
-            </div>
 
-            {/* Nav Links */}
-            <nav className="flex flex-col gap-1.5 mb-8">
-              {navLinks.map((link) => {
-                const Icon = link.icon
-                const active = isActive(link.href)
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`group flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all ${
-                      active
-                        ? 'bg-accent text-white'
-                        : 'text-text-secondary hover:bg-white hover:text-text-primary'
-                    }`}
-                  >
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                      active ? 'bg-white/20 text-white' : 'bg-bg-alt text-text-secondary'
-                    }`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold">{link.label}</p>
-                      <p className={`text-xs ${active ? 'text-white/60' : 'text-text-tertiary'}`}>{link.desc}</p>
-                    </div>
-                    <ChevronRight className={`w-4 h-4 ${active ? 'text-white/40' : 'text-text-tertiary'} group-hover:translate-x-0.5 transition-transform`} />
-                  </Link>
-                )
-              })}
-            </nav>
+              <nav className="flex flex-col">
+                {PRIMARY_NAV.map((link) => {
+                  const active = isActive(link.href)
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setDrawerOpen(false)}
+                      className="flex items-center justify-between py-4 border-b border-[#EAEAE8] last:border-0"
+                    >
+                      <span className={`text-base font-medium tracking-tight ${active ? 'text-[#0A0A0A]' : 'text-[#0A0A0A]'}`}>
+                        {link.label}
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-[#A3A3A3]" strokeWidth={1.75} />
+                    </Link>
+                  )
+                })}
+              </nav>
 
-            {/* Bottom CTA */}
-            <div className="mt-auto pt-6 border-t border-border">
-              <Link
-                href="/qual-carro"
-                className="group flex items-center justify-between p-4 bg-accent text-white rounded-xl hover:bg-black transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <Sparkles className="w-5 h-5 text-white/70" />
-                  <span className="text-sm font-semibold">Descobrir meu carro ideal</span>
+              <div className="mt-8 pt-8 border-t border-[#EAEAE8] space-y-1">
+                {isAuthenticated && (
+                  <>
+                    <Link href="/minha-conta" onClick={() => setDrawerOpen(false)} className="flex items-center gap-3 py-3 text-sm font-medium text-[#525252]">
+                      <UserRound className="w-4 h-4" strokeWidth={1.75} /> Meu perfil
+                    </Link>
+                    <Link href="/minha-conta/anuncios" onClick={() => setDrawerOpen(false)} className="flex items-center gap-3 py-3 text-sm font-medium text-[#525252]">
+                      <LayoutDashboard className="w-4 h-4" strokeWidth={1.75} /> Meus anúncios
+                    </Link>
+                    <Link href="/minha-conta/conversas" onClick={() => setDrawerOpen(false)} className="flex items-center gap-3 py-3 text-sm font-medium text-[#525252]">
+                      <MessageCircle className="w-4 h-4" strokeWidth={1.75} /> Conversas
+                    </Link>
+                    <button onClick={handleSignOut} className="flex items-center gap-3 py-3 text-sm font-medium text-[#DC2626]">
+                      <LogOut className="w-4 h-4" strokeWidth={1.75} /> Sair
+                    </button>
+                  </>
+                )}
+              </div>
+
+              <div className="mt-8 p-5 bg-[#FAFAF9] rounded-2xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-4 h-4 text-[#0A0A0A]" strokeWidth={1.75} />
+                  <span className="text-sm font-semibold text-[#0A0A0A]">Não sabe qual carro?</span>
                 </div>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-              <p className="text-center text-xs text-text-tertiary mt-4">
-                carbi &copy; 2026 &mdash; Premium Automotive
-              </p>
+                <p className="text-sm text-[#525252] mb-3">Responda 5 perguntas e descubra o carro ideal para você.</p>
+                <Link href="/qual-carro" onClick={() => setDrawerOpen(false)} className="text-sm font-medium text-[#0A0A0A] underline underline-offset-4">
+                  Iniciar quiz →
+                </Link>
+              </div>
             </div>
           </aside>
         </div>
