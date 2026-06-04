@@ -2,7 +2,8 @@ import Link from 'next/link'
 import HeroSearchBar from '@/components/ui/HeroSearchBar'
 import {
   ArrowRight, Sparkles, ShieldCheck, TrendingDown,
-  Fuel, Gauge, Calendar, Car, Zap, Tag,
+  Car, Zap, Tag,
+  Check, Clock, Wallet, Camera,
 } from 'lucide-react'
 import FAQSection from '@/components/layout/FAQSection'
 import BrandLogo from '@/components/brand/BrandLogo'
@@ -48,21 +49,46 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* ── HERO ── */}
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
+      <section className="relative pt-28 pb-16 md:pt-36 md:pb-20 overflow-hidden">
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 mb-6 text-[13px] font-medium text-[#525252]">
               <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full animate-pulse" />
               <span>Marketplace automotivo premium do Brasil</span>
             </div>
+
+            {/* Strong sell-your-car pill, right at the top */}
+            <Link
+              href="/anunciar-carro"
+              className="group inline-flex items-center gap-2 px-4 py-2 mb-7 rounded-full bg-[#0A0A0A] text-white text-[13px] font-medium tracking-tight hover:bg-[#1f1f1d] transition-all shadow-sm"
+            >
+              <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full animate-pulse" />
+              Anuncie seu carro em 2 minutos — é grátis
+              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" strokeWidth={2} />
+            </Link>
+
             <h1 className="text-balance mb-6">
               Encontre o carro certo,<br />
               <span className="text-[#525252]">pelo preço justo.</span>
             </h1>
-            <p className="body-large text-[#525252] max-w-xl mx-auto mb-10 text-pretty">
+            <p className="body-large text-[#525252] max-w-xl mx-auto mb-8 text-pretty">
               Milhares de anúncios verificados, dados reais de mercado e a ferramenta mais refinada para decidir sua próxima compra.
             </p>
             <HeroSearchBar />
+
+            {/* Secondary "sell" CTA below the search */}
+            <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3 text-[14px] text-[#525252]">
+              <span className="hidden sm:inline">Pensando em vender?</span>
+              <Link
+                href="/anunciar-carro"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-[#EAEAE8] text-[#0A0A0A] font-medium hover:border-[#0A0A0A] transition-colors"
+              >
+                <Tag className="w-4 h-4" strokeWidth={1.75} />
+                Vender meu carro
+                <ArrowRight className="w-3.5 h-3.5" strokeWidth={2} />
+              </Link>
+              <span className="text-[12px] text-[#A3A3A3] tracking-tight">+12.000 vendedores ativos</span>
+            </div>
           </div>
 
           {/* Quick Filters */}
@@ -81,6 +107,90 @@ export default async function HomePage() {
                   </Link>
                 )
               })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SELL FEATURE STRIP ── */}
+      <section className="bg-white py-10 md:py-14">
+        <div className="container">
+          <div className="relative bg-[#0A0A0A] rounded-2xl overflow-hidden p-8 md:p-12">
+            <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#10B981]/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-[#10B981]/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative grid md:grid-cols-[1.3fr_1fr] gap-10 md:gap-14 items-center">
+              <div>
+                <span className="eyebrow text-[#10B981] mb-4">Anuncie grátis</span>
+                <h2 className="text-white text-balance mb-5">
+                  Seu carro vendido<br />
+                  com a maior rapidez.
+                </h2>
+                <p className="text-white/70 body-large mb-8 max-w-md text-pretty">
+                  Anúncio ao vivo em 2 minutos. Sem comissão, sem pegadinha, sem ligação chata.
+                </p>
+
+                <ul className="space-y-2.5 mb-8 text-[14px] text-white/80">
+                  {[
+                    { icon: Clock, text: 'Publique em menos de 2 minutos' },
+                    { icon: Camera, text: 'Até 10 fotos, com blur automático de placa' },
+                    { icon: Wallet, text: 'Sem comissão — você fica com 100% da venda' },
+                  ].map(({ icon: Icon, text }) => (
+                    <li key={text} className="flex items-center gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-[#10B981]/15 flex items-center justify-center">
+                        <Check className="w-3 h-3 text-[#10B981]" strokeWidth={2.5} />
+                      </span>
+                      <span className="tracking-tight">{text}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link
+                    href="/anunciar-carro"
+                    className="inline-flex items-center justify-center gap-2 bg-white text-[#0A0A0A] hover:bg-white/90 transition-colors rounded-full min-h-[52px] px-7 text-[15px] font-semibold"
+                  >
+                    Anunciar agora
+                    <ArrowRight className="w-4 h-4" strokeWidth={2} />
+                  </Link>
+                  <Link
+                    href="/vender-carro"
+                    className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-white border border-white/20 transition-colors rounded-full min-h-[52px] px-6 text-[14px] font-medium"
+                  >
+                    Como funciona
+                  </Link>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
+                  <div className="flex items-center justify-between mb-5">
+                    <span className="eyebrow text-white/50">Seu anúncio</span>
+                    <span className="text-[10px] font-semibold text-[#10B981] uppercase tracking-widest">Ao vivo</span>
+                  </div>
+                  <div className="aspect-square w-full rounded-xl bg-white/10 overflow-hidden mb-4 flex items-center justify-center">
+                    <Car className="w-16 h-16 text-white/30" strokeWidth={1.25} />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 w-2/3 bg-white/20 rounded-full" />
+                    <div className="h-3 w-1/2 bg-white/10 rounded-full" />
+                    <div className="h-3 w-1/3 bg-white/10 rounded-full" />
+                  </div>
+                  <div className="mt-5 pt-5 border-t border-white/10 flex items-center justify-between">
+                    <div>
+                      <p className="eyebrow text-white/50 mb-1">Preço sugerido</p>
+                      <p className="text-[18px] font-semibold text-white tracking-tight">R$ 65.900</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="eyebrow text-white/50 mb-1">FIPE</p>
+                      <p className="text-[14px] font-medium text-[#10B981]">-4% abaixo</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -top-3 -right-3 bg-[#10B981] text-white px-3 py-1.5 rounded-full text-[11px] font-semibold tracking-tight shadow-lg">
+                  100% gratuito
+                </div>
+              </div>
             </div>
           </div>
         </div>
