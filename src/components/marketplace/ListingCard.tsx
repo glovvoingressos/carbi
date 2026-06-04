@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Link from 'next/link'
 import { ListingPublic } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
@@ -15,12 +16,13 @@ function hashToIndex(value: string, size: number): number {
 }
 
 export default function ListingCard({ listing }: { listing: ListingPublic }) {
-  const cover = resolveMarketplaceCarImage({
+  const [imgError, setImgError] = useState(false)
+  const cover = !imgError ? resolveMarketplaceCarImage({
     brand: listing.brand,
     model: listing.model,
     year: listing.year_model,
     preferredUrl: listing.images?.[0]?.url || null,
-  })
+  }) : null
   const hasFipe = typeof listing.fipe_price === 'number' && listing.fipe_price > 0
   const isGoodDeal = hasFipe && Number(listing.price) <= Number(listing.fipe_price) * 0.9
   const isVeryRecent = listing.listed_since?.includes('segundos') || listing.listed_since?.includes('minutos') || listing.listed_since?.includes('hora')
@@ -46,7 +48,7 @@ export default function ListingCard({ listing }: { listing: ListingPublic }) {
       <PastelSpecCard tone={tone} titleBadge={mainBadge?.label} badgeInside className="p-0 overflow-hidden">
         {cover ? (
           <div className="relative aspect-[4/3] w-full overflow-hidden bg-bg-alt">
-            <img src={cover} alt={listing.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <img src={cover} alt={listing.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onError={() => setImgError(true)} />
             {isGoodDeal && (
               <div className="absolute top-3 right-3 badge badge-success text-[10px]">
                 -{Math.round((1 - Number(listing.price) / Number(listing.fipe_price)) * 100)}% FIPE

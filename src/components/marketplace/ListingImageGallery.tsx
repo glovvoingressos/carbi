@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
+import { ImageIcon } from 'lucide-react'
 
 type ListingImageGalleryProps = {
   images: string[]
@@ -11,6 +12,17 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
   const gallery = useMemo(() => images.filter(Boolean), [images])
   const [activeIndex, setActiveIndex] = useState(0)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
+  const failedRef = useRef<Set<string>>(new Set())
+  const [, forceRender] = useState(0)
+
+  const handleImageError = useCallback((url: string) => {
+    if (!failedRef.current.has(url)) {
+      failedRef.current.add(url)
+      forceRender((n) => n + 1)
+    }
+  }, [])
+
+  const hasFailed = useCallback((url: string) => failedRef.current.has(url), [])
 
   if (!gallery.length) return null
 
@@ -36,19 +48,32 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
           setTouchStartX(null)
         }}
       >
-        <img
-          src={activeImage}
-          alt={`${title} foto ${safeIndex + 1}`}
-          className="h-full w-full object-cover"
-          loading="eager"
-          decoding="async"
-        />
+        {hasFailed(activeImage) ? (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-bg-alt p-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/60">
+              <ImageIcon className="h-7 w-7 text-text-tertiary/50" />
+            </div>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-text-tertiary">
+              Imagem indisponível
+            </p>
+          </div>
+        ) : (
+          <img
+            src={activeImage}
+            alt={`${title} foto ${safeIndex + 1}`}
+            className="h-full w-full object-cover"
+            loading="eager"
+            decoding="async"
+            onError={() => handleImageError(activeImage)}
+          />
+        )}
       </div>
 
       {gallery.length > 1 ? (
         <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
           {gallery.map((image, index) => {
             const isActive = index === safeIndex
+            const thumbFailed = hasFailed(image)
             return (
               <button
                 key={`${image}-${index}`}
@@ -59,13 +84,20 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
                 }`}
                 aria-label={`Abrir foto ${index + 1}`}
               >
-                <img
-                  src={image}
-                  alt={`${title} miniatura ${index + 1}`}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
+                {thumbFailed ? (
+                  <div className="flex h-full w-full items-center justify-center bg-bg-alt">
+                    <ImageIcon className="h-5 w-5 text-text-tertiary/30" />
+                  </div>
+                ) : (
+                  <img
+                    src={image}
+                    alt={`${title} miniatura ${index + 1}`}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    onError={() => handleImageError(image)}
+                  />
+                )}
               </button>
             )
           })}

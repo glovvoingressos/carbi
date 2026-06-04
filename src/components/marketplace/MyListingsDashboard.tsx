@@ -516,7 +516,7 @@ export default function MyListingsDashboard() {
                 <div className="flex gap-3">
                   <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl bg-bg-alt overflow-hidden flex-shrink-0">
                     {l.images?.[0] ? (
-                      <img src={l.images[0].public_url} className="w-full h-full object-cover" alt="" />
+                      <img src={l.images[0].public_url} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center"><ImageIcon className="w-6 h-6 opacity-20" /></div>
                     )}
@@ -847,7 +847,7 @@ export default function MyListingsDashboard() {
                           value={img}
                           className="relative aspect-square rounded-3xl overflow-hidden group cursor-grab active:cursor-grabbing border border-border bg-bg-alt"
                         >
-                          <img src={img.previewUrl} className="w-full h-full object-cover select-none" alt="" />
+                          <img src={img.previewUrl} className="w-full h-full object-cover select-none" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
                           
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
                             <div className="flex justify-between items-start">
