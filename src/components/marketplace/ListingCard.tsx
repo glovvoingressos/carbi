@@ -5,18 +5,18 @@ import Link from 'next/link'
 import { Heart, Gauge, Calendar, MapPin, ImageIcon } from 'lucide-react'
 import { ListingPublic } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
-import { resolveMarketplaceCarImage } from '@/lib/car-image-fallback'
+import { resolveMarketplaceCarImage, getCarImageUrl } from '@/lib/car-image-fallback'
 
 export default function ListingCard({ listing, priority = false }: { listing: ListingPublic; priority?: boolean }) {
   const [imgError, setImgError] = useState(false)
   const [favorited, setFavorited] = useState(false)
 
-  const cover = !imgError ? resolveMarketplaceCarImage({
+  const cover = !imgError ? getCarImageUrl(resolveMarketplaceCarImage({
     brand: listing.brand,
     model: listing.model,
     year: listing.year_model,
     preferredUrl: listing.images?.[0]?.url || null,
-  }) : null
+  })) : null
 
   const hasFipe = typeof listing.fipe_price === 'number' && listing.fipe_price > 0
   const isGoodDeal = hasFipe && Number(listing.price) <= Number(listing.fipe_price) * 0.9
@@ -30,11 +30,13 @@ export default function ListingCard({ listing, priority = false }: { listing: Li
     >
       <article className="bg-white border border-[#EAEAE8] rounded-2xl overflow-hidden transition-all duration-300 group-hover:border-[#0A0A0A] group-hover:shadow-lg">
         {/* Image */}
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FAFAF9]">
+        <div className="relative aspect-square w-full overflow-hidden bg-[#FAFAF9]">
           {cover ? (
             <img
               src={cover}
               alt={listing.title}
+              width={1080}
+              height={1080}
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
               loading={priority ? 'eager' : 'lazy'}
               decoding="async"

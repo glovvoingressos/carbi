@@ -145,7 +145,9 @@ export default function QualCarroPage() {
               model={topResult.car.model}
               year={topResult.car.year}
               src={topResult.car.image}
-              className="w-24 h-16 sm:w-32 sm:h-20 rounded-lg"
+              fit="cover"
+              aspectRatio="1/1"
+              className="w-20 h-20 sm:w-28 sm:h-28 rounded-lg"
             />
             <div className="flex-1 min-w-0">
               <h2 className="font-bold text-text">{topResult.car.brand} {topResult.car.model}</h2>
@@ -172,7 +174,9 @@ export default function QualCarroPage() {
                 model={result.car.model}
                 year={result.car.year}
                 src={result.car.image}
-                className="w-14 h-10 rounded hidden sm:block"
+                fit="cover"
+                aspectRatio="1/1"
+                className="w-12 h-12 rounded hidden sm:block"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-text">{result.car.brand} {result.car.model}</p>

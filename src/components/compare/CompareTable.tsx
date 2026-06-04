@@ -76,8 +76,8 @@ export default function CompareTable({ cars, winners }: CompareTableProps) {
           const brandSlug = car.brand.toLowerCase().replace(/\s+/g, '-')
           return (
             <Link href={`/${brandSlug}/${car.slug}`} key={car.id} className="bg-white border border-[#EAEAE8] rounded-2xl p-4 hover:border-[#0A0A0A] transition-colors">
-              <div className="w-full h-28 rounded-xl mb-3 overflow-hidden bg-[#FAFAF9] border border-[#EAEAE8]">
-                <CarImage id={car.id} brand={car.brand} model={car.model} year={car.year} src={car.image} className="w-full h-full object-cover" />
+              <div className="w-full aspect-square rounded-xl mb-3 overflow-hidden bg-[#FAFAF9] border border-[#EAEAE8]">
+                <CarImage id={car.id} brand={car.brand} model={car.model} year={car.year} src={car.image} fit="cover" aspectRatio="1/1" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-[14px] font-semibold text-[#0A0A0A] tracking-tight">{car.brand} {car.model}</h3>
               <p className="text-[12px] text-[#A3A3A3] mt-0.5">{car.version}</p>

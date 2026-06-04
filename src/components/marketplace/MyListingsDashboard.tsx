@@ -17,6 +17,7 @@ import {
 } from '@/lib/marketplace'
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
+import { getCarImageUrl } from '@/lib/car-image-fallback'
 
 // --- Types ---
 
@@ -600,7 +601,7 @@ export default function MyListingsDashboard() {
                 <div className="flex gap-3">
                   <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl bg-[#FAFAF9] overflow-hidden flex-shrink-0">
                     {l.images?.[0] ? (
-                      <img src={l.images[0].public_url} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                      <img src={getCarImageUrl(l.images[0].public_url) || l.images[0].public_url} width={1080} height={1080} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center"><ImageIcon className="w-6 h-6 opacity-20" /></div>
                     )}

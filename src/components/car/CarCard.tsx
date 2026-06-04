@@ -54,7 +54,7 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
       className="bg-white border border-[#EAEAE8] rounded-2xl overflow-hidden transition-all duration-200 group cursor-pointer hover:border-[#0A0A0A] hover:shadow-md"
       onClick={() => router.push(detailUrl)}
     >
-      <div className="relative w-full aspect-[4/3] bg-[#FAFAF9] overflow-hidden">
+      <div className="relative w-full aspect-square bg-[#FAFAF9] overflow-hidden">
         {badge && (
           <span className={`absolute top-3 left-3 z-10 badge ${badge.tone === 'dark' ? 'badge-inverse' : 'badge-glass'}`}>
             {badge.label}
@@ -68,7 +68,7 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
           year={car.year}
           src={car.image}
           fit="cover"
-          aspectRatio="4/3"
+          aspectRatio="1/1"
           className="h-full w-full transition-transform duration-700 group-hover:scale-[1.03]"
         />
 

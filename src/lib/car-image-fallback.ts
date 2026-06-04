@@ -1,5 +1,16 @@
 import { availableCarAssetPaths } from '@/data/carAssetManifest'
 
+export const CAR_IMAGE_SIZE = 1080
+
+export function getCarImageUrl(url: string | null | undefined, size: number = CAR_IMAGE_SIZE): string | null {
+  if (!url) return null
+  if (url.includes('supabase.co/storage/')) {
+    const sep = url.includes('?') ? '&' : '?'
+    return `${url}${sep}width=${size}&height=${size}&resize=cover&quality=80`
+  }
+  return url
+}
+
 function slug(value: string): string {
   return value
     .toLowerCase()

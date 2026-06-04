@@ -129,7 +129,7 @@ export default async function CarDetailPage({
 
           {/* Hero */}
           <div className="grid md:grid-cols-2 card-elevated overflow-hidden">
-            <div className="aspect-[4/3] bg-bg-alt flex items-center justify-center relative overflow-hidden">
+            <div className="aspect-square bg-[#FAFAF9] flex items-center justify-center relative overflow-hidden">
               <CarImage
                 id={car.id}
                 brand={car.brand}
@@ -137,7 +137,7 @@ export default async function CarDetailPage({
                 year={car.year}
                 src={car.image}
                 fit="cover"
-                aspectRatio="4/3"
+                aspectRatio="1/1"
                 className="h-full w-full"
               />
             </div>

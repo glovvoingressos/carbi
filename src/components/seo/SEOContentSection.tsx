@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Zap, ShieldCheck, Heart, MapPin, BadgeCheck, MessageCircle, Star, Search, Shield, Clock, BadgeDollarSign, MessageSquare, Car, Check, ChevronRight } from 'lucide-react'
+import { getCarImageUrl } from '@/lib/car-image-fallback'
 
 interface SEOSectionProps {
   title: string
@@ -34,8 +35,8 @@ export function SEOSection({ title, subtitle, badge, children, dark, reversed, i
             </div>
           </div>
           {image && (
-            <div className="flex-1 w-full aspect-[4/3] lg:aspect-square rounded-2xl bg-[#FAFAF9] overflow-hidden border border-[#EAEAE8]">
-              <img src={image} alt={title} className="w-full h-full object-cover" />
+            <div className="flex-1 w-full aspect-square rounded-2xl bg-[#FAFAF9] overflow-hidden border border-[#EAEAE8]">
+              <img src={getCarImageUrl(image) || image} alt={title} width={1080} height={1080} className="w-full h-full object-cover" />
             </div>
           )}
         </div>
