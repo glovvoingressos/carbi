@@ -10,7 +10,7 @@ interface BadgeProps {
 
 const VARIANT_CLASS: Record<BadgeVariant, string> = {
   neutral: 'badge-neutral',
-  accent: 'badge-accent',
+  accent: 'badge-brand',
   success: 'badge-success',
   warning: 'badge-warning',
   danger: 'badge-danger',

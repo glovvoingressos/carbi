@@ -89,7 +89,7 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
   return (
     <div className="bg-surface min-h-screen">
       {/* Intent Hero */}
-      <section className="bg-dark text-white pt-24 pb-16 relative overflow-hidden">
+      <section className="bg-[#0A0A0A] text-white pt-24 pb-16 relative overflow-hidden">
         <div className="container max-w-5xl mx-auto px-4 relative z-10 text-center">
           <Badge text="🔥 Seleção Automática Carbi" />
           <h1 className="text-4xl md:text-6xl font-black tracking-tight mt-6 mb-6">
@@ -112,19 +112,19 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
             </div>
           ) : (
              <div className="text-center py-20 bg-[#f7f9fc] rounded-3xl">
-                <p className="text-xl font-bold text-dark mb-4">Nenhum carro encontrado para este critério específico no momento.</p>
-                <Link href="/qual-carro" className="text-[#e8e8e4] hover:underline font-black">Refaça o teste de compatibilidade</Link>
+                <p className="text-xl font-bold text-[#0A0A0A] mb-4">Nenhum carro encontrado para este critério específico no momento.</p>
+                <Link href="/qual-carro" className="text-[#10B981] hover:underline font-semibold">Refaça o teste de compatibilidade</Link>
              </div>
           )}
         </div>
       </section>
       
       {/* SEO Amplification Content Bottom */}
-      <section className="bg-white border-t border-border py-16">
+      <section className="bg-white border-t border-[#EAEAE8] py-16">
         <div className="container max-w-4xl mx-auto px-4">
-           <h2 className="text-3xl font-black text-dark mb-6">Por que confiar neste ranking?</h2>
-           <p className="text-lg text-text-secondary leading-relaxed mb-4">Esta lista de <strong>{data.h1.toLowerCase()}</strong> é construída automaticamente cruzando dados da Tabela Fipe em tempo real, fichas técnicas de montadoras e avaliações de durabilidade mecânica.</p>
-           <p className="text-lg text-text-secondary leading-relaxed">Não listamos carros que sofrem com problemas crônicos graves, como transmissões que quebram com frequência. Assim, você garante não apenas um bom preço de compra, mas um baixo custo de propriedade contínuo.</p>
+           <h2 className="text-3xl font-black text-[#0A0A0A] mb-6">Por que confiar neste ranking?</h2>
+           <p className="text-lg text-[#525252] leading-relaxed mb-4">Esta lista de <strong>{data.h1.toLowerCase()}</strong> é construída automaticamente cruzando dados da Tabela Fipe em tempo real, fichas técnicas de montadoras e avaliações de durabilidade mecânica.</p>
+           <p className="text-lg text-[#525252] leading-relaxed">Não listamos carros que sofrem com problemas crônicos graves, como transmissões que quebram com frequência. Assim, você garante não apenas um bom preço de compra, mas um baixo custo de propriedade contínuo.</p>
         </div>
       </section>
     </div>
@@ -133,7 +133,7 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
 
 function Badge({ text }: { text: string }) {
   return (
-    <span className="inline-flex items-center rounded-md bg-[#e8e8e4] px-4 py-2 text-[11px] font-black text-white uppercase tracking-widest border border-dark">
+    <span className="inline-flex items-center rounded-full px-4 py-2 text-[11px] font-semibold text-white/90 uppercase tracking-widest bg-white/10 border border-white/20">
       {text}
     </span>
   )

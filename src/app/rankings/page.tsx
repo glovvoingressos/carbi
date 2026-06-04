@@ -42,7 +42,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
       <h1 className="text-2xl font-heading text-text tracking-wide">Rankings</h1>
-      <p className="text-sm text-text-secondary mt-1">
+      <p className="text-sm text-[#525252] mt-1">
         {activeProfile
           ? `Ranking por ${activeProfile.label.toLowerCase()}`
           : query
@@ -53,8 +53,8 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
       {/* Quick filters */}
       <div className="mt-4 mb-6 space-y-3">
         <div className="flex items-center gap-1.5">
-          <Filter className="w-3.5 h-3.5 text-text-tertiary" />
-          <span className="text-xs font-medium text-text-tertiary uppercase tracking-wider">Perfil</span>
+          <Filter className="w-3.5 h-3.5 text-[#A3A3A3]" />
+          <span className="text-xs font-medium text-[#A3A3A3] uppercase tracking-wider">Perfil</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {profiles.map((p) => (
@@ -62,7 +62,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 sortByProfile === p.id
                   ? 'bg-primary text-white'
-                  : 'bg-[#f3f6fb] text-text-secondary hover:bg-[#edf2f8] hover:text-primary'
+                  : 'bg-[#f3f6fb] text-[#525252] hover:bg-[#edf2f8] hover:text-primary'
               }`}
             >
               {p.label}
@@ -70,8 +70,8 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
           ))}
         </div>
         <div className="flex items-center gap-1.5 mt-3">
-          <Filter className="w-3.5 h-3.5 text-text-tertiary" />
-          <span className="text-xs font-medium text-text-tertiary uppercase tracking-wider">Pre&ccedil;o</span>
+          <Filter className="w-3.5 h-3.5 text-[#A3A3A3]" />
+          <span className="text-xs font-medium text-[#A3A3A3] uppercase tracking-wider">Pre&ccedil;o</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {sortByProfile === null && priceRanges.map((r) => (
@@ -79,7 +79,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 sortByPrice === r.id
                   ? 'bg-primary text-white'
-                  : 'bg-[#f3f6fb] text-text-secondary hover:bg-[#edf2f8] hover:text-primary'
+                  : 'bg-[#f3f6fb] text-[#525252] hover:bg-[#edf2f8] hover:text-primary'
               }`}
             >
               {r.label}
@@ -115,7 +115,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
         })}
       </div>
       {rankedCars.length === 0 && (
-        <div className="mt-8 rounded-xl bg-[#f7f9fc] p-6 text-sm font-semibold text-text-secondary">
+        <div className="mt-8 rounded-xl bg-[#f7f9fc] p-6 text-sm font-semibold text-[#525252]">
           Nenhum resultado encontrado para a busca atual.
         </div>
       )}

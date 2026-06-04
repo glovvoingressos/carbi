@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { CheckCircle2, DollarSign, Zap, Plus, ArrowRight, ShieldCheck } from 'lucide-react'
+import { CheckCircle2, DollarSign, Zap, ArrowRight, ShieldCheck, Star } from 'lucide-react'
 import Badge from '@/components/ui/Badge'
 
 export const metadata: Metadata = {
@@ -52,7 +52,7 @@ export default function AppRankingPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero SEO */}
-      <section className="bg-dark pt-32 pb-24 px-6 text-center overflow-hidden relative">
+      <section className="bg-[#0A0A0A] text-white pt-32 pb-24 px-6 text-center overflow-hidden relative">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
            <Zap className="w-96 h-96 absolute -top-10 -left-10 text-white" />
         </div>
@@ -72,35 +72,35 @@ export default function AppRankingPage() {
       {/* Comparisons Section */}
       <section className="py-20 px-6 container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
-           <div className="p-10 bg-[var(--color-bg)-alt] rounded-[40px] border border-black/10">
+           <div className="p-10 bg-[#FAFAF9] rounded-2xl border border-[#EAEAE8]">
               <div className="flex items-center gap-4 mb-6">
-                 <div className="p-3 bg-[#1a1a1a] rounded-2xl"><Zap className="w-6 h-6 text-white" /></div>
+                 <div className="p-3 bg-[#0A0A0A] rounded-2xl"><Zap className="w-6 h-6 text-white" /></div>
                  <h3 className="text-2xl font-black uppercase tracking-tight">Cenário Elétrico</h3>
               </div>
-              <p className="text-dark/60 font-medium mb-8">
+              <p className="text-[#525252] font-medium mb-8 leading-relaxed">
                  Embora o investimento inicial seja maior, o custo por KM rodado é imbatível. Em 2026, com o aumento da rede de recarga, o elétrico se torna a escolha óbvia para quem roda mais de 3.000km/mês.
               </p>
               <ul className="space-y-4">
                  {['IPVA isento em diversos estados', 'Revisões até 60% mais baratas', 'Silêncio total de rodagem (Ganhe 5 estrelas!)'].map(item => (
-                   <li key={item} className="flex items-center gap-3 font-bold text-dark italic">
-                     <CheckCircle2 className="w-5 h-5 text-dark" /> {item}
+                   <li key={item} className="flex items-center gap-3 font-bold text-[#0A0A0A]">
+                     <CheckCircle2 className="w-5 h-5 text-[#10B981]" /> {item}
                    </li>
                  ))}
               </ul>
            </div>
 
-           <div className="p-10 bg-white rounded-[40px] border border-black/10">
+           <div className="p-10 bg-white rounded-2xl border border-[#EAEAE8]">
               <div className="flex items-center gap-4 mb-6">
-                 <div className="p-3 bg-[#1a1a1a] rounded-2xl"><DollarSign className="w-6 h-6 text-white" /></div>
+                 <div className="p-3 bg-[#0A0A0A] rounded-2xl"><DollarSign className="w-6 h-6 text-white" /></div>
                  <h3 className="text-2xl font-black uppercase tracking-tight">Cenário Combustão</h3>
               </div>
-              <p className="text-dark/60 font-medium mb-8">
+              <p className="text-[#525252] font-medium mb-8 leading-relaxed">
                  O baixo custo de aquisição e a facilidade de reparo em qualquer oficina do Brasil continuam seduzindo. Para quem quer flexibilidade total sem depender de pontos de carga.
               </p>
               <ul className="space-y-4">
                  {['Peças de reposição baratas e fartas', 'Revenda garantida em poucas horas', 'Maior rede de abastecimento do mundo'].map(item => (
-                   <li key={item} className="flex items-center gap-3 font-bold text-dark italic">
-                     <CheckCircle2 className="w-5 h-5 text-dark" /> {item}
+                   <li key={item} className="flex items-center gap-3 font-bold text-[#0A0A0A]">
+                     <CheckCircle2 className="w-5 h-5 text-[#10B981]" /> {item}
                    </li>
                  ))}
               </ul>
@@ -109,44 +109,44 @@ export default function AppRankingPage() {
 
         {/* The Ranking Table */}
         <div className="mb-24">
-           <h2 className="text-4xl font-black text-dark mb-12 tracking-tight flex items-center gap-4">
-              <span className="w-12 h-12 bg-dark text-white rounded-2xl flex items-center justify-center">#</span> 
+           <h2 className="text-4xl font-black text-[#0A0A0A] mb-12 tracking-tight flex items-center gap-4">
+              <span className="w-12 h-12 bg-[#0A0A0A] text-white rounded-2xl flex items-center justify-center">#</span> 
               Ranking carbi — Eficiência 2026
            </h2>
            
            <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                  <thead>
-                    <tr className="border-b-4 border-dark">
-                       <th className="text-left py-6 px-4 font-black uppercase tracking-widest text-[#0a0a0a]/40 text-sm">Viatura</th>
-                       <th className="text-left py-6 px-4 font-black uppercase tracking-widest text-[#0a0a0a]/40 text-sm">Vantagem</th>
-                       <th className="text-center py-6 px-4 font-black uppercase tracking-widest text-[#0a0a0a]/40 text-sm">Custo/KM</th>
-                       <th className="text-center py-6 px-4 font-black uppercase tracking-widest text-[#0a0a0a]/40 text-sm">ROI (1-10)</th>
+                    <tr className="border-b-4 border-[#0A0A0A]">
+                       <th className="text-left py-6 px-4 font-black uppercase tracking-widest text-[#A3A3A3] text-sm">Viatura</th>
+                       <th className="text-left py-6 px-4 font-black uppercase tracking-widest text-[#A3A3A3] text-sm">Vantagem</th>
+                       <th className="text-center py-6 px-4 font-black uppercase tracking-widest text-[#A3A3A3] text-sm">Custo/KM</th>
+                       <th className="text-center py-6 px-4 font-black uppercase tracking-widest text-[#A3A3A3] text-sm">ROI (1-10)</th>
                        <th className="text-right py-6 px-4"></th>
                     </tr>
                  </thead>
                  <tbody>
                     {ranking.map((item, i) => (
-                      <tr key={item.id} className="border-b border-dark/10 group hover:bg-[var(--color-bg)-alt] transition-colors">
+                      <tr key={item.id} className="border-b border-[#EAEAE8] group hover:bg-[#FAFAF9] transition-colors">
                          <td className="py-8 px-4">
                             <div className="flex items-center gap-4">
-                               <div className="text-2xl font-black text-dark/20 pr-4">0{i+1}</div>
+                               <div className="text-2xl font-black text-[#D4D4D4] pr-4">0{i+1}</div>
                                <div>
                                   <p className="text-xl font-black uppercase leading-none">{item.brand} {item.model}</p>
-                                  <span className="text-[10px] font-bold text-white bg-dark px-2 py-0.5 rounded mt-2 inline-block uppercase tracking-widest">{item.type}</span>
+                                  <span className="text-[10px] font-bold text-white bg-[#0A0A0A] px-2.5 py-0.5 rounded-full mt-2 inline-block uppercase tracking-widest">{item.type}</span>
                                </div>
                             </div>
                          </td>
-                         <td className="py-8 px-4 text-dark font-medium max-w-xs">{item.reason}</td>
+                         <td className="py-8 px-4 text-[#525252] font-medium max-w-xs">{item.reason}</td>
                          <td className="py-8 px-4 text-center">
-                            <span className="text-lg font-black text-dark">{item.costPerKm}</span>
+                            <span className="text-lg font-black text-[#0A0A0A]">{item.costPerKm}</span>
                          </td>
                          <td className="py-8 px-4 text-center">
-                            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-dark text-white rounded-full font-black">
+                            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#0A0A0A] text-white rounded-full font-black">
                                {item.roiRating} <Star className="w-3 h-3 fill-white border-none" />
                             </div>
                          </td>
-                          <td className="py-8 px-4 text-right"></td>
+                         <td className="py-8 px-4 text-right"></td>
                       </tr>
                     ))}
                  </tbody>
@@ -155,22 +155,22 @@ export default function AppRankingPage() {
         </div>
 
         {/* Action Banner */}
-        <div className="bg-[#1a1a1a] rounded-[48px] p-12 md:p-20 relative overflow-hidden flex flex-col items-center text-center">
+        <div className="bg-[#121212] rounded-2xl p-12 md:p-20 relative overflow-hidden flex flex-col items-center text-center">
             <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
                <ShieldCheck className="w-64 h-64 text-white" />
             </div>
             <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-8 max-w-3xl">
                Não decida antes de ver os dados técnicos.
             </h2>
-
+            <Link
+              href="/qual-carro"
+              className="inline-flex items-center gap-2 bg-white text-[#0A0A0A] hover:bg-white/90 transition-colors rounded-full min-h-[56px] px-8 text-[15px] font-semibold"
+            >
+              Fazer o teste gratuito
+              <ArrowRight className="w-4 h-4" strokeWidth={2} />
+            </Link>
         </div>
       </section>
     </main>
-  )
-}
-
-function Star({ className }: { className?: string }) {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
   )
 }

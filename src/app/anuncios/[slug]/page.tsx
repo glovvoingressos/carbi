@@ -50,12 +50,12 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   return (
     <main className="bg-[#f5f5f3] min-h-screen pt-32 pb-24">
       <div className="container mx-auto max-w-7xl px-4">
-        <div className="mb-8 text-sm font-bold text-dark/30 flex items-center gap-2">
-          <Link href="/" className="hover:text-dark transition-colors">Home</Link> 
-          <span className="text-dark/10">/</span> 
-          <Link href="/carros-a-venda" className="hover:text-dark transition-colors">Marketplace</Link> 
-          <span className="text-dark/10">/</span> 
-          <span className="text-dark/60 truncate">{listing.brand} {listing.model}</span>
+        <div className="mb-8 text-sm font-bold text-[#A3A3A3] flex items-center gap-2">
+          <Link href="/" className="hover:text-[#0A0A0A] transition-colors">Home</Link> 
+          <span className="text-[#0A0A0A]/10">/</span> 
+          <Link href="/carros-a-venda" className="hover:text-[#0A0A0A] transition-colors">Marketplace</Link> 
+          <span className="text-[#0A0A0A]/10">/</span> 
+          <span className="text-[#525252] truncate">{listing.brand} {listing.model}</span>
         </div>
 
         <VehicleDetailView 

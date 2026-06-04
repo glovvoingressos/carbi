@@ -70,7 +70,7 @@ export function SEOCallToAction({ title, description, buttonText, buttonHref }: 
   return (
     <section className="py-20 md:py-28">
       <div className="container">
-        <div className="bg-[#0A0A0A] rounded-2xl p-10 md:p-20 text-center">
+        <div className="bg-[#0A0A0A] text-white rounded-2xl p-10 md:p-20 text-center">
           <div className="max-w-2xl mx-auto space-y-6">
             <h2 className="text-white text-balance">{title}</h2>
             <p className="body-large text-white/60 text-pretty">{description}</p>

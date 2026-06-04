@@ -200,8 +200,8 @@ export default function CarImage({
 
       {/* Loading Shimmer / Pulse */}
       {isLoading && resolvedCandidates.length > 0 && (
-        <div className="absolute inset-0 flex items-center justify-center bg-dark/5 animate-pulse z-10">
-          <div className="w-12 h-1.5 bg-dark/10 rounded-full animate-bounce" />
+        <div className="absolute inset-0 flex items-center justify-center bg-[#FAFAF9] animate-pulse z-10">
+          <div className="w-12 h-1.5 bg-[#FAFAF9] rounded-full animate-bounce" />
         </div>
       )}
 
@@ -209,21 +209,21 @@ export default function CarImage({
       {hasFinalError && (
         <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-[#eef2f5] to-[#dde4e9]">
            <div className="relative mb-3 flex items-center justify-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/50 backdrop-blur-md border border-dark/5 rounded-full absolute animate-pulse" />
-              <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white border-2 border-dark shadow-[4px_4px_0_#0A0A0A] rounded-xl flex items-center justify-center text-dark rotate-[2deg] z-10">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/50 backdrop-blur-md border border-[#0A0A0A]/5 rounded-full absolute animate-pulse" />
+              <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white border-2 border-[#0A0A0A] shadow-[4px_4px_0_#0A0A0A] rounded-xl flex items-center justify-center text-[#0A0A0A] rotate-[2deg] z-10">
                  <span className="font-black text-xl sm:text-2xl uppercase tracking-tight">{brand?.charAt(0)}</span>
               </div>
            </div>
            
            <div className="flex flex-col items-center gap-1.5 z-10">
-              <p className="text-[10px] sm:text-[11px] font-black text-dark uppercase tracking-[0.15em] text-center leading-tight bg-[#f5f5f3] px-3 py-1.5 rounded-full border border-black/10">
+              <p className="text-[10px] sm:text-[11px] font-black text-[#0A0A0A] uppercase tracking-[0.15em] text-center leading-tight bg-[#f5f5f3] px-3 py-1.5 rounded-full border border-black/10">
                 Imagem indisponível
               </p>
-              <p className="text-[9px] font-bold text-dark/30 uppercase tracking-widest text-center mt-1">
+              <p className="text-[9px] font-bold text-[#A3A3A3] uppercase tracking-widest text-center mt-1">
                  Fonte real não encontrada
               </p>
            </div>
-           <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-24 bg-dark/5 blur-3xl rounded-full skew-x-12 pointer-events-none" />
+           <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-24 bg-[#FAFAF9] blur-3xl rounded-full skew-x-12 pointer-events-none" />
         </div>
       )}
     </div>

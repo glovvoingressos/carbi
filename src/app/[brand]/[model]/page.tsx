@@ -111,14 +111,14 @@ export default async function CarDetailPage({
       <VehicleSchema vehicle={car} />
 
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-sm text-text-tertiary mb-6 overflow-x-auto no-scrollbar">
-        <Link href="/" className="hover:text-text-primary transition-colors shrink-0">Home</Link>
+      <nav className="flex items-center gap-1.5 text-sm text-[#A3A3A3] mb-6 overflow-x-auto no-scrollbar">
+        <Link href="/" className="hover:text-[#0A0A0A] transition-colors shrink-0">Home</Link>
         <ChevronRight className="w-3 h-3 shrink-0" />
-        <Link href="/marcas" className="hover:text-text-primary transition-colors shrink-0">Marcas</Link>
+        <Link href="/marcas" className="hover:text-[#0A0A0A] transition-colors shrink-0">Marcas</Link>
         <ChevronRight className="w-3 h-3 shrink-0" />
-        <Link href={`/marcas/${brandSlug}`} className="hover:text-text-primary transition-colors shrink-0">{car.brand}</Link>
+        <Link href={`/marcas/${brandSlug}`} className="hover:text-[#0A0A0A] transition-colors shrink-0">{car.brand}</Link>
         <ChevronRight className="w-3 h-3 shrink-0" />
-        <span className="text-text-primary font-medium truncate">{car.model}</span>
+        <span className="text-[#0A0A0A] font-medium truncate">{car.model}</span>
       </nav>
 
       {/* Main Grid */}
@@ -143,26 +143,26 @@ export default async function CarDetailPage({
             </div>
             <div className="p-6 md:p-8 flex flex-col justify-center">
               <div className="flex flex-wrap gap-2 mb-4">
-                <span className="badge badge-accent text-[10px]">{car.segment}</span>
+                <span className="badge badge-brand text-[10px]">{car.segment}</span>
                 {car.year === 2024 && <span className="badge badge-neutral text-[10px]">Novo</span>}
                 {car.turbo && <span className="badge badge-neutral text-[10px]">Turbo</span>}
               </div>
-              <h1 className="text-2xl md:text-3xl font-heading font-bold text-text-primary leading-tight mb-1">{car.brand} {car.model}</h1>
-              <p className="text-sm text-text-secondary mb-1">{car.version}</p>
-              <p className="text-xs text-text-tertiary mb-3">Preço FIPE</p>
-              <p className="text-3xl md:text-4xl font-bold text-accent tracking-tight">{displayPriceLabel}</p>
+              <h1 className="text-2xl md:text-3xl font-heading font-bold text-[#0A0A0A] leading-tight mb-1">{car.brand} {car.model}</h1>
+              <p className="text-sm text-[#525252] mb-1">{car.version}</p>
+              <p className="text-xs text-[#A3A3A3] mb-3">Preço FIPE</p>
+              <p className="text-3xl md:text-4xl font-bold text-[#10B981] tracking-tight">{displayPriceLabel}</p>
               <div className="flex gap-3 mt-5 items-center">
                 <YearSelector currentYear={displayYear || 'Sem ano'} availableYears={availableYears} />
               </div>
 
               {searchYear && (
-                <div className="mt-3 px-3 py-2 bg-accent-light rounded-lg text-xs font-medium text-accent">
+                <div className="mt-3 px-3 py-2 bg-[#ECFDF5] rounded-lg text-xs font-medium text-[#10B981]">
                   Exibindo dados de {displayYear}. Alguns campos podem variar por versão.
                 </div>
               )}
 
-              <p className="text-sm text-text-secondary mt-5 leading-relaxed">{car.shortDesc}</p>
-              <p className="text-sm text-text-primary mt-2">
+              <p className="text-sm text-[#525252] mt-5 leading-relaxed">{car.shortDesc}</p>
+              <p className="text-sm text-[#0A0A0A] mt-2">
                 <span className="font-medium">Ideal para:</span> {car.idealFor}
               </p>
             </div>
@@ -172,9 +172,9 @@ export default async function CarDetailPage({
           <section className="card p-5 md:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold text-accent uppercase tracking-wider">Destaque</p>
-                <p className="text-sm font-semibold text-text-primary mt-1">Quer anunciar seu carro?</p>
-                <p className="text-xs text-text-secondary mt-0.5">Publique em minutos, com fotos e contato direto.</p>
+                <p className="text-xs font-semibold text-[#10B981] uppercase tracking-wider">Destaque</p>
+                <p className="text-sm font-semibold text-[#0A0A0A] mt-1">Quer anunciar seu carro?</p>
+                <p className="text-xs text-[#525252] mt-0.5">Publique em minutos, com fotos e contato direto.</p>
               </div>
               <Link href="/anunciar-carro" className="btn btn-primary btn-sm shrink-0">
                 Anunciar meu carro
@@ -234,8 +234,8 @@ export default async function CarDetailPage({
           {/* Variants */}
           {modelVariants.length > 1 && (
             <section className="card p-5">
-              <h2 className="text-base font-bold text-text-primary mb-1">Versões do {car.model}</h2>
-              <p className="text-xs text-text-secondary mb-3">Selecione uma versão para atualizar preço e ficha.</p>
+              <h2 className="text-base font-bold text-[#0A0A0A] mb-1">Versões do {car.model}</h2>
+              <p className="text-xs text-[#525252] mb-3">Selecione uma versão para atualizar preço e ficha.</p>
               <div className="flex flex-wrap gap-1.5">
                 {modelVariants.slice(0, 20).map((variant) => (
                   <Link
@@ -243,8 +243,8 @@ export default async function CarDetailPage({
                     href={`/${brandSlug}/${car.slug}?version=${encodeURIComponent(variant.version)}${displayYear ? `&year=${displayYear}` : ''}`}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                       variant.version === car.version
-                        ? 'bg-accent text-white'
-                        : 'bg-bg-alt text-text-secondary hover:bg-accent-light hover:text-accent'
+                        ? 'bg-[#10B981] text-white'
+                        : 'bg-[#FAFAF9] text-[#525252] hover:bg-[#ECFDF5] hover:text-[#10B981]'
                     }`}
                   >
                     {variant.version} &bull; {variant.year}
@@ -258,9 +258,9 @@ export default async function CarDetailPage({
           <div className="card p-6 md:p-8">
             <p className="label mb-5">Veredito Final</p>
             <div className="grid sm:grid-cols-2 gap-6">
-              <div className="bg-bg-alt p-5 rounded-xl">
-                <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">✓ Pontos fortes</p>
-                <ul className="space-y-2 text-sm text-text-primary">
+              <div className="bg-[#FAFAF9] p-5 rounded-xl">
+                <p className="text-xs font-semibold text-[#A3A3A3] uppercase tracking-wider mb-3">✓ Pontos fortes</p>
+                <ul className="space-y-2 text-sm text-[#0A0A0A]">
                   {car.pros.map((pro, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 bg-success rounded-full mt-1.5 shrink-0" />
@@ -269,9 +269,9 @@ export default async function CarDetailPage({
                   ))}
                 </ul>
               </div>
-              <div className="bg-bg-alt p-5 rounded-xl">
-                <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">✗ Pontos fracos</p>
-                <ul className="space-y-2 text-sm text-text-primary">
+              <div className="bg-[#FAFAF9] p-5 rounded-xl">
+                <p className="text-xs font-semibold text-[#A3A3A3] uppercase tracking-wider mb-3">✗ Pontos fracos</p>
+                <ul className="space-y-2 text-sm text-[#0A0A0A]">
                   {car.cons.map((con, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 bg-text-tertiary rounded-full mt-1.5 shrink-0" />
@@ -288,10 +288,10 @@ export default async function CarDetailPage({
 
           {/* SEO Section */}
           <section className="card p-6 md:p-8">
-            <h2 className="text-lg font-bold text-text-primary mb-4">
+            <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">
               Vale a pena comprar o {car.brand} {car.model} em 2026?
             </h2>
-            <div className="text-sm text-text-secondary space-y-3 leading-relaxed">
+            <div className="text-sm text-[#525252] space-y-3 leading-relaxed">
               <p>
                 O <strong>{car.brand} {car.model} {car.year}</strong> consolida-se como uma opção de {car.segment} que atende bem ao mercado atual.
                 Com motorização {car.engineType} e desempenho focado na eficiência, ele faz cerca de {car.fuelEconomyCityGas} km/l na cidade, o que representa um custo competitivo.
@@ -302,7 +302,7 @@ export default async function CarDetailPage({
                 de ter {car.trunkCapacity}L de porta-malas, vale sim a pena incluí-lo no seu radar.
               </p>
             </div>
-            <div className="mt-6 flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#EAEAE8]">
               <Link href="/carros-usados-bh" className="btn btn-primary btn-sm">
                 Ver ofertas <ArrowRight className="w-4 h-4" />
               </Link>
@@ -327,8 +327,8 @@ export default async function CarDetailPage({
           </div>
 
           <div className="card p-5">
-            <p className="text-xs text-text-tertiary font-medium mb-1">Preço Sugerido</p>
-            <p className="text-2xl font-bold text-text-primary mb-4 tracking-tight">{formatBRL(car.priceBrl)}</p>
+            <p className="text-xs text-[#A3A3A3] font-medium mb-1">Preço Sugerido</p>
+            <p className="text-2xl font-bold text-[#0A0A0A] mb-4 tracking-tight">{formatBRL(car.priceBrl)}</p>
           </div>
         </aside>
 
@@ -337,7 +337,7 @@ export default async function CarDetailPage({
       {/* Similar Cars */}
       {similarCars.length > 0 && (
         <div className="mt-12">
-          <h2 className="text-lg font-bold text-text-primary mb-6">Carros similares</h2>
+          <h2 className="text-lg font-bold text-[#0A0A0A] mb-6">Carros similares</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {similarCars.map((c) => (
               <CarCard key={c.id} car={c} />
@@ -349,7 +349,7 @@ export default async function CarDetailPage({
       {/* Related Listings */}
       {relatedListings.length > 0 && (
         <div className="mt-12">
-          <h2 className="text-lg font-bold text-text-primary mb-6">Anúncios deste modelo</h2>
+          <h2 className="text-lg font-bold text-[#0A0A0A] mb-6">Anúncios deste modelo</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {relatedListings.map((listing) => (
               <MarketplaceListingCard key={listing.id} listing={listing} />
@@ -372,12 +372,12 @@ function StatCard({ label, value, isWinner }: { label: string; value: string; is
   }
 
   return (
-    <div className={`rounded-lg p-3 ${isWinner ? 'bg-success/10' : 'bg-bg-alt'}`}>
+    <div className={`rounded-lg p-3 ${isWinner ? 'bg-success/10' : 'bg-[#FAFAF9]'}`}>
       <div className="flex items-center gap-1.5 mb-1">
-        <span className="text-text-tertiary">{icons[label] || null}</span>
-        <p className="text-xs text-text-tertiary font-medium">{label}</p>
+        <span className="text-[#A3A3A3]">{icons[label] || null}</span>
+        <p className="text-xs text-[#A3A3A3] font-medium">{label}</p>
       </div>
-      <p className="text-sm font-bold text-text-primary">{value}</p>
+      <p className="text-sm font-bold text-[#0A0A0A]">{value}</p>
       {isWinner && <p className="text-xs font-medium text-success mt-0.5">Melhor do segmento</p>}
     </div>
   )
@@ -386,8 +386,8 @@ function StatCard({ label, value, isWinner }: { label: string; value: string; is
 function SpecRow({ label, value, isWinner }: { label: string; value: string; isWinner?: boolean }) {
   return (
     <div className="flex justify-between items-center py-0.5">
-      <span className="text-text-secondary">{label}</span>
-      <span className={`font-medium ${isWinner ? 'text-success' : 'text-text-primary'}`}>{value}</span>
+      <span className="text-[#525252]">{label}</span>
+      <span className={`font-medium ${isWinner ? 'text-success' : 'text-[#0A0A0A]'}`}>{value}</span>
     </div>
   )
 }

@@ -86,9 +86,9 @@ export default async function MarcasPage() {
                   />
                 </div>
 
-                <p className="text-xl font-black text-dark tracking-tight relative z-10 uppercase">{brand.label}</p>
+                <p className="text-xl font-black text-[#0A0A0A] tracking-tight relative z-10 uppercase">{brand.label}</p>
                 <div className="mt-3">
-                   <span className="bg-white/70 text-text-secondary font-bold text-[11px] px-3 py-1 rounded-full uppercase tracking-widest relative z-10 group-hover:bg-dark group-hover:text-white transition-colors">
+                   <span className="bg-white/70 text-[#525252] font-bold text-[11px] px-3 py-1 rounded-full uppercase tracking-widest relative z-10 group-hover:bg-[#0A0A0A] group-hover:text-white transition-colors">
                      {brand.count} modelo{brand.count !== 1 ? 's' : ''}
                    </span>
                 </div>

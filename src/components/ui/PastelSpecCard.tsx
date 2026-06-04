@@ -23,7 +23,7 @@ export function PastelSpecCard({
     >
       {titleBadge ? (
         <div
-          className={`absolute left-4 z-20 badge badge-accent ${badgeInside ? 'top-4' : '-top-3'}`}
+          className={`absolute left-4 z-20 badge badge-brand ${badgeInside ? 'top-4' : '-top-3'}`}
         >
           {titleBadge}
         </div>
@@ -43,8 +43,8 @@ export function PastelKeyValueRows({ rows }: { rows: PastelRow[] }) {
     <div className="space-y-2.5">
       {rows.map((row) => (
         <div key={row.label} className="flex items-center justify-between gap-4">
-          <p className="text-xs text-text-tertiary">{row.label}</p>
-          <p className="text-xs font-semibold text-text-primary text-right">{row.value}</p>
+          <p className="text-xs text-[#A3A3A3]">{row.label}</p>
+          <p className="text-xs font-semibold text-[#0A0A0A] text-right">{row.value}</p>
         </div>
       ))}
     </div>

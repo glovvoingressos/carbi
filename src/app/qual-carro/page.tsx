@@ -151,7 +151,7 @@ export default function QualCarroPage() {
             />
             <div className="flex-1 min-w-0">
               <h2 className="font-bold text-text">{topResult.car.brand} {topResult.car.model}</h2>
-              <p className="text-xs text-text-secondary">{topResult.car.version} &middot; {topResult.car.year}</p>
+              <p className="text-xs text-[#525252]">{topResult.car.version} &middot; {topResult.car.year}</p>
               <p className="text-lg font-bold text-primary mt-1">{formatBRL(topResult.car.priceBrl)}</p>
             </div>
             <Link
@@ -167,7 +167,7 @@ export default function QualCarroPage() {
         <div className="space-y-2 mb-8">
           {results.slice(1).map((result, i) => (
             <div key={result.car.id} className="bg-[#f7f9fc] rounded-xl p-4 flex items-center gap-3 transition-colors">
-              <span className="text-xs font-bold text-text-tertiary w-6 text-center">{i + 2}</span>
+              <span className="text-xs font-bold text-[#A3A3A3] w-6 text-center">{i + 2}</span>
               <CarImage
                 id={result.car.id}
                 brand={result.car.brand}
@@ -180,11 +180,11 @@ export default function QualCarroPage() {
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-text">{result.car.brand} {result.car.model}</p>
-                <p className="text-xs text-text-secondary">{result.car.version}</p>
+                <p className="text-xs text-[#525252]">{result.car.version}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm font-bold text-primary">{formatBRL(result.car.priceBrl)}</p>
-                <p className="text-xs text-text-secondary">Match {Math.round(result.score)}%</p>
+                <p className="text-xs text-[#525252]">Match {Math.round(result.score)}%</p>
               </div>
               <Link
                 href={`/${result.car.brand.toLowerCase().replace(/\s+/g, '-')}/${result.car.slug}`}
@@ -199,7 +199,7 @@ export default function QualCarroPage() {
         {/* Summary */}
         <div className="bg-[#f7f9fc] rounded-xl p-5 mb-6">
           <h3 className="text-sm font-semibold text-text mb-2">Seu perfil</h3>
-          <ul className="text-xs text-text-secondary space-y-1">
+          <ul className="text-xs text-[#525252] space-y-1">
             {answers.orcamento && <li>Orçamento: {answers.orcamento.label}</li>}
             {answers.usos.length > 0 && <li>Uso: {answers.usos.join(', ')}</li>}
             {answers.passageiros && <li>Passageiros: {answers.passageiros}</li>}
@@ -209,7 +209,7 @@ export default function QualCarroPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <button onClick={reset} className="flex items-center justify-center gap-2 text-sm font-medium text-text-secondary hover:text-text px-4 py-2.5 rounded-lg bg-[#f2f6fb] hover:bg-[#e9f0f7] transition-colors">
+          <button onClick={reset} className="flex items-center justify-center gap-2 text-sm font-medium text-[#525252] hover:text-text px-4 py-2.5 rounded-lg bg-[#f2f6fb] hover:bg-[#e9f0f7] transition-colors">
             <RotateCcw className="w-4 h-4" /> Refazer teste
           </button>
 
@@ -222,7 +222,7 @@ export default function QualCarroPage() {
   return (
     <div className="max-w-xl mx-auto px-4 sm:px-6 py-8">
       {catalogLoading && (
-        <div className="mb-4 flex items-center justify-center gap-2 rounded-xl bg-[#f7f9fc] px-4 py-3 text-sm font-semibold text-text-secondary">
+        <div className="mb-4 flex items-center justify-center gap-2 rounded-xl bg-[#f7f9fc] px-4 py-3 text-sm font-semibold text-[#525252]">
           <Loader2 className="h-4 w-4 animate-spin" /> Carregando catálogo...
         </div>
       )}
@@ -233,7 +233,7 @@ export default function QualCarroPage() {
       )}
       {/* Progress */}
       <div className="flex items-center justify-between mb-2">
-        <p className="text-sm font-medium text-text-tertiary">Passo {step + 1} de {steps.length}</p>
+        <p className="text-sm font-medium text-[#A3A3A3]">Passo {step + 1} de {steps.length}</p>
         <p className="text-sm font-medium text-primary">{steps[step]}</p>
       </div>
       <div className="w-full bg-border rounded-full h-1.5 mb-8">
@@ -252,7 +252,7 @@ export default function QualCarroPage() {
                   className={`p-3.5 rounded-lg text-left text-sm font-medium transition-all ${
                     answers.orcamento?.label === o.label
                       ? 'bg-primary-light border-2 border-primary text-primary'
-                      : 'border border-border hover:border-primary/30 text-text-secondary bg-white'
+                      : 'border border-[#EAEAE8] hover:border-primary/30 text-[#525252] bg-white'
                   }`}
                 >
                   {o.label}
@@ -266,7 +266,7 @@ export default function QualCarroPage() {
         {step === 1 && (
           <>
             <h2 className="text-lg font-bold text-text mb-1">Para que voc&ecirc; vai usar o carro?</h2>
-            <p className="text-xs text-text-secondary mb-4">Pode marcar mais de um.</p>
+            <p className="text-xs text-[#525252] mb-4">Pode marcar mais de um.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {usos.map((u) => (
                 <button key={u}
@@ -277,7 +277,7 @@ export default function QualCarroPage() {
                   className={`p-3.5 rounded-lg text-left text-sm font-medium transition-all ${
                     answers.usos.includes(u)
                       ? 'bg-primary-light border-2 border-primary text-primary'
-                      : 'border border-border hover:border-primary/30 text-text-secondary bg-white'
+                      : 'border border-[#EAEAE8] hover:border-primary/30 text-[#525252] bg-white'
                   }`}
                 >
                   {u}
@@ -298,7 +298,7 @@ export default function QualCarroPage() {
                   className={`p-3.5 rounded-lg text-center text-sm font-medium transition-all ${
                     answers.passageiros === p
                       ? 'bg-primary-light border-2 border-primary text-primary'
-                      : 'border border-border hover:border-primary/30 text-text-secondary bg-white'
+                      : 'border border-[#EAEAE8] hover:border-primary/30 text-[#525252] bg-white'
                   }`}
                 >
                   {p}
@@ -312,7 +312,7 @@ export default function QualCarroPage() {
         {step === 3 && (
           <>
             <h2 className="text-lg font-bold text-text mb-1">O que é mais importante?</h2>
-            <p className="text-xs text-text-secondary mb-4">Selecione sua prioridade principal.</p>
+            <p className="text-xs text-[#525252] mb-4">Selecione sua prioridade principal.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {prioridades.map((p) => (
                 <button key={p.id}
@@ -320,7 +320,7 @@ export default function QualCarroPage() {
                   className={`p-3.5 rounded-lg text-left text-sm font-medium transition-all ${
                     answers.prioridade === p.id
                       ? 'bg-primary-light border-2 border-primary text-primary'
-                      : 'border border-border hover:border-primary/30 text-text-secondary bg-white'
+                      : 'border border-[#EAEAE8] hover:border-primary/30 text-[#525252] bg-white'
                   }`}
                 >
                   {p.label}
@@ -341,7 +341,7 @@ export default function QualCarroPage() {
                   className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition-all ${
                     answers.tipo === t
                       ? 'bg-primary-light border-primary text-primary'
-                      : 'border-border hover:border-primary/30 text-text-secondary bg-white'
+                      : 'border-[#EAEAE8] hover:border-primary/30 text-[#525252] bg-white'
                   }`}
                 >
                   {t}
@@ -352,10 +352,10 @@ export default function QualCarroPage() {
         )}
 
         {/* Navigation */}
-        <div className="flex justify-between mt-6 pt-4 border-t border-border">
+        <div className="flex justify-between mt-6 pt-4 border-t border-[#EAEAE8]">
           <button onClick={prev} disabled={step === 0}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium ${
-              step === 0 ? 'text-text-tertiary' : 'text-text-secondary hover:bg-surface'
+              step === 0 ? 'text-[#A3A3A3]' : 'text-[#525252] hover:bg-surface'
             }`}
           >
             <ArrowLeft className="w-4 h-4" /> Voltar

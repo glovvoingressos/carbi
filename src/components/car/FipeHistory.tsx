@@ -21,7 +21,7 @@ export default function FipeHistory({ history }: FipeHistoryProps) {
 
   return (
     <div className="bg-white border border-[#EAEAE8] rounded-2xl overflow-hidden">
-      <div className="bg-[#0A0A0A] p-6 md:p-8 flex items-center justify-between">
+      <div className="bg-[#0A0A0A] text-white p-6 md:p-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white">
             <Calendar className="w-5 h-5" strokeWidth={1.5} />
