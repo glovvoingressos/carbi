@@ -3,7 +3,7 @@ import HeroSearchBar from '@/components/ui/HeroSearchBar'
 import {
   ArrowRight, Sparkles, ShieldCheck, TrendingDown,
   Car, Zap, Tag,
-  Check, Clock, Wallet, Camera,
+  Check, Clock, Wallet, Camera, BarChart3, Users,
 } from 'lucide-react'
 import FAQSection from '@/components/layout/FAQSection'
 import BrandLogo from '@/components/brand/BrandLogo'
@@ -113,82 +113,124 @@ export default async function HomePage() {
       </section>
 
       {/* ── SELL FEATURE STRIP ── */}
-      <section className="bg-white py-10 md:py-14">
+      <section className="bg-white py-12 md:py-16">
         <div className="container">
-          <div className="relative bg-[#0A0A0A] rounded-2xl overflow-hidden p-8 md:p-12">
-            <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#10B981]/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-[#10B981]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative bg-gradient-to-br from-[#0A0A0A] via-[#121212] to-[#0A0A0A] rounded-3xl overflow-hidden p-8 md:p-14 shadow-2xl">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMiI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50 pointer-events-none" />
+            <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-[#10B981]/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-[#10B981]/5 rounded-full blur-[120px] pointer-events-none" />
 
-            <div className="relative grid md:grid-cols-[1.3fr_1fr] gap-10 md:gap-14 items-center">
-              <div>
-                <span className="eyebrow text-[#10B981] mb-4">Anuncie grátis</span>
-                <h2 className="text-white text-balance mb-5">
-                  Seu carro vendido<br />
-                  com a maior rapidez.
+            <div className="relative grid md:grid-cols-[1.1fr_0.9fr] gap-10 md:gap-12 items-center">
+              <div className="space-y-7">
+                <div className="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-full px-4 py-1.5 text-[12px] text-white/60 tracking-tight">
+                  <span className="w-1.5 h-1.5 bg-[#10B981] rounded-full animate-pulse" />
+                  2 minutos para publicar
+                </div>
+
+                <h2 className="text-white text-balance text-[32px] md:text-[40px] leading-[1.12] tracking-tight">
+                  Venda seu carro na<br />
+                  plataforma mais<br />
+                  <span className="text-[#10B981]">moderna do Brasil.</span>
                 </h2>
-                <p className="text-white/70 body-large mb-8 max-w-md text-pretty">
-                  Anúncio ao vivo em 2 minutos. Sem comissão, sem pegadinha, sem ligação chata.
+
+                <p className="text-[15px] text-white/60 max-w-md leading-relaxed text-pretty">
+                  Anúncio ao vivo em 2 minutos. Sem comissão. Sem taxas escondidas. Seu carro pronto pra ser visto por milhares de compradores qualificados.
                 </p>
 
-                <ul className="space-y-2.5 mb-8 text-[14px] text-white/80">
-                  {[
-                    { icon: Clock, text: 'Publique em menos de 2 minutos' },
-                    { icon: Camera, text: 'Até 10 fotos, com blur automático de placa' },
-                    { icon: Wallet, text: 'Sem comissão — você fica com 100% da venda' },
-                  ].map(({ icon: Icon, text }) => (
-                    <li key={text} className="flex items-center gap-2.5">
-                      <span className="w-5 h-5 rounded-full bg-[#10B981]/15 flex items-center justify-center">
-                        <Check className="w-3 h-3 text-[#10B981]" strokeWidth={2.5} />
-                      </span>
-                      <span className="tracking-tight">{text}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="flex gap-6 pt-1">
+                  <div>
+                    <p className="text-[24px] font-semibold text-white tracking-tight">12k+</p>
+                    <p className="text-[12px] text-white/40 tracking-tight">Anúncios ativos</p>
+                  </div>
+                  <div className="w-px bg-white/10" />
+                  <div>
+                    <p className="text-[24px] font-semibold text-white tracking-tight">3 min</p>
+                    <p className="text-[12px] text-white/40 tracking-tight">Tempo médio de venda</p>
+                  </div>
+                  <div className="w-px bg-white/10" />
+                  <div>
+                    <p className="text-[24px] font-semibold text-white tracking-tight">100%</p>
+                    <p className="text-[12px] text-white/40 tracking-tight">Comissão zero</p>
+                  </div>
+                </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <Link
                     href="/anunciar-carro"
-                    className="inline-flex items-center justify-center gap-2 bg-white text-[#0A0A0A] hover:bg-white/90 transition-colors rounded-full min-h-[52px] px-7 text-[15px] font-semibold"
+                    className="inline-flex items-center justify-center gap-2.5 bg-white text-[#0A0A0A] hover:bg-white/90 transition-all rounded-full min-h-[56px] px-8 text-[15px] font-semibold group"
                   >
-                    Anunciar agora
-                    <ArrowRight className="w-4 h-4" strokeWidth={2} />
+                    Anunciar meu carro
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" strokeWidth={2} />
                   </Link>
                   <Link
                     href="/vender-carro"
-                    className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-white border border-white/20 transition-colors rounded-full min-h-[52px] px-6 text-[14px] font-medium"
+                    className="inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/15 hover:border-white/30 transition-all rounded-full min-h-[56px] px-7 text-[14px] font-medium"
                   >
                     Como funciona
                   </Link>
                 </div>
+
+                <div className="flex items-center gap-2 text-[12px] text-white/30 tracking-tight">
+                  <Users className="w-3.5 h-3.5" strokeWidth={1.75} />
+                  +8.000 vendedores já anunciaram este mês
+                </div>
               </div>
 
               <div className="relative">
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
-                  <div className="flex items-center justify-between mb-5">
-                    <span className="eyebrow text-white/50">Seu anúncio</span>
-                    <span className="text-[10px] font-semibold text-[#10B981] uppercase tracking-widest">Ao vivo</span>
-                  </div>
-                  <div className="aspect-square w-full rounded-xl bg-white/10 overflow-hidden mb-4 flex items-center justify-center">
-                    <Car className="w-16 h-16 text-white/30" strokeWidth={1.25} />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="h-3 w-2/3 bg-white/20 rounded-full" />
-                    <div className="h-3 w-1/2 bg-white/10 rounded-full" />
-                    <div className="h-3 w-1/3 bg-white/10 rounded-full" />
-                  </div>
-                  <div className="mt-5 pt-5 border-t border-white/10 flex items-center justify-between">
-                    <div>
-                      <p className="eyebrow text-white/50 mb-1">Preço sugerido</p>
-                      <p className="text-[18px] font-semibold text-white tracking-tight">R$ 65.900</p>
+                <div className="bg-white/[0.04] border border-white/[0.07] rounded-2xl p-5 backdrop-blur-sm hover:bg-white/[0.06] transition-colors">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#10B981]/20 flex items-center justify-center">
+                        <Car className="w-4 h-4 text-[#10B981]" strokeWidth={1.75} />
+                      </div>
+                      <div>
+                        <p className="text-[12px] font-medium text-white/70 tracking-tight">Pré-visualização</p>
+                        <p className="text-[10px] text-white/30 tracking-tight">Como aparece no marketplace</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="eyebrow text-white/50 mb-1">FIPE</p>
-                      <p className="text-[14px] font-medium text-[#10B981]">-4% abaixo</p>
+                    <span className="text-[10px] font-semibold text-[#10B981] uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#10B981]/10">Ao vivo</span>
+                  </div>
+
+                  <div className="aspect-[4/3] w-full rounded-xl bg-gradient-to-br from-white/[0.06] to-white/[0.02] overflow-hidden mb-4 flex items-center justify-center border border-white/[0.06]">
+                    <div className="text-center">
+                      <Car className="w-14 h-14 text-white/15 mx-auto mb-2" strokeWidth={1} />
+                      <p className="text-[11px] text-white/20 tracking-tight">Foto do veículo</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 mb-5">
+                    <div>
+                      <p className="text-[16px] font-semibold text-white tracking-tight">VW Polo Highline 1.0 TSI</p>
+                      <p className="text-[12px] text-white/40 tracking-tight">2022/2023 • 38.000 km • BH/MG</p>
+                    </div>
+                    <div className="h-px bg-white/[0.06]" />
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="eyebrow text-white/30 mb-0.5">Preço</p>
+                        <p className="text-[22px] font-semibold text-white tracking-tight">R$ 65.900</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="eyebrow text-white/30 mb-0.5">FIPE</p>
+                        <p className="text-[13px] font-medium text-[#10B981]">-4% abaixo da tabela</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <div className="flex-1 py-2.5 px-4 rounded-xl bg-white/[0.06] border border-white/[0.06] text-center">
+                      <p className="text-[11px] text-white/40">Visualizações (hoje)</p>
+                      <p className="text-[14px] font-semibold text-white">342</p>
+                    </div>
+                    <div className="flex-1 py-2.5 px-4 rounded-xl bg-[#10B981]/[0.06] border border-[#10B981]/[0.08] text-center">
+                      <BarChart3 className="w-3.5 h-3.5 text-[#10B981] mx-auto mb-0.5" strokeWidth={2} />
+                      <p className="text-[11px] text-[#10B981]">Destaque</p>
                     </div>
                   </div>
                 </div>
-                <div className="absolute -top-3 -right-3 bg-[#10B981] text-white px-3 py-1.5 rounded-full text-[11px] font-semibold tracking-tight shadow-lg">
-                  100% gratuito
+
+                <div className="absolute -top-3.5 -right-3.5 bg-[#10B981] text-white px-4 py-2 rounded-full text-[12px] font-semibold tracking-tight shadow-lg shadow-[#10B981]/20 flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
+                  Grátis
                 </div>
               </div>
             </div>
