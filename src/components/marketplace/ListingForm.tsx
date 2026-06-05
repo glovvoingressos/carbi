@@ -28,7 +28,7 @@ interface UploadImageItem {
 }
 
 interface FormState {
-  vehicle_type: 'car' | 'truck'
+  vehicle_type: 'car'
   title: string
   brand: string
   model: string
@@ -50,11 +50,6 @@ interface FormState {
   plateFinal: string
   doors: string
   vin: string
-  // Truck-specific fields
-  truck_type: string
-  load_capacity: string
-  axles: string
-  truck_body_type: string
 }
 
 interface CatalogCar {
@@ -106,10 +101,7 @@ const INITIAL_STATE: FormState = {
   plateFinal: '',
   doors: '',
   vin: '',
-  truck_type: '',
-  load_capacity: '',
-  axles: '',
-  truck_body_type: '',
+
 }
 
 const EMPTY_TECHNICAL: TechnicalSnapshot = {
@@ -659,21 +651,11 @@ export default function ListingForm() {
       if (!form.price || !form.mileage || !form.city || !form.state || !form.description.trim()) {
         return 'Preencha preço, quilometragem, cidade, estado e descrição.'
       }
-      if (form.vehicle_type === 'truck') {
-        if (!form.truck_type || !form.load_capacity || !form.axles || !form.truck_body_type) {
-          return 'Para caminhões, preencha tipo, capacidade de carga, eixos e tipo de carroceria.'
-        }
       }
-    }
 
     if (step === 3) {
       if (!form.price || !form.mileage || !form.city || !form.state || !form.description.trim()) {
         return 'Complete preço, quilometragem, localização e descrição antes de publicar.'
-      }
-      if (form.vehicle_type === 'truck') {
-        if (!form.truck_type || !form.load_capacity || !form.axles || !form.truck_body_type) {
-          return 'Complete os campos específicos de caminhão.'
-        }
       }
     }
 
@@ -768,10 +750,7 @@ export default function ListingForm() {
           fipe_model_code: selectedModelCode || null,
           fipe_year_code: selectedVersionCode || null,
           ...fipeSnapshot,
-          truck_type: form.vehicle_type === 'truck' ? form.truck_type : null,
-          load_capacity: form.vehicle_type === 'truck' ? (form.load_capacity ? Number(form.load_capacity) : null) : null,
-          axles: form.vehicle_type === 'truck' ? (form.axles ? Number(form.axles) : null) : null,
-          truck_body_type: form.vehicle_type === 'truck' ? form.truck_body_type : null,
+
           structured_data: {
             source: 'web_form',
           },
@@ -892,14 +871,10 @@ export default function ListingForm() {
                 <p className="label text-[#10B981]">Tipo de veículo</p>
                 <span className="badge badge-brand text-[10px]">Obrigatório</span>
               </div>
-              <select
-                className="input"
-                value={form.vehicle_type}
-                onChange={(e) => handleInput('vehicle_type', e.target.value)}
-              >
-                <option value="car">Carro</option>
-                <option value="truck">Caminhão</option>
-              </select>
+                <input
+                  type="hidden"
+                  value={form.vehicle_type}
+                />
             </div>
 
             <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3">
@@ -1028,17 +1003,7 @@ export default function ListingForm() {
             <textarea className="input min-h-[120px] py-3 resize-none leading-relaxed max-[330px]:min-h-[100px]" placeholder="Descrição do veículo... Destaque os pontos fortes, manutenções recentes e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
             <input className="input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
 
-            {form.vehicle_type === 'truck' && (
-              <div className="card p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3">
-                <h4 className="text-sm font-bold text-[#0A0A0A] max-[330px]:text-[13px]">Informações do Caminhão</h4>
-                <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
-                  <input className="input" placeholder="Tipo (ex: Baú, Caçamba)" value={form.truck_type} onChange={(e) => handleInput('truck_type', e.target.value)} />
-                  <input className="input" placeholder="Capacidade (toneladas)" value={form.load_capacity} onChange={(e) => handleInput('load_capacity', e.target.value.replace(/[^0-9.]/g, ''))} />
-                  <input className="input" placeholder="Nº de eixos" value={form.axles} onChange={(e) => handleInput('axles', e.target.value.replace(/\D/g, ''))} />
-                  <input className="input" placeholder="Tipo de carroceria" value={form.truck_body_type} onChange={(e) => handleInput('truck_body_type', e.target.value)} />
-                </div>
-              </div>
-            )}
+
 
             <label
               className="surface border-2 border-dashed border-[#17170F]/18 p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] hover:border-[#17170F]/30 hover:bg-[#D9F85F] transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px]"

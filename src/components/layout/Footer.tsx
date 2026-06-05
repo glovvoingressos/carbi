@@ -9,7 +9,7 @@ const NAV_GROUPS = [
       { href: '/carros/mais-baratos', label: 'Mais baratos' },
       { href: '/carros/suv', label: 'SUVs' },
       { href: '/carros/automaticos', label: 'Automáticos' },
-      { href: '/caminhoes', label: 'Caminhões' },
+
     ],
   },
   {

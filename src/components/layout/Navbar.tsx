@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react'
 import {
   Menu, X, Search, CarFront, Sparkles, ChevronRight,
   MessageCircle, LayoutDashboard, UserRound, LogOut,
-  ShoppingBag, Tag, Truck, Home,
+  ShoppingBag, Tag, Home,
 } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
@@ -19,7 +19,6 @@ const BOTTOM_NAV = [
 
 const PRIMARY_NAV = [
   { href: '/carros-a-venda', label: 'Comprar' },
-  { href: '/caminhoes', label: 'Caminhões' },
   { href: '/anunciar-carro', label: 'Vender' },
   { href: '/marcas', label: 'Marcas' },
   { href: '/qual-carro', label: 'Qual carro?' },

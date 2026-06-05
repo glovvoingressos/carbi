@@ -9,6 +9,8 @@ export async function generateStaticParams() {
   return MARKETPLACE_SEO_SLUGS.map((slug) => ({ slug }))
 }
 
+export const dynamicParams = true
+
 const SORT_OPTIONS: Array<{ value: ListingSort; label: string }> = [
   { value: 'recent', label: 'Mais recentes' },
   { value: 'price_asc', label: 'Menor preço' },

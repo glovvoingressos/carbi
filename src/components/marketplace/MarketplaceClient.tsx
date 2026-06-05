@@ -116,8 +116,6 @@ export default function MarketplaceClient({
   const router = useRouter()
   const searchParams = useSearchParams()
   const pathname = usePathname()
-  const isTruckOnlyPage = pathname === '/caminhoes'
-
   const [listings, setListings] = useState<ListingPublic[]>(initialListings)
   const [total, setTotal] = useState(initialTotal)
   const [currentPage, setCurrentPage] = useState(initialPage)
@@ -128,7 +126,6 @@ export default function MarketplaceClient({
   const [q, setQ] = useState(searchParams.get('q') || '')
   const [selectedVehicleType, setSelectedVehicleType] = useState<string>(() => {
     const urlVehicle = searchParams.get('vehicle_type')
-    if (isTruckOnlyPage && !urlVehicle) return 'truck'
     return urlVehicle || ''
   })
   const [selectedBrands, setSelectedBrands] = useState<string[]>(searchParams.getAll('brand'))
@@ -247,8 +244,8 @@ export default function MarketplaceClient({
 
   const activeChips = useMemo(() => {
     const chips: Array<{ label: string; onRemove: () => void }> = []
-    if (selectedVehicleType && !isTruckOnlyPage) {
-      chips.push({ label: selectedVehicleType === 'car' ? 'Carro' : 'Caminhão', onRemove: () => setSelectedVehicleType('') })
+    if (selectedVehicleType) {
+      chips.push({ label: 'Carro', onRemove: () => setSelectedVehicleType('') })
     }
     selectedBrands.forEach(b => chips.push({ label: b, onRemove: () => toggleItem(selectedBrands, b, setSelectedBrands) }))
     selectedModels.forEach(m => chips.push({ label: m, onRemove: () => toggleItem(selectedModels, m, setSelectedModels) }))
@@ -263,28 +260,20 @@ export default function MarketplaceClient({
       chips.push({ label: `Até ${mileageMax.toLocaleString('pt-BR')} km`, onRemove: () => setMileageMax(300000) })
     }
     return chips
-  }, [selectedVehicleType, selectedBrands, selectedModels, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, priceRange, mileageMax, isTruckOnlyPage])
+  }, [selectedVehicleType, selectedBrands, selectedModels, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, priceRange, mileageMax])
 
   const filtersContent = (
     <div className="space-y-8">
-      {!isTruckOnlyPage && (
-        <FilterSection title="Tipo">
-          <div className="flex flex-wrap gap-2">
-            <ToggleButton
-              active={selectedVehicleType === 'car'}
-              onClick={() => setSelectedVehicleType(selectedVehicleType === 'car' ? '' : 'car')}
-            >
-              Carro
-            </ToggleButton>
-            <ToggleButton
-              active={selectedVehicleType === 'truck'}
-              onClick={() => setSelectedVehicleType(selectedVehicleType === 'truck' ? '' : 'truck')}
-            >
-              Caminhão
-            </ToggleButton>
-          </div>
-        </FilterSection>
-      )}
+      <FilterSection title="Tipo">
+        <div className="flex flex-wrap gap-2">
+          <ToggleButton
+            active={selectedVehicleType === 'car'}
+            onClick={() => setSelectedVehicleType(selectedVehicleType === 'car' ? '' : 'car')}
+          >
+            Carro
+          </ToggleButton>
+        </div>
+      </FilterSection>
 
       <FilterSection title="Preço">
           <div className="grid grid-cols-2 gap-2">

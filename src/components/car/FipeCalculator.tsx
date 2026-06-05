@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Loader2, TrendingDown, AlertCircle, Info, Car, Bike, Truck, Check } from 'lucide-react'
+import { Loader2, TrendingDown, AlertCircle, Info, Car, Bike, Check } from 'lucide-react'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
 
 interface FipeCalculatorProps {
@@ -32,7 +32,6 @@ const skeletonClass = 'h-12 w-full rounded-xl bg-[#FAFAF9] animate-pulse border 
 const VEHICLE_TYPES = [
   { id: 'cars', label: 'Carros', icon: Car },
   { id: 'motorcycles', label: 'Motos', icon: Bike },
-  { id: 'trucks', label: 'Caminhões', icon: Truck },
 ] as const
 
 function normalize(value: string): string {

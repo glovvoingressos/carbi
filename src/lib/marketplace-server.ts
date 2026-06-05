@@ -437,12 +437,7 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
     .range(from, to)
 
   if (input.q) {
-    const q = input.q.toLowerCase()
-    const isTruckQuery = /caminh(o|ão|ões)|truck|baú|caçamba|carreta|veículo pesado/i.test(q)
     let searchQuery = `brand.ilike.%${input.q}%,model.ilike.%${input.q}%,title.ilike.%${input.q}%`
-    if (isTruckQuery) {
-      searchQuery += `,truck_type.ilike.%${input.q}%,truck_body_type.ilike.%${input.q}%`
-    }
     query = query.or(searchQuery)
   }
   
