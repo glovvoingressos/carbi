@@ -108,6 +108,11 @@ export interface ListingPublic {
   load_capacity?: number | null
   axles?: number | null
   truck_body_type?: string | null
+  // Negotiation settings
+  accepts_offers?: boolean
+  negotiable?: 'open' | 'low' | 'firm'
+  accepts_counter?: boolean
+  accepts_trade?: boolean
 }
 
 export function parseMoneyInputToNumber(value: string): number {

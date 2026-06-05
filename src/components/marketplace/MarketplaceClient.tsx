@@ -199,7 +199,7 @@ export default function MarketplaceClient({
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!isSearching) updateResults({ page: 1 })
-    }, 500)
+    }, 250)
     return () => clearTimeout(timer)
   }, [q, priceRange, yearRange, mileageMax, sort])
 
@@ -504,7 +504,19 @@ export default function MarketplaceClient({
         {/* Results */}
         <div className="mb-5 flex items-baseline justify-between">
           <h1 className="text-[22px] font-semibold tracking-tight text-[#0A0A0A]">
-            {isSearching ? 'Buscando...' : `${total.toLocaleString('pt-BR')} ${total === 1 ? 'veículo' : 'veículos'}`}
+            {isSearching ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="inline-block w-4 h-4 rounded-full border-2 border-[#17170F] border-t-transparent animate-spin" />
+                Buscando...
+              </span>
+            ) : (
+              <span className="tabular-nums">
+                <strong className="text-[28px]">{total.toLocaleString('pt-BR')}</strong>
+                <span className="text-[16px] text-[#52607A] ml-1.5 font-medium">
+                  {total === 1 ? 'veículo encontrado' : 'veículos encontrados'}
+                </span>
+              </span>
+            )}
           </h1>
         </div>
 

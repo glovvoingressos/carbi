@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   TrendingDown, TrendingUp, Calendar,
   MapPin, Gauge, Fuel, Zap,
   Settings2, ShieldCheck, Check,
   Share2, Heart, MessageCircle, Phone,
-  Info, ArrowRight,
+  Info, ArrowRight, HandCoins, BadgeCheck,
 } from 'lucide-react'
 import { motion, Variants } from 'framer-motion'
 import { ListingPublic } from '@/lib/marketplace'
@@ -15,6 +15,9 @@ import { formatBRL } from '@/data/cars'
 import ListingImageGallery from './ListingImageGallery'
 import ChatStarter from './ChatStarter'
 import ListingCard from './ListingCard'
+import OfferModal from './OfferModal'
+import OfferHistory from './OfferHistory'
+import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 interface VehicleDetailViewProps {
   listing: ListingPublic
@@ -36,6 +39,21 @@ export default function VehicleDetailView({
 }: VehicleDetailViewProps) {
   const [showFullDescription, setShowFullDescription] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
+  const [showOfferModal, setShowOfferModal] = useState(false)
+  const [sessionUserId, setSessionUserId] = useState<string | null>(null)
+  const [accessToken, setAccessToken] = useState<string | null>(null)
+  const isSeller = sessionUserId === listing.user_id
+
+  useEffect(() => {
+    if (!isSupabaseBrowserConfigured()) return
+    const supabase = getSupabaseBrowserClient()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.access_token) {
+        setSessionUserId(session.user.id)
+        setAccessToken(session.access_token)
+      }
+    })
+  }, [])
 
   const mainSpecs = [
     { label: 'Ano', value: `${listing.year}/${listing.year_model}`, icon: Calendar },
@@ -179,8 +197,42 @@ export default function VehicleDetailView({
                 </div>
               )}
 
+              {/* Negotiation indicators */}
+              <div className="mt-5 pt-5 border-t border-white/70">
+                <div className="flex flex-wrap gap-2">
+                  {listing.accepts_offers !== false && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#10B981]/20 bg-[#ECFDF5] px-3 py-1.5 text-[11px] font-semibold text-[#10B981]">
+                      <BadgeCheck className="w-3 h-3" strokeWidth={2} />
+                      Aceita ofertas
+                    </span>
+                  )}
+                  {listing.negotiable === 'low' && (
+                    <span className="rounded-full border border-[#F59E0B]/20 bg-[#FFF8DF] px-3 py-1.5 text-[11px] font-semibold text-[#F59E0B]">
+                      Pouco negociável
+                    </span>
+                  )}
+                  {listing.negotiable === 'firm' && (
+                    <span className="rounded-full border border-[#DC2626]/20 bg-[#FEF2F2] px-3 py-1.5 text-[11px] font-semibold text-[#DC2626]">
+                      Valor firme
+                    </span>
+                  )}
+                  {listing.accepts_trade && (
+                    <span className="rounded-full border border-[#8B5CF6]/20 bg-[#F5F3FF] px-3 py-1.5 text-[11px] font-semibold text-[#8B5CF6]">
+                      Aceita troca
+                    </span>
+                  )}
+                </div>
+              </div>
+
               {/* Actions */}
               <div className="mt-6 space-y-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowOfferModal(true)}
+                  className="btn btn-primary w-full shadow-sm"
+                >
+                  <HandCoins className="w-4 h-4" strokeWidth={1.75} /> Fazer Oferta
+                </button>
                 <ChatStarter listingId={listing.id} />
                 <button className="btn btn-secondary w-full">
                   <Phone className="w-4 h-4" strokeWidth={1.75} /> Ver telefone
@@ -386,6 +438,24 @@ export default function VehicleDetailView({
         </motion.section>
       )}
 
+      {/* ── OFFER HISTORY ── */}
+      {accessToken && (
+        <OfferHistory
+          listingId={listing.id}
+          isSeller={isSeller}
+          accessToken={accessToken}
+        />
+      )}
+
+      {/* ── OFFER MODAL ── */}
+      <OfferModal
+        listingId={listing.id}
+        listingPrice={Number(listing.price)}
+        listingTitle={`${listing.brand} ${listing.model} ${listing.year_model}`}
+        isOpen={showOfferModal}
+        onClose={() => setShowOfferModal(false)}
+      />
+
       {/* ── MOBILE STICKY CTA ── */}
       <div className="lg:hidden fixed inset-x-0 bottom-0 z-[60] bg-white/82 backdrop-blur-2xl border-t border-white/70 p-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
         <div className="flex items-center gap-3">
@@ -397,7 +467,13 @@ export default function VehicleDetailView({
               <p className="text-[11px] text-[#16855C] font-bold tracking-tight">Abaixo da FIPE</p>
             )}
           </div>
-          <ChatStarter listingId={listing.id} />
+          <button
+            type="button"
+            onClick={() => setShowOfferModal(true)}
+            className="btn btn-primary shadow-sm"
+          >
+            <HandCoins className="w-4 h-4" strokeWidth={1.75} /> Fazer Oferta
+          </button>
         </div>
       </div>
     </motion.div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, type DragEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2 } from 'lucide-react'
+import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2, Check } from 'lucide-react'
 import Link from 'next/link'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
@@ -180,6 +180,7 @@ export default function ListingForm() {
   const supabaseReady = isSupabaseBrowserConfigured()
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
+  const [listingSubStep, setListingSubStep] = useState(1)
   const [form, setForm] = useState<FormState>(INITIAL_STATE)
   const [images, setImages] = useState<UploadImageItem[]>([])
 
@@ -671,13 +672,26 @@ export default function ListingForm() {
     }
     setError(null)
     setValidationDetails([])
+    setListingSubStep(1)
     setCurrentStep((prev) => Math.min(3, prev + 1))
   }
 
   const prevStep = () => {
     setError(null)
     setValidationDetails([])
+    if (currentStep === 1 && listingSubStep > 1) {
+      setListingSubStep((prev) => prev - 1)
+      return
+    }
     setCurrentStep((prev) => Math.max(1, prev - 1))
+  }
+
+  const handleSubStepNext = () => {
+    if (listingSubStep === 1 && !selectedBrandCode) { setError('Selecione uma marca.'); return }
+    if (listingSubStep === 2 && !selectedModelCode) { setError('Selecione um modelo.'); return }
+    if (listingSubStep === 3 && !selectedYear) { setError('Selecione o ano.'); return }
+    setError(null)
+    setListingSubStep((prev) => Math.min(4, prev + 1))
   }
 
   const handleSubmit = async () => {
@@ -862,29 +876,45 @@ export default function ListingForm() {
             <div>
               <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Selecione seu veículo</h3>
               <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
-                Escolha o tipo de veículo, depois marca, modelo e ano. O restante é automático.
+                Vamos guiar você passo a passo. Comece escolhendo a marca.
               </p>
             </div>
-            
-            <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3">
-              <div className="flex items-center justify-between gap-3 max-[330px]:gap-2">
-                <p className="label text-[#10B981]">Tipo de veículo</p>
-                <span className="badge badge-brand text-[10px]">Obrigatório</span>
-              </div>
-                <input
-                  type="hidden"
-                  value={form.vehicle_type}
-                />
+
+            {/* Step indicator */}
+            <div className="flex items-center gap-2">
+              {[1, 2, 3, 4].map((s) => (
+                <div key={s} className="flex items-center gap-2 flex-1">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-[12px] font-bold transition-all ${
+                    listingSubStep === s
+                      ? 'bg-[#17170F] text-white scale-110 shadow-md'
+                      : listingSubStep > s
+                      ? 'bg-[#10B981] text-white'
+                      : 'bg-[#EAEAE8] text-[#A3A3A3]'
+                  }`}>
+                    {listingSubStep > s ? <Check className="w-4 h-4" /> : s}
+                  </div>
+                  {s < 4 && <div className={`h-0.5 flex-1 rounded-full transition-colors ${listingSubStep > s ? 'bg-[#10B981]' : 'bg-[#EAEAE8]'}`} />}
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-between text-[11px] font-medium text-[#A3A3A3] -mt-2">
+              <span className={listingSubStep >= 1 ? 'text-[#17170F]' : ''}>Marca</span>
+              <span className={listingSubStep >= 2 ? 'text-[#17170F]' : ''}>Modelo</span>
+              <span className={listingSubStep >= 3 ? 'text-[#17170F]' : ''}>Ano</span>
+              <span className={listingSubStep >= 4 ? 'text-[#17170F]' : ''}>Versão</span>
             </div>
 
-            <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3">
-              <div className="flex items-center justify-between gap-3 max-[330px]:gap-2">
-                <p className="label text-[#10B981]">Seleção do veículo</p>
-                <span className="badge badge-neutral text-[10px]">Sequencial</span>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-3 max-[330px]:grid-cols-1">
+            <input type="hidden" value={form.vehicle_type} />
+
+            {/* Sub-step 1: Brand */}
+            {listingSubStep === 1 && (
+              <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="label text-[#10B981]">Marca</p>
+                  <span className="badge badge-brand text-[10px]">Passo 1 de 4</span>
+                </div>
                 <select
-                  className="input"
+                  className="input text-[15px]"
                   value={selectedBrandCode}
                   onChange={(e) => {
                     const code = e.target.value
@@ -893,12 +923,27 @@ export default function ListingForm() {
                     handleInput('brand', selected?.name || '')
                   }}
                 >
-                  <option value="">1. Selecione a marca</option>
+                  <option value="">Selecione a marca</option>
                   {brands.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
                 </select>
+                {selectedBrandCode && (
+                  <button type="button" onClick={handleSubStepNext} className="btn btn-primary w-full mt-2">
+                    Continuar
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            )}
 
+            {/* Sub-step 2: Model */}
+            {listingSubStep === 2 && (
+              <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="label text-[#10B981]">Modelo</p>
+                  <span className="badge badge-brand text-[10px]">Passo 2 de 4</span>
+                </div>
                 <select
-                  className="input"
+                  className="input text-[15px]"
                   value={selectedModelCode}
                   onChange={(e) => {
                     const code = e.target.value
@@ -907,14 +952,29 @@ export default function ListingForm() {
                     const rawName = selected?.name || ''
                     handleInput('model', resolveCatalogModelName(form.brand, rawName))
                   }}
-                  disabled={!selectedBrandCode}
+                  disabled={models.length === 0}
                 >
-                  <option value="">2. Selecione o modelo</option>
+                  <option value="">Selecione o modelo</option>
                   {models.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
                 </select>
+                {selectedModelCode && (
+                  <button type="button" onClick={handleSubStepNext} className="btn btn-primary w-full mt-2">
+                    Continuar
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            )}
 
+            {/* Sub-step 3: Year */}
+            {listingSubStep === 3 && (
+              <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="label text-[#10B981]">Ano</p>
+                  <span className="badge badge-brand text-[10px]">Passo 3 de 4</span>
+                </div>
                 <select
-                  className="input"
+                  className="input text-[15px]"
                   value={selectedYear ?? ''}
                   onChange={(e) => {
                     const code = e.target.value
@@ -924,28 +984,78 @@ export default function ListingForm() {
                     handleInput('yearModel', code)
                   }}
                 >
-                  <option value="">3. Selecione o ano</option>
+                  <option value="">Selecione o ano</option>
                   {years.map((year) => <option key={year} value={year}>{year}</option>)}
                 </select>
+                {selectedYear && (
+                  <button type="button" onClick={handleSubStepNext} className="btn btn-primary w-full mt-2">
+                    Continuar
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
               </div>
+            )}
 
-              {selectedYear ? (
-                <div className="grid gap-4 sm:grid-cols-3 mt-6 max-[330px]:grid-cols-1 max-[330px]:gap-2.5">
-                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-col gap-1 max-[330px]:p-3">
-                    <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Ano fab.</span>
-                    <strong className="text-sm text-[#0A0A0A]">{form.year || '-'}</strong>
+            {/* Sub-step 4: Version + FIPE */}
+            {listingSubStep === 4 && (
+              <div className="space-y-4 animate-fade-in">
+                <div className="surface p-5 space-y-4 max-[330px]:p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="label text-[#10B981]">Versões disponíveis</p>
+                    <span className="badge badge-brand text-[10px]">Passo 4 de 4</span>
                   </div>
-                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-col gap-1 max-[330px]:p-3">
-                    <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Ano/modelo</span>
-                    <strong className="text-sm text-[#0A0A0A]">{form.yearModel || '-'}</strong>
+                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-wrap items-center gap-x-6 gap-y-2 max-[330px]:p-3">
+                    <div>
+                      <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Marca</span>
+                      <p className="text-sm font-bold text-[#0A0A0A]">{form.brand || '-'}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Modelo</span>
+                      <p className="text-sm font-bold text-[#0A0A0A]">{form.model || '-'}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Ano</span>
+                      <p className="text-sm font-bold text-[#0A0A0A]">{form.year || '-'}</p>
+                    </div>
                   </div>
-                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-col gap-1 max-[330px]:p-3">
-                    <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Versão</span>
-                    <strong className="text-sm text-[#0A0A0A] truncate" title={form.version}>{form.version || 'Automática'}</strong>
-                  </div>
+                  {versions.length > 0 ? (
+                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                      {versions.map((v) => (
+                        <button
+                          key={v.code}
+                          type="button"
+                          onClick={() => {
+                            setSelectedVersionCode(v.code)
+                            handleInput('version', v.name)
+                            handleInput('title', `${form.brand} ${form.model} ${form.yearModel} ${v.name}`.trim())
+                          }}
+                          className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                            selectedVersionCode === v.code
+                              ? 'border-[#17170F] bg-[#17170F]/5 shadow-sm'
+                              : 'border-[#EAEAE8] hover:border-[#17170F]/30 bg-white'
+                          }`}
+                        >
+                          <p className="text-[14px] font-bold text-[#0A0A0A]">{v.name}</p>
+                          {v.code !== selectedVersionCode && selectedVersionCode && (
+                            <p className="text-[11px] text-[#A3A3A3] mt-0.5">Clique para selecionar</p>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  ) : fipeLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-[#A3A3A3]" />
+                      <span className="ml-3 text-sm text-[#525252]">Carregando versões...</span>
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <p className="text-sm text-[#525252]">Nenhuma versão encontrada para esta combinação.</p>
+                      <button type="button" onClick={prevStep} className="text-sm text-[#10B981] font-medium mt-2 hover:underline">
+                        Voltar e escolher outro ano
+                      </button>
+                    </div>
+                  )}
                 </div>
-              ) : null}
-            </div>
 
             <div className="surface-strong p-8 relative overflow-hidden max-[330px]:p-4">
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#D9F85F]/50 rounded-bl-full -z-10" />
@@ -981,6 +1091,9 @@ export default function ListingForm() {
                 </p>
               )}
             </div>
+              </div>
+        )}
+
           </div>
         )}
 

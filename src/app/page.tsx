@@ -432,6 +432,9 @@ export default async function HomePage() {
             <h2 className="text-[48px] font-black leading-[0.95] tracking-normal text-[#1E2330] max-[330px]:text-[28px] md:text-[78px]">
               Marcas para começar sua busca
             </h2>
+            <p className="mt-4 text-[16px] font-bold text-[#4F4A3E] max-[330px]:text-[13px]">
+              Clique em uma marca para ver todos os anúncios disponíveis
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 max-[330px]:gap-2.5">
             {brands.map((brand) => {
@@ -439,13 +442,14 @@ export default async function HomePage() {
               return (
                 <Link
                   key={brand}
-                  href={`/marcas/${slug}`}
-                  className="flex min-h-36 flex-col items-center justify-center rounded-[34px] border-2 border-[#17170F]/12 bg-white p-5 text-center shadow-sm transition-transform hover:-translate-y-1 hover:bg-[#D9F85F] max-[330px]:min-h-28 max-[330px]:rounded-[24px] max-[330px]:p-3"
+                  href={`/carros-a-venda?brand=${encodeURIComponent(brand)}`}
+                  className="flex min-h-36 flex-col items-center justify-center rounded-[34px] border-2 border-[#17170F]/12 bg-white p-5 text-center shadow-sm transition-all hover:-translate-y-1 hover:bg-[#D9F85F] hover:shadow-md hover:border-[#17170F]/30 max-[330px]:min-h-28 max-[330px]:rounded-[24px] max-[330px]:p-3"
                 >
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center max-[330px]:mb-2 max-[330px]:h-10 max-[330px]:w-10">
+                  <div className="mb-4 flex h-14 w-14 items-center justify-center max-[330px]:mb-2 max-[330px]:h-10 max-[330px]:w-10">
                     <BrandLogo brandName={brand} domain={`${slug}.com`} className="h-full w-full object-contain" />
                   </div>
                   <span className="text-[13px] font-black text-[#17170F] max-[330px]:text-[11px]">{brand}</span>
+                  <span className="text-[10px] font-bold text-[#857C6B] mt-1">Ver anúncios →</span>
                 </Link>
               )
             })}
