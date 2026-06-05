@@ -7,9 +7,21 @@ const data = SEO_DATA.vender
 export const metadata: Metadata = {
   title: data.title,
   description: data.description,
+  keywords: ['vender carro', 'vender carro rápido', 'vender seminovo', 'anunciar carro grátis', 'carros à venda'],
   alternates: {
-    canonical: 'https://carbi.com.br/vender-carro'
-  }
+    canonical: '/vender-carro',
+  },
+  openGraph: {
+    title: data.title,
+    description: data.description,
+    type: 'website',
+    url: '/vender-carro',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: data.title,
+    description: data.description,
+  },
 }
 
 export default function VenderCarroPage() {

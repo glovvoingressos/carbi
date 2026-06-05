@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Sparkles, ArrowRight } from 'lucide-react'
 import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import CarCard from '@/components/car/CarCard'
+import { BreadcrumbSchema } from '@/components/seo/JSONLD'
 
 // SEO Definitions mapped to intents
 const INTENTS: Record<string, { title: string, desc: string, h1: string, filter: (c: any) => boolean }> = {
@@ -58,6 +59,10 @@ const INTENTS: Record<string, { title: string, desc: string, h1: string, filter:
   }
 }
 
+export async function generateStaticParams() {
+  return Object.keys(INTENTS).map((intent) => ({ intent }))
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ intent: string }> }): Promise<Metadata> {
   const resolved = await params
   const data = INTENTS[resolved.intent]
@@ -66,9 +71,15 @@ export async function generateMetadata({ params }: { params: Promise<{ intent: s
   return {
     title: `${data.title} | Carbi`,
     description: data.desc,
+    keywords: [data.h1, 'carros à venda', 'seminovos à venda', 'carros usados'],
+    alternates: {
+      canonical: `/categorias/${resolved.intent}`,
+    },
     openGraph: {
        title: data.title,
-       description: data.desc
+       description: data.desc,
+       url: `/categorias/${resolved.intent}`,
+       type: 'website',
     }
   }
 }
@@ -88,6 +99,11 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
 
   return (
     <div className="bg-[#FAFAF9] min-h-screen">
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: '/' },
+        { name: 'Categorias', url: '/categorias/ate-50-mil' },
+        { name: data.h1, url: `/categorias/${resolved.intent}` },
+      ]} />
       {/* Intent Hero */}
       <section className="bg-[#0A0A0A] text-white pt-24 pb-16 relative overflow-hidden">
         <div className="container max-w-5xl mx-auto px-4 relative z-10 text-center">

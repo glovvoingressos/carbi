@@ -20,9 +20,21 @@ const data = {
 export const metadata: Metadata = {
   title: 'Vender Carro em BH | Melhor Avaliação e Venda Rápida | Carbi',
   description: 'Quer vender seu carro em Belo Horizonte? Anuncie na Carbi e venda rápido para compradores reais de BH. Sem comissões, com segurança e preço justo.',
+  keywords: ['vender carro bh', 'vender carro belo horizonte', 'seminovos bh', 'carros usados bh', 'anunciar carro grátis'],
   alternates: {
-    canonical: 'https://carbi.com.br/vender-carro-bh'
-  }
+    canonical: '/vender-carro-bh',
+  },
+  openGraph: {
+    title: 'Vender Carro em BH | Melhor Avaliação e Venda Rápida | Carbi',
+    description: 'Quer vender seu carro em Belo Horizonte? Anuncie na Carbi e venda rápido para compradores reais de BH. Sem comissões, com segurança e preço justo.',
+    type: 'website',
+    url: '/vender-carro-bh',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Vender Carro em BH | Melhor Avaliação e Venda Rápida | Carbi',
+    description: 'Quer vender seu carro em Belo Horizonte? Anuncie na Carbi e venda rápido para compradores reais de BH. Sem comissões, com segurança e preço justo.',
+  },
 }
 
 export default function VenderCarroBHPage() {

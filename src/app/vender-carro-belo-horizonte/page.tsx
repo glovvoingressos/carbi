@@ -12,8 +12,20 @@ export const metadata: Metadata = {
   title: 'Vender Carro em Belo Horizonte | Anuncie Grátis | Carbi',
   description: 'Procurando como vender carro em Belo Horizonte? A Carbi conecta você a milhares de compradores interessados em BH. Venda rápida e segura.',
   alternates: {
-    canonical: 'https://carbi.com.br/vender-carro-belo-horizonte'
-  }
+    canonical: '/vender-carro-belo-horizonte',
+  },
+  keywords: ['vender carro belo horizonte', 'vender carro bh', 'anunciar carro grátis', 'seminovos bh', 'carros usados bh'],
+  openGraph: {
+    title: 'Vender Carro em Belo Horizonte | Anuncie Grátis | Carbi',
+    description: 'Procurando como vender carro em Belo Horizonte? A Carbi conecta você a milhares de compradores interessados em BH. Venda rápida e segura.',
+    type: 'website',
+    url: '/vender-carro-belo-horizonte',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Vender Carro em Belo Horizonte | Anuncie Grátis | Carbi',
+    description: 'Procurando como vender carro em Belo Horizonte? A Carbi conecta você a milhares de compradores interessados em BH. Venda rápida e segura.',
+  },
 }
 
 export default function VenderCarroBeloHorizontePage() {

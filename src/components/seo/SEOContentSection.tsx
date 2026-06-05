@@ -4,6 +4,7 @@ import { ReactNode } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Zap, ShieldCheck, Heart, MapPin, BadgeCheck, MessageCircle, Star, Search, Shield, Clock, BadgeDollarSign, MessageSquare, Car, Check, ChevronRight } from 'lucide-react'
 import { getCarImageUrl } from '@/lib/car-image-fallback'
+import { FAQSchema } from './JSONLD'
 
 interface SEOSectionProps {
   title: string
@@ -48,6 +49,7 @@ export function SEOSection({ title, subtitle, badge, children, dark, reversed, i
 export function FAQSection({ items }: { items: { q: string, a: string }[] }) {
   return (
     <section className="py-20 md:py-28 bg-transparent">
+      <FAQSchema items={items} />
       <div className="container max-w-3xl">
         <div className="text-center mb-12">
           <p className="eyebrow mb-3">Dúvidas frequentes</p>

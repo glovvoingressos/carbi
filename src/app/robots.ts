@@ -5,8 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/minha-conta/', '/admin/'],
+      disallow: ['/api/', '/minha-conta/', '/entrar', '/admin/'],
     },
-    sitemap: 'https://www.carbi.com.br/sitemap.xml',
+    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'}/sitemap.xml`,
   }
 }

@@ -1,7 +1,24 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import BrandLogo from '@/components/brand/BrandLogo'
 import { normalizeBrandKey, pickPreferredBrandName, slugifyBrand } from '@/lib/brand-utils'
+import { BreadcrumbSchema } from '@/components/seo/JSONLD'
+
+export const metadata: Metadata = {
+  title: 'Marcas de carros à venda | Carbi',
+  description: 'Veja marcas de carros com anúncios reais, dados técnicos e opções seminovas à venda em uma vitrine organizada.',
+  keywords: ['marcas de carros', 'carros à venda', 'seminovos à venda', 'carros usados', 'comprar carro'],
+  alternates: {
+    canonical: '/marcas',
+  },
+  openGraph: {
+    title: 'Marcas de carros à venda | Carbi',
+    description: 'Veja marcas de carros com anúncios reais, dados técnicos e opções seminovas à venda em uma vitrine organizada.',
+    type: 'website',
+    url: '/marcas',
+  },
+}
 
 export default async function MarcasPage() {
   const cars = await getAllCars()
@@ -23,6 +40,10 @@ export default async function MarcasPage() {
 
   return (
     <div>
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: '/' },
+        { name: 'Marcas', url: '/marcas' },
+      ]} />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-20">
         <div className="mb-12 text-center flex flex-col items-center">
           <div className="bg-bg-muted text-[#0A0A0A] px-5 py-2 rounded-full font-bold text-[12px] tracking-widest uppercase mb-6 shadow-sm">Catálogo Oficial</div>

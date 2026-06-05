@@ -1,15 +1,13 @@
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import SEOPageClient from '@/components/seo/SEOPageClient'
 import { Zap, ShieldCheck, BadgeDollarSign, Car, Search, MessageSquare } from 'lucide-react'
-
-// Popular brands for pre-generation or matching
-const POPULAR_BRANDS = ['toyota', 'honda', 'volkswagen', 'fiat', 'chevrolet', 'ford', 'hyundai', 'jeep', 'renault', 'nissan']
+import { getAllCars } from '@/lib/data-fetcher'
+import { slugifyBrand } from '@/lib/brand-utils'
 
 export async function generateStaticParams() {
-  return POPULAR_BRANDS.map((brand) => ({
-    brand: brand,
-  }))
+  const cars = await getAllCars()
+  const uniqueBrands = Array.from(new Set(cars.map((car) => slugifyBrand(car.brand))))
+  return uniqueBrands.slice(0, 40).map((brand) => ({ brand }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }): Promise<Metadata> {
@@ -19,6 +17,16 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
   return {
     title: `Vender ${capitalizedBrand}: Anuncie seu ${capitalizedBrand} rápido na Carbi`,
     description: `Quer vender seu ${capitalizedBrand}? Na Carbi você anuncia seu ${capitalizedBrand} usado ou seminovo com segurança e alcança milhares de compradores.`,
+    keywords: [`vender ${capitalizedBrand}`, `anunciar ${capitalizedBrand}`, 'vender carro', 'anunciar carro grátis', 'seminovos à venda'],
+    alternates: {
+      canonical: `/vender/${brand}`,
+    },
+    openGraph: {
+      title: `Vender ${capitalizedBrand}: Anuncie seu ${capitalizedBrand} rápido na Carbi`,
+      description: `Quer vender seu ${capitalizedBrand}? Na Carbi você anuncia seu ${capitalizedBrand} usado ou seminovo com segurança e alcança milhares de compradores.`,
+      type: 'website',
+      url: `/vender/${brand}`,
+    },
   }
 }
 

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import HeroSearchBar from '@/components/ui/HeroSearchBar'
 import {
@@ -23,6 +24,26 @@ import { getAllCars } from '@/lib/data-fetcher'
 import { formatBRL } from '@/data/cars'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Carbi | anunciar carros grátis, seminovos à venda e FIPE',
+  description: 'Anuncie carros grátis, encontre seminovos à venda e compare preço com FIPE em uma plataforma com chat interno e dados reais.',
+  keywords: ['anunciar carros grátis', 'seminovos à venda', 'carros à venda', 'anunciar carro', 'vender carro', 'comprar carro', 'tabela fipe'],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Carbi | anunciar carros grátis, seminovos à venda e FIPE',
+    description: 'Anuncie carros grátis, encontre seminovos à venda e compare preço com FIPE em uma plataforma com chat interno e dados reais.',
+    url: '/',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Carbi | anunciar carros grátis, seminovos à venda e FIPE',
+    description: 'Anuncie carros grátis, encontre seminovos à venda e compare preço com FIPE em uma plataforma com chat interno e dados reais.',
+  },
+}
 
 const QUICK_FILTERS = [
   { label: 'SUV', icon: Car, href: '/carros/suv' },

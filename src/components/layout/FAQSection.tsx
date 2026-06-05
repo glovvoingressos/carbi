@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
+import { FAQSchema } from '@/components/seo/JSONLD'
 
 const faqs = [
   { q: "O que é o carbi?", a: "O carbi é uma plataforma premium de inteligência automotiva. Você compara valor de mercado, dados técnicos e avaliações para tomar decisões mais seguras na compra e venda." },
@@ -17,6 +18,7 @@ export default function FAQSection() {
 
   return (
     <section className="py-20 md:py-28">
+      <FAQSchema items={faqs} />
       <div className="container max-w-3xl">
         <div className="text-center mb-12">
           <p className="eyebrow mb-3">Suporte</p>

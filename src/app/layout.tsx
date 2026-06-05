@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
-import { OrganizationSchema } from '@/components/seo/JSONLD'
+import { OrganizationSchema, WebSiteSchema } from '@/components/seo/JSONLD'
 
 const font = Inter({
   subsets: ['latin'],
@@ -21,11 +21,11 @@ const fontHeading = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'),
   title: {
-    default: 'carbi — O marketplace premium que entende de carro',
-    template: '%s | carbi',
+    default: 'Carbi | anunciar carros grátis e comprar seminovos',
+    template: '%s | Carbi',
   },
-  description: 'Explore milhares de anúncios verificados, compare especificações técnicas e encontre o carro ideal com dados reais de mercado.',
-  keywords: ['comprar carro', 'anúncios de carros', 'carros usados', 'carros novos', 'tabela fipe', 'avaliação de carros'],
+  description: 'Anuncie carros grátis, compare preço com FIPE e encontre seminovos à venda com dados reais, fotos quadradas e chat interno seguro.',
+  keywords: ['anunciar carros', 'anunciar carro grátis', 'seminovos à venda', 'carros à venda', 'carros usados', 'tabela fipe', 'vender carro', 'comprar carro'],
   authors: [{ name: 'Equipe carbi' }],
   creator: 'carbi',
   publisher: 'carbi Inc.',
@@ -37,14 +37,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'pt_BR',
     url: '/',
-    siteName: 'carbi',
-    title: 'carbi — O marketplace premium que entende de carro',
-    description: 'Milhares de anúncios verificados com dados reais de mercado. Encontre, compare e negocie o carro ideal.',
+    siteName: 'Carbi',
+    title: 'Carbi | anunciar carros grátis e comprar seminovos',
+    description: 'Marketplace para anunciar carros grátis, comparar preço com FIPE e negociar seminovos com chat interno seguro.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'carbi — Marketplace Automotivo Premium',
-    description: 'Milhares de anúncios verificados com dados reais de mercado. Encontre, compare e negocie o carro ideal.',
+    title: 'Carbi | anunciar carros grátis e comprar seminovos',
+    description: 'Marketplace para anunciar carros grátis, comparar preço com FIPE e negociar seminovos com chat interno seguro.',
   },
   robots: {
     index: true,
@@ -67,6 +67,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${font.variable} ${fontHeading.variable}`}>
       <body className={font.className}>
+        <WebSiteSchema />
         <OrganizationSchema />
         <ClientShell>{children}</ClientShell>
       </body>

@@ -7,9 +7,21 @@ const data = SEO_DATA.anunciar
 export const metadata: Metadata = {
   title: data.title,
   description: data.description,
+  keywords: ['anunciar carro grátis', 'anunciar carro', 'vender carro', 'seminovos à venda', 'carros usados'],
   alternates: {
-    canonical: 'https://carbi.com.br/anunciar-carro'
-  }
+    canonical: '/anunciar-carro',
+  },
+  openGraph: {
+    title: data.title,
+    description: data.description,
+    type: 'website',
+    url: '/anunciar-carro',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: data.title,
+    description: data.description,
+  },
 }
 
 export default function AnunciarCarroPage() {

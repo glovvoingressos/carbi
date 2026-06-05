@@ -9,7 +9,31 @@ export type MarketplaceSeoPreset = {
   listingQuery: ListingsPageInput
 }
 
-const PRESETS: MarketplaceSeoPreset[] = [
+export const MARKETPLACE_SEO_PRESETS: MarketplaceSeoPreset[] = [
+  {
+    slug: 'anunciar-gratis',
+    title: 'Anunciar carro grátis | Carbi',
+    description: 'Publique seu carro grátis na Carbi com fotos reais, chat interno e comparação FIPE.',
+    h1: 'Anunciar carro grátis',
+    intro: 'Fluxo rápido para publicar seu veículo sem custo e alcançar compradores reais.',
+    listingQuery: { sort: 'recent' },
+  },
+  {
+    slug: 'seminovos-a-venda',
+    title: 'Seminovos à venda | Carbi',
+    description: 'Veja seminovos à venda com preço, fotos quadradas e comparação FIPE atualizada.',
+    h1: 'Seminovos à venda',
+    intro: 'Descubra seminovos reais em destaque, com filtros e ordenação por intenção de compra.',
+    listingQuery: { sort: 'recent' },
+  },
+  {
+    slug: 'carros-usados',
+    title: 'Carros usados à venda | Carbi',
+    description: 'Encontre carros usados à venda com transparência, preço real e anúncios ativos.',
+    h1: 'Carros usados à venda',
+    intro: 'Seleção de carros usados para quem busca compra direta com mais confiança.',
+    listingQuery: { sort: 'recent' },
+  },
   {
     slug: 'ate-50-mil',
     title: 'Carros até R$ 50 mil | Carbi',
@@ -74,7 +98,7 @@ function decodeSlug(slug: string): string {
 
 export function resolveSeoPreset(slug: string): MarketplaceSeoPreset | null {
   const normalized = decodeSlug(slug)
-  const direct = PRESETS.find((preset) => preset.slug === normalized)
+  const direct = MARKETPLACE_SEO_PRESETS.find((preset) => preset.slug === normalized)
   if (direct) return direct
 
   if (normalized.startsWith('marca-')) {
@@ -105,6 +129,8 @@ export function resolveSeoPreset(slug: string): MarketplaceSeoPreset | null {
 
   return null
 }
+
+export const MARKETPLACE_SEO_SLUGS = MARKETPLACE_SEO_PRESETS.map((preset) => preset.slug)
 
 export const QUICK_LINKS: Array<{ href: string; label: string }> = [
   { href: '/carros/ate-50-mil', label: 'Até R$ 50 mil' },

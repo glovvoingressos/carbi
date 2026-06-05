@@ -5,6 +5,10 @@ import ConversationInbox from '@/components/marketplace/ConversationInbox'
 export const metadata: Metadata = {
   title: 'Minhas conversas | Carbi',
   description: 'Converse com compradores e anunciantes com segurança, sem expor contato direto.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default function ConversationsPage() {

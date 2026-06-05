@@ -1,19 +1,83 @@
 import type { Metadata } from 'next'
 import MarketplaceClient from '@/components/marketplace/MarketplaceClient'
 import { fetchPublicListingsPage, ListingSort, getFilterOptions } from '@/lib/marketplace-server'
-import { LocalBusinessSchema } from '@/components/seo/JSONLD'
+import { BreadcrumbSchema, LocalBusinessSchema } from '@/components/seo/JSONLD'
 import { FAQSection } from '@/components/seo/SEOContentSection'
 
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>
+  searchParams: Promise<{
+    q?: string
+    ordem?: ListingSort
+    pagina?: string
+    brand?: string | string[]
+    fuel?: string | string[]
+    transmission?: string | string[]
+    color?: string | string[]
+    body_type?: string | string[]
+    price_min?: string
+    price_max?: string
+    year_min?: string
+    year_max?: string
+    mileage_min?: string
+    mileage_max?: string
+  }>
 }): Promise<Metadata> {
   const sp = await searchParams
   const query = (sp.q || '').trim()
+  const hasFilters = Boolean(
+    query ||
+    sp.ordem ||
+    sp.pagina ||
+    sp.brand ||
+    sp.fuel ||
+    sp.transmission ||
+    sp.color ||
+    sp.body_type ||
+    sp.price_min ||
+    sp.price_max ||
+    sp.year_min ||
+    sp.year_max ||
+    sp.mileage_min ||
+    sp.mileage_max,
+  )
   return {
-    title: query ? `Carros à venda: ${query} | Carbi` : 'Carros à venda no Brasil | Marketplace Inteligente | Carbi',
-    description: 'Encontre o seu próximo carro com o marketplace inteligente da Carbi. Ofertas reais com segurança e transparência em todo o Brasil.',
+    title: query ? `Carros à venda: ${query} | Carbi` : 'Carros à venda, seminovos e usados | Carbi',
+    description: 'Encontre carros à venda, seminovos e usados com preços reais, comparação FIPE e chat interno seguro na Carbi.',
+    keywords: ['carros à venda', 'seminovos à venda', 'carros usados', 'comprar carro', 'carro seminovo', 'anunciar carro grátis'],
+    alternates: {
+      canonical: '/carros-a-venda',
+    },
+    robots: hasFilters
+      ? {
+          index: false,
+          follow: true,
+          googleBot: {
+            index: false,
+            follow: true,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+            'max-video-preview': -1,
+          },
+        }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+            'max-video-preview': -1,
+          },
+        },
+    openGraph: {
+      title: 'Carros à venda, seminovos e usados | Carbi',
+      description: 'Encontre carros à venda, seminovos e usados com preços reais, comparação FIPE e chat interno seguro na Carbi.',
+      type: 'website',
+      url: '/carros-a-venda',
+    },
   }
 }
 
@@ -69,6 +133,10 @@ export default async function CarrosAVendaPage({
   return (
     <main className="min-h-screen pt-28 pb-24">
       <LocalBusinessSchema />
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: '/' },
+        { name: 'Carros à venda', url: '/carros-a-venda' },
+      ]} />
       <div className="container">
         <div className="hero-bento p-6 md:p-10 lg:p-12 mb-8">
           <div className="section-heading">

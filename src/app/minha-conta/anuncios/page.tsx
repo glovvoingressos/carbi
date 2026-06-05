@@ -4,6 +4,10 @@ import MyListingsDashboard from '@/components/marketplace/MyListingsDashboard'
 export const metadata: Metadata = {
   title: 'Meus anúncios | Carbi',
   description: 'Gerencie seus anúncios com edição real de preço, descrição e fotos.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default function MyListingsPage() {

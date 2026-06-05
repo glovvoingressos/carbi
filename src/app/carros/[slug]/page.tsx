@@ -2,7 +2,12 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import ListingCard from '@/components/marketplace/ListingCard'
 import { fetchPublicListingsPage, ListingSort } from '@/lib/marketplace-server'
-import { ALLOWED_SORTS, QUICK_LINKS, resolveSeoPreset } from '@/lib/marketplace-seo'
+import { ALLOWED_SORTS, MARKETPLACE_SEO_SLUGS, QUICK_LINKS, resolveSeoPreset } from '@/lib/marketplace-seo'
+import { BreadcrumbSchema } from '@/components/seo/JSONLD'
+
+export async function generateStaticParams() {
+  return MARKETPLACE_SEO_SLUGS.map((slug) => ({ slug }))
+}
 
 const SORT_OPTIONS: Array<{ value: ListingSort; label: string }> = [
   { value: 'recent', label: 'Mais recentes' },
@@ -29,8 +34,15 @@ export async function generateMetadata({
   return {
     title: preset.title,
     description: preset.description,
+    keywords: ['carros à venda', 'seminovos à venda', 'carros usados', preset.h1.toLowerCase()],
     alternates: {
       canonical: `/carros/${preset.slug}`,
+    },
+    openGraph: {
+      title: preset.title,
+      description: preset.description,
+      url: `/carros/${preset.slug}`,
+      type: 'website',
     },
   }
 }
@@ -59,6 +71,11 @@ export default async function CarrosSeoPage({
 
   return (
     <main className="bg-[#f5f5f3] min-h-screen pt-32 pb-24">
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: '/' },
+        { name: 'Carros à venda', url: '/carros-a-venda' },
+        { name: preset.h1, url: `/carros/${preset.slug}` },
+      ]} />
       <div className="container mx-auto max-w-6xl px-4">
         {/* Header Section */}
         <div className="mb-12">

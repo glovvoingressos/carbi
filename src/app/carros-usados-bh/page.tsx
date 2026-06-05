@@ -10,11 +10,15 @@ export const metadata: Metadata = {
   title: 'Carros Usados em BH (Belo Horizonte) | Compra e Venda | Carbi',
   description: 'Procurando carros usados e seminovos em Belo Horizonte (BH)? Encontre ofertas verificadas, compare valores atualizados e faça um negócio seguro.',
   keywords: ['carros usados bh', 'comprar carro belo horizonte', 'seminovos bh', 'loja de carros bh', 'veículos usados'],
+  alternates: {
+    canonical: '/carros-usados-bh',
+  },
   openGraph: {
     title: 'Carros Usados e Seminovos em BH - As Melhores Ofertas',
     description: 'Encontre o seu próximo carro em Belo Horizonte com a confiança da Carbi.',
     locale: 'pt_BR',
     type: 'website',
+    url: '/carros-usados-bh',
   }
 }
 

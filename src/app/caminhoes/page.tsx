@@ -15,6 +15,16 @@ export async function generateMetadata({
   return {
     title: query ? `Caminhões à venda: ${query} | Carbi` : 'Caminhões à venda no Brasil | Marketplace Inteligente | Carbi',
     description: 'Encontre o seu próximo caminhão com o marketplace inteligente da Carbi. Ofertas de caminhões, trucks, bitrem, carreta e veículos pesados em todo o Brasil.',
+    keywords: ['caminhões à venda', 'comprar caminhão', 'truck à venda', 'veículos pesados'],
+    alternates: {
+      canonical: '/caminhoes',
+    },
+    openGraph: {
+      title: query ? `Caminhões à venda: ${query} | Carbi` : 'Caminhões à venda no Brasil | Marketplace Inteligente | Carbi',
+      description: 'Encontre o seu próximo caminhão com o marketplace inteligente da Carbi. Ofertas de caminhões, trucks, bitrem, carreta e veículos pesados em todo o Brasil.',
+      type: 'website',
+      url: '/caminhoes',
+    },
   }
 }
 

@@ -3,6 +3,10 @@ import AuthCard from '@/components/marketplace/AuthCard'
 
 export const metadata: Metadata = {
   title: 'Entrar | Carbi',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default function LoginPage() {

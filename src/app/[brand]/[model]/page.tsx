@@ -8,7 +8,7 @@ import CarCard from '@/components/car/CarCard'
 import {
   Fuel, Zap, Gauge, Shield, Package, Timer, ChevronRight, TrendingDown, ArrowRight
 } from 'lucide-react'
-import { VehicleSchema } from '@/components/seo/JSONLD'
+import { BreadcrumbSchema, VehicleSchema } from '@/components/seo/JSONLD'
 import ReviewSection from '@/components/car/ReviewSection'
 import VideoReviews from '@/components/car/VideoReviews'
 import CarImage from '@/components/car/CarImage'
@@ -17,8 +17,19 @@ import FipeHistory from '@/components/car/FipeHistory'
 import { getEnhancedSpecs } from '@/lib/car-query-service'
 import { getListingVehicleId, getRelatedListings } from '@/lib/marketplace-server'
 import MarketplaceListingCard from '@/components/marketplace/ListingCard'
-import { getAllCars } from '@/lib/data-fetcher'
+import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import { getVehicleEnrichmentForPublic } from '@/lib/vehicle-enrichment-server'
+import { slugifyBrand } from '@/lib/brand-utils'
+
+export async function generateStaticParams() {
+  const cars = await getAllCars()
+  return groupCarsByModel(cars)
+    .map((item) => ({
+      brand: slugifyBrand(item.representative.brand),
+      model: item.modelSlug,
+    }))
+    .slice(0, 250)
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ brand: string; model: string }> }): Promise<Metadata> {
   const resolved = await params
@@ -28,6 +39,16 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
   return {
     title: `${car.brand} ${car.model} ${car.version} (${car.year}) — Preço e Especificações`,
     description: car.shortDesc,
+    keywords: [car.brand, car.model, car.version, 'carros à venda', 'seminovos à venda', 'carro usado'],
+    alternates: {
+      canonical: `/${resolved.brand}/${resolved.model}`,
+    },
+    openGraph: {
+      title: `${car.brand} ${car.model} ${car.version} (${car.year}) — Preço e Especificações`,
+      description: car.shortDesc,
+      url: `/${resolved.brand}/${resolved.model}`,
+      type: 'website',
+    },
   }
 }
 
@@ -109,6 +130,12 @@ export default async function CarDetailPage({
   return (
     <div className="container pt-24 pb-8">
       <VehicleSchema vehicle={car} />
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: '/' },
+        { name: 'Marcas', url: '/marcas' },
+        { name: car.brand, url: `/marcas/${brandSlug}` },
+        { name: car.model, url: `/${resolved.brand}/${resolved.model}` },
+      ]} />
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm text-[#A3A3A3] mb-6 overflow-x-auto no-scrollbar">

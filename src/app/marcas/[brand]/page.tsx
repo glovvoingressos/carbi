@@ -1,11 +1,37 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import CarCard from '@/components/car/CarCard'
 import { ChevronRight } from 'lucide-react'
-import { normalizeBrandKey, pickPreferredBrandName } from '@/lib/brand-utils'
+import { normalizeBrandKey, pickPreferredBrandName, slugifyBrand } from '@/lib/brand-utils'
+import { BreadcrumbSchema } from '@/components/seo/JSONLD'
 
-// Remove generateStaticParams for large database
-// export function generateStaticParams() { ... }
+export async function generateStaticParams() {
+  const allCars = await getAllCars()
+  const uniqueBrands = Array.from(new Set(allCars.map((car) => slugifyBrand(car.brand))))
+  return uniqueBrands.slice(0, 80).map((brand) => ({ brand }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }): Promise<Metadata> {
+  const resolved = await params
+  const brandName = resolved.brand.replace(/-/g, ' ')
+  const titleBrand = brandName.replace(/\b\w/g, (match) => match.toUpperCase())
+
+  return {
+    title: `Carros ${titleBrand} à venda | Carbi`,
+    description: `Veja carros ${titleBrand} à venda com anúncios reais, fotos quadradas, comparação FIPE e negociação via chat interno.`,
+    keywords: [`carros ${titleBrand}`, `${titleBrand} à venda`, 'carros à venda', 'seminovos à venda'],
+    alternates: {
+      canonical: `/marcas/${resolved.brand}`,
+    },
+    openGraph: {
+      title: `Carros ${titleBrand} à venda | Carbi`,
+      description: `Veja carros ${titleBrand} à venda com anúncios reais, fotos quadradas, comparação FIPE e negociação via chat interno.`,
+      type: 'website',
+      url: `/marcas/${resolved.brand}`,
+    },
+  }
+}
 
 export default async function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
   const resolved = await params
@@ -35,6 +61,11 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: '/' },
+        { name: 'Marcas', url: '/marcas' },
+        { name: realBrandName, url: `/marcas/${brandSlug}` },
+      ]} />
       <nav className="flex items-center gap-1 text-sm text-[#A3A3A3] mb-6">
         <Link href="/" className="hover:text-[#0A0A0A] transition-colors">Home</Link>
         <ChevronRight className="w-3.5 h-3.5" />

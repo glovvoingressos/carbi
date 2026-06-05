@@ -4,6 +4,10 @@ import ListingForm from '@/components/marketplace/ListingForm'
 export const metadata: Metadata = {
   title: 'Anunciar meu carro | Carbi',
   description: 'Publique seu anúncio gratuitamente, com até 10 fotos e chat interno seguro.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default function AnunciarFluxoPage() {

@@ -7,8 +7,19 @@ export const metadata: Metadata = {
   description: 'O melhor lugar para anunciar seu carro em BH. Venda seu seminovo ou usado em Belo Horizonte com segurança, preço FIPE e sem pagar comissões abusivas.',
   keywords: ['anunciar carro bh', 'vender carro belo horizonte', 'carros usados bh', 'seminovos bh', 'onde vender carro em bh'],
   alternates: {
-    canonical: 'https://carbi.com.br/anunciar-carro-bh'
-  }
+    canonical: '/anunciar-carro-bh',
+  },
+  openGraph: {
+    title: 'Anunciar Carro em BH: Venda rápido em Belo Horizonte | Carbi',
+    description: 'O melhor lugar para anunciar seu carro em BH. Venda seu seminovo ou usado em Belo Horizonte com segurança, preço FIPE e sem pagar comissões abusivas.',
+    type: 'website',
+    url: '/anunciar-carro-bh',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Anunciar Carro em BH: Venda rápido em Belo Horizonte | Carbi',
+    description: 'O melhor lugar para anunciar seu carro em BH. Venda seu seminovo ou usado em Belo Horizonte com segurança, preço FIPE e sem pagar comissões abusivas.',
+  },
 }
 
 export default function AnunciarCarroBHPage() {

@@ -1,6 +1,15 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { LayoutDashboard, MessageCircle, CarFront, UserRound } from 'lucide-react'
 import ProfilePanel from '@/components/marketplace/ProfilePanel'
+
+export const metadata: Metadata = {
+  title: 'Minha conta | Carbi',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default function MinhaContaPage() {
   return (
