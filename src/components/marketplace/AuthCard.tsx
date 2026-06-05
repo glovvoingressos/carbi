@@ -77,18 +77,18 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
   }
 
   return (
-    <div className={`bg-white border border-[#EAEAE8] rounded-2xl ${compact ? 'p-6' : 'p-8 md:p-10'}`}>
+    <div className={`surface-strong ${compact ? 'p-6' : 'p-8 md:p-10'}`}>
       <h2 className="text-[24px] md:text-[28px] font-semibold tracking-tight text-[#0A0A0A] text-balance">
         {mode === 'login' ? 'Entre na sua conta' : 'Crie sua conta'}
       </h2>
-      <p className="mt-2 text-[15px] text-[#525252] tracking-tight text-pretty">
+      <p className="mt-2 text-[15px] text-[#52607A] tracking-tight text-pretty">
         {mode === 'login'
           ? 'Acesse para gerenciar seus anúncios e conversas.'
-          : 'Comece a anunciar em menos de 2 minutos, é gratuito.'}
+          : <>Comece a anunciar em menos de 2 minutos, <span className="font-black text-[#16855C]">é grátis</span>.</>}
       </p>
 
       {!supabaseReady && (
-        <div className="mt-6 p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-xl">
+        <div className="mt-6 p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-2xl">
           <p className="text-[13px] text-[#DC2626] tracking-tight">
             Ambiente sem Supabase configurado. Login indisponível.
           </p>
@@ -109,7 +109,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="voce@email.com"
-              className="w-full h-12 pl-11 pr-4 bg-white border border-[#EAEAE8] rounded-xl text-[14px] tracking-tight outline-none focus:border-[#0A0A0A] transition-colors"
+              className="input h-12 pl-11 pr-4 rounded-2xl"
             />
           </div>
         </div>
@@ -128,18 +128,18 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mínimo 6 caracteres"
-              className="w-full h-12 pl-11 pr-4 bg-white border border-[#EAEAE8] rounded-xl text-[14px] tracking-tight outline-none focus:border-[#0A0A0A] transition-colors"
+              className="input h-12 pl-11 pr-4 rounded-2xl"
             />
           </div>
         </div>
 
         {error && (
-          <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl">
+          <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-2xl">
             <p className="text-[13px] text-[#DC2626] tracking-tight">{error}</p>
           </div>
         )}
         {message && (
-          <div className="p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl">
+          <div className="p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-2xl">
             <p className="text-[13px] text-[#10B981] tracking-tight">{message}</p>
           </div>
         )}
@@ -162,7 +162,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
             setError(null)
             setMessage(null)
           }}
-          className="text-[14px] text-[#525252] hover:text-[#0A0A0A] transition-colors"
+          className="text-[14px] text-[#52607A] hover:text-[#0A0A0A] transition-colors"
         >
           {mode === 'login' ? (
             <>Não tem conta? <span className="text-[#0A0A0A] font-medium">Criar conta</span></>
