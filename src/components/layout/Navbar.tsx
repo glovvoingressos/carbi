@@ -257,7 +257,7 @@ export default function Navbar() {
 
       {/* ── MOBILE BOTTOM NAV ── */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/78 backdrop-blur-2xl border-t border-white/70 pb-[env(safe-area-inset-bottom)] shadow-[0_-12px_40px_rgba(15,23,42,0.06)]">
-        <div className="flex items-center justify-around h-16">
+        <div className="flex h-16 items-center justify-around max-[330px]:h-14">
           {BOTTOM_NAV.map((item) => {
             const Icon = item.icon
             const active = isActive(item.href)
@@ -265,24 +265,24 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+                className={`flex h-full flex-1 flex-col items-center justify-center gap-1 transition-colors max-[330px]:gap-0.5 ${
                   active ? 'text-[#17170F]' : 'text-[#857C6B]'
                 }`}
               >
-                <Icon className="w-[22px] h-[22px]" strokeWidth={active ? 2 : 1.75} />
-                <span className="text-[10px] font-medium tracking-tight">{item.label}</span>
+                <Icon className="h-[22px] w-[22px] max-[330px]:h-[20px] max-[330px]:w-[20px]" strokeWidth={active ? 2 : 1.75} />
+                <span className="text-[10px] font-medium tracking-tight max-[330px]:text-[9px]">{item.label}</span>
               </Link>
             )
           })}
           <button
             onClick={() => setAccountOpen((prev) => !prev)}
-            className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+            className={`flex h-full flex-1 flex-col items-center justify-center gap-1 transition-colors max-[330px]:gap-0.5 ${
               accountOpen ? 'text-[#17170F]' : 'text-[#857C6B]'
             }`}
             aria-label="Conta"
           >
-            <UserRound className="w-[22px] h-[22px]" strokeWidth={accountOpen ? 2 : 1.75} />
-            <span className="text-[10px] font-medium tracking-tight">Conta</span>
+            <UserRound className="h-[22px] w-[22px] max-[330px]:h-[20px] max-[330px]:w-[20px]" strokeWidth={accountOpen ? 2 : 1.75} />
+            <span className="text-[10px] font-medium tracking-tight max-[330px]:text-[9px]">Conta</span>
           </button>
         </div>
       </nav>

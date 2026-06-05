@@ -152,9 +152,9 @@ export default async function CarrosSeoPage({
             )}
           </>
         ) : (
-          <div className="bg-white rounded-[40px] p-20 text-center border border-[#EAEAE8] mt-8">
-            <h2 className="text-2xl font-black text-[#0A0A0A] mb-2">Nenhum veículo encontrado</h2>
-            <p className="text-[#A3A3A3] font-bold">Tente ajustar seus filtros ou buscar por outro termo.</p>
+          <div className="mt-8 rounded-[40px] border border-[#EAEAE8] bg-white p-20 text-center max-[330px]:rounded-[24px] max-[330px]:p-5">
+            <h2 className="mb-2 text-2xl font-black text-[#0A0A0A] max-[330px]:text-lg">Nenhum veículo encontrado</h2>
+            <p className="font-bold text-[#A3A3A3] max-[330px]:text-sm">Tente ajustar seus filtros ou buscar por outro termo.</p>
           </div>
         )}
       </div>

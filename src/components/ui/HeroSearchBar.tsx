@@ -93,14 +93,14 @@ export default function HeroSearchBar() {
   }
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto z-50" ref={containerRef}>
+    <div className="relative z-50 mx-auto w-full max-w-3xl" ref={containerRef}>
       <form onSubmit={handleSubmit}>
         <div
-          className={`flex items-center bg-white border-2 border-[#17170F]/18 rounded-full pl-5 pr-2 py-2.5 shadow-sm transition-all duration-200 ${
+          className={`flex min-w-0 items-center rounded-full border-2 border-[#17170F]/18 bg-white pl-4 pr-2 py-2 shadow-sm transition-all duration-200 max-[380px]:pl-3 max-[380px]:py-1.5 ${
             isOpen ? 'rounded-b-none border-b-transparent' : 'hover:border-[#17170F]/30'
           }`}
         >
-          <Search className="w-[18px] h-[18px] text-[#17170F] mr-3 shrink-0" strokeWidth={1.75} />
+          <Search className="mr-2 h-[18px] w-[18px] shrink-0 text-[#17170F] max-[380px]:mr-1.5 max-[380px]:h-4 max-[380px]:w-4" strokeWidth={1.75} />
           <input
             type="text"
             value={query}
@@ -111,22 +111,22 @@ export default function HeroSearchBar() {
             onKeyDown={handleKeyDown}
             onFocus={() => query.length >= 2 && setIsOpen(true)}
             placeholder="Busque por marca ou modelo..."
-            className="flex-1 bg-transparent border-none outline-none text-[#17170F] placeholder:text-[#857C6B] py-2 text-[15px] tracking-tight"
+            className="min-w-0 flex-1 border-none bg-transparent py-2 text-[15px] tracking-tight outline-none placeholder:text-[#857C6B] max-[380px]:py-1.5 max-[380px]:text-[13px]"
           />
 
           {query && (
             <button
               type="button"
               onClick={() => { setQuery(''); setSuggestions([]); setIsOpen(false) }}
-              className="p-1.5 hover:bg-[#D9F85F] rounded-full mr-1 transition-colors"
+              className="mr-1 rounded-full p-1.5 transition-colors hover:bg-[#D9F85F] max-[380px]:mr-0.5"
             >
-              <X className="w-4 h-4 text-[#857C6B]" />
+              <X className="h-4 w-4 text-[#857C6B] max-[380px]:h-3.5 max-[380px]:w-3.5" />
             </button>
           )}
 
           <button
             type="submit"
-            className="btn btn-primary btn-sm shadow-sm"
+            className="btn btn-primary btn-sm shrink-0 px-4 shadow-sm max-[380px]:px-3 max-[360px]:px-2.5 max-[360px]:text-[12px]"
           >
             Buscar
           </button>
@@ -134,30 +134,30 @@ export default function HeroSearchBar() {
       </form>
 
       {isOpen && (
-        <div className="absolute top-full left-0 w-full bg-white border-2 border-t-0 border-[#17170F]/18 rounded-b-3xl shadow-2xl overflow-hidden animate-fade-in">
+        <div className="absolute left-0 top-full w-full overflow-hidden rounded-b-3xl border-2 border-t-0 border-[#17170F]/18 bg-white shadow-2xl animate-fade-in">
           <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
             {loading && suggestions.length === 0 ? (
-              <div className="p-8 flex flex-col items-center justify-center text-[#857C6B]">
+              <div className="flex flex-col items-center justify-center p-8 text-[#857C6B] max-[380px]:p-5">
                 <Loader2 className="w-5 h-5 animate-spin mb-2" />
                 <p className="text-[13px] font-medium tracking-tight">Buscando...</p>
               </div>
             ) : suggestions.length > 0 ? (
               <div className="py-2">
-                <p className="px-5 py-2 eyebrow">Sugestões</p>
+                <p className="eyebrow px-4 py-2 max-[380px]:px-3">Sugestões</p>
                 {suggestions.map((s, i) => (
                   <button
                     key={s.brandSlug + '-' + s.slug}
                     onClick={() => handleSelect(s)}
                     onMouseEnter={() => setActiveIndex(i)}
-                    className={`w-full flex items-center px-5 py-2.5 gap-3 transition-colors text-left ${
+                    className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors max-[380px]:gap-2 max-[380px]:px-3 ${
                       activeIndex === i ? 'bg-[#FFF8DF]' : 'bg-transparent'
                     }`}
                   >
-                    <div className="w-12 h-9 bg-white rounded-xl flex items-center justify-center overflow-hidden border border-white/70 shrink-0 shadow-sm">
+                    <div className="flex h-9 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/70 bg-white shadow-sm max-[380px]:h-8 max-[380px]:w-10">
                       {s.image ? (
                         <img src={s.image} alt={s.model} className="w-full h-full object-contain p-0.5" />
                       ) : (
-                        <Car className="w-4 h-4 text-[#857C6B]" strokeWidth={1.5} />
+                        <Car className="h-4 w-4 text-[#857C6B]" strokeWidth={1.5} />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -173,7 +173,7 @@ export default function HeroSearchBar() {
 
                 <button
                   onClick={() => router.push(`/rankings?q=${encodeURIComponent(query)}`)}
-                  className="w-full py-3 px-5 text-[13px] font-bold text-[#17170F] hover:bg-[#FFF8DF] flex items-center justify-between border-t border-[#17170F]/10 mt-1"
+                  className="mt-1 flex w-full items-center justify-between border-t border-[#17170F]/10 px-4 py-3 text-[13px] font-bold text-[#17170F] hover:bg-[#FFF8DF] max-[380px]:px-3"
                 >
                   <span className="flex items-center gap-2">
                     <Search className="w-4 h-4" strokeWidth={1.75} />
@@ -183,7 +183,7 @@ export default function HeroSearchBar() {
                 </button>
               </div>
             ) : (
-              <div className="p-8 text-center text-[#857C6B]">
+              <div className="p-8 text-center text-[#857C6B] max-[380px]:p-5">
                 <p className="text-[14px] font-medium mb-1 text-[#17170F]">Nenhum resultado encontrado</p>
                 <p className="text-[12px]">Tente buscar por marca, modelo ou segmento.</p>
               </div>

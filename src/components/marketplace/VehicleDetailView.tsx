@@ -144,7 +144,7 @@ export default function VehicleDetailView({
 
       {/* ── GALLERY + SIDEBAR ── */}
       <motion.section variants={itemVariants} className="container pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_400px] lg:gap-8">
           <div>
             <ListingImageGallery
               images={listing.images?.map(img => img.url) || []}
@@ -154,16 +154,16 @@ export default function VehicleDetailView({
 
           {/* ── Sticky Price & Seller Card ── */}
           <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
-            <div className="surface-strong p-6">
+            <div className="surface-strong p-6 max-[330px]:p-4">
               <p className="eyebrow mb-2">Preço</p>
-              <p className="text-[44px] font-semibold tracking-tight text-[#0A0A0A] leading-none">
+              <p className="text-[44px] font-semibold tracking-normal text-[#0A0A0A] leading-none max-[380px]:text-[36px] max-[330px]:text-[30px]">
                 {formatBRL(Number(listing.price))}
               </p>
 
               {/* FIPE comparison */}
               {listing.fipe_price && (
                 <div className="mt-5 pt-5 border-t border-white/70">
-                  <div className="flex items-center justify-between text-[13px] mb-3">
+                  <div className="mb-3 flex items-center justify-between gap-3 text-[13px] max-[330px]:text-[12px]">
                     <span className="text-[#52607A]">Tabela FIPE</span>
                     <span className="text-[#0A0A0A] font-medium">{formatBRL(Number(listing.fipe_price))}</span>
                   </div>
@@ -196,7 +196,7 @@ export default function VehicleDetailView({
             </div>
 
             {/* Seller card */}
-            <div className="surface p-6">
+            <div className="surface p-6 max-[330px]:p-4">
               <p className="eyebrow mb-3">Vendedor</p>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-[#FFF8DF] flex items-center justify-center text-[#0A0A0A] border border-[#17170F]/10">

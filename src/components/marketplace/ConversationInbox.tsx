@@ -189,7 +189,7 @@ export default function ConversationInbox() {
 
   if (!ready) {
     return (
-      <div className="surface-strong p-20 text-center">
+      <div className="surface-strong p-20 text-center max-[330px]:p-6">
         <Loader2 className="mx-auto h-6 w-6 animate-spin text-[#0A0A0A]" />
       </div>
     )

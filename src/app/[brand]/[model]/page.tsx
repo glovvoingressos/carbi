@@ -149,14 +149,14 @@ export default async function CarDetailPage({
       </nav>
 
       {/* Main Grid */}
-      <div className="grid lg:grid-cols-[1fr_360px] gap-8 items-start">
+      <div className="grid items-start gap-8 lg:grid-cols-[1fr_360px] max-[330px]:gap-5">
 
         {/* ── MAIN COLUMN ── */}
         <div className="space-y-8">
 
           {/* Hero */}
-          <div className="grid md:grid-cols-2 card-elevated overflow-hidden">
-            <div className="aspect-square bg-[#FAFAF9] flex items-center justify-center relative overflow-hidden">
+          <div className="card-elevated grid overflow-hidden md:grid-cols-2">
+            <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-[#FAFAF9]">
               <CarImage
                 id={car.id}
                 brand={car.brand}
@@ -168,16 +168,16 @@ export default async function CarDetailPage({
                 className="h-full w-full"
               />
             </div>
-            <div className="p-6 md:p-8 flex flex-col justify-center">
-              <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-col justify-center p-6 md:p-8 max-[330px]:p-4">
+              <div className="mb-4 flex flex-wrap gap-2">
                 <span className="badge badge-brand text-[10px]">{car.segment}</span>
                 {car.year === 2024 && <span className="badge badge-neutral text-[10px]">Novo</span>}
                 {car.turbo && <span className="badge badge-neutral text-[10px]">Turbo</span>}
               </div>
-              <h1 className="text-2xl md:text-3xl font-heading font-bold text-[#0A0A0A] leading-tight mb-1">{car.brand} {car.model}</h1>
+              <h1 className="mb-1 text-2xl font-bold leading-tight text-[#0A0A0A] md:text-3xl max-[330px]:text-xl">{car.brand} {car.model}</h1>
               <p className="text-sm text-[#525252] mb-1">{car.version}</p>
               <p className="text-xs text-[#A3A3A3] mb-3">Preço FIPE</p>
-              <p className="text-3xl md:text-4xl font-bold text-[#10B981] tracking-tight">{displayPriceLabel}</p>
+              <p className="text-3xl font-bold tracking-normal text-[#10B981] md:text-4xl max-[330px]:text-2xl">{displayPriceLabel}</p>
               <div className="flex gap-3 mt-5 items-center">
                 <YearSelector currentYear={displayYear || 'Sem ano'} availableYears={availableYears} />
               </div>

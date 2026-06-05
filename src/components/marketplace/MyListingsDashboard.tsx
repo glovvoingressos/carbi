@@ -562,8 +562,8 @@ export default function MyListingsDashboard() {
 
   if (!sessionReady) {
     return (
-      <div className="surface-strong flex flex-col items-center justify-center p-20 text-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#0A0A0A]" />
+      <div className="surface-strong flex flex-col items-center justify-center p-20 text-center max-[330px]:p-6">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0A0A0A] max-[330px]:h-6 max-[330px]:w-6" />
         <p className="mt-4 font-bold text-[#0A0A0A]">Carregando sua garagem...</p>
       </div>
     )
@@ -939,10 +939,10 @@ export default function MyListingsDashboard() {
                   )}
 
                   {localImages.length === 0 ? (
-                    <label className="block p-20 text-center border-2 border-dashed border-[#EAEAE8] rounded-2xl bg-[#FAFAF9] cursor-pointer hover:border-[#10B981] hover:bg-[#ECFDF5]/30 transition-colors">
-                      <ImageIcon className="w-12 h-12 text-[#A3A3A3] mx-auto mb-4" />
-                      <p className="text-sm font-bold text-[#0A0A0A] mb-1">Arraste fotos aqui ou clique para selecionar</p>
-                      <p className="text-xs text-[#A3A3A3]">JPG, PNG ou WEBP • até {LISTING_MAX_IMAGES} fotos • máx {LISTING_MAX_IMAGE_SIZE_MB}MB cada</p>
+                    <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-[#EAEAE8] bg-[#FAFAF9] p-20 text-center transition-colors hover:border-[#10B981] hover:bg-[#ECFDF5]/30 max-[330px]:p-6">
+                      <ImageIcon className="mx-auto mb-4 h-12 w-12 text-[#A3A3A3] max-[330px]:h-8 max-[330px]:w-8" />
+                      <p className="mb-1 text-sm font-bold text-[#0A0A0A] max-[330px]:text-[12px]">Arraste fotos aqui ou clique para selecionar</p>
+                      <p className="text-xs text-[#A3A3A3] max-[330px]:text-[10px]">JPG, PNG ou WEBP • até {LISTING_MAX_IMAGES} fotos • máx {LISTING_MAX_IMAGE_SIZE_MB}MB cada</p>
                       <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { handleImageSelect(e.target.files); e.target.value = '' }} />
                     </label>
                   ) : (
@@ -1012,10 +1012,10 @@ export default function MyListingsDashboard() {
               </div>
             </motion.div>
           ) : (
-            <div className="bg-white rounded-[48px] p-20 text-center border border-[#EAEAE8] shadow-sm flex flex-col items-center">
-              <div className="w-24 h-24 bg-[#FAFAF9] rounded-full flex items-center justify-center mb-8"><Car className="w-10 h-10 text-[#A3A3A3]" /></div>
-              <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tight">Selecione um anúncio</h2>
-              <p className="mt-4 text-lg font-medium text-[#525252] max-w-sm">Escolha um dos seus veículos ao lado para editar detalhes, fotos e preço.</p>
+            <div className="flex flex-col items-center rounded-[48px] border border-[#EAEAE8] bg-white p-20 text-center shadow-sm max-[330px]:rounded-[24px] max-[330px]:p-6">
+              <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-[#FAFAF9] max-[330px]:mb-5 max-[330px]:h-14 max-[330px]:w-14"><Car className="h-10 w-10 text-[#A3A3A3] max-[330px]:h-6 max-[330px]:w-6" /></div>
+              <h2 className="text-3xl font-black tracking-normal text-[#0A0A0A] max-[330px]:text-xl">Selecione um anúncio</h2>
+              <p className="mt-4 max-w-sm text-lg font-medium text-[#525252] max-[330px]:text-sm">Escolha um dos seus veículos ao lado para editar detalhes, fotos e preço.</p>
             </div>
           )}
         </AnimatePresence>

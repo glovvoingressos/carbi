@@ -49,7 +49,7 @@ export default function ClientShell({ children }: { children: React.ReactNode })
   return (
     <>
       <Navbar />
-      <main style={{ minHeight: '100vh', paddingBottom: '76px' }} className="md:pb-0 page-shell">
+      <main style={{ minHeight: '100vh', paddingBottom: '96px' }} className="md:pb-0 page-shell">
         {children}
       </main>
       <Footer />

@@ -510,7 +510,7 @@ export default function FipeCalculator({
         <div className="space-y-5 pt-6 mt-6 border-t border-dashed border-[#EAEAE8]">
           <div>
             <p className="eyebrow mb-1.5">Preço FIPE</p>
-            <p className="text-[40px] font-semibold text-[#0A0A0A] tracking-tight leading-none">{safeResult.price}</p>
+            <p className="text-[40px] font-semibold leading-none tracking-normal text-[#0A0A0A] max-[380px]:text-[34px] max-[330px]:text-[28px]">{safeResult.price}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">

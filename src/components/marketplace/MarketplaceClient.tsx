@@ -526,12 +526,12 @@ export default function MarketplaceClient({
               <ListingCard key={listing.id} listing={listing} priority={idx < 3} />
             ))
           ) : !isSearching && (
-            <div className="col-span-full surface-strong p-16 text-center">
-              <div className="w-14 h-14 bg-[#D9F85F] rounded-2xl flex items-center justify-center mx-auto mb-5 border border-[#17170F]/20">
-                <CarFront className="w-7 h-7 text-[#17170F]" strokeWidth={1.5} />
+            <div className="col-span-full surface-strong p-16 text-center max-[330px]:p-5">
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#17170F]/20 bg-[#D9F85F] max-[330px]:h-10 max-[330px]:w-10">
+                <CarFront className="h-7 w-7 text-[#17170F] max-[330px]:h-5 max-[330px]:w-5" strokeWidth={1.5} />
               </div>
-              <h3 className="text-[18px] font-semibold text-[#0A0A0A] mb-2 tracking-tight">Nenhum resultado</h3>
-              <p className="text-[14px] text-[#52607A] mb-6 max-w-sm mx-auto">Tente ajustar os filtros para encontrar mais veículos.</p>
+              <h3 className="mb-2 text-[18px] font-semibold tracking-normal text-[#0A0A0A] max-[330px]:text-[16px]">Nenhum resultado</h3>
+              <p className="mx-auto mb-6 max-w-sm text-[14px] text-[#52607A] max-[330px]:text-[12px]">Tente ajustar os filtros para encontrar mais veículos.</p>
               <button onClick={clearFilters} className="btn btn-primary">Limpar todos os filtros</button>
             </div>
           )}
@@ -539,20 +539,20 @@ export default function MarketplaceClient({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="mt-12 flex items-center justify-center gap-2">
+          <div className="mt-12 flex items-center justify-center gap-2 max-[330px]:mt-8 max-[330px]:gap-1.5">
             <button
               disabled={currentPage <= 1 || isSearching}
               onClick={() => {
                 setCurrentPage(currentPage - 1)
                 updateResults({ page: currentPage - 1 })
               }}
-              className={`w-11 h-11 rounded-full flex items-center justify-center border transition-colors bg-white/84 backdrop-blur-xl shadow-sm ${
+              className={`flex h-11 w-11 items-center justify-center rounded-full border bg-white/84 shadow-sm backdrop-blur-xl transition-colors max-[330px]:h-9 max-[330px]:w-9 ${
                 currentPage <= 1 ? 'opacity-30 border-[#17170F]/10' : 'border-[#17170F]/12 hover:border-[#17170F]'
               }`}
             >
               <ChevronLeft className="w-4 h-4" strokeWidth={1.75} />
             </button>
-            <div className="px-5 h-11 flex items-center text-[13px] font-medium tracking-tight text-[#0A0A0A]">
+            <div className="flex h-11 items-center px-5 text-[13px] font-medium tracking-normal text-[#0A0A0A] max-[330px]:h-9 max-[330px]:px-3 max-[330px]:text-[12px]">
               {currentPage} de {totalPages}
             </div>
             <button
@@ -561,7 +561,7 @@ export default function MarketplaceClient({
                 setCurrentPage(currentPage + 1)
                 updateResults({ page: currentPage + 1 })
               }}
-              className={`w-11 h-11 rounded-full flex items-center justify-center border transition-colors bg-white/84 backdrop-blur-xl shadow-sm ${
+              className={`flex h-11 w-11 items-center justify-center rounded-full border bg-white/84 shadow-sm backdrop-blur-xl transition-colors max-[330px]:h-9 max-[330px]:w-9 ${
                 currentPage >= totalPages ? 'opacity-30 border-[#17170F]/10' : 'border-[#17170F]/12 hover:border-[#17170F]'
               }`}
             >
@@ -587,18 +587,18 @@ export default function MarketplaceClient({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 250 }}
-              className="fixed inset-x-0 bottom-0 bg-white/94 backdrop-blur-2xl rounded-t-[32px] z-[101] max-h-[90vh] flex flex-col lg:hidden shadow-[0_-24px_60px_rgba(15,23,42,0.12)]"
+              className="fixed inset-x-0 bottom-0 z-[101] flex max-h-[90vh] flex-col rounded-t-[32px] bg-white/94 shadow-[0_-24px_60px_rgba(15,23,42,0.12)] backdrop-blur-2xl lg:hidden max-[330px]:rounded-t-[24px]"
             >
-              <div className="flex items-center justify-between p-5 border-b border-white/70">
-                <h3 className="text-[18px] font-semibold tracking-tight">Filtros</h3>
+              <div className="flex items-center justify-between border-b border-white/70 p-5 max-[330px]:p-4">
+                <h3 className="text-[18px] font-semibold tracking-normal max-[330px]:text-[16px]">Filtros</h3>
                 <button onClick={() => setShowFilters(false)} className="btn-icon">
                   <X className="w-5 h-5" strokeWidth={1.75} />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto p-5 pb-6">
-                <div className="surface p-5">{filtersContent}</div>
+              <div className="flex-1 overflow-y-auto p-5 pb-6 max-[330px]:p-3 max-[330px]:pb-4">
+                <div className="surface p-5 max-[330px]:p-3">{filtersContent}</div>
               </div>
-              <div className="p-4 border-t border-white/70 flex gap-2">
+              <div className="flex gap-2 border-t border-white/70 p-4 max-[330px]:p-3">
                 <button
                   onClick={clearFilters}
                   className="h-12 flex-1 bg-white/84 text-[#52607A] rounded-full text-[14px] font-medium border border-white/70"

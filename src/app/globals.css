@@ -180,6 +180,13 @@ body {
   font-feature-settings: "ss01", "cv11";
 }
 
+#__next,
+main,
+.page-shell {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 body::before {
   content: '';
   position: fixed;
@@ -420,6 +427,7 @@ p {
   border: 2px solid transparent;
   border-radius: var(--radius-full);
   white-space: nowrap;
+  max-width: 100%;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   min-height: 48px;
@@ -853,6 +861,20 @@ p {
 @media (max-width: 380px) {
   html { font-size: 15px; }
   .container { padding-inline: 16px; }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+  }
+
+  p, a, button, span {
+    overflow-wrap: anywhere;
+  }
+
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 @media (max-width: 330px) {
@@ -909,6 +931,11 @@ p {
   .section-kicker {
     padding-inline: 10px;
     font-size: 0.6875rem;
+  }
+
+  .eyebrow,
+  .label {
+    letter-spacing: 0;
   }
 
   h1 {

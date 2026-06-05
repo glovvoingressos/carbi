@@ -17,10 +17,10 @@ export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-20 md:py-28 max-[330px]:py-14">
       <FAQSchema items={faqs} />
       <div className="container max-w-3xl">
-        <div className="text-center mb-12">
+        <div className="mb-12 text-center max-[330px]:mb-6">
           <p className="eyebrow mb-3">Suporte</p>
           <h2 className="text-balance">Perguntas frequentes</h2>
         </div>
@@ -33,9 +33,9 @@ export default function FAQSection() {
               <div key={i}>
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : i)}
-                  className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 hover:bg-white/60 transition-colors"
+                  className="flex w-full items-center justify-between gap-4 p-5 text-left transition-colors hover:bg-white/60 md:p-6 max-[330px]:gap-3 max-[330px]:p-4"
                 >
-                  <span className="text-[15px] font-medium text-[#0A0A0A] tracking-tight">
+                  <span className="text-[15px] font-medium tracking-normal text-[#0A0A0A] max-[330px]:text-[13px]">
                     {faq.q}
                   </span>
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all ${
@@ -48,8 +48,8 @@ export default function FAQSection() {
                   className={`grid transition-all duration-300 ease-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
                 >
                   <div className="overflow-hidden">
-                    <div className="px-5 md:px-6 pb-5 md:pb-6 pt-0">
-                      <p className="text-[14px] leading-relaxed text-[#525252]">
+                    <div className="px-5 pb-5 pt-0 md:px-6 md:pb-6 max-[330px]:px-4 max-[330px]:pb-4">
+                      <p className="text-[14px] leading-relaxed text-[#525252] max-[330px]:text-[12px]">
                         {faq.a}
                       </p>
                     </div>
