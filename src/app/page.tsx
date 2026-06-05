@@ -119,17 +119,6 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen overflow-x-clip bg-[#F3F0E7]">
       <section className="relative min-h-screen overflow-x-clip bg-[#D9F85F] px-4 pb-14 pt-24 sm:pt-28 md:pb-16 md:pt-36">
-        <div className="mx-auto mb-8 flex max-w-5xl items-center justify-center">
-          <Link
-            href="/carros-a-venda"
-            className="inline-flex items-center gap-2 rounded-full bg-[#17170F] px-5 py-2.5 text-[13px] font-extrabold text-[#FFFDF3] shadow-sm transition-transform hover:-translate-y-0.5"
-          >
-            Encontre seu arquétipo automotivo
-            <span className="underline decoration-[#D9F85F] underline-offset-4">ver seminovos</span>
-            <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
-          </Link>
-        </div>
-
         <div className="container">
           <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
             <div className="text-center lg:text-left">
@@ -204,10 +193,17 @@ export default async function HomePage() {
                 Navegue por ofertas reais e encontre o carro certo com menos esforço.
               </p>
             </div>
-            <div className="rounded-[28px] border-2 border-[#17170F]/14 bg-[#17170F] p-4 shadow-sm max-[330px]:rounded-[22px] max-[330px]:p-3">
-              <p className="text-[11px] font-black uppercase tracking-normal text-[#D9F85F] max-[330px]:text-[10px]">fipe em destaque</p>
-              <p className="mt-2 text-[18px] font-black leading-tight text-[#FFFDF3] max-[330px]:text-[15px]">Compare antes de chamar</p>
-              <p className="mt-2 text-[13px] font-bold leading-relaxed text-[#E7E4DA]">
+            <div
+              className="rounded-[28px] border-2 border-[#17170F]/14 bg-[#17170F] p-4 shadow-sm max-[330px]:rounded-[22px] max-[330px]:p-3"
+              style={{ color: '#FFFDF3' }}
+            >
+              <p className="text-[11px] font-black uppercase tracking-normal max-[330px]:text-[10px]" style={{ color: '#D9F85F' }}>
+                fipe em destaque
+              </p>
+              <p className="mt-2 text-[18px] font-black leading-tight max-[330px]:text-[15px]" style={{ color: '#FFFDF3' }}>
+                Compare antes de chamar
+              </p>
+              <p className="mt-2 text-[13px] font-bold leading-relaxed max-[330px]:text-[12px]" style={{ color: '#E7E4DA' }}>
                 Veja o preço pedido e a referência de mercado com clareza no celular.
               </p>
             </div>
@@ -281,18 +277,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="overflow-hidden bg-[#17170F] py-10 text-[#FFFDF3] md:py-14">
+      <section className="overflow-hidden bg-[#17170F] py-8 text-[#FFFDF3] md:py-12">
         <div className="flex w-max animate-[marquee_42s_linear_infinite] gap-4 md:gap-8">
           {[...AUDIENCES, ...AUDIENCES, ...AUDIENCES].map((item, index) => (
             <span key={`${item}-${index}`} className="text-[30px] font-black leading-none tracking-normal md:text-[72px]">
               {item}
             </span>
           ))}
-        </div>
-        <div className="container mt-5 text-center md:mt-8">
-          <h2 className="mx-auto max-w-5xl text-[34px] font-black leading-[0.95] tracking-normal text-[#FFFDF3] max-[330px]:text-[26px] md:text-[78px]">
-            O marketplace de seminovos para quem quer comprar, vender e decidir rápido.
-          </h2>
         </div>
       </section>
 
@@ -462,12 +453,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#17170F] py-20 text-[#FFFDF3] md:py-28 max-[330px]:py-14">
-        <div className="container">
-          <h2 className="mx-auto max-w-5xl text-center text-[48px] font-black leading-[0.95] tracking-normal text-[#FFFDF3] max-[330px]:text-[28px] md:text-[78px]">
+      <section className="bg-[#17170F] py-20 text-[#FFFDF3] md:py-28 max-[330px]:py-8">
+        <div className="container" style={{ color: '#FFFDF3' }}>
+          <p className="mb-4 text-center text-[12px] font-black uppercase tracking-normal text-[#D9F85F] max-[330px]:mb-3">
+            Marketplace em destaque
+          </p>
+          <h2
+            className="mx-auto max-w-5xl text-center text-[48px] font-black leading-[0.95] tracking-normal max-[330px]:text-[22px] max-[330px]:leading-tight md:text-[78px]"
+            style={{ color: '#FFFDF3' }}
+          >
             O jeito rápido, amigável e poderoso de comprar e vender seminovos.
           </h2>
-          <div className="mt-10 flex justify-center max-[330px]:mt-6">
+          <div className="mt-10 flex justify-center max-[330px]:mt-4">
             <Link href="/carros-a-venda" className="rounded-full bg-[#E9C0F7] px-10 py-5 text-[16px] font-black text-[#17170F] transition-transform hover:-translate-y-1 max-[330px]:px-5 max-[330px]:py-3 max-[330px]:text-[13px]">
               Explorar marketplace
             </Link>
@@ -499,9 +496,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#D9F85F] px-4 py-20 md:py-28 max-[330px]:px-3 max-[330px]:py-14">
-        <div className="mx-auto max-w-6xl rounded-[56px] bg-[#17170F] p-8 text-center text-[#FFFDF3] md:p-16 max-[330px]:rounded-[28px] max-[330px]:p-4">
-          <h2 className="mx-auto max-w-4xl text-[52px] font-black leading-[0.9] tracking-normal text-[#FFFDF3] max-[330px]:text-[28px] md:text-[92px]">
+      <section className="bg-[#D9F85F] px-4 py-20 md:py-28 max-[330px]:px-3 max-[330px]:py-10">
+        <div className="mx-auto max-w-6xl rounded-[56px] bg-[#17170F] p-8 text-center text-[#FFFDF3] md:p-16 max-[330px]:rounded-[28px] max-[330px]:p-4" style={{ color: '#FFFDF3' }}>
+          <h2
+            className="mx-auto max-w-4xl text-[52px] font-black leading-[0.9] tracking-normal max-[330px]:text-[24px] max-[330px]:leading-tight md:text-[92px]"
+            style={{ color: '#FFFDF3' }}
+          >
             Comece seu próximo capítulo sobre rodas hoje.
           </h2>
           <div className="mx-auto mt-10 max-w-2xl max-[330px]:mt-5">
