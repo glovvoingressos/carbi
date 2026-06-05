@@ -175,7 +175,7 @@ export default function CarImage({
 
   return (
     <div 
-      className={`relative overflow-hidden bg-bg-muted dark:bg-neutral-900 ${className}`}
+      className={`relative overflow-hidden bg-[#FFF8DF] ${className}`}
       style={{
         ...style,
         aspectRatio,
@@ -200,30 +200,30 @@ export default function CarImage({
 
       {/* Loading Shimmer / Pulse */}
       {isLoading && resolvedCandidates.length > 0 && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#FAFAF9] animate-pulse z-10">
-          <div className="w-12 h-1.5 bg-[#FAFAF9] rounded-full animate-bounce" />
+        <div className="absolute inset-0 flex items-center justify-center bg-[#FFF8DF] animate-pulse z-10">
+          <div className="w-12 h-1.5 bg-white rounded-full animate-bounce shadow-sm" />
         </div>
       )}
 
       {/* Premium Fallback UI (Se tudo falhar) */}
       {hasFinalError && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-bg-muted to-border">
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-[#FFF8DF] to-[#F3F0E7]">
            <div className="relative mb-3 flex items-center justify-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/50 backdrop-blur-md border border-[#0A0A0A]/5 rounded-full absolute animate-pulse" />
-              <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white border-2 border-[#0A0A0A] shadow-[4px_4px_0_#0A0A0A] rounded-xl flex items-center justify-center text-[#0A0A0A] rotate-[2deg] z-10">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/60 backdrop-blur-md border border-white/70 rounded-full absolute animate-pulse" />
+              <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white border border-white/70 shadow-sm rounded-xl flex items-center justify-center text-[#0A0A0A] rotate-[2deg] z-10">
                  <span className="font-black text-xl sm:text-2xl uppercase tracking-tight">{brand?.charAt(0)}</span>
               </div>
            </div>
            
            <div className="flex flex-col items-center gap-1.5 z-10">
-              <p className="text-[10px] sm:text-[11px] font-black text-[#0A0A0A] uppercase tracking-[0.15em] text-center leading-tight bg-[#f5f5f3] px-3 py-1.5 rounded-full border border-[#EAEAE8]">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-[#0A0A0A] uppercase tracking-[0.15em] text-center leading-tight bg-white/80 px-3 py-1.5 rounded-full border border-white/80">
                 Imagem indisponível
               </p>
-              <p className="text-[9px] font-bold text-[#A3A3A3] uppercase tracking-widest text-center mt-1">
+              <p className="text-[9px] font-bold text-[#8A95A8] uppercase tracking-widest text-center mt-1">
                  Fonte real não encontrada
               </p>
            </div>
-           <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-24 bg-[#FAFAF9] blur-3xl rounded-full skew-x-12 pointer-events-none" />
+           <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-24 bg-white blur-3xl rounded-full skew-x-12 pointer-events-none" />
         </div>
       )}
     </div>

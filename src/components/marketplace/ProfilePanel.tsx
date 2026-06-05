@@ -145,7 +145,7 @@ export default function ProfilePanel() {
 
   if (!sessionReady) {
     return (
-      <div className="bg-white border border-[#EAEAE8] rounded-2xl p-12 text-center">
+      <div className="surface-strong p-12 text-center">
         <Loader2 className="mx-auto h-5 w-5 animate-spin text-[#0A0A0A]" />
         <p className="mt-3 text-[14px] text-[#525252]">Carregando perfil...</p>
       </div>
@@ -157,16 +157,16 @@ export default function ProfilePanel() {
   }
 
   return (
-    <section className="bg-white border border-[#EAEAE8] rounded-2xl p-8 md:p-10">
+    <section className="surface-strong p-8 md:p-10">
       <h1 className="text-[28px] font-semibold tracking-tight text-[#0A0A0A]">Configurações</h1>
-      <p className="mt-2 text-[15px] text-[#525252]">Atualize seu nome e sua foto de perfil.</p>
+      <p className="mt-2 text-[15px] text-[#52607A]">Atualize seu nome e sua foto de perfil.</p>
 
       <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-5">
         {avatarUrl ? (
-          <img src={avatarUrl} alt="Foto de perfil" className="w-24 h-24 rounded-full object-cover border border-[#EAEAE8]" />
+          <img src={avatarUrl} alt="Foto de perfil" className="w-24 h-24 rounded-full object-cover border border-white/70 shadow-sm" />
         ) : (
-          <div className="w-24 h-24 rounded-full bg-[#FAFAF9] flex items-center justify-center border border-[#EAEAE8]">
-            <User className="w-9 h-9 text-[#A3A3A3]" strokeWidth={1.5} />
+          <div className="w-24 h-24 rounded-full bg-[#FFF8DF] flex items-center justify-center border border-[#17170F]/10">
+            <User className="w-9 h-9 text-[#8A95A8]" strokeWidth={1.5} />
           </div>
         )}
         <label className="btn btn-secondary cursor-pointer">
@@ -191,7 +191,7 @@ export default function ProfilePanel() {
           <input
             value={email}
             disabled
-            className="input opacity-60 cursor-not-allowed bg-[#FAFAF9]"
+            className="input opacity-60 cursor-not-allowed bg-white/60"
           />
         </div>
       </div>

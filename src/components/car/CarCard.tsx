@@ -51,10 +51,10 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
 
   return (
     <article
-      className="bg-white border border-[#EAEAE8] rounded-2xl overflow-hidden transition-all duration-200 group cursor-pointer hover:border-[#0A0A0A] hover:shadow-md"
+      className="surface-strong overflow-hidden transition-all duration-200 group cursor-pointer hover:-translate-y-1 hover:shadow-xl"
       onClick={() => router.push(detailUrl)}
     >
-      <div className="relative w-full aspect-square bg-[#FAFAF9] overflow-hidden">
+      <div className="relative w-full aspect-square bg-[#FFF8DF] overflow-hidden">
         {badge && (
           <span className={`absolute top-3 left-3 z-10 badge ${badge.tone === 'dark' ? 'badge-inverse' : 'badge-glass'}`}>
             {badge.label}
@@ -73,7 +73,7 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
         />
 
         <button
-          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/95 backdrop-blur flex items-center justify-center shadow-sm"
+          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/95 backdrop-blur flex items-center justify-center shadow-sm border border-white/70"
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
@@ -85,13 +85,13 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
         </button>
       </div>
 
-      <div className="p-5 flex flex-col flex-1">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-1">
+        <div className="p-5 flex flex-col flex-1">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-1">
             <Star className="w-3.5 h-3.5 fill-[#FACC15] text-[#FACC15]" />
             <span className="text-[13px] font-medium text-[#0A0A0A]">{rating}</span>
           </div>
-          <span className="text-[11px] font-medium text-[#A3A3A3] uppercase tracking-wider truncate max-w-[80px]">
+          <span className="text-[11px] font-medium text-[#8A95A8] uppercase tracking-wider truncate max-w-[80px]">
             {segLabel}
           </span>
         </div>
@@ -106,17 +106,17 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
         </p>
 
         <div className="flex gap-1.5 flex-wrap mb-5">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#525252] bg-[#FAFAF9] border border-[#EAEAE8] px-2.5 py-1 rounded-full">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#52607A] bg-white/80 border border-white/70 px-2.5 py-1 rounded-full">
             <Fuel className="w-3 h-3" strokeWidth={1.75} /> {car.engineType}
           </span>
           {car.horsepower > 0 && (
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#525252] bg-[#FAFAF9] border border-[#EAEAE8] px-2.5 py-1 rounded-full">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#52607A] bg-white/80 border border-white/70 px-2.5 py-1 rounded-full">
               <Zap className="w-3 h-3" strokeWidth={1.75} /> {car.horsepower} cv
             </span>
           )}
         </div>
 
-        <div className="mt-auto pt-4 border-t border-[#EAEAE8] flex items-center justify-between">
+        <div className="mt-auto pt-4 border-t border-white/70 flex items-center justify-between">
           <span className="text-[13px] font-medium text-[#0A0A0A] inline-flex items-center gap-1.5 group-hover:gap-2 transition-all">
             Ver detalhes
             <ArrowRight className="w-3.5 h-3.5" strokeWidth={2} />

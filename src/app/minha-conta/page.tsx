@@ -4,46 +4,46 @@ import ProfilePanel from '@/components/marketplace/ProfilePanel'
 
 export default function MinhaContaPage() {
   return (
-    <main className="min-h-screen bg-[#f5f5f3] pb-16 pt-32">
-      <div className="container mx-auto max-w-4xl px-4">
-        <section className="bg-white rounded-[32px] border border-[#EAEAE8] p-8 sm:p-12 shadow-sm">
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#A3A3A3]">Minha conta</p>
-          <h1 className="mt-2 text-3xl sm:text-4xl font-black text-[#0A0A0A] tracking-tight">Seu painel de perfil</h1>
-          <p className="mt-3 text-lg font-medium text-[#A3A3A3]">
+    <main className="min-h-screen pb-16 pt-28">
+      <div className="container max-w-4xl">
+        <section className="hero-bento p-8 sm:p-12">
+          <p className="section-kicker">Minha conta</p>
+          <h1 className="mt-3 text-balance">Seu painel de perfil</h1>
+          <p className="mt-3 text-lg font-medium text-[#52607A]">
             Acesse seus anúncios, chats e ação rápida para publicar um novo veículo.
           </p>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            <Link href="/minha-conta/anuncios" className="rounded-3xl bg-[#f5f5f3] border border-[#EAEAE8] p-6 transition-all hover:-translate-y-1 hover:bg-[#0A0A0A] hover:text-white group">
+            <Link href="/minha-conta/anuncios" className="surface p-6 transition-all hover:-translate-y-1 hover:border-[#17170F]/30 hover:bg-[#D9F85F] group">
               <div className="flex items-center gap-3 text-[#0A0A0A] group-hover:text-white transition-colors">
                 <LayoutDashboard className="h-5 w-5" />
                 <span className="text-base font-black">Meus anúncios</span>
               </div>
-              <p className="mt-2 text-sm font-medium text-[#A3A3A3] group-hover:text-white/60 transition-colors">Editar fotos, preço e descrição.</p>
+              <p className="mt-2 text-sm font-medium text-[#52607A] group-hover:text-[#52607A] transition-colors">Editar fotos, preço e descrição.</p>
             </Link>
 
-            <Link href="/minha-conta/conversas" className="rounded-3xl bg-[#f5f5f3] border border-[#EAEAE8] p-6 transition-all hover:-translate-y-1 hover:bg-[#0A0A0A] hover:text-white group">
+            <Link href="/minha-conta/conversas" className="surface p-6 transition-all hover:-translate-y-1 hover:border-[#17170F]/30 hover:bg-[#D9F85F] group">
               <div className="flex items-center gap-3 text-[#0A0A0A] group-hover:text-white transition-colors">
                 <MessageCircle className="h-5 w-5" />
                 <span className="text-base font-black">Meus chats</span>
               </div>
-              <p className="mt-2 text-sm font-medium text-[#A3A3A3] group-hover:text-white/60 transition-colors">Acompanhar conversas com compradores.</p>
+              <p className="mt-2 text-sm font-medium text-[#52607A] group-hover:text-[#52607A] transition-colors">Acompanhar conversas com compradores.</p>
             </Link>
 
-            <Link href="/anunciar-carro" className="rounded-3xl bg-[#f5f5f3] border border-[#EAEAE8] p-6 transition-all hover:-translate-y-1 hover:bg-[#0A0A0A] hover:text-white group">
+            <Link href="/anunciar-carro" className="surface p-6 transition-all hover:-translate-y-1 hover:border-[#17170F]/30 hover:bg-[#D9F85F] group">
               <div className="flex items-center gap-3 text-[#0A0A0A] group-hover:text-white transition-colors">
                 <CarFront className="h-5 w-5" />
                 <span className="text-base font-black">Anunciar carro</span>
               </div>
-              <p className="mt-2 text-sm font-medium text-[#A3A3A3] group-hover:text-white/60 transition-colors">Publicar novo anúncio em poucos passos.</p>
+              <p className="mt-2 text-sm font-medium text-[#52607A] group-hover:text-[#52607A] transition-colors">Publicar novo anúncio em poucos passos.</p>
             </Link>
 
-            <Link href="/entrar" className="rounded-3xl bg-[#f5f5f3] border border-[#EAEAE8] p-6 transition-all hover:-translate-y-1 hover:bg-[#0A0A0A] hover:text-white group">
+            <Link href="/entrar" className="surface p-6 transition-all hover:-translate-y-1 hover:border-[#17170F]/30 hover:bg-[#D9F85F] group">
               <div className="flex items-center gap-3 text-[#0A0A0A] group-hover:text-white transition-colors">
                 <UserRound className="h-5 w-5" />
                 <span className="text-base font-black">Login / Segurança</span>
               </div>
-              <p className="mt-2 text-sm font-medium text-[#A3A3A3] group-hover:text-white/60 transition-colors">Entrar ou trocar de conta.</p>
+              <p className="mt-2 text-sm font-medium text-[#52607A] group-hover:text-[#52607A] transition-colors">Entrar ou trocar de conta.</p>
             </Link>
           </div>
         </section>

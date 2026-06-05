@@ -42,7 +42,7 @@ const COLOR_MAP: Record<string, string> = {
   'Prata': '#C0C0C0',
   'Cinza': '#808080',
   'Vermelho': '#DC2626',
-  'Azul': '#2563EB',
+  'Azul': '#93C5FD',
   'Verde': '#10B981',
   'Amarelo': '#FACC15',
   'Bege': '#F5F5DC',
@@ -54,7 +54,7 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
     <button
       type="button"
       onClick={onRemove}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0A0A0A] text-white text-[12px] font-medium tracking-tight hover:bg-[#1F1F1F] transition-colors"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#17170F] text-[#FFFDF3] text-[12px] font-bold tracking-tight hover:bg-[#2A2A1D] transition-colors shadow-sm"
     >
       {label}
       <X className="w-3 h-3" strokeWidth={2.5} />
@@ -78,8 +78,8 @@ function ToggleButton({ active, onClick, children }: { active: boolean; onClick:
       onClick={onClick}
       className={`px-3.5 py-2 rounded-full text-[13px] font-medium tracking-tight transition-colors ${
         active
-          ? 'bg-[#0A0A0A] text-white'
-          : 'bg-[#FAFAF9] text-[#525252] hover:bg-[#F4F4F2] border border-[#EAEAE8]'
+          ? 'bg-[#17170F] text-[#FFFDF3] shadow-sm'
+          : 'bg-white text-[#4F4A3E] hover:bg-[#D9F85F] border-2 border-[#17170F]/10'
       }`}
     >
       {children}
@@ -95,11 +95,11 @@ function CheckboxRow({ label, checked, onChange }: { label: string; checked: boo
       className="w-full flex items-center gap-3 py-1.5 text-left group"
     >
       <div className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
-        checked ? 'bg-[#0A0A0A] border-[#0A0A0A]' : 'bg-white border-[#D4D4D4] group-hover:border-[#0A0A0A]'
+        checked ? 'bg-[#17170F] border-[#17170F]' : 'bg-white border-[#C8BEA8] group-hover:border-[#17170F]'
       }`}>
         {checked && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
       </div>
-      <span className={`text-[13px] tracking-tight transition-colors ${checked ? 'text-[#0A0A0A] font-medium' : 'text-[#525252] group-hover:text-[#0A0A0A]'}`}>
+      <span className={`text-[13px] tracking-tight transition-colors ${checked ? 'text-[#0A0A0A] font-medium' : 'text-[#52607A] group-hover:text-[#0A0A0A]'}`}>
         {label}
       </span>
     </button>
@@ -287,20 +287,20 @@ export default function MarketplaceClient({
       )}
 
       <FilterSection title="Preço">
-        <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2">
           <input
             type="number"
             value={priceRange[0] || ''}
             onChange={e => setPriceRange([Number(e.target.value) || 0, priceRange[1]])}
             placeholder="Mínimo"
-            className="w-full h-10 px-3 bg-white border border-[#EAEAE8] rounded-lg text-[13px] outline-none focus:border-[#0A0A0A] transition-colors"
+            className="w-full h-10 px-3 bg-white/80 border border-white/80 rounded-xl text-[13px] outline-none focus:border-[#17170F] transition-colors"
           />
           <input
             type="number"
             value={priceRange[1] === 1000000 ? '' : priceRange[1]}
             onChange={e => setPriceRange([priceRange[0], Number(e.target.value) || 1000000])}
             placeholder="Máximo"
-            className="w-full h-10 px-3 bg-white border border-[#EAEAE8] rounded-lg text-[13px] outline-none focus:border-[#0A0A0A] transition-colors"
+            className="w-full h-10 px-3 bg-white/80 border border-white/80 rounded-xl text-[13px] outline-none focus:border-[#17170F] transition-colors"
           />
         </div>
         <div className="flex flex-wrap gap-1.5 mt-3">
@@ -373,10 +373,10 @@ export default function MarketplaceClient({
           onChange={e => setMileageMax(Number(e.target.value))}
           className="w-full h-1 bg-[#EAEAE8] rounded-full appearance-none cursor-pointer accent-[#0A0A0A]"
         />
-        <div className="flex justify-between mt-2 text-[11px] text-[#A3A3A3] tracking-tight">
-          <span>0</span>
-          <span>300.000 km</span>
-        </div>
+          <div className="flex justify-between mt-2 text-[11px] text-[#8A95A8] tracking-tight">
+            <span>0</span>
+            <span>300.000 km</span>
+          </div>
       </FilterSection>
 
       {filterOptions?.fuels && filterOptions.fuels.length > 0 && (
@@ -460,14 +460,11 @@ export default function MarketplaceClient({
         <div className="sticky top-24">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-[15px] font-semibold tracking-tight text-[#0A0A0A]">Filtros</h2>
-            <button
-              onClick={clearFilters}
-              className="text-[12px] font-medium text-[#A3A3A3] hover:text-[#0A0A0A] transition-colors"
-            >
+            <button onClick={clearFilters} className="text-[12px] font-medium text-[#52607A] hover:text-[#0A0A0A] transition-colors">
               Limpar tudo
             </button>
           </div>
-          {filtersContent}
+          <div className="surface-strong p-5">{filtersContent}</div>
         </div>
       </aside>
 
@@ -476,18 +473,18 @@ export default function MarketplaceClient({
         {/* Search + Sort */}
         <div className="flex gap-2 mb-5">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3]" strokeWidth={1.75} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#17170F]" strokeWidth={1.75} />
             <input
               type="text"
               value={q}
               onChange={e => setQ(e.target.value)}
               placeholder="Buscar por marca, modelo ou versão..."
-              className="w-full h-12 pl-11 pr-4 bg-white border border-[#EAEAE8] rounded-full text-[14px] tracking-tight outline-none focus:border-[#0A0A0A] transition-colors"
+              className="w-full h-12 pl-11 pr-4 bg-white border-2 border-[#17170F]/12 rounded-full text-[14px] tracking-tight outline-none focus:border-[#17170F] transition-colors shadow-sm"
             />
           </div>
           <button
             onClick={() => setShowFilters(true)}
-            className="lg:hidden h-12 px-4 bg-white border border-[#EAEAE8] rounded-full flex items-center gap-2 text-[14px] font-medium tracking-tight"
+            className="lg:hidden h-12 px-4 bg-white border-2 border-[#17170F]/12 rounded-full flex items-center gap-2 text-[14px] font-bold tracking-tight shadow-sm"
           >
             <SlidersHorizontal className="w-4 h-4" strokeWidth={1.75} />
             Filtros
@@ -496,7 +493,7 @@ export default function MarketplaceClient({
             <select
               value={sort}
               onChange={e => setSort(e.target.value as ListingSort)}
-              className="h-12 pl-4 pr-10 bg-white border border-[#EAEAE8] rounded-full text-[14px] font-medium tracking-tight appearance-none outline-none cursor-pointer hover:border-[#0A0A0A] focus:border-[#0A0A0A] transition-colors"
+              className="h-12 pl-4 pr-10 bg-white border-2 border-[#17170F]/12 rounded-full text-[14px] font-bold tracking-tight appearance-none outline-none cursor-pointer hover:border-[#17170F] focus:border-[#17170F] transition-colors shadow-sm"
             >
               {SORT_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -529,12 +526,12 @@ export default function MarketplaceClient({
               <ListingCard key={listing.id} listing={listing} priority={idx < 3} />
             ))
           ) : !isSearching && (
-            <div className="col-span-full bg-white border border-[#EAEAE8] rounded-2xl p-16 text-center">
-              <div className="w-14 h-14 bg-[#FAFAF9] rounded-2xl flex items-center justify-center mx-auto mb-5">
-                <CarFront className="w-7 h-7 text-[#0A0A0A]" strokeWidth={1.5} />
+            <div className="col-span-full surface-strong p-16 text-center">
+              <div className="w-14 h-14 bg-[#D9F85F] rounded-2xl flex items-center justify-center mx-auto mb-5 border border-[#17170F]/20">
+                <CarFront className="w-7 h-7 text-[#17170F]" strokeWidth={1.5} />
               </div>
               <h3 className="text-[18px] font-semibold text-[#0A0A0A] mb-2 tracking-tight">Nenhum resultado</h3>
-              <p className="text-[14px] text-[#525252] mb-6 max-w-sm mx-auto">Tente ajustar os filtros para encontrar mais veículos.</p>
+              <p className="text-[14px] text-[#52607A] mb-6 max-w-sm mx-auto">Tente ajustar os filtros para encontrar mais veículos.</p>
               <button onClick={clearFilters} className="btn btn-primary">Limpar todos os filtros</button>
             </div>
           )}
@@ -549,8 +546,8 @@ export default function MarketplaceClient({
                 setCurrentPage(currentPage - 1)
                 updateResults({ page: currentPage - 1 })
               }}
-              className={`w-11 h-11 rounded-full flex items-center justify-center border transition-colors ${
-                currentPage <= 1 ? 'opacity-30 border-[#EAEAE8]' : 'border-[#EAEAE8] hover:border-[#0A0A0A]'
+              className={`w-11 h-11 rounded-full flex items-center justify-center border transition-colors bg-white/84 backdrop-blur-xl shadow-sm ${
+                currentPage <= 1 ? 'opacity-30 border-[#17170F]/10' : 'border-[#17170F]/12 hover:border-[#17170F]'
               }`}
             >
               <ChevronLeft className="w-4 h-4" strokeWidth={1.75} />
@@ -564,8 +561,8 @@ export default function MarketplaceClient({
                 setCurrentPage(currentPage + 1)
                 updateResults({ page: currentPage + 1 })
               }}
-              className={`w-11 h-11 rounded-full flex items-center justify-center border transition-colors ${
-                currentPage >= totalPages ? 'opacity-30 border-[#EAEAE8]' : 'border-[#EAEAE8] hover:border-[#0A0A0A]'
+              className={`w-11 h-11 rounded-full flex items-center justify-center border transition-colors bg-white/84 backdrop-blur-xl shadow-sm ${
+                currentPage >= totalPages ? 'opacity-30 border-[#17170F]/10' : 'border-[#17170F]/12 hover:border-[#17170F]'
               }`}
             >
               <ChevronRight className="w-4 h-4" strokeWidth={1.75} />
@@ -590,27 +587,27 @@ export default function MarketplaceClient({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 250 }}
-              className="fixed inset-x-0 bottom-0 bg-white rounded-t-3xl z-[101] max-h-[90vh] flex flex-col lg:hidden"
+              className="fixed inset-x-0 bottom-0 bg-white/94 backdrop-blur-2xl rounded-t-[32px] z-[101] max-h-[90vh] flex flex-col lg:hidden shadow-[0_-24px_60px_rgba(15,23,42,0.12)]"
             >
-              <div className="flex items-center justify-between p-5 border-b border-[#EAEAE8]">
+              <div className="flex items-center justify-between p-5 border-b border-white/70">
                 <h3 className="text-[18px] font-semibold tracking-tight">Filtros</h3>
                 <button onClick={() => setShowFilters(false)} className="btn-icon">
                   <X className="w-5 h-5" strokeWidth={1.75} />
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto p-5 pb-6">
-                {filtersContent}
+                <div className="surface p-5">{filtersContent}</div>
               </div>
-              <div className="p-4 border-t border-[#EAEAE8] flex gap-2">
+              <div className="p-4 border-t border-white/70 flex gap-2">
                 <button
                   onClick={clearFilters}
-                  className="h-12 flex-1 bg-[#FAFAF9] text-[#525252] rounded-full text-[14px] font-medium"
+                  className="h-12 flex-1 bg-white/84 text-[#52607A] rounded-full text-[14px] font-medium border border-white/70"
                 >
                   Limpar
                 </button>
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="h-12 flex-[2] bg-[#0A0A0A] text-white rounded-full text-[14px] font-medium"
+                  className="h-12 flex-[2] bg-[#17170F] text-[#FFFDF3] rounded-full text-[14px] font-bold shadow-sm"
                 >
                   Ver {total} resultados
                 </button>

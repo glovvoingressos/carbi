@@ -39,7 +39,7 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
   return (
     <div className="space-y-3">
       <div
-        className="relative aspect-square w-full overflow-hidden rounded-[26px] bg-white/70"
+        className="relative aspect-square w-full overflow-hidden rounded-[32px] bg-white shadow-xl border border-white/70"
         onTouchStart={(event) => setTouchStartX(event.touches[0]?.clientX ?? null)}
         onTouchEnd={(event) => {
           if (touchStartX == null) return
@@ -53,11 +53,11 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
         }}
       >
         {hasFailed(activeImage) ? (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-[#FAFAF9] p-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/60">
-              <ImageIcon className="h-7 w-7 text-[#A3A3A3]" />
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-[#FFF8DF] p-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/70 border border-white/70">
+              <ImageIcon className="h-7 w-7 text-[#8A95A8]" />
             </div>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-[#A3A3A3]">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-[#8A95A8]">
               Imagem indisponível
             </p>
           </div>
@@ -85,14 +85,14 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
                 key={`${image}-${index}`}
                 type="button"
                 onClick={() => setActiveIndex(index)}
-                className={`relative aspect-square h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl transition ${
-                  isActive ? 'ring-2 ring-[#0A0A0A]' : 'opacity-80 hover:opacity-100'
+                className={`relative aspect-square h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl transition ${
+                  isActive ? 'ring-2 ring-[#17170F]' : 'opacity-80 hover:opacity-100'
                 }`}
                 aria-label={`Abrir foto ${index + 1}`}
               >
                 {thumbFailed ? (
-                  <div className="flex h-full w-full items-center justify-center bg-[#FAFAF9]">
-                    <ImageIcon className="h-5 w-5 text-[#A3A3A3]" />
+                  <div className="flex h-full w-full items-center justify-center bg-[#FFF8DF]">
+                    <ImageIcon className="h-5 w-5 text-[#8A95A8]" />
                   </div>
                 ) : (
                   <img

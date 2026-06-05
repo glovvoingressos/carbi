@@ -17,7 +17,7 @@ interface SEOSectionProps {
 
 export function SEOSection({ title, subtitle, badge, children, dark, reversed, image }: SEOSectionProps) {
   return (
-    <section className={`py-20 md:py-28 ${dark ? 'bg-[#0A0A0A] text-white' : 'bg-white text-[#0A0A0A]'}`}>
+    <section className={`py-20 md:py-28 ${dark ? 'bg-[#17170F] text-white' : 'bg-transparent text-[#0A0A0A]'}`}>
       <div className="container">
         <div className={`flex flex-col lg:flex-row items-center gap-12 lg:gap-16 ${reversed ? 'lg:flex-row-reverse' : ''}`}>
           <div className="flex-1 space-y-6">
@@ -35,7 +35,7 @@ export function SEOSection({ title, subtitle, badge, children, dark, reversed, i
             </div>
           </div>
           {image && (
-            <div className="flex-1 w-full aspect-square rounded-2xl bg-[#FAFAF9] overflow-hidden border border-[#EAEAE8]">
+            <div className="flex-1 w-full aspect-square rounded-3xl bg-white overflow-hidden border border-white/70 shadow-lg">
               <img src={getCarImageUrl(image) || image} alt={title} width={1080} height={1080} className="w-full h-full object-cover" />
             </div>
           )}
@@ -47,7 +47,7 @@ export function SEOSection({ title, subtitle, badge, children, dark, reversed, i
 
 export function FAQSection({ items }: { items: { q: string, a: string }[] }) {
   return (
-    <section className="py-20 md:py-28 bg-[#FAFAF9]">
+    <section className="py-20 md:py-28 bg-transparent">
       <div className="container max-w-3xl">
         <div className="text-center mb-12">
           <p className="eyebrow mb-3">Dúvidas frequentes</p>
@@ -55,7 +55,7 @@ export function FAQSection({ items }: { items: { q: string, a: string }[] }) {
         </div>
         <div className="space-y-3">
           {items.map((item, idx) => (
-            <div key={idx} className="bg-white rounded-2xl p-6 md:p-8 border border-[#EAEAE8]">
+            <div key={idx} className="surface p-6 md:p-8">
               <h3 className="text-[16px] font-semibold text-[#0A0A0A] mb-2 tracking-tight">{item.q}</h3>
               <p className="text-[15px] text-[#525252] leading-relaxed">{item.a}</p>
             </div>
@@ -70,14 +70,14 @@ export function SEOCallToAction({ title, description, buttonText, buttonHref }: 
   return (
     <section className="py-20 md:py-28">
       <div className="container">
-        <div className="bg-[#0A0A0A] text-white rounded-2xl p-10 md:p-20 text-center">
+        <div className="surface-dark p-10 md:p-20 text-center">
           <div className="max-w-2xl mx-auto space-y-6">
             <h2 className="text-white text-balance">{title}</h2>
             <p className="body-large text-white/60 text-pretty">{description}</p>
             <div className="pt-4">
               <Link
                 href={buttonHref}
-                className="inline-flex items-center justify-center gap-2 bg-white text-[#0A0A0A] hover:bg-white/90 transition-colors rounded-full min-h-[52px] px-7 text-[15px] font-medium"
+                className="inline-flex items-center justify-center gap-2 bg-[#17170F] text-[#FFFDF3] hover:bg-[#2A2A1D] transition-colors rounded-full min-h-[52px] px-7 text-[15px] font-bold shadow-sm"
               >
                 {buttonText} <ArrowRight className="w-4 h-4" strokeWidth={2} />
               </Link>
@@ -107,13 +107,13 @@ function IconResolver({ icon, className }: { icon: any, className?: string }) {
 
 export function BenefitGrid({ items }: { items: { icon: any, title: string, description: string }[] }) {
   return (
-    <section className="py-20 md:py-28 bg-white">
+    <section className="py-20 md:py-28 bg-transparent">
       <div className="container">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#EAEAE8] border border-[#EAEAE8] rounded-2xl overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/70 border border-white/70 rounded-3xl overflow-hidden shadow-lg">
           {items.map((item, idx) => (
-            <div key={idx} className="bg-white p-8 md:p-10 group">
-              <div className="w-12 h-12 rounded-2xl bg-[#FAFAF9] flex items-center justify-center mb-6 group-hover:bg-[#0A0A0A] group-hover:text-white transition-colors">
-                <IconResolver icon={item.icon} className="w-6 h-6 text-[#0A0A0A] group-hover:text-white transition-colors" />
+            <div key={idx} className="bg-white/90 p-8 md:p-10 group">
+              <div className="w-12 h-12 rounded-2xl bg-[#D9F85F] flex items-center justify-center mb-6 group-hover:bg-[#17170F] group-hover:text-white transition-colors">
+                <IconResolver icon={item.icon} className="w-6 h-6 text-[#17170F] group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-[18px] font-semibold text-[#0A0A0A] tracking-tight mb-2">{item.title}</h3>
               <p className="text-[15px] text-[#525252] leading-relaxed">{item.description}</p>

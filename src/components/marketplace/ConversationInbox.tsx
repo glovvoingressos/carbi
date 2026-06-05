@@ -189,7 +189,7 @@ export default function ConversationInbox() {
 
   if (!ready) {
     return (
-      <div className="bg-white border border-[#EAEAE8] rounded-2xl p-20 text-center">
+      <div className="surface-strong p-20 text-center">
         <Loader2 className="mx-auto h-6 w-6 animate-spin text-[#0A0A0A]" />
       </div>
     )
@@ -200,15 +200,15 @@ export default function ConversationInbox() {
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[360px_1fr] h-[calc(100vh-180px)] min-h-[600px]">
+    <div className="grid gap-5 lg:grid-cols-[380px_1fr] h-[calc(100vh-180px)] min-h-[620px]">
       {/* Sidebar */}
-      <aside className="bg-white border border-[#EAEAE8] rounded-2xl flex flex-col h-full overflow-hidden">
-        <div className="p-5 border-b border-[#EAEAE8]">
+      <aside className="surface-strong flex flex-col h-full overflow-hidden">
+        <div className="p-5 border-b border-white/70">
           <h2 className="text-[17px] font-semibold tracking-tight text-[#0A0A0A]">Conversas</h2>
         </div>
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           {loadingConversations && conversations.length === 0 ? (
-            <div className="p-8 text-center text-[13px] text-[#A3A3A3]">Carregando...</div>
+            <div className="p-8 text-center text-[13px] text-[#8A95A8]">Carregando...</div>
           ) : null}
 
           <div className="p-2 space-y-1">
@@ -219,8 +219,8 @@ export default function ConversationInbox() {
                   key={conversation.id}
                   type="button"
                   onClick={() => setSelectedId(conversation.id)}
-                  className={`w-full rounded-xl p-3 text-left transition-colors ${
-                    isActive ? 'bg-[#FAFAF9]' : 'hover:bg-[#FAFAF9]'
+                  className={`w-full rounded-2xl p-3 text-left transition-colors ${
+                    isActive ? 'bg-[#FFF8DF]' : 'hover:bg-[#F3F0E7]'
                   }`}
                 >
                   <div className="flex items-start gap-2.5">
@@ -231,10 +231,10 @@ export default function ConversationInbox() {
                       <p className="text-[14px] font-semibold text-[#0A0A0A] tracking-tight line-clamp-1">
                         {conversation.vehicle_listings_public.title}
                       </p>
-                      <p className="text-[12px] text-[#525252] mt-0.5 tracking-tight">
+                      <p className="text-[12px] text-[#52607A] mt-0.5 tracking-tight">
                         {formatBRL(Number(conversation.vehicle_listings_public.price))}
                       </p>
-                      <p className="text-[12px] text-[#A3A3A3] mt-1.5 line-clamp-1 tracking-tight">
+                      <p className="text-[12px] text-[#8A95A8] mt-1.5 line-clamp-1 tracking-tight">
                         {conversation.last_message_preview || 'Conversa iniciada.'}
                       </p>
                     </div>
@@ -245,37 +245,37 @@ export default function ConversationInbox() {
           </div>
 
           {conversations.length === 0 && !loadingConversations ? (
-            <div className="m-4 p-8 text-center bg-[#FAFAF9] rounded-xl">
+            <div className="m-4 p-8 text-center bg-[#F5F8FC] rounded-2xl border border-white/70">
               <MessageSquare className="w-8 h-8 text-[#A3A3A3] mx-auto mb-3" strokeWidth={1.5} />
-              <p className="text-[13px] text-[#525252]">Você ainda não possui conversas.</p>
+              <p className="text-[13px] text-[#52607A]">Você ainda não possui conversas.</p>
             </div>
           ) : null}
         </div>
       </aside>
 
       {/* Conversation panel */}
-      <section className="bg-white border border-[#EAEAE8] rounded-2xl flex flex-col h-full overflow-hidden relative">
+      <section className="surface-strong flex flex-col h-full overflow-hidden relative">
         {!selectedConversation ? (
           <div className="flex-1 flex items-center justify-center p-8 text-center">
             <div>
               <MessageSquare className="w-10 h-10 text-[#A3A3A3] mx-auto mb-3" strokeWidth={1.5} />
-              <p className="text-[15px] text-[#525252]">Selecione uma conversa para começar.</p>
+              <p className="text-[15px] text-[#52607A]">Selecione uma conversa para começar.</p>
             </div>
           </div>
         ) : (
           <>
-            <div className="px-6 py-5 border-b border-[#EAEAE8] bg-white">
+            <div className="px-6 py-5 border-b border-white/70 bg-white/60 backdrop-blur-xl">
               <p className="text-[16px] font-semibold text-[#0A0A0A] tracking-tight">
                 {selectedConversation.vehicle_listings_public.title}
               </p>
-              <p className="text-[12px] text-[#525252] mt-0.5 tracking-tight">
+              <p className="text-[12px] text-[#52607A] mt-0.5 tracking-tight">
                 {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} · {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
               </p>
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
               {loadingMessages && messages.length === 0 ? (
-                <p className="text-[13px] text-[#A3A3A3] text-center mt-8">Carregando mensagens...</p>
+                <p className="text-[13px] text-[#8A95A8] text-center mt-8">Carregando mensagens...</p>
               ) : null}
               <div className="space-y-3">
                 {messages.map((message) => {
@@ -287,8 +287,8 @@ export default function ConversationInbox() {
                     >
                       <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                         isMine
-                          ? 'bg-[#0A0A0A] text-white rounded-br-md'
-                          : 'bg-[#FAFAF9] text-[#0A0A0A] rounded-bl-md'
+                          ? 'bg-[#17170F] text-[#FFFDF3] rounded-br-md shadow-sm'
+                          : 'bg-[#F5F8FC] text-[#0A0A0A] rounded-bl-md border border-white/70'
                       }`}>
                         <p className="text-[14px] leading-relaxed tracking-tight">{message.message}</p>
                         <p className={`mt-1 text-[10px] tracking-tight ${isMine ? 'text-white/50' : 'text-[#A3A3A3]'}`}>
@@ -301,8 +301,8 @@ export default function ConversationInbox() {
               </div>
             </div>
 
-            <div className="p-4 bg-white border-t border-[#EAEAE8]">
-              <div className="flex items-center gap-2 bg-white border border-[#EAEAE8] rounded-full pl-5 pr-1.5 py-1.5 focus-within:border-[#0A0A0A] transition-colors">
+            <div className="p-4 bg-white/60 border-t border-white/70">
+              <div className="flex items-center gap-2 bg-white border-2 border-[#17170F]/12 rounded-full pl-5 pr-1.5 py-1.5 focus-within:border-[#17170F] transition-colors shadow-sm">
                 <input
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
@@ -313,13 +313,13 @@ export default function ConversationInbox() {
                     }
                   }}
                   placeholder="Digite sua mensagem..."
-                  className="flex-1 bg-transparent px-1 py-2 text-[14px] text-[#0A0A0A] outline-none placeholder:text-[#A3A3A3] tracking-tight"
+                  className="flex-1 bg-transparent px-1 py-2 text-[14px] text-[#0A0A0A] outline-none placeholder:text-[#8A95A8] tracking-tight"
                 />
                 <button
                   type="button"
                   disabled={sending || !messageText.trim()}
                   onClick={() => void sendMessage()}
-                  className="w-9 h-9 rounded-full bg-[#0A0A0A] text-white hover:bg-[#1F1F1F] disabled:opacity-30 transition-colors flex items-center justify-center"
+                  className="w-9 h-9 rounded-full bg-[#17170F] text-[#FFFDF3] hover:bg-[#2A2A1D] disabled:opacity-30 transition-colors flex items-center justify-center shadow-sm"
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" strokeWidth={1.75} />}
                 </button>
@@ -329,7 +329,7 @@ export default function ConversationInbox() {
         )}
 
         {error && (
-          <div className="absolute top-4 right-4 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] px-3 py-2 rounded-lg text-[12px] tracking-tight z-50">
+          <div className="absolute top-4 right-4 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] px-3 py-2 rounded-2xl text-[12px] tracking-tight z-50 shadow-sm">
             {error}
           </div>
         )}

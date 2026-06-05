@@ -95,7 +95,7 @@ export default function VehicleDetailView({
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="bg-white min-h-screen"
+      className="min-h-screen"
     >
       {/* ── HEADER ── */}
       <motion.section variants={itemVariants} className="container pt-8 pb-6">
@@ -108,7 +108,7 @@ export default function VehicleDetailView({
                 </span>
               ))}
               {isGoodDeal && (
-                <span className="badge badge-trust">
+                <span className="badge badge-brand">
                   {comparison.diffPercent && Math.abs(comparison.diffPercent).toFixed(0)}% abaixo da FIPE
                 </span>
               )}
@@ -123,14 +123,14 @@ export default function VehicleDetailView({
           <div className="flex items-center gap-2">
             <button
               onClick={handleShare}
-              className="btn-icon"
+              className="btn-icon bg-white/70 border border-white/70 shadow-sm"
               aria-label="Compartilhar"
             >
               <Share2 className="w-[18px] h-[18px]" strokeWidth={1.75} />
             </button>
             <button
               onClick={() => setIsFavorite(!isFavorite)}
-              className="btn-icon"
+              className="btn-icon bg-white/70 border border-white/70 shadow-sm"
               aria-label="Favoritar"
             >
               <Heart
@@ -154,7 +154,7 @@ export default function VehicleDetailView({
 
           {/* ── Sticky Price & Seller Card ── */}
           <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
-            <div className="bg-white border border-[#EAEAE8] rounded-2xl p-6">
+            <div className="surface-strong p-6">
               <p className="eyebrow mb-2">Preço</p>
               <p className="text-[44px] font-semibold tracking-tight text-[#0A0A0A] leading-none">
                 {formatBRL(Number(listing.price))}
@@ -162,9 +162,9 @@ export default function VehicleDetailView({
 
               {/* FIPE comparison */}
               {listing.fipe_price && (
-                <div className="mt-5 pt-5 border-t border-[#EAEAE8]">
+                <div className="mt-5 pt-5 border-t border-white/70">
                   <div className="flex items-center justify-between text-[13px] mb-3">
-                    <span className="text-[#525252]">Tabela FIPE</span>
+                    <span className="text-[#52607A]">Tabela FIPE</span>
                     <span className="text-[#0A0A0A] font-medium">{formatBRL(Number(listing.fipe_price))}</span>
                   </div>
                   {comparison.status !== 'unknown' && (
@@ -179,7 +179,7 @@ export default function VehicleDetailView({
                     </div>
                   )}
                   {listing.fipe_reference_month && (
-                    <p className="mt-2 text-[11px] text-[#A3A3A3] tracking-tight">
+                    <p className="mt-2 text-[11px] text-[#8A95A8] tracking-tight">
                       Referência: {listing.fipe_reference_month}
                     </p>
                   )}
@@ -196,10 +196,10 @@ export default function VehicleDetailView({
             </div>
 
             {/* Seller card */}
-            <div className="bg-white border border-[#EAEAE8] rounded-2xl p-6">
+            <div className="surface p-6">
               <p className="eyebrow mb-3">Vendedor</p>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[#FAFAF9] flex items-center justify-center text-[#0A0A0A]">
+                <div className="w-12 h-12 rounded-full bg-[#FFF8DF] flex items-center justify-center text-[#0A0A0A] border border-[#17170F]/10">
                   {sellerInfo?.avatarUrl ? (
                     <img src={sellerInfo.avatarUrl} alt={sellerInfo.name} className="w-full h-full rounded-full object-cover" />
                   ) : (
@@ -214,11 +214,11 @@ export default function VehicleDetailView({
                   </p>
                   <div className="flex items-center gap-1 mt-0.5">
                     <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" strokeWidth={2} />
-                    <span className="text-[11px] text-[#525252] tracking-tight">Perfil verificado</span>
+                    <span className="text-[11px] text-[#52607A] tracking-tight">Perfil verificado</span>
                   </div>
                 </div>
               </div>
-              <p className="mt-4 text-[11px] text-[#A3A3A3] tracking-tight">
+              <p className="mt-4 text-[11px] text-[#8A95A8] tracking-tight">
                 Anunciando desde {new Date(sellerInfo?.memberSince || Date.now()).getFullYear()}
               </p>
             </div>
@@ -227,14 +227,14 @@ export default function VehicleDetailView({
       </motion.section>
 
       {/* ── MAIN SPECS ── */}
-      <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+      <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
         <h2 className="text-balance mb-8">Visão geral</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#EAEAE8] border border-[#EAEAE8] rounded-2xl overflow-hidden">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {mainSpecs.map(spec => {
             const Icon = spec.icon
             return (
-              <div key={spec.label} className="bg-white p-6">
-                <Icon className="w-5 h-5 text-[#0A0A0A] mb-3" strokeWidth={1.5} />
+              <div key={spec.label} className="surface p-6">
+                <Icon className="w-5 h-5 text-[#17170F] mb-3" strokeWidth={1.5} />
                 <p className="eyebrow mb-1">{spec.label}</p>
                 <p className="text-[15px] font-semibold text-[#0A0A0A] tracking-tight">{spec.value}</p>
               </div>
@@ -244,12 +244,12 @@ export default function VehicleDetailView({
       </motion.section>
 
       {/* ── TECHNICAL SPECS ── */}
-      <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+      <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
         <h2 className="text-balance mb-8">Ficha técnica</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0 max-w-4xl">
           {technicalSpecs.map(spec => (
-            <div key={spec.label} className="flex items-center justify-between py-4 border-b border-[#EAEAE8]">
-              <span className="text-[14px] text-[#525252] tracking-tight">{spec.label}</span>
+            <div key={spec.label} className="flex items-center justify-between py-4 border-b border-white/70">
+              <span className="text-[14px] text-[#52607A] tracking-tight">{spec.label}</span>
               <span className="text-[14px] font-medium text-[#0A0A0A] tracking-tight">{spec.value}</span>
             </div>
           ))}
@@ -258,7 +258,7 @@ export default function VehicleDetailView({
 
       {/* ── ENRICHMENT (SPECS) ── */}
       {enrichment && (
-        <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+        <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
           <h2 className="text-balance mb-8">Especificações técnicas</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl">
             {enrichment.powertrain && (
@@ -266,20 +266,20 @@ export default function VehicleDetailView({
                 <p className="eyebrow mb-4">Motor e performance</p>
                 <div className="space-y-0">
                   {enrichment.powertrain.engine && (
-                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
-                      <span className="text-[14px] text-[#525252]">Motor</span>
+                    <div className="flex justify-between py-3 border-b border-white/70">
+                      <span className="text-[14px] text-[#52607A]">Motor</span>
                       <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.powertrain.engine}</span>
                     </div>
                   )}
                   {enrichment.powertrain.horsepower && (
-                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
-                      <span className="text-[14px] text-[#525252]">Potência</span>
+                    <div className="flex justify-between py-3 border-b border-white/70">
+                      <span className="text-[14px] text-[#52607A]">Potência</span>
                       <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.powertrain.horsepower} cv</span>
                     </div>
                   )}
                   {enrichment.powertrain.transmission && (
-                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
-                      <span className="text-[14px] text-[#525252]">Transmissão</span>
+                    <div className="flex justify-between py-3 border-b border-white/70">
+                      <span className="text-[14px] text-[#52607A]">Transmissão</span>
                       <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.powertrain.transmission}</span>
                     </div>
                   )}
@@ -291,20 +291,20 @@ export default function VehicleDetailView({
                 <p className="eyebrow mb-4">Dimensões e capacidade</p>
                 <div className="space-y-0">
                   {enrichment.dimensions.cargoCapacity && (
-                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
-                      <span className="text-[14px] text-[#525252]">Porta-malas</span>
+                    <div className="flex justify-between py-3 border-b border-white/70">
+                      <span className="text-[14px] text-[#52607A]">Porta-malas</span>
                       <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.dimensions.cargoCapacity}L</span>
                     </div>
                   )}
                   {enrichment.dimensions.curbWeight && (
-                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
-                      <span className="text-[14px] text-[#525252]">Peso</span>
+                    <div className="flex justify-between py-3 border-b border-white/70">
+                      <span className="text-[14px] text-[#52607A]">Peso</span>
                       <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.dimensions.curbWeight} kg</span>
                     </div>
                   )}
                   {enrichment.dimensions.length && (
-                    <div className="flex justify-between py-3 border-b border-[#EAEAE8]">
-                      <span className="text-[14px] text-[#525252]">Comprimento</span>
+                    <div className="flex justify-between py-3 border-b border-white/70">
+                      <span className="text-[14px] text-[#52607A]">Comprimento</span>
                       <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.dimensions.length} mm</span>
                     </div>
                   )}
@@ -317,12 +317,12 @@ export default function VehicleDetailView({
 
       {/* ── OPTIONALS ── */}
       {listing.optional_items?.length > 0 && (
-        <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+        <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
           <h2 className="text-balance mb-8">Opcionais e acessórios</h2>
           <div className="flex flex-wrap gap-2">
             {listing.optional_items.map(item => (
-              <div key={item} className="inline-flex items-center gap-2 px-4 py-2 bg-[#FAFAF9] border border-[#EAEAE8] rounded-full">
-                <Check className="w-3.5 h-3.5 text-[#0A0A0A]" strokeWidth={2.5} />
+              <div key={item} className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-[#17170F]/12 rounded-full">
+                <Check className="w-3.5 h-3.5 text-[#17170F]" strokeWidth={2.5} />
                 <span className="text-[13px] font-medium text-[#0A0A0A] tracking-tight">{item}</span>
               </div>
             ))}
@@ -332,14 +332,14 @@ export default function VehicleDetailView({
 
       {/* ── DESCRIPTION ── */}
       {listing.description && (
-        <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+        <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
           <h2 className="text-balance mb-6">Descrição do anunciante</h2>
           <div className={`relative ${!showFullDescription && listing.description.length > 500 ? 'max-h-72 overflow-hidden' : ''}`}>
-            <p className="text-[16px] text-[#525252] leading-relaxed whitespace-pre-wrap text-pretty">
+            <p className="text-[16px] text-[#52607A] leading-relaxed whitespace-pre-wrap text-pretty">
               {listing.description}
             </p>
             {!showFullDescription && listing.description.length > 500 && (
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#F6F7FB] to-transparent pointer-events-none" />
             )}
           </div>
           {listing.description.length > 500 && (
@@ -355,7 +355,7 @@ export default function VehicleDetailView({
 
       {/* ── RECALLS ── */}
       {enrichment?.recalls?.count > 0 && (
-        <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+        <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-[#FEF2F2] rounded-xl flex items-center justify-center">
               <Info className="w-5 h-5 text-[#DC2626]" strokeWidth={1.75} />
@@ -375,7 +375,7 @@ export default function VehicleDetailView({
 
       {/* ── RELATED ── */}
       {relatedListings.length > 0 && (
-        <motion.section variants={itemVariants} className="container py-12 border-t border-[#EAEAE8]">
+        <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
           <div className="flex items-end justify-between mb-8">
             <div>
               <p className="eyebrow mb-2">Veículos semelhantes</p>
@@ -394,14 +394,14 @@ export default function VehicleDetailView({
       )}
 
       {/* ── MOBILE STICKY CTA ── */}
-      <div className="lg:hidden fixed inset-x-0 bottom-0 z-[60] bg-white/95 backdrop-blur-xl border-t border-[#EAEAE8] p-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
+      <div className="lg:hidden fixed inset-x-0 bottom-0 z-[60] bg-white/82 backdrop-blur-2xl border-t border-white/70 p-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <p className="text-[18px] font-semibold text-[#0A0A0A] tracking-tight truncate">
               {formatBRL(Number(listing.price))}
             </p>
             {isGoodDeal && (
-              <p className="text-[11px] text-[#10B981] font-medium tracking-tight">Abaixo da FIPE</p>
+              <p className="text-[11px] text-[#16855C] font-bold tracking-tight">Abaixo da FIPE</p>
             )}
           </div>
           <ChatStarter listingId={listing.id} />

@@ -562,7 +562,7 @@ export default function MyListingsDashboard() {
 
   if (!sessionReady) {
     return (
-      <div className="flex flex-col items-center justify-center p-20 text-center bg-white rounded-2xl border border-[#EAEAE8]">
+      <div className="surface-strong flex flex-col items-center justify-center p-20 text-center">
         <Loader2 className="h-8 w-8 animate-spin text-[#0A0A0A]" />
         <p className="mt-4 font-bold text-[#0A0A0A]">Carregando sua garagem...</p>
       </div>
@@ -584,8 +584,8 @@ export default function MyListingsDashboard() {
           {loadingListings ? (
             [1,2,3].map(i => <div key={i} className="min-w-[200px] lg:w-full h-24 bg-white rounded-3xl animate-pulse flex-shrink-0" />)
           ) : listings.length === 0 ? (
-            <div className="w-full p-8 text-center bg-white rounded-3xl border border-[#EAEAE8]">
-              <p className="text-sm font-bold text-[#A3A3A3]">Nenhum anúncio encontrado.</p>
+            <div className="w-full p-8 text-center surface">
+              <p className="text-sm font-bold text-[#8A95A8]">Nenhum anúncio encontrado.</p>
             </div>
           ) : (
             listings.map((l) => (
@@ -594,12 +594,12 @@ export default function MyListingsDashboard() {
                 onClick={() => setSelectedId(l.id)}
                 className={`min-w-[240px] lg:w-full group text-left p-3 lg:p-4 rounded-3xl border transition-all flex-shrink-0 ${
                   selectedId === l.id 
-                    ? 'bg-[#10B981] border-[#10B981] text-white shadow-xl ' 
-                    : 'bg-white border-[#EAEAE8] text-[#0A0A0A] hover:border-[#10B981]'
+                    ? 'bg-[#17170F] border-[#17170F] text-[#FFFDF3] shadow-xl ' 
+                    : 'bg-white border-[#17170F]/12 text-[#0A0A0A] hover:border-[#17170F]/30 hover:bg-[#D9F85F]'
                 }`}
               >
                 <div className="flex gap-3">
-                  <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl bg-[#FAFAF9] overflow-hidden flex-shrink-0">
+                  <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl bg-[#FFF8DF] overflow-hidden flex-shrink-0">
                     {l.images?.[0] ? (
                       <img src={getCarImageUrl(l.images[0].public_url) || l.images[0].public_url} width={1080} height={1080} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
                     ) : (
@@ -634,13 +634,13 @@ export default function MyListingsDashboard() {
               className="space-y-8"
             >
               {/* Toolbar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-[#EAEAE8] shadow-sm sticky top-24 z-20">
+              <div className="flex flex-wrap items-center justify-between gap-4 surface-strong p-6 sticky top-24 z-20">
                 <div className="flex items-center gap-4">
                   <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-colors ${
-                    saveStatus === 'saving' ? 'bg-[#FAFAF9] text-[#0A0A0A]' :
-                    saveStatus === 'saved' ? 'bg-green-50 text-green-500' :
+                    saveStatus === 'saving' ? 'bg-[#E9FFF2] text-[#16855C]' :
+                    saveStatus === 'saved' ? 'bg-[#ECFDF5] text-[#10B981]' :
                     saveStatus === 'error' ? 'bg-red-50 text-red-500' :
-                    'bg-[#FAFAF9] text-[#A3A3A3]'
+                    'bg-[#FFF8DF] text-[#857C6B]'
                   }`}>
                     {saveStatus === 'saving' ? <Loader2 className="w-3 h-3 animate-spin" /> : 
                      saveStatus === 'saved' ? <Check className="w-3 h-3" /> :
@@ -676,9 +676,9 @@ export default function MyListingsDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 
                 {/* --- Section: Basic --- */}
-                <div className="bg-white p-8 rounded-2xl border border-[#EAEAE8] shadow-sm space-y-6">
+                <div className="surface-strong p-8 space-y-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-2xl bg-[#FAFAF9] flex items-center justify-center text-[#10B981]"><Info className="w-5 h-5" /></div>
+                    <div className="w-10 h-10 rounded-2xl bg-[#D9F85F] flex items-center justify-center text-[#17170F]"><Info className="w-5 h-5" /></div>
                     <h3 className="font-black text-lg">Informações Básicas</h3>
                   </div>
                   
@@ -687,7 +687,7 @@ export default function MyListingsDashboard() {
                       <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Título do Anúncio</label>
                       <input 
                         autoFocus
-                        className={`w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-2 transition-all font-bold text-[#0A0A0A] focus:outline-none ${errors.title ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-[#10B981]'}`}
+                        className={`w-full h-14 px-6 rounded-2xl bg-white/80 border-2 transition-all font-bold text-[#0A0A0A] focus:outline-none ${errors.title ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-[#17170F]'}`}
                         value={formData.title || ''}
                         onChange={(e) => updateField('title', e.target.value)}
                         placeholder="Ex: Toyota Corolla 2.0 XEi 2024"
@@ -700,7 +700,7 @@ export default function MyListingsDashboard() {
                         <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Ano Fabricação</label>
                         <input 
                           type="number"
-                          className="w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-transparent border-2 focus:border-[#10B981] transition-all font-bold text-[#0A0A0A] focus:outline-none"
+                          className="w-full h-14 px-6 rounded-2xl bg-white/80 border-transparent border-2 focus:border-[#17170F] transition-all font-bold text-[#0A0A0A] focus:outline-none"
                           value={formData.year || ''}
                           onChange={(e) => updateField('year', Number(e.target.value))}
                         />
@@ -709,7 +709,7 @@ export default function MyListingsDashboard() {
                         <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Ano Modelo</label>
                         <input 
                           type="number"
-                          className="w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-transparent border-2 focus:border-[#10B981] transition-all font-bold text-[#0A0A0A] focus:outline-none"
+                          className="w-full h-14 px-6 rounded-2xl bg-white/80 border-transparent border-2 focus:border-[#17170F] transition-all font-bold text-[#0A0A0A] focus:outline-none"
                           value={formData.year_model || ''}
                           onChange={(e) => updateField('year_model', Number(e.target.value))}
                         />
@@ -719,7 +719,7 @@ export default function MyListingsDashboard() {
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Status do Anúncio</label>
                       <select
-                        className="w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-transparent border-2 focus:border-[#10B981] transition-all font-bold text-[#0A0A0A] focus:outline-none appearance-none cursor-pointer"
+                        className="w-full h-14 px-6 rounded-2xl bg-white/80 border-transparent border-2 focus:border-[#17170F] transition-all font-bold text-[#0A0A0A] focus:outline-none appearance-none cursor-pointer"
                         value={formData.status || 'active'}
                         onChange={(e) => updateField('status', e.target.value)}
                       >

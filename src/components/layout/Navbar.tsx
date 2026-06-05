@@ -136,32 +136,31 @@ export default function Navbar() {
     <>
       {/* ── TOP NAV ── */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled || !isHome
-            ? 'bg-white/80 backdrop-blur-xl border-b border-[#EAEAE8]'
-            : 'bg-transparent'
-        }`}
+        className="fixed left-0 right-0 top-0 z-50 px-3 py-4 transition-all duration-300"
         style={{ height: 'var(--navbar-height)' }}
       >
-        <div className="container h-full flex items-center justify-between">
+        <div className={`container flex h-full items-center justify-between rounded-full border-2 border-[#17170F]/10 bg-[#FFFDF3]/92 px-4 shadow-sm backdrop-blur-2xl transition-all duration-300 md:px-5 ${
+          scrolled || !isHome ? 'shadow-[0_12px_40px_rgba(23,23,15,0.08)]' : ''
+        }`}>
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-[#0A0A0A] hover:opacity-70 transition-opacity"
+            className="flex items-center gap-2 text-[#17170F] hover:opacity-80 transition-opacity"
             aria-label="carbi"
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M5 17L7 8H17L19 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M4 17H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              <circle cx="8" cy="19" r="1.5" fill="currentColor"/>
-              <circle cx="16" cy="19" r="1.5" fill="currentColor"/>
-              <path d="M7 12H17" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.5"/>
-            </svg>
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#17170F] text-[#FFFDF3] shadow-sm">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 17L7 8H17L19 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M4 17H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                <circle cx="8" cy="19" r="1.5" fill="currentColor"/>
+                <circle cx="16" cy="19" r="1.5" fill="currentColor"/>
+              </svg>
+            </span>
             <span className="text-[17px] font-semibold tracking-tight">carbi</span>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1 rounded-full bg-transparent px-2 py-1">
             {PRIMARY_NAV.map((link) => {
               const active = isActive(link.href)
               return (
@@ -170,8 +169,8 @@ export default function Navbar() {
                   href={link.href}
                   className={`px-3.5 py-2 text-[14px] font-medium tracking-tight rounded-full transition-colors ${
                     active
-                      ? 'text-[#0A0A0A]'
-                      : 'text-[#525252] hover:text-[#0A0A0A]'
+                      ? 'bg-[#D9F85F] text-[#17170F] shadow-sm'
+                      : 'text-[#4F4A3E] hover:text-[#17170F] hover:bg-[#F3F0E7]'
                   }`}
                 >
                   {link.label}
@@ -184,7 +183,7 @@ export default function Navbar() {
           <div className="flex items-center gap-1">
             <button
               onClick={() => setSearchOpen(true)}
-              className="btn-icon hidden sm:flex"
+              className="btn-icon hidden sm:flex bg-[#F3F0E7] border-2 border-[#17170F]/10 shadow-sm"
               aria-label="Buscar"
             >
               <Search className="w-[18px] h-[18px]" strokeWidth={1.75} />
@@ -240,14 +239,14 @@ export default function Navbar() {
 
             <Link
               href="/anunciar-carro"
-              className="hidden md:inline-flex btn btn-primary btn-sm ml-1"
+              className="hidden md:inline-flex btn btn-sm ml-1 border-2 border-transparent bg-[#E9C0F7] text-[#17170F] shadow-sm hover:bg-[#D9F85F]"
             >
               Anunciar grátis
             </Link>
 
             <button
               onClick={() => setDrawerOpen(true)}
-              className="btn-icon lg:hidden ml-1"
+              className="btn-icon lg:hidden ml-1 bg-[#F3F0E7] border-2 border-[#17170F]/10 shadow-sm"
               aria-label="Menu"
             >
               <Menu className="w-[18px] h-[18px]" strokeWidth={1.75} />
@@ -257,7 +256,7 @@ export default function Navbar() {
       </header>
 
       {/* ── MOBILE BOTTOM NAV ── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 backdrop-blur-xl border-t border-[#EAEAE8] pb-[env(safe-area-inset-bottom)]">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/78 backdrop-blur-2xl border-t border-white/70 pb-[env(safe-area-inset-bottom)] shadow-[0_-12px_40px_rgba(15,23,42,0.06)]">
         <div className="flex items-center justify-around h-16">
           {BOTTOM_NAV.map((item) => {
             const Icon = item.icon
@@ -267,7 +266,7 @@ export default function Navbar() {
                 key={item.href}
                 href={item.href}
                 className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
-                  active ? 'text-[#0A0A0A]' : 'text-[#A3A3A3]'
+                  active ? 'text-[#17170F]' : 'text-[#857C6B]'
                 }`}
               >
                 <Icon className="w-[22px] h-[22px]" strokeWidth={active ? 2 : 1.75} />
@@ -278,7 +277,7 @@ export default function Navbar() {
           <button
             onClick={() => setAccountOpen((prev) => !prev)}
             className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
-              accountOpen ? 'text-[#0A0A0A]' : 'text-[#A3A3A3]'
+              accountOpen ? 'text-[#17170F]' : 'text-[#857C6B]'
             }`}
             aria-label="Conta"
           >
@@ -290,7 +289,7 @@ export default function Navbar() {
 
       {/* ── SEARCH OVERLAY ── */}
       {searchOpen && (
-        <div className="fixed inset-0 z-[1000] bg-white/98 backdrop-blur-xl animate-fade-in">
+        <div className="fixed inset-0 z-[1000] bg-[#F3F0E7]/94 backdrop-blur-2xl animate-fade-in">
           <div className="container pt-8">
             <div className="flex items-center justify-between mb-12">
               <Link href="/" className="flex items-center gap-2">
@@ -330,7 +329,7 @@ export default function Navbar() {
                         router.push(`/carros-a-venda?q=${encodeURIComponent(s)}`)
                         setSearchOpen(false)
                       }}
-                      className="badge badge-outline cursor-pointer hover:bg-[#0A0A0A] hover:text-white hover:border-[#0A0A0A] transition-colors"
+                      className="badge badge-outline cursor-pointer hover:bg-[#17170F] hover:text-white hover:border-[#17170F] transition-colors"
                     >
                       {s}
                     </button>
@@ -349,8 +348,8 @@ export default function Navbar() {
             className="absolute inset-0 bg-black/30 animate-fade-in"
             onClick={() => setDrawerOpen(false)}
           />
-          <aside className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-white shadow-xl animate-slide-in-right overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-[#EAEAE8] px-6 h-16 flex items-center justify-between">
+          <aside className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-white/94 backdrop-blur-2xl shadow-xl animate-slide-in-right overflow-y-auto">
+            <div className="sticky top-0 bg-white/94 backdrop-blur-2xl border-b border-white/80 px-6 h-16 flex items-center justify-between">
               <span className="text-[17px] font-semibold tracking-tight text-[#0A0A0A]">Menu</span>
               <button onClick={() => setDrawerOpen(false)} className="btn-icon" aria-label="Fechar">
                 <X className="w-5 h-5" strokeWidth={1.75} />
@@ -411,9 +410,9 @@ export default function Navbar() {
                 )}
               </div>
 
-              <div className="mt-8 p-5 bg-[#FAFAF9] rounded-2xl">
+              <div className="mt-8 p-5 bg-[#FFF8DF] rounded-2xl border-2 border-[#17170F]/10">
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-4 h-4 text-[#0A0A0A]" strokeWidth={1.75} />
+                  <Sparkles className="w-4 h-4 text-[#17170F]" strokeWidth={1.75} />
                   <span className="text-sm font-semibold text-[#0A0A0A]">Não sabe qual carro?</span>
                 </div>
                 <p className="text-sm text-[#525252] mb-3">Responda 5 perguntas e descubra o carro ideal para você.</p>

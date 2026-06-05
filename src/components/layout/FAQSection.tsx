@@ -23,7 +23,7 @@ export default function FAQSection() {
           <h2 className="text-balance">Perguntas frequentes</h2>
         </div>
 
-        <div className="bg-white border border-[#EAEAE8] rounded-2xl overflow-hidden divide-y divide-[#EAEAE8]">
+        <div className="surface-strong overflow-hidden divide-y divide-white/70">
           {faqs.map((faq, i) => {
             const isOpen = openIndex === i
 
@@ -31,13 +31,13 @@ export default function FAQSection() {
               <div key={i}>
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : i)}
-                  className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 hover:bg-[#FAFAF9] transition-colors"
+                  className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 hover:bg-white/60 transition-colors"
                 >
                   <span className="text-[15px] font-medium text-[#0A0A0A] tracking-tight">
                     {faq.q}
                   </span>
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                    isOpen ? 'bg-[#0A0A0A] text-white rotate-45' : 'bg-[#FAFAF9] text-[#0A0A0A]'
+                    isOpen ? 'bg-[#17170F] text-[#FFFDF3] rotate-45' : 'bg-white text-[#17170F] border border-[#17170F]/12'
                   }`}>
                     <Plus className="w-3.5 h-3.5" strokeWidth={2} />
                   </div>

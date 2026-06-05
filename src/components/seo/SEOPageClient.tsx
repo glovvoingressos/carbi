@@ -12,34 +12,34 @@ interface SEOPageClientProps {
 
 export default function SEOPageClient({ data, ctaHref }: SEOPageClientProps) {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="pt-48 pb-32 bg-[#f5f5f3] overflow-hidden">
-        <div className="container mx-auto max-w-6xl px-4 text-center">
+      <section className="pt-36 pb-24 overflow-hidden">
+        <div className="container max-w-6xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <span className="inline-block px-4 py-1.5 rounded-full bg-[#FAFAF9] text-[#A3A3A3] text-[10px] font-black uppercase tracking-widest mb-8">
+            <span className="section-kicker mb-8">
               Atrito Zero • Marketplace Inteligente
             </span>
-            <h1 className="text-4xl sm:text-5xl md:text-[110px] font-black text-[#0A0A0A] tracking-tighter leading-[0.85] mb-12">
+            <h1 className="text-balance mb-8">
               {data.h1}
             </h1>
-            <p className="text-xl sm:text-2xl font-bold text-[#A3A3A3] max-w-3xl mx-auto mb-16 leading-relaxed">
+            <p className="text-xl sm:text-2xl font-semibold text-[#52607A] max-w-3xl mx-auto mb-12 leading-relaxed">
               {data.subtitle}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <Link 
                 href={ctaHref}
-                className="h-24 px-16 rounded-full bg-[#0A0A0A] text-white text-lg font-black uppercase tracking-widest flex items-center justify-center hover:scale-105 transition-all shadow-2xl shadow-black/20 group"
+                className="h-16 px-8 rounded-full bg-[#17170F] text-[#FFFDF3] text-[15px] font-bold flex items-center justify-center hover:bg-[#2A2A1D] transition-all shadow-sm group"
               >
                 {data.ctaButtonText || 'Começar agora'} <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </Link>
               <a 
                 href="#detalhes" 
-                className="h-24 px-16 rounded-full bg-white border border-[#EAEAE8] text-[#0A0A0A] text-lg font-black uppercase tracking-widest flex items-center justify-center hover:bg-[#f5f5f3] transition-all"
+                className="h-16 px-8 rounded-full bg-white border-2 border-[#17170F]/12 text-[#17170F] text-[15px] font-bold flex items-center justify-center hover:bg-[#D9F85F] hover:border-[#17170F]/30 transition-all shadow-sm"
               >
                 Saber mais
               </a>

@@ -850,7 +850,7 @@ export default function ListingForm() {
 
   if (!sessionReady) {
     return (
-      <div className="bg-white rounded-2xl border border-[#EAEAE8] p-8 text-center shadow-sm">
+      <div className="surface-strong p-8 text-center">
         <Loader2 className="mx-auto h-5 w-5 animate-spin text-[#0A0A0A]" />
         <p className="mt-2 text-sm text-[#525252]">Carregando sessão...</p>
       </div>
@@ -877,7 +877,7 @@ export default function ListingForm() {
         </p>
       </div>
 
-      <div className="card p-6 sm:p-8 space-y-8">
+      <div className="surface-strong p-6 sm:p-8 space-y-8">
         {currentStep === 1 && (
           <div className="space-y-6">
             <div>
@@ -887,7 +887,7 @@ export default function ListingForm() {
               </p>
             </div>
             
-            <div className="bg-[#FAFAF9] rounded-xl p-5 space-y-4">
+            <div className="surface p-5 space-y-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="label text-[#10B981]">Tipo de veículo</p>
                 <span className="badge badge-brand text-[10px]">Obrigatório</span>
@@ -902,7 +902,7 @@ export default function ListingForm() {
               </select>
             </div>
 
-            <div className="bg-[#FAFAF9] rounded-xl p-5 space-y-4">
+            <div className="surface p-5 space-y-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="label text-[#10B981]">Seleção do veículo</p>
                 <span className="badge badge-neutral text-[10px]">Sequencial</span>
@@ -972,8 +972,8 @@ export default function ListingForm() {
               ) : null}
             </div>
 
-            <div className="bg-white rounded-2xl p-8 border border-[#EAEAE8] shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#FAFAF9] rounded-bl-full -z-10" />
+            <div className="surface-strong p-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#D9F85F]/50 rounded-bl-full -z-10" />
               <div className="flex items-center justify-between gap-3 mb-6">
                 <p className="text-lg font-semibold font-black text-[#0A0A0A]">Referência FIPE</p>
                 <span className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest shadow-sm ${hasAskingPrice && comparison.status === 'below' ? 'bg-green-50 text-green-600 border-green-100' : hasAskingPrice && comparison.status === 'above' ? 'bg-red-50 text-red-600 border-red-100' : hasAskingPrice && comparison.status === 'near' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-[#FAFAF9] text-[#525252] border-[#EAEAE8]'}`}>
@@ -1041,15 +1041,15 @@ export default function ListingForm() {
             )}
 
             <label
-              className="card border-2 border-dashed border-[#EAEAE8] p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#525252] hover:border-[#10B981] hover:bg-[#ECFDF5] transition-all group"
+              className="surface border-2 border-dashed border-[#17170F]/18 p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] hover:border-[#17170F]/30 hover:bg-[#D9F85F] transition-all group"
               onDragOver={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
               }}
               onDrop={onDropFiles}
             >
-              <div className="w-14 h-14 rounded-full bg-[#FAFAF9] flex items-center justify-center group-hover:scale-110 transition-transform">
-                <ImagePlus className="h-6 w-6 text-[#10B981]" />
+              <div className="w-14 h-14 rounded-full bg-[#FFF8DF] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <ImagePlus className="h-6 w-6 text-[#17170F]" />
               </div>
               <span className="text-sm text-[#0A0A0A] mt-1">Arraste fotos ou clique ({images.length}/{LISTING_MAX_IMAGES})</span>
               <span className="badge badge-brand text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens</span>
@@ -1060,7 +1060,7 @@ export default function ListingForm() {
             {images.length > 0 && (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8">
                 {images.map((image, index) => (
-                  <div key={image.previewUrl} className="bg-white rounded-2xl overflow-hidden p-3 border border-[#EAEAE8] shadow-sm hover:shadow-md transition-shadow">
+                  <div key={image.previewUrl} className="surface p-3 hover:shadow-md transition-shadow">
                     <img src={image.previewUrl} alt={`Preview ${index + 1}`} width={1080} height={1080} className="aspect-square w-full rounded-xl object-cover" />
                     <p className="mt-4 px-2 text-[10px] font-black uppercase tracking-widest text-[#525252]">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
                     <div className="mt-3 flex items-center gap-2 px-2 pb-1">
@@ -1091,7 +1091,7 @@ export default function ListingForm() {
             </div>
             
             <div className="card p-5 relative overflow-hidden">
-              <p className="label text-[#10B981] mb-4">Informações</p>
+              <p className="label text-[#16855C] mb-4">Informações</p>
               <div className="grid gap-4 text-sm sm:grid-cols-2">
                 <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#A3A3A3]">Veículo</span><strong className="text-sm text-[#0A0A0A]">{form.brand} {form.model} {form.version}</strong></div>
                 <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#A3A3A3]">Ano</span><strong className="text-sm text-[#0A0A0A]">{form.year}/{form.yearModel}</strong></div>
@@ -1103,7 +1103,7 @@ export default function ListingForm() {
               </div>
             </div>
 
-            <div className="card p-5">
+            <div className="surface p-5">
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-7 h-7 rounded-full bg-[#ECFDF5] flex items-center justify-center text-[#10B981] font-bold text-[10px]">AI</span>
                 <p className="label">Ficha técnica automática</p>
@@ -1140,8 +1140,8 @@ export default function ListingForm() {
               </div>
             </div>
 
-            <div className="bg-green-50 border border-green-100 rounded-2xl p-4 flex items-center justify-center text-center">
-              <p className="text-xs font-bold text-green-700">
+            <div className="bg-[#E9FFF2] border border-[#16855C]/20 rounded-2xl p-4 flex items-center justify-center text-center">
+              <p className="text-xs font-bold text-[#16855C]">
                 Seu contato direto não é exibido. Toda negociação acontece via chat seguro da plataforma.
               </p>
             </div>
@@ -1162,12 +1162,12 @@ export default function ListingForm() {
         ) : null}
 
         {success ? (
-          <div className="bg-green-50 rounded-2xl border border-green-100 p-6 shadow-sm text-center">
-            <p className="text-base font-black text-green-600">{success}</p>
+          <div className="bg-[#E9FFF2] rounded-2xl border border-[#16855C]/20 p-6 shadow-sm text-center">
+            <p className="text-base font-black text-[#16855C]">{success}</p>
           </div>
         ) : null}
 
-        <div className="mt-8 flex flex-col-reverse justify-between gap-3 sm:flex-row pt-6 border-t border-[#EAEAE8]">
+        <div className="mt-8 flex flex-col-reverse justify-between gap-3 sm:flex-row pt-6 border-t border-white/70">
           {currentStep > 1 ? (
             <button
               type="button"

@@ -24,19 +24,19 @@ export default async function CarrosUsadosBHPage() {
   const displayCars = groupCarsByModel(cars).map((item) => item.representative).slice(0, 12);
 
   return (
-    <div className="bg-bg min-h-screen">
+    <div className="min-h-screen">
       <LocalBusinessBHTicketsSchema />
       
       {/* Local Hero Area */}
-      <section className="pt-16 pb-12 bg-bg border-b border-[#EAEAE8]">
-        <div className="container max-w-5xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-[#FAFAF9] text-[#0A0A0A] px-4 py-2 rounded-full font-semibold text-xs uppercase tracking-wider mb-6 border border-[#EAEAE8]">
+      <section className="pt-16 pb-12 border-b border-white/70">
+        <div className="container max-w-5xl text-center">
+          <div className="section-kicker mb-6">
             <MapPin className="w-3.5 h-3.5" /> Belo Horizonte e Região
           </div>
-          <h1 className="text-4xl md:text-6xl font-display text-[#0A0A0A] tracking-tight mb-6">
+          <h1 className="text-balance mb-6">
             O carro perfeito para você,<br className="hidden md:block" /> com a confiança que <span className="text-[#0A0A0A]">BH merece.</span>
           </h1>
-          <p className="text-lg md:text-xl font-medium text-[#525252] max-w-2xl mx-auto leading-relaxed mb-8">
+          <p className="text-lg md:text-xl font-medium text-[#52607A] max-w-2xl mx-auto leading-relaxed mb-8">
             Compare centenas de opções reais, confira valor atualizado na hora e não caia em furadas.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
@@ -48,28 +48,28 @@ export default async function CarrosUsadosBHPage() {
       </section>
 
       {/* Trust Badges - Local */}
-      <section className="py-8 bg-bg">
-         <div className="container max-w-4xl mx-auto px-4">
+      <section className="py-8">
+         <div className="container max-w-4xl">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-               <div className="flex items-center gap-3 bg-white p-5 rounded-2xl border border-[#EAEAE8] shadow-xs">
+               <div className="flex items-center gap-3 surface p-5">
                   <CheckCircle2 className="text-success w-6 h-6 flex-shrink-0" />
                   <div>
-                    <h4 className="font-bold text-[#0A0A0A]">Valor Atualizado Ao Vivo</h4>
-                    <p className="text-xs text-[#525252] font-medium mt-1">Garantia de negócio justo.</p>
+                    <h4 className="font-semibold text-[#0A0A0A]">Valor Atualizado Ao Vivo</h4>
+                    <p className="text-xs text-[#52607A] font-medium mt-1">Garantia de negócio justo.</p>
                   </div>
                </div>
-               <div className="flex items-center gap-3 bg-white p-5 rounded-2xl border border-[#EAEAE8] shadow-xs">
+               <div className="flex items-center gap-3 surface p-5">
                   <CheckCircle2 className="text-success w-6 h-6 flex-shrink-0" />
                   <div>
-                    <h4 className="font-bold text-[#0A0A0A]">Atendimento Local</h4>
-                    <p className="text-xs text-[#525252] font-medium mt-1">Conectamos você aos lojistas de BH.</p>
+                    <h4 className="font-semibold text-[#0A0A0A]">Atendimento Local</h4>
+                    <p className="text-xs text-[#52607A] font-medium mt-1">Conectamos você aos lojistas de BH.</p>
                   </div>
                </div>
-               <div className="flex items-center gap-3 bg-white p-5 rounded-2xl border border-[#EAEAE8] shadow-xs">
+               <div className="flex items-center gap-3 surface p-5">
                   <CheckCircle2 className="text-success w-6 h-6 flex-shrink-0" />
                   <div>
-                    <h4 className="font-bold text-[#0A0A0A]">Venda em 24h</h4>
-                    <p className="text-xs text-[#525252] font-medium mt-1">Compradores reais na sua região.</p>
+                    <h4 className="font-semibold text-[#0A0A0A]">Venda em 24h</h4>
+                    <p className="text-xs text-[#52607A] font-medium mt-1">Compradores reais na sua região.</p>
                   </div>
                </div>
             </div>
@@ -78,10 +78,10 @@ export default async function CarrosUsadosBHPage() {
 
       {/* Destaques Locais */}
       <section className="py-16">
-        <div className="container max-w-6xl mx-auto px-4">
+        <div className="container max-w-6xl">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-display text-[#0A0A0A] tracking-tight">Veículos em Destaque (BH)</h2>
-            <Link href="/marcas" className="hidden md:flex items-center gap-1 font-bold text-[#0A0A0A] hover:text-[#10B981] transition-colors">
+            <Link href="/marcas" className="hidden md:flex items-center gap-1 font-medium text-[#0A0A0A] hover:text-[#16855C] transition-colors">
               Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -95,10 +95,10 @@ export default async function CarrosUsadosBHPage() {
       </section>
       
       {/* SEO Content Block (Very important for localized long tail) */}
-      <section className="py-16 bg-white border-t border-[#EAEAE8]">
-         <div className="container max-w-4xl mx-auto px-4 font-sans text-[#0A0A0A]">
+      <section className="py-16 border-t border-white/70">
+         <div className="container max-w-4xl text-[#0A0A0A]">
             <h2 className="text-2xl font-display text-[#0A0A0A] mb-4">Comprar Carro Usado em Belo Horizonte: Dicas da Carbi</h2>
-            <div className="space-y-4 text-[#525252]">
+            <div className="space-y-4 text-[#52607A]">
               <p>O mercado de <strong>carros usados em BH</strong> é um dos mais aquecidos do Brasil. Com o relevo acidentado (famosos morros), mineiros costumam procurar veículos com bom torque, suspensão reforçada e, preferencialmente, motorização 1.6 ou superior.</p>
               
               <h3 className="text-lg font-bold text-[#0A0A0A] mt-6 mb-2">Por que pesquisar o valor de referência antes de comprar em BH?</h3>

@@ -48,9 +48,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   const sellerInfo = await getSellerInfo(listing.user_id)
 
   return (
-    <main className="bg-[#f5f5f3] min-h-screen pt-32 pb-24">
-      <div className="container mx-auto max-w-7xl px-4">
-        <div className="mb-8 text-sm font-bold text-[#A3A3A3] flex items-center gap-2">
+    <main className="min-h-screen pt-28 pb-24">
+      <div className="container">
+        <div className="mb-8 text-sm font-medium text-[#8A95A8] flex items-center gap-2">
           <Link href="/" className="hover:text-[#0A0A0A] transition-colors">Home</Link> 
           <span className="text-[#0A0A0A]/10">/</span> 
           <Link href="/carros-a-venda" className="hover:text-[#0A0A0A] transition-colors">Marketplace</Link> 

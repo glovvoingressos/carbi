@@ -84,20 +84,17 @@ export default async function CaminhoesPage({
   const totalPages = Math.max(1, Math.ceil(result.total / result.pageSize))
 
   return (
-    <main className="bg-[#f5f5f3] min-h-screen pt-32 pb-24">
+    <main className="min-h-screen pt-28 pb-24">
       <LocalBusinessSchema />
-      <div className="container mx-auto max-w-7xl px-4">
-        {/* Header Section */}
-        <div className="mb-12">
-          <div className="inline-flex items-center gap-2 bg-white/50 border border-[#EAEAE8] px-3 py-1 rounded-full mb-4">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">Marketplace</span>
+      <div className="container">
+        <div className="hero-bento p-6 md:p-10 lg:p-12 mb-8">
+          <div className="section-heading">
+            <div className="section-kicker mb-4">Marketplace</div>
+            <h1 className="text-balance">Caminhões à venda.</h1>
+            <p className="body-large mt-4 max-w-2xl text-pretty">
+              Encontre o caminhão perfeito entre os {result.total} anúncios ativos na plataforma.
+            </p>
           </div>
-          <h1 className="text-4xl sm:text-6xl font-black text-[#0A0A0A] tracking-tight leading-[0.95]">
-            Caminhões à venda.
-          </h1>
-          <p className="mt-4 text-[#A3A3A3] font-bold text-lg">
-            Encontre o caminhão perfeito entre os {result.total} anúncios ativos na plataforma.
-          </p>
         </div>
 
         <MarketplaceClient 
@@ -109,22 +106,22 @@ export default async function CaminhoesPage({
         />
 
         {/* Bottom SEO Content */}
-        <div className="mt-32">
-          <section className="bg-white rounded-[48px] p-12 sm:p-20 border border-[#EAEAE8] shadow-sm">
-            <h2 className="text-3xl sm:text-5xl font-black text-[#0A0A0A] tracking-tight mb-8">
+        <div className="mt-20 md:mt-28">
+          <section className="surface-strong p-8 sm:p-12 md:p-16">
+            <h2 className="text-balance mb-8">
               Compre seu próximo caminhão com segurança
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div className="space-y-6">
-                <p className="text-xl font-bold text-[#A3A3A3] leading-relaxed">
+                <p className="text-xl font-bold text-[#52607A] leading-relaxed">
                   O marketplace da Carbi foi desenhado para quem busca caminhões, trucks, bitrems e veículos pesados com transparência e segurança. Cada anúncio é verificado e enriquecido com dados técnicos precisos.
                 </p>
-                <p className="text-lg font-medium text-[#A3A3A3] leading-relaxed">
+                <p className="text-lg font-medium text-[#52607A] leading-relaxed">
                   Seja para transporte de cargas, construção civil ou frota empresarial, utilize nossos filtros avançados para encontrar exatamente o que precisa: tipo de caminhão, capacidade de carga, número de eixos e carroceria.
                 </p>
               </div>
               <div className="space-y-6">
-                <h3 className="text-xl font-black text-[#0A0A0A]">Por que comprar um caminhão na Carbi?</h3>
+                <h3 className="text-xl font-semibold text-[#0A0A0A]">Por que comprar um caminhão na Carbi?</h3>
                 <ul className="space-y-4">
                   {[
                     'Filtros específicos para caminhões (tipo, carga, eixos)',
@@ -133,8 +130,8 @@ export default async function CaminhoesPage({
                     'Chat seguro para negociação direta',
                     'Verificação de procedência e histórico'
                   ].map(item => (
-                    <li key={item} className="flex items-center gap-3 text-lg font-bold text-[#525252]">
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                    <li key={item} className="flex items-center gap-3 text-lg font-bold text-[#52607A]">
+                      <div className="w-2 h-2 rounded-full bg-[#D9F85F]" />
                       {item}
                     </li>
                   ))}
