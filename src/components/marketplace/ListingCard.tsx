@@ -30,7 +30,7 @@ export default function ListingCard({ listing, priority = false }: { listing: Li
     >
       <article className="surface-strong overflow-hidden transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
         {/* Image */}
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FFF8DF]">
+        <div className="relative aspect-square w-full overflow-hidden bg-[#FFF8DF]">
           {cover ? (
             <img
               src={cover}
@@ -81,23 +81,23 @@ export default function ListingCard({ listing, priority = false }: { listing: Li
         </div>
 
         {/* Content */}
-        <div className="p-4">
-          <h3 className="text-[15px] font-bold text-[#17170F] tracking-tight line-clamp-1">
+        <div className="p-4 max-[330px]:p-3">
+          <h3 className="text-[15px] font-bold text-[#17170F] tracking-tight line-clamp-1 max-[330px]:text-[14px]">
             {listing.title}
           </h3>
 
-          <p className="mt-2 text-[21px] font-extrabold text-[#17170F] tracking-tight">
+          <p className="mt-2 text-[21px] font-extrabold text-[#17170F] tracking-tight max-[330px]:text-[18px]">
             {formatBRL(Number(listing.price))}
           </p>
 
           {hasFipe && (
-            <p className="mt-0.5 text-[12px] text-[#857C6B] tracking-tight">
+            <p className="mt-0.5 text-[12px] text-[#857C6B] tracking-tight max-[330px]:text-[11px]">
               FIPE {formatBRL(Number(listing.fipe_price))}
             </p>
           )}
 
           {/* Specs */}
-          <div className="mt-4 pt-3 border-t border-[#17170F]/10 flex items-center gap-3 text-[12px] text-[#4F4A3E]">
+          <div className="mt-4 pt-3 border-t border-[#17170F]/10 flex items-center gap-3 text-[12px] text-[#4F4A3E] max-[330px]:gap-2 max-[330px]:text-[11px]">
             <span className="inline-flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5" strokeWidth={1.75} />
               {listing.year}/{listing.year_model}

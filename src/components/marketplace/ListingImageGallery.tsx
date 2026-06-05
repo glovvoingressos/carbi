@@ -37,9 +37,9 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
   const goNext = () => setActiveIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1))
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 max-[330px]:space-y-2">
       <div
-        className="relative aspect-square w-full overflow-hidden rounded-[32px] bg-white shadow-xl border border-white/70"
+        className="relative aspect-square w-full overflow-hidden rounded-[32px] bg-white shadow-xl border border-white/70 max-[330px]:rounded-[24px]"
         onTouchStart={(event) => setTouchStartX(event.touches[0]?.clientX ?? null)}
         onTouchEnd={(event) => {
           if (touchStartX == null) return
@@ -76,7 +76,7 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
       </div>
 
       {gallery.length > 1 ? (
-        <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
+        <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1 max-[330px]:gap-1.5">
           {gallery.map((image, index) => {
             const isActive = index === safeIndex
             const thumbFailed = hasFailed(image)
@@ -85,7 +85,7 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
                 key={`${image}-${index}`}
                 type="button"
                 onClick={() => setActiveIndex(index)}
-                className={`relative aspect-square h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl transition ${
+                className={`relative aspect-square h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl transition max-[330px]:h-14 max-[330px]:w-14 max-[330px]:rounded-xl ${
                   isActive ? 'ring-2 ring-[#17170F]' : 'opacity-80 hover:opacity-100'
                 }`}
                 aria-label={`Abrir foto ${index + 1}`}

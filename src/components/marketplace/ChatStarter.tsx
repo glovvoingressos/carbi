@@ -62,7 +62,7 @@ export default function ChatStarter({ listingId, fullWidth = true }: { listingId
         type="button"
         onClick={openConversation}
         disabled={loading}
-        className={`btn btn-primary ${fullWidth ? 'w-full' : ''} shadow-sm`}
+        className={`btn btn-primary ${fullWidth ? 'w-full' : ''} shadow-sm max-[330px]:px-4 max-[330px]:text-[13px]`}
       >
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" strokeWidth={1.75} />}
         Conversar com vendedor

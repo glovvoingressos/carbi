@@ -855,6 +855,76 @@ p {
   .container { padding-inline: 16px; }
 }
 
+@media (max-width: 330px) {
+  html { font-size: 14px; }
+
+  .container {
+    padding-inline: 12px;
+  }
+
+  .hero-bento,
+  .surface,
+  .surface-strong,
+  .page-card {
+    border-radius: 22px;
+  }
+
+  .hero-bento,
+  .surface,
+  .surface-strong,
+  .page-card {
+    box-shadow: 0 8px 24px rgba(23, 23, 15, 0.08);
+  }
+
+  .btn {
+    min-height: 42px;
+    padding: 0 16px;
+    font-size: 0.875rem;
+  }
+
+  .btn-lg {
+    min-height: 46px;
+    padding: 0 18px;
+  }
+
+  .btn-xl {
+    min-height: 50px;
+    padding: 0 20px;
+  }
+
+  .btn-icon,
+  .btn-icon-bg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .input,
+  .input-lg {
+    min-height: 44px;
+    padding-inline: 14px;
+    font-size: 0.875rem;
+  }
+
+  .badge,
+  .section-kicker {
+    padding-inline: 10px;
+    font-size: 0.6875rem;
+  }
+
+  h1 {
+    font-size: clamp(2.1rem, 13vw, 3rem);
+    line-height: 0.95;
+  }
+
+  h2 {
+    font-size: clamp(1.6rem, 9vw, 2.2rem);
+  }
+
+  h3 {
+    font-size: 1.05rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

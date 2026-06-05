@@ -200,18 +200,18 @@ export default function ConversationInbox() {
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[380px_1fr] h-[calc(100vh-180px)] min-h-[620px]">
+    <div className="grid gap-5 lg:grid-cols-[380px_1fr] h-[calc(100vh-180px)] min-h-[620px] max-[330px]:gap-3 max-[330px]:h-auto max-[330px]:min-h-0">
       {/* Sidebar */}
-      <aside className="surface-strong flex flex-col h-full overflow-hidden">
-        <div className="p-5 border-b border-white/70">
-          <h2 className="text-[17px] font-semibold tracking-tight text-[#0A0A0A]">Conversas</h2>
+      <aside className="surface-strong flex flex-col h-full overflow-hidden max-[330px]:rounded-[24px]">
+        <div className="p-5 border-b border-white/70 max-[330px]:p-4">
+          <h2 className="text-[17px] font-semibold tracking-tight text-[#0A0A0A] max-[330px]:text-[15px]">Conversas</h2>
         </div>
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           {loadingConversations && conversations.length === 0 ? (
-            <div className="p-8 text-center text-[13px] text-[#8A95A8]">Carregando...</div>
+            <div className="p-8 text-center text-[13px] text-[#8A95A8] max-[330px]:p-5">Carregando...</div>
           ) : null}
 
-          <div className="p-2 space-y-1">
+          <div className="p-2 space-y-1 max-[330px]:p-1.5">
             {conversations.map((conversation) => {
               const isActive = selectedId === conversation.id
               return (
@@ -219,22 +219,22 @@ export default function ConversationInbox() {
                   key={conversation.id}
                   type="button"
                   onClick={() => setSelectedId(conversation.id)}
-                  className={`w-full rounded-2xl p-3 text-left transition-colors ${
+                  className={`w-full rounded-2xl p-3 text-left transition-colors max-[330px]:rounded-[18px] max-[330px]:p-2.5 ${
                     isActive ? 'bg-[#FFF8DF]' : 'hover:bg-[#F3F0E7]'
                   }`}
                 >
-                  <div className="flex items-start gap-2.5">
+                  <div className="flex items-start gap-2.5 max-[330px]:gap-2">
                     {conversation.is_unread && !isActive && (
-                      <span className="w-1.5 h-1.5 mt-2 rounded-full bg-[#10B981] shrink-0" />
+                      <span className="w-1.5 h-1.5 mt-2 rounded-full bg-[#10B981] shrink-0 max-[330px]:mt-1.5" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-[#0A0A0A] tracking-tight line-clamp-1">
+                      <p className="text-[14px] font-semibold text-[#0A0A0A] tracking-tight line-clamp-1 max-[330px]:text-[13px]">
                         {conversation.vehicle_listings_public.title}
                       </p>
-                      <p className="text-[12px] text-[#52607A] mt-0.5 tracking-tight">
+                      <p className="text-[12px] text-[#52607A] mt-0.5 tracking-tight max-[330px]:text-[11px]">
                         {formatBRL(Number(conversation.vehicle_listings_public.price))}
                       </p>
-                      <p className="text-[12px] text-[#8A95A8] mt-1.5 line-clamp-1 tracking-tight">
+                      <p className="text-[12px] text-[#8A95A8] mt-1.5 line-clamp-1 tracking-tight max-[330px]:mt-1 max-[330px]:text-[11px]">
                         {conversation.last_message_preview || 'Conversa iniciada.'}
                       </p>
                     </div>
@@ -245,37 +245,37 @@ export default function ConversationInbox() {
           </div>
 
           {conversations.length === 0 && !loadingConversations ? (
-            <div className="m-4 p-8 text-center bg-[#F5F8FC] rounded-2xl border border-white/70">
+            <div className="m-4 p-8 text-center bg-[#F5F8FC] rounded-2xl border border-white/70 max-[330px]:m-3 max-[330px]:p-5">
               <MessageSquare className="w-8 h-8 text-[#A3A3A3] mx-auto mb-3" strokeWidth={1.5} />
-              <p className="text-[13px] text-[#52607A]">Você ainda não possui conversas.</p>
+              <p className="text-[13px] text-[#52607A] max-[330px]:text-[12px]">Você ainda não possui conversas.</p>
             </div>
           ) : null}
         </div>
       </aside>
 
       {/* Conversation panel */}
-      <section className="surface-strong flex flex-col h-full overflow-hidden relative">
+      <section className="surface-strong flex flex-col h-full overflow-hidden relative max-[330px]:rounded-[24px]">
         {!selectedConversation ? (
-          <div className="flex-1 flex items-center justify-center p-8 text-center">
+          <div className="flex-1 flex items-center justify-center p-8 text-center max-[330px]:p-5">
             <div>
               <MessageSquare className="w-10 h-10 text-[#A3A3A3] mx-auto mb-3" strokeWidth={1.5} />
-              <p className="text-[15px] text-[#52607A]">Selecione uma conversa para começar.</p>
+              <p className="text-[15px] text-[#52607A] max-[330px]:text-[13px]">Selecione uma conversa para começar.</p>
             </div>
           </div>
         ) : (
           <>
-            <div className="px-6 py-5 border-b border-white/70 bg-white/60 backdrop-blur-xl">
-              <p className="text-[16px] font-semibold text-[#0A0A0A] tracking-tight">
+            <div className="px-6 py-5 border-b border-white/70 bg-white/60 backdrop-blur-xl max-[330px]:px-4 max-[330px]:py-4">
+              <p className="text-[16px] font-semibold text-[#0A0A0A] tracking-tight max-[330px]:text-[14px]">
                 {selectedConversation.vehicle_listings_public.title}
               </p>
-              <p className="text-[12px] text-[#52607A] mt-0.5 tracking-tight">
+              <p className="text-[12px] text-[#52607A] mt-0.5 tracking-tight max-[330px]:text-[11px]">
                 {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} · {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
               </p>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar max-[330px]:px-4 max-[330px]:py-4">
               {loadingMessages && messages.length === 0 ? (
-                <p className="text-[13px] text-[#8A95A8] text-center mt-8">Carregando mensagens...</p>
+                <p className="text-[13px] text-[#8A95A8] text-center mt-8 max-[330px]:mt-4">Carregando mensagens...</p>
               ) : null}
               <div className="space-y-3">
                 {messages.map((message) => {
@@ -285,12 +285,12 @@ export default function ConversationInbox() {
                       key={message.id}
                       className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
                     >
-                      <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                      <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 max-[330px]:max-w-[88%] max-[330px]:px-3 max-[330px]:py-2 ${
                         isMine
                           ? 'bg-[#17170F] text-[#FFFDF3] rounded-br-md shadow-sm'
                           : 'bg-[#F5F8FC] text-[#0A0A0A] rounded-bl-md border border-white/70'
                       }`}>
-                        <p className="text-[14px] leading-relaxed tracking-tight">{message.message}</p>
+                        <p className="text-[14px] leading-relaxed tracking-tight max-[330px]:text-[13px]">{message.message}</p>
                         <p className={`mt-1 text-[10px] tracking-tight ${isMine ? 'text-white/50' : 'text-[#A3A3A3]'}`}>
                           {new Date(message.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                         </p>
@@ -301,8 +301,8 @@ export default function ConversationInbox() {
               </div>
             </div>
 
-            <div className="p-4 bg-white/60 border-t border-white/70">
-              <div className="flex items-center gap-2 bg-white border-2 border-[#17170F]/12 rounded-full pl-5 pr-1.5 py-1.5 focus-within:border-[#17170F] transition-colors shadow-sm">
+            <div className="p-4 bg-white/60 border-t border-white/70 max-[330px]:p-3">
+              <div className="flex items-center gap-2 bg-white border-2 border-[#17170F]/12 rounded-full pl-5 pr-1.5 py-1.5 focus-within:border-[#17170F] transition-colors shadow-sm max-[330px]:pl-4 max-[330px]:py-1">
                 <input
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
@@ -313,13 +313,13 @@ export default function ConversationInbox() {
                     }
                   }}
                   placeholder="Digite sua mensagem..."
-                  className="flex-1 bg-transparent px-1 py-2 text-[14px] text-[#0A0A0A] outline-none placeholder:text-[#8A95A8] tracking-tight"
+                  className="flex-1 bg-transparent px-1 py-2 text-[14px] text-[#0A0A0A] outline-none placeholder:text-[#8A95A8] tracking-tight max-[330px]:text-[13px]"
                 />
                 <button
                   type="button"
                   disabled={sending || !messageText.trim()}
                   onClick={() => void sendMessage()}
-                  className="w-9 h-9 rounded-full bg-[#17170F] text-[#FFFDF3] hover:bg-[#2A2A1D] disabled:opacity-30 transition-colors flex items-center justify-center shadow-sm"
+                  className="w-9 h-9 rounded-full bg-[#17170F] text-[#FFFDF3] hover:bg-[#2A2A1D] disabled:opacity-30 transition-colors flex items-center justify-center shadow-sm max-[330px]:h-8 max-[330px]:w-8"
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" strokeWidth={1.75} />}
                 </button>

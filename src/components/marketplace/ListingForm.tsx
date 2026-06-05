@@ -862,7 +862,7 @@ export default function ListingForm() {
   }
 
   return (
-    <div className="space-y-8 pb-4 max-w-3xl mx-auto">
+    <div className="space-y-8 pb-4 max-w-3xl mx-auto max-[330px]:space-y-6 max-[330px]:pb-20">
       <div className="space-y-3">
         <div className="h-1.5 bg-[#FAFAF9] rounded-full overflow-hidden">
           <div
@@ -877,18 +877,18 @@ export default function ListingForm() {
         </p>
       </div>
 
-      <div className="surface-strong p-6 sm:p-8 space-y-8">
+      <div className="surface-strong p-6 sm:p-8 space-y-8 max-[330px]:p-4 max-[330px]:space-y-6">
         {currentStep === 1 && (
-          <div className="space-y-6">
+          <div className="space-y-6 max-[330px]:space-y-5">
             <div>
-              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2">Selecione seu veículo</h3>
-              <p className="text-sm text-[#525252]">
+              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Selecione seu veículo</h3>
+              <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
                 Escolha o tipo de veículo, depois marca, modelo e ano. O restante é automático.
               </p>
             </div>
             
-            <div className="surface p-5 space-y-4">
-              <div className="flex items-center justify-between gap-3">
+            <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3">
+              <div className="flex items-center justify-between gap-3 max-[330px]:gap-2">
                 <p className="label text-[#10B981]">Tipo de veículo</p>
                 <span className="badge badge-brand text-[10px]">Obrigatório</span>
               </div>
@@ -902,12 +902,12 @@ export default function ListingForm() {
               </select>
             </div>
 
-            <div className="surface p-5 space-y-4">
-              <div className="flex items-center justify-between gap-3">
+            <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3">
+              <div className="flex items-center justify-between gap-3 max-[330px]:gap-2">
                 <p className="label text-[#10B981]">Seleção do veículo</p>
                 <span className="badge badge-neutral text-[10px]">Sequencial</span>
               </div>
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-3 max-[330px]:grid-cols-1">
                 <select
                   className="input"
                   value={selectedBrandCode}
@@ -955,16 +955,16 @@ export default function ListingForm() {
               </div>
 
               {selectedYear ? (
-                <div className="grid gap-4 sm:grid-cols-3 mt-6">
-                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-col gap-1">
+                <div className="grid gap-4 sm:grid-cols-3 mt-6 max-[330px]:grid-cols-1 max-[330px]:gap-2.5">
+                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-col gap-1 max-[330px]:p-3">
                     <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Ano fab.</span>
                     <strong className="text-sm text-[#0A0A0A]">{form.year || '-'}</strong>
                   </div>
-                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-col gap-1">
+                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-col gap-1 max-[330px]:p-3">
                     <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Ano/modelo</span>
                     <strong className="text-sm text-[#0A0A0A]">{form.yearModel || '-'}</strong>
                   </div>
-                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-col gap-1">
+                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-col gap-1 max-[330px]:p-3">
                     <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Versão</span>
                     <strong className="text-sm text-[#0A0A0A] truncate" title={form.version}>{form.version || 'Automática'}</strong>
                   </div>
@@ -972,11 +972,11 @@ export default function ListingForm() {
               ) : null}
             </div>
 
-            <div className="surface-strong p-8 relative overflow-hidden">
+            <div className="surface-strong p-8 relative overflow-hidden max-[330px]:p-4">
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#D9F85F]/50 rounded-bl-full -z-10" />
-              <div className="flex items-center justify-between gap-3 mb-6">
-                <p className="text-lg font-semibold font-black text-[#0A0A0A]">Referência FIPE</p>
-                <span className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest shadow-sm ${hasAskingPrice && comparison.status === 'below' ? 'bg-green-50 text-green-600 border-green-100' : hasAskingPrice && comparison.status === 'above' ? 'bg-red-50 text-red-600 border-red-100' : hasAskingPrice && comparison.status === 'near' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-[#FAFAF9] text-[#525252] border-[#EAEAE8]'}`}>
+              <div className="flex items-center justify-between gap-3 mb-6 max-[330px]:mb-4 max-[330px]:gap-2">
+                <p className="text-lg font-semibold font-black text-[#0A0A0A] max-[330px]:text-[16px]">Referência FIPE</p>
+                <span className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest shadow-sm max-[330px]:px-3 max-[330px]:py-1.5 ${hasAskingPrice && comparison.status === 'below' ? 'bg-green-50 text-green-600 border-green-100' : hasAskingPrice && comparison.status === 'above' ? 'bg-red-50 text-red-600 border-red-100' : hasAskingPrice && comparison.status === 'near' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-[#FAFAF9] text-[#525252] border-[#EAEAE8]'}`}>
                   {!hasAskingPrice && 'Preço pendente'}
                   {hasAskingPrice && comparison.status === 'below' && 'Abaixo'}
                   {hasAskingPrice && comparison.status === 'near' && 'Próximo'}
@@ -985,11 +985,11 @@ export default function ListingForm() {
                 </span>
               </div>
               {!selectedYear ? (
-                <p className="text-sm font-medium text-[#525252] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8]">Complete marca, modelo e ano para carregar os dados automáticos.</p>
+                <p className="text-sm font-medium text-[#525252] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8] max-[330px]:text-[13px] max-[330px]:p-3">Complete marca, modelo e ano para carregar os dados automáticos.</p>
               ) : fipeLoading ? (
-                <p className="text-sm font-medium text-[#10B981] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8] flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Consultando valor atualizado...</p>
+                <p className="text-sm font-medium text-[#10B981] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8] flex items-center gap-2 max-[330px]:text-[13px] max-[330px]:p-3"><Loader2 className="w-4 h-4 animate-spin" /> Consultando valor atualizado...</p>
               ) : fipeResult ? (
-                <div className="grid gap-3 text-sm font-medium text-[#525252]">
+                <div className="grid gap-3 text-sm font-medium text-[#525252] max-[330px]:gap-2.5 max-[330px]:text-[13px]">
                   <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#A3A3A3]">Versão automática:</span> <strong className="text-[#0A0A0A]">{form.version || 'Não informada'}</strong></div>
                   <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#A3A3A3]">Preço FIPE:</span> <strong className="text-[#0A0A0A]">{fipeResult.price}</strong></div>
                   <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#A3A3A3]">Seu anúncio:</span> <strong className="text-[#0A0A0A]">{hasAskingPrice ? formatBRL(priceNumber) : 'Informe o preço na próxima etapa'}</strong></div>
@@ -1010,28 +1010,28 @@ export default function ListingForm() {
         )}
 
         {currentStep === 2 && (
-          <div className="space-y-8">
+          <div className="space-y-8 max-[330px]:space-y-5">
             <div>
-              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2">Preço e descrição</h3>
-              <p className="text-sm text-[#525252]">
+              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Preço e descrição</h3>
+              <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
                 Preencha os detalhes para atrair mais compradores.
               </p>
             </div>
             
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
               <input className="input" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} />
               <input className="input" placeholder="Quilometragem" value={form.mileage} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
               <input className="input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
               <input className="input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
             </div>
 
-            <textarea className="input min-h-[120px] py-3 resize-none leading-relaxed" placeholder="Descrição do veículo... Destaque os pontos fortes, manutenções recentes e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
+            <textarea className="input min-h-[120px] py-3 resize-none leading-relaxed max-[330px]:min-h-[100px]" placeholder="Descrição do veículo... Destaque os pontos fortes, manutenções recentes e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
             <input className="input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
 
             {form.vehicle_type === 'truck' && (
-              <div className="card p-5 space-y-4">
-                <h4 className="text-sm font-bold text-[#0A0A0A]">Informações do Caminhão</h4>
-                <div className="grid gap-3 sm:grid-cols-2">
+              <div className="card p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3">
+                <h4 className="text-sm font-bold text-[#0A0A0A] max-[330px]:text-[13px]">Informações do Caminhão</h4>
+                <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
                   <input className="input" placeholder="Tipo (ex: Baú, Caçamba)" value={form.truck_type} onChange={(e) => handleInput('truck_type', e.target.value)} />
                   <input className="input" placeholder="Capacidade (toneladas)" value={form.load_capacity} onChange={(e) => handleInput('load_capacity', e.target.value.replace(/[^0-9.]/g, ''))} />
                   <input className="input" placeholder="Nº de eixos" value={form.axles} onChange={(e) => handleInput('axles', e.target.value.replace(/\D/g, ''))} />
@@ -1041,36 +1041,36 @@ export default function ListingForm() {
             )}
 
             <label
-              className="surface border-2 border-dashed border-[#17170F]/18 p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] hover:border-[#17170F]/30 hover:bg-[#D9F85F] transition-all group"
+              className="surface border-2 border-dashed border-[#17170F]/18 p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] hover:border-[#17170F]/30 hover:bg-[#D9F85F] transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px]"
               onDragOver={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
               }}
               onDrop={onDropFiles}
             >
-              <div className="w-14 h-14 rounded-full bg-[#FFF8DF] flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-14 h-14 rounded-full bg-[#FFF8DF] flex items-center justify-center group-hover:scale-110 transition-transform max-[330px]:w-12 max-[330px]:h-12">
                 <ImagePlus className="h-6 w-6 text-[#17170F]" />
               </div>
-              <span className="text-sm text-[#0A0A0A] mt-1">Arraste fotos ou clique ({images.length}/{LISTING_MAX_IMAGES})</span>
+              <span className="text-sm text-[#0A0A0A] mt-1 max-[330px]:text-[13px]">Arraste fotos ou clique ({images.length}/{LISTING_MAX_IMAGES})</span>
               <span className="badge badge-brand text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens</span>
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
             </label>
             <p className="text-xs text-[#A3A3A3] text-center">Você pode publicar sem foto e enviar depois no painel.</p>
 
             {images.length > 0 && (
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8">
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8 max-[330px]:grid-cols-1 max-[330px]:gap-4">
                 {images.map((image, index) => (
-                  <div key={image.previewUrl} className="surface p-3 hover:shadow-md transition-shadow">
+                  <div key={image.previewUrl} className="surface p-3 hover:shadow-md transition-shadow max-[330px]:p-2.5">
                     <img src={image.previewUrl} alt={`Preview ${index + 1}`} width={1080} height={1080} className="aspect-square w-full rounded-xl object-cover" />
-                    <p className="mt-4 px-2 text-[10px] font-black uppercase tracking-widest text-[#525252]">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
-                    <div className="mt-3 flex items-center gap-2 px-2 pb-1">
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#10B981] hover:bg-[#FAFAF9]/80 transition-colors" onClick={() => moveImage(index, -1)} disabled={index === 0}>
+                    <p className="mt-4 px-2 text-[10px] font-black uppercase tracking-widest text-[#525252] max-[330px]:mt-3">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
+                    <div className="mt-3 flex items-center gap-2 px-2 pb-1 max-[330px]:gap-1.5">
+                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#10B981] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, -1)} disabled={index === 0}>
                         <MoveLeft className="h-4 w-4" />
                       </button>
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#10B981] hover:bg-[#FAFAF9]/80 transition-colors" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1}>
+                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#10B981] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1}>
                         <MoveRight className="h-4 w-4" />
                       </button>
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors ml-auto" onClick={() => removeImage(index)}>
+                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors ml-auto max-[330px]:h-9 max-[330px]:w-9" onClick={() => removeImage(index)}>
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -1082,17 +1082,17 @@ export default function ListingForm() {
         )}
 
         {currentStep === 3 && (
-          <div className="space-y-8">
+          <div className="space-y-8 max-[330px]:space-y-5">
             <div>
-              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2">Revisar e publicar</h3>
-              <p className="text-sm text-[#525252]">
+              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Revisar e publicar</h3>
+              <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
                 Confira os detalhes antes de finalizar.
               </p>
             </div>
             
-            <div className="card p-5 relative overflow-hidden">
+            <div className="card p-5 relative overflow-hidden max-[330px]:p-4">
               <p className="label text-[#16855C] mb-4">Informações</p>
-              <div className="grid gap-4 text-sm sm:grid-cols-2">
+              <div className="grid gap-4 text-sm sm:grid-cols-2 max-[330px]:grid-cols-1 max-[330px]:gap-3">
                 <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#A3A3A3]">Veículo</span><strong className="text-sm text-[#0A0A0A]">{form.brand} {form.model} {form.version}</strong></div>
                 <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#A3A3A3]">Ano</span><strong className="text-sm text-[#0A0A0A]">{form.year}/{form.yearModel}</strong></div>
                 <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#A3A3A3]">Preço</span><strong className="text-sm text-[#0A0A0A]">{form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado'}</strong></div>
@@ -1103,13 +1103,13 @@ export default function ListingForm() {
               </div>
             </div>
 
-            <div className="surface p-5">
+            <div className="surface p-5 max-[330px]:p-4">
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-7 h-7 rounded-full bg-[#ECFDF5] flex items-center justify-center text-[#10B981] font-bold text-[10px]">AI</span>
                 <p className="label">Ficha técnica automática</p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 max-[330px]:grid-cols-1">
+                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5 max-[330px]:p-2.5">
                   <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Motor</span>
                   <strong className="text-sm font-semibold text-[#0A0A0A]">{technical.engine}</strong>
                 </div>
@@ -1129,7 +1129,7 @@ export default function ListingForm() {
                   <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Câmbio</span>
                   <strong className="text-sm font-bold text-[#0A0A0A]">{technical.transmission}</strong>
                 </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5 lg:col-span-2">
+                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5 lg:col-span-2 max-[330px]:p-2.5">
                   <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Consumo</span>
                   <strong className="text-sm font-bold text-[#0A0A0A]">{technical.consumption}</strong>
                 </div>
@@ -1140,8 +1140,8 @@ export default function ListingForm() {
               </div>
             </div>
 
-            <div className="bg-[#E9FFF2] border border-[#16855C]/20 rounded-2xl p-4 flex items-center justify-center text-center">
-              <p className="text-xs font-bold text-[#16855C]">
+            <div className="bg-[#E9FFF2] border border-[#16855C]/20 rounded-2xl p-4 flex items-center justify-center text-center max-[330px]:p-3">
+              <p className="text-xs font-bold text-[#16855C] max-[330px]:text-[11px]">
                 Seu contato direto não é exibido. Toda negociação acontece via chat seguro da plataforma.
               </p>
             </div>
@@ -1167,7 +1167,7 @@ export default function ListingForm() {
           </div>
         ) : null}
 
-        <div className="mt-8 flex flex-col-reverse justify-between gap-3 sm:flex-row pt-6 border-t border-white/70">
+        <div className="mt-8 flex flex-col-reverse justify-between gap-3 sm:flex-row pt-6 border-t border-white/70 max-[330px]:mt-6 max-[330px]:pt-4">
           {currentStep > 1 ? (
             <button
               type="button"
@@ -1185,9 +1185,9 @@ export default function ListingForm() {
           <button
             type="button"
             onClick={currentStep === 3 ? handleSubmit : nextStep}
-            className="btn btn-primary"
-            disabled={saving || fipeLoading}
-          >
+              className="btn btn-primary max-[330px]:w-full"
+              disabled={saving || fipeLoading}
+            >
             {saving ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -1205,12 +1205,12 @@ export default function ListingForm() {
         </div>
 
         {currentStep === 3 ? (
-          <div className="fixed inset-x-0 bottom-20 z-30 px-4 sm:hidden">
+          <div className="fixed inset-x-0 bottom-20 z-30 px-4 sm:hidden max-[330px]:px-3">
             <button
               type="button"
               disabled={saving}
               onClick={handleSubmit}
-              className="btn btn-primary w-full shadow-lg"
+              className="btn btn-primary w-full shadow-lg max-[330px]:text-[13px]"
             >
               {saving ? 'Publicando...' : 'Publicar anúncio'}
             </button>

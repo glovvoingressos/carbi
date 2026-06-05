@@ -326,7 +326,7 @@ export default async function HomePage() {
                   </div>
                   <Sparkles className="h-8 w-8 text-[#17170F]" strokeWidth={2} />
                 </div>
-                <div className="flex aspect-[4/3] items-center justify-center rounded-[34px] bg-[#FFFDF3]">
+                <div className="flex aspect-square items-center justify-center rounded-[34px] bg-[#FFFDF3]">
                   <Car className="h-24 w-24 text-[#17170F]" strokeWidth={1.2} />
                 </div>
                 <div className="mt-5 grid grid-cols-3 gap-3">
