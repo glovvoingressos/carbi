@@ -1173,7 +1173,15 @@ p {
 .ref-ctas-row { display: flex; flex-direction: column; gap: 10px; }
 .ref-cta-link { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; background: rgba(255,255,255,.08); border-radius: 14px; text-decoration: none; color: var(--white); font-size: 15px; font-weight: 500; border: 1px solid rgba(255,255,255,.1); transition: all .2s; }
 .ref-cta-link:hover { background: rgba(255,255,255,.14); transform: translateX(4px); }
-.ref-sec-lightgreen { background: #e6f4e8; }
+.ref-sec-lightgreen { background: var(--forest); color: var(--white); }
+.ref-sec-lightgreen .ref-sec-label { color: rgba(255,255,255,.52); }
+.ref-sec-lightgreen .ref-section-h2 { color: var(--chartreuse); }
+.ref-sec-lightgreen .ref-section-p { color: rgba(255,255,255,.72); }
+.ref-sec-lightgreen .ref-feature-item { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.08); }
+.ref-sec-lightgreen .ref-feature-item h3 { color: var(--white); }
+.ref-sec-lightgreen .ref-feature-item p { color: rgba(255,255,255,.72); }
+.ref-sec-lightgreen .ref-btn-forest { background: var(--chartreuse); color: var(--ink); border-color: var(--chartreuse); }
+.ref-sec-lightgreen .ref-btn-forest:hover { background: #b8e84a; border-color: #b8e84a; }
 .ref-analytics-mock { background: var(--white); border-radius: 24px; padding: 32px; box-shadow: 0 8px 40px rgba(0,0,0,.07); }
 .ref-analytics-title { font-size: 12px; font-family: var(--font-mono); color: #888; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
 .ref-chart-bars { display: flex; align-items: flex-end; gap: 7px; height: 110px; margin-bottom: 20px; }
@@ -1201,11 +1209,11 @@ p {
 .ref-card-lavender { background: var(--lavender); color: var(--ink); }
 .ref-card-lime { background: var(--lime); color: var(--ink); }
 .ref-card-iris { background: var(--iris); color: var(--white); }
-.ref-card-img-area { width: 100%; height: 180px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
-.ref-card-lavender .ref-card-img-area { background: rgba(0,0,0,.08); }
-.ref-card-lime .ref-card-img-area { background: rgba(0,0,0,.06); }
-.ref-card-iris .ref-card-img-area { background: rgba(255,255,255,.12); }
-.ref-card-img-area svg { width: 80px; height: auto; opacity: .5; }
+.ref-card-img-area { width: 100%; height: 180px; border-radius: 0; display: flex; align-items: center; justify-content: center; background: transparent; overflow: hidden; }
+.ref-card-lavender .ref-card-img-area,
+.ref-card-lime .ref-card-img-area,
+.ref-card-iris .ref-card-img-area { background: transparent; }
+.ref-card-img-area svg { width: 100%; height: 100%; opacity: 1; display: block; transform: scale(1.24); transform-origin: center; }
 .ref-plans-grid { display: flex; gap: 20px; }
 .ref-plan-card { flex: 1; background: var(--white); border: 2px solid transparent; border-radius: 24px; padding: 36px 32px; transition: all .25s; }
 .ref-plan-card:hover { border-color: var(--iris); transform: translateY(-4px); }
