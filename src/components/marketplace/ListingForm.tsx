@@ -1193,7 +1193,12 @@ export default function ListingForm() {
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 max-[330px]:grid-cols-1">
                 <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5 max-[330px]:p-2.5">
                   <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Motor</span>
-                  <strong className="text-sm font-semibold text-[#0A0A0A]">{technical.engine}</strong>
+                  <input
+                    className="text-sm font-semibold text-[#0A0A0A] bg-transparent border border-[#EAEAE8] rounded-lg px-2 py-1 w-full outline-none focus:border-[#10B981]"
+                    value={form.engine || (technical.engine !== 'Não informado' ? technical.engine : '')}
+                    onChange={(e) => handleInput('engine', e.target.value)}
+                    placeholder="Ex: 2.0 Turbo"
+                  />
                 </div>
                 <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
                   <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Potência</span>
