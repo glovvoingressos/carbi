@@ -843,7 +843,7 @@ export default function ListingForm() {
 
   if (!sessionReady) {
     return (
-      <div className="surface-strong p-8 text-center">
+      <div className="listing-form-ref surface-strong p-8 text-center">
         <Loader2 className="mx-auto h-5 w-5 animate-spin text-[#0A0A0A]" />
         <p className="mt-2 text-sm text-[#525252]">Carregando sessão...</p>
       </div>
@@ -851,11 +851,15 @@ export default function ListingForm() {
   }
 
   if (!isAuthenticated) {
-    return <AuthCard onAuthenticated={() => setIsAuthenticated(true)} />
+    return (
+      <div className="listing-form-ref">
+        <AuthCard onAuthenticated={() => setIsAuthenticated(true)} />
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-8 pb-4 max-w-3xl mx-auto max-[330px]:space-y-6 max-[330px]:pb-20">
+    <div className="listing-form-ref space-y-8 pb-4 max-w-3xl mx-auto max-[330px]:space-y-6 max-[330px]:pb-20">
       <div className="space-y-3">
         <div className="h-1.5 bg-[#FAFAF9] rounded-full overflow-hidden">
           <div

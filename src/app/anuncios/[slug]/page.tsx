@@ -58,7 +58,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   const sellerInfo = await getSellerInfo(listing.user_id)
 
   return (
-    <main className="min-h-screen pt-28 pb-24">
+    <main className="ref-detail-page min-h-screen pb-24">
       <div className="container">
         <VehicleSchema vehicle={listing} />
         <BreadcrumbSchema
@@ -69,7 +69,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             { name: listing.model, url: `/anuncios/${listing.slug}` },
           ]}
         />
-        <div className="mb-8 text-sm font-medium text-[#8A95A8] flex items-center gap-2">
+        <div className="ref-detail-breadcrumb">
           <Link href="/" className="hover:text-[#0A0A0A] transition-colors">Home</Link> 
           <span className="text-[#0A0A0A]/10">/</span> 
           <Link href="/carros-a-venda" className="hover:text-[#0A0A0A] transition-colors">Marketplace</Link> 

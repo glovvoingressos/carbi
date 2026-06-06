@@ -1,4 +1,6 @@
 import { Metadata } from 'next'
+import Link from 'next/link'
+import { ArrowRight, CheckCircle2 } from 'lucide-react'
 import ListingForm from '@/components/marketplace/ListingForm'
 
 export const metadata: Metadata = {
@@ -10,22 +12,53 @@ export const metadata: Metadata = {
   },
 }
 
+const flow = ['Marca', 'Modelo', 'Ano', 'Versão', 'Preço', 'FIPE', 'Fotos', 'Publicar']
+
 export default function AnunciarFluxoPage() {
   return (
-    <main className="min-h-screen pb-24 pt-28">
-      <div className="container">
-        <div className="hero-bento p-8 sm:p-12 mb-6">
-          <p className="section-kicker bg-[#17170F] text-[#FFFDF3] border-[#17170F]">100% grátis</p>
-          <h1 className="mt-3 text-balance">
-            Anuncie seu carro no Brasil <span className="text-[#16855C]">sem pagar nada</span>
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg font-medium text-[#52607A]">
-            Experiência limpa, rápida e guiada para publicar gratuitamente seu veículo com segurança em qualquer lugar do país.
-          </p>
+    <main className="ref-flow-page">
+      <section className="ref-flow-hero">
+        <div className="ref-flow-hero-inner">
+          <div>
+            <span className="ref-hero-badge"><span className="ref-dot" /> Anúncio 100% grátis</span>
+            <h1>Monte seu anúncio com a mesma experiência premium da Carbi.</h1>
+            <p>
+              Um fluxo guiado para selecionar veículo, consultar FIPE, enviar até 10 fotos e publicar com dados reais.
+            </p>
+          </div>
+          <Link href="/carros-a-venda" className="ref-btn ref-btn-lavender">
+            Ver ofertas <ArrowRight size={16} />
+          </Link>
         </div>
+        <div className="ref-flow-steps" aria-label="Etapas do anúncio">
+          {flow.map((item, index) => (
+            <div className="ref-flow-step" key={item}>
+              <span>{index + 1}</span>
+              <strong>{item}</strong>
+            </div>
+          ))}
+        </div>
+      </section>
 
-        <ListingForm />
-      </div>
+      <section className="ref-flow-form-section">
+        <div className="ref-flow-form-grid">
+          <aside className="ref-flow-side-card">
+            <span className="ref-sec-label">Onboarding</span>
+            <h2>Preencha pouco, publique bem.</h2>
+            <p>
+              O formulário usa FIPE real, valida fotos, salva o anúncio no banco e mantém contato por chat interno.
+            </p>
+            <div className="ref-flow-side-list">
+              {['FIPE durante o preenchimento', 'Upload real de imagens', 'Preview e revisão final', 'Negociação protegida'].map((item) => (
+                <div key={item}><CheckCircle2 size={17} /> {item}</div>
+              ))}
+            </div>
+          </aside>
+          <div className="ref-flow-form-wrap">
+            <ListingForm />
+          </div>
+        </div>
+      </section>
     </main>
   )
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { DM_Mono, DM_Sans } from 'next/font/google'
+import { DM_Sans, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
 import { OrganizationSchema, WebSiteSchema } from '@/components/seo/JSONLD'
@@ -18,7 +18,7 @@ const fontHeading = DM_Sans({
   display: 'swap',
 })
 
-const fontMono = DM_Mono({
+const fontMono = Plus_Jakarta_Sans({
   subsets: ['latin'],
   weight: ['400', '500'],
   variable: '--font-mono',

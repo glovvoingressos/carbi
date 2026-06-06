@@ -22,9 +22,16 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
   const handleImageError = useCallback((url: string) => {
     if (!failedRef.current.has(url)) {
       failedRef.current.add(url)
+      setActiveIndex((currentIndex) => {
+        const currentUrl = gallery[currentIndex]
+        if (currentUrl === url && currentIndex < gallery.length - 1) {
+          return currentIndex + 1
+        }
+        return currentIndex
+      })
       forceRender((n) => n + 1)
     }
-  }, [])
+  }, [gallery])
 
   const hasFailed = useCallback((url: string) => failedRef.current.has(url), [])
 
@@ -53,7 +60,7 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
         }}
       >
         {hasFailed(activeImage) ? (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-[#FFF8DF] p-4">
+          <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center gap-2 bg-[#FFF8DF] p-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/70 border border-white/70">
               <ImageIcon className="h-7 w-7 text-[#8A95A8]" />
             </div>
@@ -62,16 +69,19 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
             </p>
           </div>
         ) : (
-          <img
-            src={activeImage}
-            alt={`${title} foto ${safeIndex + 1}`}
-            width={1080}
-            height={1080}
-            className="h-full w-full object-cover"
-            loading="eager"
-            decoding="async"
-            onError={() => handleImageError(activeImage)}
-          />
+          <div className="absolute inset-0">
+            <img
+              src={activeImage}
+              alt={`${title} foto ${safeIndex + 1}`}
+              width={1080}
+              height={1080}
+              className="block h-full w-full object-cover object-center"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+              loading="eager"
+              decoding="async"
+              onError={() => handleImageError(activeImage)}
+            />
+          </div>
         )}
       </div>
 
@@ -100,7 +110,8 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
                     alt={`${title} miniatura ${index + 1}`}
                     width={1080}
                     height={1080}
-                    className="h-full w-full object-cover"
+                    className="block h-full w-full object-cover object-center"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
                     loading="lazy"
                     decoding="async"
                     onError={() => handleImageError(image)}

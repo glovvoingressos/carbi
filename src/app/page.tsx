@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Fragment } from 'react'
 import Link from 'next/link'
 import FAQSection from '@/components/layout/FAQSection'
+import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
 import { getLatestPublicListings } from '@/lib/marketplace-server'
 import { formatBRL } from '@/data/cars'
 
@@ -112,11 +113,20 @@ function ListingReferenceCard({ listing, index }: { listing: Listing; index: num
   const label = fipeLabel(listing)
   const below = typeof listing.fipe_difference_percent === 'number' && listing.fipe_difference_percent <= -3
   const title = listing.title || `${listing.brand} ${listing.model}`
+  const imageUrls = listing.images?.map((image) => image.url) || []
 
   return (
     <Link href={`/anuncios/${listing.slug}`} className="ref-car-card" data-price={Math.round(Number(listing.price))}>
       <div className="ref-car-card-img" style={{ background: carGradient(index) }}>
-        <CarSilhouette dark={index === 7} />
+        <MarketplaceListingImage
+          brand={listing.brand}
+          model={listing.model}
+          year={listing.year_model}
+          imageUrls={imageUrls}
+          alt={title}
+          className="h-full w-full object-cover"
+          priority={index < 4}
+        />
         {listing.badges?.some((badge) => badge.key === 'new') && <div className="ref-tag ref-tag-new">Novo</div>}
         {label && <div className={`ref-tag ${below ? 'ref-tag-fipe' : 'ref-tag-fipe-ok'}`}>{below ? `-${label}` : label}</div>}
       </div>
@@ -168,7 +178,15 @@ export default async function HomePage() {
               {heroListings.map((listing, index) => (
                 <Link href={`/anuncios/${listing.slug}`} className="ref-car-card-mini" key={listing.id}>
                   <div className="ref-car-img-mini">
-                    <CarSilhouette />
+                    <MarketplaceListingImage
+                      brand={listing.brand}
+                      model={listing.model}
+                      year={listing.year_model}
+                      imageUrls={listing.images?.map((image) => image.url) || []}
+                      alt={`${listing.brand} ${listing.model}`}
+                      className="h-full w-full object-cover"
+                      priority={index < 2}
+                    />
                   </div>
                   <h4>{listing.brand} {listing.model}</h4>
                   <div className="price">{formatBRL(Number(listing.price))}</div>
@@ -259,14 +277,14 @@ export default async function HomePage() {
         <div className="ref-container ref-flex-h reverse">
           <div className="ref-content-half">
             <div className="ref-sec-label" style={{ color: 'rgba(255,255,255,.5)' }}>Alcançar</div>
-            <h2 className="ref-section-h2">Compartilhe seu anúncio em qualquer lugar</h2>
+            <h2 className="ref-section-h2" style={{ color: 'var(--chartreuse)' }}>Compartilhe seu anúncio em qualquer lugar</h2>
             <p className="ref-section-p">Link único para seu anúncio. QR code para impressão ou compartilhamento no WhatsApp em um toque.</p>
             <div className="ref-ctas-row">
               <Link href="/anunciar-carro" className="ref-cta-link">Link único para cada anúncio <span>→</span></Link>
               <Link href="/carros-a-venda" className="ref-cta-link">QR code em alta resolução <span>→</span></Link>
               <Link href="/entrar" className="ref-cta-link">Compartilhe direto pelo WhatsApp <span>→</span></Link>
             </div>
-            <div style={{ marginTop: 32 }}><Link href="/anunciar-carro" className="ref-btn ref-btn-lavender ref-btn-wide">Criar meu anúncio</Link></div>
+            <div style={{ marginTop: 32 }}><Link href="/anunciar-carro" className="ref-btn ref-btn-chartreuse ref-btn-wide">Criar meu anúncio</Link></div>
           </div>
           <div className="ref-img-half">
             <div className="ref-share-mock">

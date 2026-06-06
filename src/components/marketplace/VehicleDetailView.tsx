@@ -106,7 +106,7 @@ export default function VehicleDetailView({
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen"
+      className="vehicle-detail-ref min-h-screen"
     >
       {/* ── HEADER ── */}
       <motion.section variants={itemVariants} className="container pt-8 pb-6">
@@ -124,9 +124,9 @@ export default function VehicleDetailView({
                 </span>
               )}
             </div>
-            <h1 className="text-balance">Detalhes do anúncio</h1>
+            <h1 className="text-balance">{listing.brand} {listing.model}</h1>
             <p className="mt-2 text-[15px] text-[#525252] tracking-tight">
-              {listing.city}, {listing.state} · Anunciado em{' '}
+              {listing.version || 'Versão não informada'} · {listing.year}/{listing.year_model} · {listing.city}, {listing.state} · Anunciado em{' '}
               {new Date(listing.created_at).toLocaleDateString('pt-BR', {
                 day: '2-digit',
                 month: 'long',
