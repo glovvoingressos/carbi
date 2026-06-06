@@ -14,6 +14,7 @@ import {
   buildFipeSnapshot,
   getFipeComparison,
   normalizeOptionalItems,
+  formatBrazilianInt,
   parseBrazilianInt,
   parseMoneyInputToNumber,
 } from '@/lib/marketplace'
@@ -1113,7 +1114,7 @@ export default function ListingForm() {
             
             <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
               <input className="input" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} />
-              <input className="input" placeholder="Quilometragem" value={form.mileage} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
+              <input className="input" placeholder="Quilometragem" value={formatBrazilianInt(form.mileage)} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
               <input className="input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
               <input className="input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
             </div>

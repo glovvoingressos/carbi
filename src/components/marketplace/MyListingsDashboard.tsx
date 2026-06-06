@@ -14,6 +14,7 @@ import {
   LISTING_MAX_IMAGE_SIZE_MB,
   parseMoneyInputToNumber,
   parseBrazilianInt,
+  formatBrazilianInt,
   validateListingPayload,
 } from '@/lib/marketplace'
 import AuthCard from '@/components/marketplace/AuthCard'
@@ -777,7 +778,7 @@ export default function MyListingsDashboard() {
                           type="number"
                           step="1"
                           className={`w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-2 transition-all font-bold text-[#0A0A0A] focus:outline-none ${errors.mileage ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-[#10B981]'}`}
-                          value={formData.mileage || ''}
+                          value={formatBrazilianInt(formData.mileage)}
                           onChange={(e) => updateField('mileage', parseBrazilianInt(e.target.value))}
                         />
                       {errors.mileage && <p className="text-[10px] font-bold text-red-500 ml-4">{errors.mileage}</p>}

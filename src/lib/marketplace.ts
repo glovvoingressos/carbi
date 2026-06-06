@@ -128,6 +128,13 @@ export function parseBrazilianInt(value: string | number): number {
   return Number.isFinite(parsed) ? Math.round(parsed) : 0
 }
 
+export function formatBrazilianInt(value: number | string | null | undefined): string {
+  if (value == null) return ''
+  const num = typeof value === 'string' ? parseBrazilianInt(value) : value
+  if (!num) return ''
+  return num.toLocaleString('pt-BR')
+}
+
 export function normalizeOptionalItems(raw: string): string[] {
   return raw
     .split(',')
