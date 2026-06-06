@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Send, Loader2, MessageSquare } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowUpRight, CarFront, Loader2, MessageSquare, Send, ShieldCheck } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
@@ -189,111 +190,135 @@ export default function ConversationInbox() {
 
   if (!ready) {
     return (
-      <div className="surface-strong p-20 text-center max-[330px]:p-6">
+      <div className="conversation-loading-card">
         <Loader2 className="mx-auto h-6 w-6 animate-spin text-[#0A0A0A]" />
+        <p>Carregando conversas...</p>
       </div>
     )
   }
 
   if (!authenticated) {
-    return <AuthCard />
+    return (
+      <div className="conversation-auth-wrap">
+        <AuthCard redirectTo="/minha-conta/conversas" />
+      </div>
+    )
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[380px_1fr] h-[calc(100vh-180px)] min-h-[620px] max-[330px]:gap-3 max-[330px]:h-auto max-[330px]:min-h-0">
-      {/* Sidebar */}
-      <aside className="surface-strong flex flex-col h-full overflow-hidden max-[330px]:rounded-[24px]">
-        <div className="p-5 border-b border-white/70 max-[330px]:p-4">
-          <h2 className="text-[17px] font-semibold tracking-tight text-[#0A0A0A] max-[330px]:text-[15px]">Conversas</h2>
+    <div className="conversation-workspace">
+      <aside className="conversation-list-panel">
+        <div className="conversation-list-head">
+          <div>
+            <span>Inbox</span>
+            <h2>Minhas conversas</h2>
+          </div>
+          {loadingConversations ? <Loader2 className="h-4 w-4 animate-spin text-[#8A95A8]" /> : null}
         </div>
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
+
+        <div className="conversation-thread-scroll custom-scrollbar">
           {loadingConversations && conversations.length === 0 ? (
-            <div className="p-8 text-center text-[13px] text-[#8A95A8] max-[330px]:p-5">Carregando...</div>
+            <div className="conversation-list-muted">Carregando...</div>
           ) : null}
 
-          <div className="p-2 space-y-1 max-[330px]:p-1.5">
+          <div className="conversation-thread-stack">
             {conversations.map((conversation) => {
               const isActive = selectedId === conversation.id
+              const imageUrl = conversation.vehicle_listings_public.images?.[0]?.url
               return (
                 <button
                   key={conversation.id}
                   type="button"
                   onClick={() => setSelectedId(conversation.id)}
-                  className={`w-full rounded-2xl p-3 text-left transition-colors max-[330px]:rounded-[18px] max-[330px]:p-2.5 ${
-                    isActive ? 'bg-[#FFF8DF]' : 'hover:bg-[#F3F0E7]'
-                  }`}
+                  className={`conversation-thread-card ${isActive ? 'is-active' : ''}`}
                 >
-                  <div className="flex items-start gap-2.5 max-[330px]:gap-2">
-                    {conversation.is_unread && !isActive && (
-                      <span className="w-1.5 h-1.5 mt-2 rounded-full bg-[#10B981] shrink-0 max-[330px]:mt-1.5" />
+                  <span className="conversation-thread-thumb">
+                    {imageUrl ? (
+                      <img src={imageUrl} alt={conversation.vehicle_listings_public.title} />
+                    ) : (
+                      <CarFront className="h-5 w-5" strokeWidth={1.6} />
                     )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-[#0A0A0A] tracking-tight line-clamp-1 max-[330px]:text-[13px]">
-                        {conversation.vehicle_listings_public.title}
-                      </p>
-                      <p className="text-[12px] text-[#52607A] mt-0.5 tracking-tight max-[330px]:text-[11px]">
-                        {formatBRL(Number(conversation.vehicle_listings_public.price))}
-                      </p>
-                      <p className="text-[12px] text-[#8A95A8] mt-1.5 line-clamp-1 tracking-tight max-[330px]:mt-1 max-[330px]:text-[11px]">
-                        {conversation.last_message_preview || 'Conversa iniciada.'}
-                      </p>
-                    </div>
-                  </div>
+                  </span>
+                  <span className="conversation-thread-content">
+                    <span className="conversation-thread-title">{conversation.vehicle_listings_public.title}</span>
+                    <span className="conversation-thread-meta">
+                      {formatBRL(Number(conversation.vehicle_listings_public.price))} · {conversation.vehicle_listings_public.city}/{conversation.vehicle_listings_public.state}
+                    </span>
+                    <span className="conversation-thread-preview">
+                      {conversation.last_message_preview || 'Conversa iniciada.'}
+                    </span>
+                  </span>
+                  {conversation.is_unread && !isActive ? <span className="conversation-unread-dot" /> : null}
                 </button>
               )
             })}
           </div>
 
           {conversations.length === 0 && !loadingConversations ? (
-            <div className="m-4 p-8 text-center bg-[#F5F8FC] rounded-2xl border border-white/70 max-[330px]:m-3 max-[330px]:p-5">
-              <MessageSquare className="w-8 h-8 text-[#A3A3A3] mx-auto mb-3" strokeWidth={1.5} />
-              <p className="text-[13px] text-[#52607A] max-[330px]:text-[12px]">Você ainda não possui conversas.</p>
+            <div className="conversation-empty-state">
+              <MessageSquare className="h-8 w-8" strokeWidth={1.5} />
+              <strong>Nenhuma conversa ainda</strong>
+              <p>Quando alguém chamar em um anúncio, a conversa aparece aqui.</p>
             </div>
           ) : null}
         </div>
       </aside>
 
-      {/* Conversation panel */}
-      <section className="surface-strong flex flex-col h-full overflow-hidden relative max-[330px]:rounded-[24px]">
+      <section className="conversation-chat-panel">
         {!selectedConversation ? (
-          <div className="flex-1 flex items-center justify-center p-8 text-center max-[330px]:p-5">
-            <div>
-              <MessageSquare className="w-10 h-10 text-[#A3A3A3] mx-auto mb-3" strokeWidth={1.5} />
-              <p className="text-[15px] text-[#52607A] max-[330px]:text-[13px]">Selecione uma conversa para começar.</p>
+          <div className="conversation-select-empty">
+            <div className="conversation-select-icon">
+              <MessageSquare className="h-9 w-9" strokeWidth={1.5} />
             </div>
+            <h2>Selecione uma conversa</h2>
+            <p>O histórico e as novas mensagens aparecem em tempo real.</p>
           </div>
         ) : (
           <>
-            <div className="px-6 py-5 border-b border-white/70 bg-white/60 backdrop-blur-xl max-[330px]:px-4 max-[330px]:py-4">
-              <p className="text-[16px] font-semibold text-[#0A0A0A] tracking-tight max-[330px]:text-[14px]">
-                {selectedConversation.vehicle_listings_public.title}
-              </p>
-              <p className="text-[12px] text-[#52607A] mt-0.5 tracking-tight max-[330px]:text-[11px]">
-                {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} · {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
-              </p>
+            <div className="conversation-chat-head">
+              <div className="conversation-chat-car">
+                <span className="conversation-chat-thumb">
+                  {selectedConversation.vehicle_listings_public.images?.[0]?.url ? (
+                    <img src={selectedConversation.vehicle_listings_public.images[0].url} alt={selectedConversation.vehicle_listings_public.title} />
+                  ) : (
+                    <CarFront className="h-5 w-5" strokeWidth={1.6} />
+                  )}
+                </span>
+                <div>
+                  <p>{selectedConversation.vehicle_listings_public.title}</p>
+                  <span>
+                    {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} · {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
+                  </span>
+                </div>
+              </div>
+              <Link href={`/anuncios/${selectedConversation.vehicle_listings_public.slug}`} className="conversation-open-listing">
+                Ver anúncio
+                <ArrowUpRight className="h-4 w-4" strokeWidth={1.8} />
+              </Link>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar max-[330px]:px-4 max-[330px]:py-4">
+            <div className="conversation-safety-strip">
+              <ShieldCheck className="h-4 w-4" strokeWidth={1.8} />
+              <span>Negociação protegida: evite compartilhar telefone, e-mail ou dados bancários no chat.</span>
+            </div>
+
+            <div className="conversation-message-scroll custom-scrollbar">
               {loadingMessages && messages.length === 0 ? (
-                <p className="text-[13px] text-[#8A95A8] text-center mt-8 max-[330px]:mt-4">Carregando mensagens...</p>
+                <p className="conversation-list-muted">Carregando mensagens...</p>
               ) : null}
-              <div className="space-y-3">
+              <div className="conversation-message-stack">
                 {messages.map((message) => {
                   const isMine = message.sender_user_id === myUserId
                   return (
                     <div
                       key={message.id}
-                      className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+                      className={`conversation-message-row ${isMine ? 'is-mine' : ''}`}
                     >
-                      <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 max-[330px]:max-w-[88%] max-[330px]:px-3 max-[330px]:py-2 ${
-                        isMine
-                          ? 'bg-[#17170F] text-[#FFFDF3] rounded-br-md shadow-sm'
-                          : 'bg-[#F5F8FC] text-[#0A0A0A] rounded-bl-md border border-white/70'
-                      }`}>
-                        <p className="text-[14px] leading-relaxed tracking-tight max-[330px]:text-[13px]">{message.message}</p>
-                        <p className={`mt-1 text-[10px] tracking-tight ${isMine ? 'text-white/50' : 'text-[#A3A3A3]'}`}>
+                      <div className={`conversation-bubble ${isMine ? 'is-mine' : ''}`}>
+                        <p>{message.message}</p>
+                        <time>
                           {new Date(message.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                        </p>
+                        </time>
                       </div>
                     </div>
                   )
@@ -301,8 +326,8 @@ export default function ConversationInbox() {
               </div>
             </div>
 
-            <div className="p-4 bg-white/60 border-t border-white/70 max-[330px]:p-3">
-              <div className="flex items-center gap-2 bg-white border-2 border-[#17170F]/12 rounded-full pl-5 pr-1.5 py-1.5 focus-within:border-[#17170F] transition-colors shadow-sm max-[330px]:pl-4 max-[330px]:py-1">
+            <div className="conversation-composer-wrap">
+              <div className="conversation-composer">
                 <input
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
@@ -313,13 +338,14 @@ export default function ConversationInbox() {
                     }
                   }}
                   placeholder="Digite sua mensagem..."
-                  className="flex-1 bg-transparent px-1 py-2 text-[14px] text-[#0A0A0A] outline-none placeholder:text-[#8A95A8] tracking-tight max-[330px]:text-[13px]"
+                  className="conversation-composer-input"
                 />
                 <button
                   type="button"
                   disabled={sending || !messageText.trim()}
                   onClick={() => void sendMessage()}
-                  className="w-9 h-9 rounded-full bg-[#17170F] text-[#FFFDF3] hover:bg-[#2A2A1D] disabled:opacity-30 transition-colors flex items-center justify-center shadow-sm max-[330px]:h-8 max-[330px]:w-8"
+                  className="conversation-send-btn"
+                  aria-label="Enviar mensagem"
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" strokeWidth={1.75} />}
                 </button>
@@ -329,7 +355,7 @@ export default function ConversationInbox() {
         )}
 
         {error && (
-          <div className="absolute top-4 right-4 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] px-3 py-2 rounded-2xl text-[12px] tracking-tight z-50 shadow-sm">
+          <div className="conversation-error-toast">
             {error}
           </div>
         )}

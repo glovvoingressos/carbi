@@ -106,7 +106,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
             E-mail
           </label>
           <div className="relative">
-            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3]" strokeWidth={1.75} />
+            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" strokeWidth={1.75} />
             <input
               id="email"
               type="email"
@@ -114,7 +114,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="voce@email.com"
-              className="input h-12 pl-11 pr-4 rounded-2xl"
+              className="input auth-icon-input h-12 pr-4 rounded-2xl"
             />
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
             Senha
           </label>
           <div className="relative">
-            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3]" strokeWidth={1.75} />
+            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" strokeWidth={1.75} />
             <input
               id="password"
               type="password"
@@ -133,7 +133,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mínimo 6 caracteres"
-              className="input h-12 pl-11 pr-4 rounded-2xl"
+              className="input auth-icon-input h-12 pr-4 rounded-2xl"
             />
           </div>
         </div>

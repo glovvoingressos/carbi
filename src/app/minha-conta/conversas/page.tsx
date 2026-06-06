@@ -1,5 +1,7 @@
 import { Metadata } from 'next'
+import Link from 'next/link'
 import { Suspense } from 'react'
+import { ArrowLeft, MessageCircle, ShieldCheck } from 'lucide-react'
 import ConversationInbox from '@/components/marketplace/ConversationInbox'
 
 export const metadata: Metadata = {
@@ -13,16 +15,43 @@ export const metadata: Metadata = {
 
 export default function ConversationsPage() {
   return (
-    <div className="container max-w-6xl pb-16 pt-24">
-      <div className="hero-bento p-5 sm:p-6">
-        <h1 className="text-balance">Chat interno</h1>
-        <p className="mt-2 text-base font-medium text-[#52607A]">Todas as negociações do seu anúncio ficam protegidas dentro da plataforma.</p>
+    <main className="conversation-page-shell">
+      <div className="conversation-page-head">
+        <Link href="/minha-conta" className="conversation-back-link">
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.8} />
+          Minha conta
+        </Link>
+
+        <div className="conversation-hero-line">
+          <div>
+            <span className="auth-hero-kicker">Chat interno</span>
+            <h1 className="conversation-title">Conversas protegidas em um painel claro.</h1>
+            <p className="conversation-copy">
+              Negocie pelo chat da Carbi, acompanhe propostas e responda compradores sem expor telefone ou e-mail.
+            </p>
+          </div>
+
+          <div className="conversation-trust-card">
+            <div className="conversation-trust-icon">
+              <ShieldCheck className="h-5 w-5" strokeWidth={1.8} />
+            </div>
+            <div>
+              <strong>Contato protegido</strong>
+              <span>Histórico real, vinculado ao anúncio.</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="conversation-head-actions">
+          <span><MessageCircle className="h-4 w-4" /> Mensagens em tempo real</span>
+          <span>Dados do vendedor privados</span>
+          <span>Negociação vinculada ao veículo</span>
+        </div>
       </div>
-      <div className="mt-6">
-        <Suspense fallback={<div className="surface-strong p-6 text-sm text-[#52607A]">Carregando conversas...</div>}>
-          <ConversationInbox />
-        </Suspense>
-      </div>
-    </div>
+
+      <Suspense fallback={<div className="conversation-loading-card">Carregando conversas...</div>}>
+        <ConversationInbox />
+      </Suspense>
+    </main>
   )
 }
