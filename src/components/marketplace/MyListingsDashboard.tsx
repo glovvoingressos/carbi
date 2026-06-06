@@ -286,11 +286,11 @@ export default function MyListingsDashboard() {
       const sanitizedPayload = {
         ...formData,
         price: typeof formData.price === 'string' ? parseMoneyInputToNumber(formData.price) : Number(formData.price),
-        mileage: Number(formData.mileage),
-        year: Number(formData.year),
-        year_model: Number(formData.year_model),
-        horsepower: formData.horsepower ? Number(formData.horsepower) : undefined,
-        doors: formData.doors ? Number(formData.doors) : undefined,
+        mileage: formData.mileage ? Math.round(Number(formData.mileage)) : undefined,
+        year: formData.year ? Math.round(Number(formData.year)) : undefined,
+        year_model: formData.year_model ? Math.round(Number(formData.year_model)) : undefined,
+        horsepower: formData.horsepower ? Math.round(Number(formData.horsepower)) : undefined,
+        doors: formData.doors ? Math.round(Number(formData.doors)) : undefined,
       }
 
       const response = await fetch(`/api/marketplace/listings/${selectedListing.id}`, {
@@ -773,11 +773,12 @@ export default function MyListingsDashboard() {
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">KM Atual</label>
                       <input 
-                        type="number"
-                        className={`w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-2 transition-all font-bold text-[#0A0A0A] focus:outline-none ${errors.mileage ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-[#10B981]'}`}
-                        value={formData.mileage || ''}
-                        onChange={(e) => updateField('mileage', Number(e.target.value))}
-                      />
+                          type="number"
+                          step="1"
+                          className={`w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-2 transition-all font-bold text-[#0A0A0A] focus:outline-none ${errors.mileage ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-[#10B981]'}`}
+                          value={formData.mileage || ''}
+                          onChange={(e) => updateField('mileage', Math.round(Number(e.target.value)))}
+                        />
                       {errors.mileage && <p className="text-[10px] font-bold text-red-500 ml-4">{errors.mileage}</p>}
                     </div>
                   </div>
