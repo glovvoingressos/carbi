@@ -111,56 +111,8 @@ export default function VehicleDetailView({
       animate="visible"
       className="vehicle-detail-ref min-h-screen"
     >
-      {/* ── HEADER ── */}
-      <motion.section variants={itemVariants} className="container pt-8 pb-6">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-          <div>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {listing.badges?.slice(0, 3).map(badge => (
-                <span key={badge.key} className="badge badge-neutral">
-                  {badge.label}
-                </span>
-              ))}
-              {isGoodDeal && (
-                <span className="badge badge-brand">
-                  {comparison.diffPercent && Math.abs(comparison.diffPercent).toFixed(0)}% abaixo da FIPE
-                </span>
-              )}
-            </div>
-            <h1 className="text-balance">{listing.brand} {listing.model}</h1>
-            <p className="mt-2 text-[15px] text-[#525252] tracking-tight">
-              {listing.version || 'Versão não informada'} · {listing.year}/{listing.year_model} · {listing.city}, {listing.state} · Anunciado em{' '}
-              {new Date(listing.created_at).toLocaleDateString('pt-BR', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-              })}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleShare}
-              className="btn-icon bg-white/70 border border-white/70 shadow-sm"
-              aria-label="Compartilhar"
-            >
-              <Share2 className="w-[18px] h-[18px]" strokeWidth={1.75} />
-            </button>
-            <button
-              onClick={() => setIsFavorite(!isFavorite)}
-              className="btn-icon bg-white/70 border border-white/70 shadow-sm"
-              aria-label="Favoritar"
-            >
-              <Heart
-                className={`w-[18px] h-[18px] ${isFavorite ? 'fill-[#DC2626] text-[#DC2626]' : ''}`}
-                strokeWidth={1.75}
-              />
-            </button>
-          </div>
-        </div>
-      </motion.section>
-
       {/* ── GALLERY + SIDEBAR ── */}
-      <motion.section variants={itemVariants} className="container pb-12">
+      <motion.section variants={itemVariants} className="container pt-8 pb-12">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_400px] lg:gap-8">
           <div>
             <ListingImageGallery
@@ -172,10 +124,64 @@ export default function VehicleDetailView({
           {/* ── Sticky Price & Seller Card ── */}
           <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
             <div className="surface-strong p-6 max-[330px]:p-4">
+              <div className="mb-5 border-b border-white/70 pb-5">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div className="flex flex-wrap gap-2">
+                    {listing.badges?.slice(0, 3).map(badge => (
+                      <span key={badge.key} className="badge badge-neutral">
+                        {badge.label}
+                      </span>
+                    ))}
+                    {isGoodDeal && (
+                      <span className="badge badge-brand">
+                        {comparison.diffPercent && Math.abs(comparison.diffPercent).toFixed(0)}% abaixo da FIPE
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      onClick={handleShare}
+                      className="btn-icon bg-white/70 border border-white/70 shadow-sm"
+                      aria-label="Compartilhar"
+                    >
+                      <Share2 className="w-[18px] h-[18px]" strokeWidth={1.75} />
+                    </button>
+                    <button
+                      onClick={() => setIsFavorite(!isFavorite)}
+                      className="btn-icon bg-white/70 border border-white/70 shadow-sm"
+                      aria-label="Favoritar"
+                    >
+                      <Heart
+                        className={`w-[18px] h-[18px] ${isFavorite ? 'fill-[#DC2626] text-[#DC2626]' : ''}`}
+                        strokeWidth={1.75}
+                      />
+                    </button>
+                  </div>
+                </div>
+                <div
+                  className="vehicle-price-card-title"
+                  role="heading"
+                  aria-level={1}
+                  style={{
+                    color: '#10131D',
+                    fontSize: 22,
+                    fontWeight: 650,
+                    lineHeight: 1.12,
+                    letterSpacing: 0,
+                  }}
+                >
+                  {listing.brand} {listing.model}
+                </div>
+                <p className="mt-2 text-[13px] font-medium leading-relaxed text-[#525252] tracking-tight max-[330px]:text-[12px]">
+                  {listing.version || 'Versão não informada'} · {listing.year}/{listing.year_model} · {listing.city}, {listing.state} · Anunciado em{' '}
+                  {new Date(listing.created_at).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+              </div>
               <p className="eyebrow mb-1">Preço</p>
-              <p className="text-[13px] font-medium text-[#52607A] mb-1 tracking-tight">
-                {listing.title}
-              </p>
               <p className="text-[44px] font-semibold tracking-normal text-[#0A0A0A] leading-none max-[380px]:text-[36px] max-[330px]:text-[30px]">
                 {formatBRL(Number(listing.price))}
               </p>

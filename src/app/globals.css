@@ -1634,8 +1634,8 @@ p {
 .vehicle-detail-ref .container { max-width: 1200px; padding-left: 40px; padding-right: 40px; }
 .vehicle-detail-ref > section:first-of-type {
   max-width: none;
-  background: linear-gradient(135deg, var(--chartreuse), #ecffad 72%, var(--marble));
-  padding: 64px 0 54px;
+  background: transparent;
+  padding: 32px 0 54px;
   margin-top: 0;
 }
 .vehicle-detail-ref > section:first-of-type > div {
@@ -1653,6 +1653,14 @@ p {
 }
 .vehicle-detail-ref h1 { font-size: clamp(52px, 7vw, 108px) !important; }
 .vehicle-detail-ref h2 { font-size: clamp(34px, 4vw, 54px) !important; }
+.vehicle-detail-ref .vehicle-price-card-title {
+  color: #10131D !important;
+  font-size: 22px !important;
+  font-weight: 650 !important;
+  line-height: 1.12 !important;
+  letter-spacing: 0 !important;
+  margin: 0 !important;
+}
 .vehicle-detail-ref .surface,
 .vehicle-detail-ref .surface-strong {
   background: var(--white) !important;
