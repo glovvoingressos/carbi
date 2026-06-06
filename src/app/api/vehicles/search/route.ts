@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
+import { searchPublicListings } from '@/lib/marketplace-server'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -9,32 +9,18 @@ export async function GET(request: Request) {
     return NextResponse.json({ results: [] })
   }
 
-  const allCars = await getAllCars()
-  const grouped = groupCarsByModel(allCars)
-
-  const results = grouped
-    .filter(item => {
-      const b = item.representative.brand.toLowerCase()
-      const m = item.representative.model.toLowerCase()
-      const s = item.modelSlug.toLowerCase()
-      const seg = item.representative.segment.toLowerCase()
-      
-      // Intent matching
-      const isUberIntent = q.includes('uber') || q.includes('aplicativo') || q.includes('99')
-      if (isUberIntent && (item.representative.isPopular || item.representative.fuelEconomyCityGas > 14)) return true
-
-      return b.includes(q) || m.includes(q) || s.includes(q) || seg.includes(q)
-    })
-    .slice(0, 8)
-    .map(item => ({
-      brand: item.representative.brand,
-      model: item.representative.model,
-      slug: item.modelSlug,
-      brandSlug: item.representative.brand.toLowerCase().replace(/\s+/g, '-'),
-      image: item.representative.image,
-      year: item.representative.year,
-      price: item.representative.priceBrl,
-    }))
+  const listings = await searchPublicListings(q, 8)
+  const results = listings.map((listing) => ({
+    listingSlug: listing.slug,
+    title: listing.title,
+    brand: listing.brand,
+    model: listing.model,
+    image: listing.images?.find((image) => image.is_primary)?.url || listing.images?.[0]?.url || '',
+    year: listing.year_model,
+    price: listing.price,
+    city: listing.city,
+    state: listing.state,
+  }))
 
   return NextResponse.json({ results })
 }

@@ -124,11 +124,14 @@ export default function VehicleDetailView({
                 </span>
               )}
             </div>
-            <h1 className="text-balance">
-              {listing.brand} {listing.model}
-            </h1>
+            <h1 className="text-balance">Detalhes do anúncio</h1>
             <p className="mt-2 text-[15px] text-[#525252] tracking-tight">
-              {listing.version || 'Versão Standard'} · {listing.year}/{listing.year_model} · {listing.city}, {listing.state}
+              {listing.city}, {listing.state} · Anunciado em{' '}
+              {new Date(listing.created_at).toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+              })}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -167,6 +170,12 @@ export default function VehicleDetailView({
           <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
             <div className="surface-strong p-6 max-[330px]:p-4">
               <p className="eyebrow mb-2">Preço</p>
+              <p className="text-[17px] font-bold leading-tight tracking-normal text-[#0A0A0A] max-[380px]:text-[15px] max-[330px]:text-[14px]">
+                {listing.brand} {listing.model}
+              </p>
+              <p className="mt-1 text-[12px] font-medium tracking-normal text-[#52607A] max-[330px]:text-[11px]">
+                {listing.version || 'Versão Standard'} · {listing.year}/{listing.year_model} · {listing.city}, {listing.state}
+              </p>
               <p className="text-[44px] font-semibold tracking-normal text-[#0A0A0A] leading-none max-[380px]:text-[36px] max-[330px]:text-[30px]">
                 {formatBRL(Number(listing.price))}
               </p>

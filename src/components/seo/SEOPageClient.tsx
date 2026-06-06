@@ -33,7 +33,7 @@ export default function SEOPageClient({ data, ctaHref }: SEOPageClientProps) {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <Link 
                 href={ctaHref}
-                className="h-16 px-8 rounded-full bg-[#17170F] text-[#FFFDF3] text-[15px] font-bold flex items-center justify-center hover:bg-[#2A2A1D] transition-all shadow-sm group"
+                className="h-16 px-8 rounded-full bg-[#FFFDF3] border-2 border-[#17170F]/12 text-[#17170F] text-[15px] font-bold flex items-center justify-center hover:bg-[#D9F85F] hover:border-[#17170F]/25 transition-all shadow-sm group"
               >
                 {data.ctaButtonText || 'Começar agora'} <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </Link>

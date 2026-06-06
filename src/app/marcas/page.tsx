@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import BrandLogo from '@/components/brand/BrandLogo'
 import { normalizeBrandKey, pickPreferredBrandName, slugifyBrand } from '@/lib/brand-utils'
 import { BreadcrumbSchema } from '@/components/seo/JSONLD'
+import { fetchPublicListingsPage } from '@/lib/marketplace-server'
 
 export const metadata: Metadata = {
   title: 'Marcas de carros à venda | Carbi',
@@ -21,18 +21,17 @@ export const metadata: Metadata = {
 }
 
 export default async function MarcasPage() {
-  const cars = await getAllCars()
-  const modelCards = groupCarsByModel(cars).map((item) => item.representative)
+  const { items } = await fetchPublicListingsPage({ page: 1, pageSize: 200, sort: 'recent' })
   const brands = Array.from(
-    modelCards.reduce((acc, car) => {
-      const key = normalizeBrandKey(car.brand)
+    items.reduce((acc, listing) => {
+      const key = normalizeBrandKey(listing.brand)
       const current = acc.get(key)
       if (current) {
         current.count += 1
-        current.label = pickPreferredBrandName(current.label, car.brand)
+        current.label = pickPreferredBrandName(current.label, listing.brand)
         return acc
       }
-      acc.set(key, { key, label: car.brand, count: 1 })
+      acc.set(key, { key, label: listing.brand, count: 1 })
       return acc
     }, new Map<string, { key: string; label: string; count: number }>())
       .values(),

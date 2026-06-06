@@ -5,13 +5,15 @@ import { useRouter } from 'next/navigation'
 import { Search, Car, ArrowRight, Loader2, X } from 'lucide-react'
 
 interface Suggestion {
+  listingSlug: string
   brand: string
   model: string
-  slug: string
-  brandSlug: string
+  title: string
   image?: string
   year?: number
   price?: number
+  city?: string
+  state?: string
 }
 
 export default function HeroSearchBar() {
@@ -68,9 +70,9 @@ export default function HeroSearchBar() {
     } else if (e.key === 'Enter') {
       if (activeIndex >= 0) {
         const s = suggestions[activeIndex]
-        router.push(`/${s.brandSlug}/${s.slug}`)
+        router.push(`/anuncios/${s.listingSlug}`)
       } else {
-        router.push(`/rankings?q=${encodeURIComponent(query)}`)
+        router.push(`/carros-a-venda?q=${encodeURIComponent(query)}`)
       }
       setIsOpen(false)
     } else if (e.key === 'Escape') {
@@ -79,7 +81,7 @@ export default function HeroSearchBar() {
   }
 
   const handleSelect = (s: Suggestion) => {
-    router.push(`/${s.brandSlug}/${s.slug}`)
+    router.push(`/anuncios/${s.listingSlug}`)
     setIsOpen(false)
     setQuery('')
   }
@@ -146,7 +148,7 @@ export default function HeroSearchBar() {
                 <p className="eyebrow px-4 py-2 max-[380px]:px-3">Sugestões</p>
                 {suggestions.map((s, i) => (
                   <button
-                    key={s.brandSlug + '-' + s.slug}
+                    key={s.listingSlug}
                     onClick={() => handleSelect(s)}
                     onMouseEnter={() => setActiveIndex(i)}
                     className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors max-[380px]:gap-2 max-[380px]:px-3 ${
@@ -162,17 +164,22 @@ export default function HeroSearchBar() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[14px] font-medium text-[#17170F] truncate tracking-tight">
+                        {s.title}
+                      </p>
+                      <p className="text-[12px] text-[#857C6B] tracking-tight">
                         <span className="text-[#857C6B] font-normal mr-1">{s.brand}</span>
                         {s.model}
+                        {s.year ? ` · ${s.year}` : ''}
+                        {s.price ? ` · R$ ${s.price.toLocaleString('pt-BR')}` : ''}
+                        {s.city && s.state ? ` · ${s.city}/${s.state}` : ''}
                       </p>
-                      <p className="text-[12px] text-[#857C6B] tracking-tight">{s.year}{s.price ? ` · R$ ${s.price.toLocaleString('pt-BR')}` : ''}</p>
                     </div>
                     <ArrowRight className={`w-4 h-4 transition-all shrink-0 ${activeIndex === i ? 'text-[#17170F] translate-x-0.5' : 'text-[#C8BEA8]'}`} strokeWidth={1.75} />
                   </button>
                 ))}
 
                 <button
-                  onClick={() => router.push(`/rankings?q=${encodeURIComponent(query)}`)}
+                  onClick={() => router.push(`/carros-a-venda?q=${encodeURIComponent(query)}`)}
                   className="mt-1 flex w-full items-center justify-between border-t border-[#17170F]/10 px-4 py-3 text-[13px] font-bold text-[#17170F] hover:bg-[#FFF8DF] max-[380px]:px-3"
                 >
                   <span className="flex items-center gap-2">

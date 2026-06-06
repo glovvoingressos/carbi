@@ -1,29 +1,28 @@
 import { Metadata } from 'next'
 import SEOPageClient from '@/components/seo/SEOPageClient'
-import { Zap, ShieldCheck, BadgeDollarSign, Car, Search, MessageSquare } from 'lucide-react'
-import { getAllCars } from '@/lib/data-fetcher'
-import { slugifyBrand } from '@/lib/brand-utils'
+import { BadgeDollarSign, Car, ShieldCheck } from 'lucide-react'
+import { fetchPublicListingsPage } from '@/lib/marketplace-server'
 
-export async function generateStaticParams() {
-  const cars = await getAllCars()
-  const uniqueBrands = Array.from(new Set(cars.map((car) => slugifyBrand(car.brand))))
-  return uniqueBrands.slice(0, 40).map((brand) => ({ brand }))
+function titleCase(value: string) {
+  return value
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (match) => match.toUpperCase())
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }): Promise<Metadata> {
   const { brand } = await params
-  const capitalizedBrand = brand.charAt(0).toUpperCase() + brand.slice(1)
-  
+  const capitalizedBrand = titleCase(brand)
+
   return {
     title: `Vender ${capitalizedBrand}: Anuncie seu ${capitalizedBrand} rápido na Carbi`,
-    description: `Quer vender seu ${capitalizedBrand}? Na Carbi você anuncia seu ${capitalizedBrand} usado ou seminovo com segurança e alcança milhares de compradores.`,
+    description: `Quer vender seu ${capitalizedBrand}? Na Carbi você anuncia seu ${capitalizedBrand} usado ou seminovo com segurança e alcança compradores reais.`,
     keywords: [`vender ${capitalizedBrand}`, `anunciar ${capitalizedBrand}`, 'vender carro', 'anunciar carro grátis', 'seminovos à venda'],
     alternates: {
       canonical: `/vender/${brand}`,
     },
     openGraph: {
       title: `Vender ${capitalizedBrand}: Anuncie seu ${capitalizedBrand} rápido na Carbi`,
-      description: `Quer vender seu ${capitalizedBrand}? Na Carbi você anuncia seu ${capitalizedBrand} usado ou seminovo com segurança e alcança milhares de compradores.`,
+      description: `Quer vender seu ${capitalizedBrand}? Na Carbi você anuncia seu ${capitalizedBrand} usado ou seminovo com segurança e alcança compradores reais.`,
       type: 'website',
       url: `/vender/${brand}`,
     },
@@ -32,36 +31,37 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
 
 export default async function VenderBrandPage({ params }: { params: Promise<{ brand: string }> }) {
   const { brand } = await params
-  const capitalizedBrand = brand.charAt(0).toUpperCase() + brand.slice(1)
+  const capitalizedBrand = titleCase(brand)
+  const { items } = await fetchPublicListingsPage({ brand: `%${capitalizedBrand}%`, page: 1, pageSize: 24, sort: 'recent' })
 
   const data = {
     h1: `Vender ${capitalizedBrand} Rápido e Seguro`,
-    subtitle: `Anuncie seu ${capitalizedBrand} na plataforma inteligente e venda sem intermediários para compradores de todo o Brasil.`,
+    subtitle: `Anuncie seu ${capitalizedBrand} na plataforma e venda sem intermediários para compradores reais.`,
     ctaButtonText: `Anunciar meu ${capitalizedBrand}`,
     benefits: [
-      { icon: 'BadgeDollarSign', title: 'Valorização Real', description: `Saiba exatamente quanto vale seu ${capitalizedBrand} com nossa base da Tabela FIPE atualizada.` },
-      { icon: 'Car', title: `Especialista em ${capitalizedBrand}`, description: `Nossa plataforma destaca os diferenciais tecnológicos e de mecânica do seu ${capitalizedBrand}.` },
-      { icon: 'ShieldCheck', title: 'Venda Direta', description: 'Conectamos você a compradores reais, sem lojistas que depreciam seu veículo.' }
+      { icon: 'BadgeDollarSign', title: 'Valorização real', description: `Compare seu ${capitalizedBrand} com anúncios ativos e a FIPE para precificar melhor.` },
+      { icon: 'Car', title: `Anúncios da marca`, description: `Veja demanda real por ${capitalizedBrand} na plataforma antes de publicar.` },
+      { icon: 'ShieldCheck', title: 'Venda direta', description: 'Conectamos você a compradores reais, com chat interno e sem expor contato.' },
     ],
     sections: [
       {
-        badge: 'Guia de Venda',
-        title: `Como vender seu ${capitalizedBrand} pelo melhor preço`,
-        subtitle: `O mercado de ${capitalizedBrand} seminovos é extremamente valorizado.`,
-        content: `Para garantir o melhor valor no seu ${capitalizedBrand}, mantenha o histórico de revisões atualizado e destaque isso no seu anúncio na Carbi. Veículos desta marca são conhecidos pela durabilidade, e compradores buscam essa segurança.`
+        badge: 'Mercado atual',
+        title: `Como está a procura por ${capitalizedBrand}`,
+        subtitle: `Os anúncios ativos mostram a janela de preço e demanda da marca.`,
+        content: `Hoje há ${items.length} anúncio(s) ativo(s) de ${capitalizedBrand} na plataforma. Use essa vitrine para ajustar o preço e publicar com mais confiança.`,
       },
       {
-        badge: 'Mercado Nacional',
-        title: `Procura por ${capitalizedBrand} no Brasil`,
-        subtitle: `Existe uma alta demanda nacional por modelos ${capitalizedBrand}.`,
-        content: `Veículos da marca ${capitalizedBrand} são extremamente buscados em nosso marketplace. Ao anunciar conosco, seu carro ganha visibilidade estruturada para compradores que valorizam a procedência e o estado de conservação.`
-      }
+        badge: 'Guia de venda',
+        title: `Como vender seu ${capitalizedBrand} pelo melhor preço`,
+        subtitle: `Preço justo e fotos reais aceleram o fechamento.`,
+        content: `Ao anunciar na Carbi, seu ${capitalizedBrand} entra no mesmo fluxo de descoberta que os compradores já usam para pesquisar seminovos e carros usados.`,
+      },
     ],
     faqs: [
-      { q: `É fácil vender um ${capitalizedBrand} usado?`, a: `Sim, a liquidez de um ${capitalizedBrand} é uma das mais altas do mercado, especialmente se estiver bem conservado e anunciado em uma plataforma com foco em qualidade como a Carbi.` },
-      { q: `Como avaliar meu ${capitalizedBrand}?`, a: 'Basta entrar no nosso fluxo de anúncio. Nós puxamos automaticamente o valor da Tabela FIPE para o seu modelo e ano específico.' },
-      { q: 'Quanto tempo demora para vender?', a: `Em média, um ${capitalizedBrand} anunciado com preço justo na Carbi é vendido em menos de 15 dias.` }
-    ]
+      { q: `É fácil vender um ${capitalizedBrand} usado?`, a: `Sim. O fluxo de anúncio é rápido e o contato com interessados acontece pelo chat interno.` },
+      { q: `Como avaliar meu ${capitalizedBrand}?`, a: 'Use a comparação com FIPE e a régua de anúncios ativos da própria plataforma.' },
+      { q: 'Quanto tempo demora para vender?', a: `Depende do preço e da demanda, mas anúncios bem posicionados tendem a receber contato rápido.` },
+    ],
   }
 
   return <SEOPageClient data={data} ctaHref="/anunciar-carro" />

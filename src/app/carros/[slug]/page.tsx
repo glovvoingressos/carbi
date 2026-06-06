@@ -1,23 +1,15 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import ListingCard from '@/components/marketplace/ListingCard'
-import { fetchPublicListingsPage, ListingSort } from '@/lib/marketplace-server'
-import { ALLOWED_SORTS, MARKETPLACE_SEO_SLUGS, QUICK_LINKS, resolveSeoPreset } from '@/lib/marketplace-seo'
+import MarketplaceClient from '@/components/marketplace/MarketplaceClient'
 import { BreadcrumbSchema } from '@/components/seo/JSONLD'
+import { fetchPublicListingsPage, getFilterOptions, ListingSort, ListingsPageInput } from '@/lib/marketplace-server'
+import { ALLOWED_SORTS, MARKETPLACE_SEO_SLUGS, resolveSeoPreset } from '@/lib/marketplace-seo'
 
 export async function generateStaticParams() {
   return MARKETPLACE_SEO_SLUGS.map((slug) => ({ slug }))
 }
 
 export const dynamicParams = true
-
-const SORT_OPTIONS: Array<{ value: ListingSort; label: string }> = [
-  { value: 'recent', label: 'Mais recentes' },
-  { value: 'price_asc', label: 'Menor preço' },
-  { value: 'price_desc', label: 'Maior preço' },
-  { value: 'mileage_asc', label: 'Menor km' },
-  { value: 'year_desc', label: 'Mais novos' },
-]
 
 export async function generateMetadata({
   params,
@@ -49,116 +41,118 @@ export async function generateMetadata({
   }
 }
 
+function readValue(searchParams: Record<string, string | string[] | undefined>, key: string): string | undefined {
+  const value = searchParams[key]
+  if (Array.isArray(value)) return value[0]
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined
+}
+
+function readValues(searchParams: Record<string, string | string[] | undefined>, key: string): string[] {
+  const value = searchParams[key]
+  if (Array.isArray(value)) return value.map((item) => item.trim()).filter(Boolean)
+  if (typeof value === 'string' && value.trim()) return [value.trim()]
+  return []
+}
+
+function readNumber(searchParams: Record<string, string | string[] | undefined>, key: string): number | undefined {
+  const value = readValue(searchParams, key)
+  if (!value) return undefined
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
+function parseListingInput(
+  searchParams: Record<string, string | string[] | undefined>,
+  presetQuery: ListingsPageInput,
+): ListingsPageInput {
+  const sort = readValue(searchParams, 'ordem')
+  const page = readNumber(searchParams, 'pagina') || readNumber(searchParams, 'page')
+  const vehicleType = readValues(searchParams, 'vehicle_type')
+  const brand = readValues(searchParams, 'brand')
+  const model = readValues(searchParams, 'model')
+  const city = readValues(searchParams, 'city')
+  const bodyType = readValues(searchParams, 'body_type')
+  const transmission = readValues(searchParams, 'transmission')
+  const fuel = readValues(searchParams, 'fuel')
+  const color = readValues(searchParams, 'color')
+  const optionalItems = readValues(searchParams, 'optional')
+
+  const input: ListingsPageInput = {
+    ...presetQuery,
+    q: readValue(searchParams, 'q') || presetQuery.q,
+    ...(vehicleType.length > 0 ? { vehicle_type: vehicleType } : {}),
+    ...(brand.length > 0 ? { brand } : {}),
+    ...(model.length > 0 ? { model } : {}),
+    ...(city.length > 0 ? { city } : {}),
+    state: readValue(searchParams, 'state'),
+    ...(bodyType.length > 0 ? { bodyType } : {}),
+    ...(transmission.length > 0 ? { transmission } : {}),
+    ...(fuel.length > 0 ? { fuel } : {}),
+    ...(color.length > 0 ? { color } : {}),
+    priceMin: readNumber(searchParams, 'price_min'),
+    priceMax: readNumber(searchParams, 'price_max'),
+    yearMin: readNumber(searchParams, 'year_min'),
+    yearMax: readNumber(searchParams, 'year_max'),
+    mileageMin: readNumber(searchParams, 'mileage_min'),
+    mileageMax: readNumber(searchParams, 'mileage_max'),
+    ...(optionalItems.length > 0 ? { optionalItems } : {}),
+    sort: ALLOWED_SORTS.includes(sort as ListingSort)
+      ? (sort as ListingSort)
+      : presetQuery.sort || 'recent',
+    page: page || 1,
+    pageSize: 24,
+  }
+
+  return input
+}
+
 export default async function CarrosSeoPage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>
-  searchParams: Promise<{ ordem?: ListingSort; pagina?: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const { slug } = await params
-  const sp = await searchParams
   const preset = resolveSeoPreset(slug)
   if (!preset) notFound()
 
-  const sort = ALLOWED_SORTS.includes(sp.ordem as ListingSort) ? (sp.ordem as ListingSort) : (preset.listingQuery.sort || 'recent')
-  const page = Math.max(Number(sp.pagina || '1') || 1, 1)
-  const result = await fetchPublicListingsPage({
-    ...preset.listingQuery,
-    sort,
-    page,
-    pageSize: 24,
-  })
-  const totalPages = Math.max(1, Math.ceil(result.total / result.pageSize))
+  const sp = await searchParams
+  const queryInput = parseListingInput(sp, preset.listingQuery)
+  const listings = await fetchPublicListingsPage(queryInput)
+  const filterOptions = await getFilterOptions()
 
   return (
-    <main className="bg-[#f5f5f3] min-h-screen pt-32 pb-24">
-      <BreadcrumbSchema items={[
-        { name: 'Home', url: '/' },
-        { name: 'Carros à venda', url: '/carros-a-venda' },
-        { name: preset.h1, url: `/carros/${preset.slug}` },
-      ]} />
+    <main className="min-h-screen bg-[#f5f5f3] pt-28 pb-20">
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Carros à venda', url: '/carros-a-venda' },
+          { name: preset.h1, url: `/carros/${preset.slug}` },
+        ]}
+      />
+
       <div className="container mx-auto max-w-6xl px-4">
-        {/* Header Section */}
-        <div className="mb-12">
-          <div className="inline-flex items-center gap-2 bg-white/50 border border-[#EAEAE8] px-3 py-1 rounded-full mb-4">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">Marketplace SEO</span>
+        <header className="mb-10">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#EAEAE8] bg-white/70 px-3 py-1">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">Marketplace real</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-[#0A0A0A] tracking-tight leading-none">
+          <h1 className="mt-4 text-4xl font-black tracking-tight text-[#0A0A0A] sm:text-5xl">
             {preset.h1}
           </h1>
-          <p className="mt-4 text-[#A3A3A3] font-bold">
-            {preset.intro} • Página {page} de {totalPages}
+          <p className="mt-4 max-w-3xl text-[15px] font-medium leading-relaxed text-[#52607A] sm:text-[16px]">
+            {preset.intro}
           </p>
-        </div>
+        </header>
 
-        <div className="mt-8 flex flex-wrap gap-2 mb-10">
-          {QUICK_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="px-5 py-2 bg-white border border-[#EAEAE8] rounded-full text-xs font-bold text-[#525252] hover:text-[#0A0A0A] hover:border-[#EAEAE8] transition-all shadow-sm"
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
-
-        <div className="bg-white rounded-[32px] p-4 border border-[#EAEAE8] mb-10 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
-          <form action={`/carros/${slug}`} method="get" className="flex items-center gap-3 w-full md:w-auto">
-            <select
-              name="ordem"
-              defaultValue={sort}
-              className="w-full md:w-48 h-12 bg-[#f5f5f3] rounded-2xl pl-4 pr-4 text-sm font-bold outline-none appearance-none cursor-pointer"
-            >
-              {SORT_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <input type="hidden" name="pagina" value="1" />
-            <button
-              type="submit"
-              className="h-12 px-8 bg-[#0A0A0A] text-white rounded-2xl font-bold uppercase tracking-widest text-xs hover:opacity-90 transition-all"
-            >
-              Aplicar
-            </button>
-          </form>
-        </div>
-
-        {result.items.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {result.items.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
-              ))}
-            </div>
-            
-            {totalPages > 1 && (
-              <div className="mt-16 flex items-center justify-center gap-4">
-                <a
-                  href={`/carros/${slug}?ordem=${sort}&pagina=${Math.max(page - 1, 1)}`}
-                  className={`w-14 h-14 rounded-full flex items-center justify-center border transition-all ${page <= 1 ? 'pointer-events-none border-transparent text-[#0A0A0A]/10' : 'border-[#EAEAE8] bg-white text-[#0A0A0A] hover:border-black/20 shadow-sm'}`}
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                </a>
-                <div className="px-6 h-14 bg-white rounded-full border border-[#EAEAE8] flex items-center shadow-sm">
-                  <span className="font-black text-[#0A0A0A] tracking-widest">{page} / {totalPages}</span>
-                </div>
-                <a
-                  href={`/carros/${slug}?ordem=${sort}&pagina=${Math.min(page + 1, totalPages)}`}
-                  className={`w-14 h-14 rounded-full flex items-center justify-center border transition-all ${page >= totalPages ? 'pointer-events-none border-transparent text-[#0A0A0A]/10' : 'border-[#EAEAE8] bg-white text-[#0A0A0A] hover:border-black/20 shadow-sm'}`}
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                </a>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="mt-8 rounded-[40px] border border-[#EAEAE8] bg-white p-20 text-center max-[330px]:rounded-[24px] max-[330px]:p-5">
-            <h2 className="mb-2 text-2xl font-black text-[#0A0A0A] max-[330px]:text-lg">Nenhum veículo encontrado</h2>
-            <p className="font-bold text-[#A3A3A3] max-[330px]:text-sm">Tente ajustar seus filtros ou buscar por outro termo.</p>
-          </div>
-        )}
+        <MarketplaceClient
+          initialListings={listings.items}
+          initialTotal={listings.total}
+          initialPage={listings.page}
+          initialTotalPages={Math.max(1, Math.ceil(listings.total / listings.pageSize))}
+          defaultFilters={preset.listingQuery}
+          filterOptions={filterOptions}
+        />
       </div>
     </main>
   )

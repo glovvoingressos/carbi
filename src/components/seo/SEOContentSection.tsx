@@ -18,20 +18,20 @@ interface SEOSectionProps {
 
 export function SEOSection({ title, subtitle, badge, children, dark, reversed, image }: SEOSectionProps) {
   return (
-    <section className={`py-20 md:py-28 max-[330px]:py-14 ${dark ? 'bg-[#17170F] text-white' : 'bg-transparent text-[#0A0A0A]'}`}>
+    <section className={`py-20 md:py-28 max-[330px]:py-14 ${dark ? 'seo-dark-surface bg-[#17170F] text-white' : 'bg-transparent text-[#0A0A0A]'}`}>
       <div className="container">
         <div className={`flex flex-col items-center gap-12 lg:flex-row lg:gap-16 max-[330px]:gap-7 ${reversed ? 'lg:flex-row-reverse' : ''}`}>
           <div className="flex-1 space-y-6 max-[330px]:space-y-4">
             {badge && (
-              <span className={`eyebrow ${dark ? 'text-white/50' : 'text-[#A3A3A3]'}`}>{badge}</span>
+              <span className={`eyebrow ${dark ? 'text-[#F4F0E7]/75' : 'text-[#A3A3A3]'}`}>{badge}</span>
             )}
-            <h2 className="text-balance">{title}</h2>
+            <h2 className={`text-balance ${dark ? 'text-[#FFFDF3]' : 'text-[#0A0A0A]'}`}>{title}</h2>
             {subtitle && (
-              <p className={`body-large text-pretty ${dark ? 'text-white/60' : 'text-[#525252]'}`}>
+              <p className={`body-large text-pretty ${dark ? 'text-[#F4F0E7]/88' : 'text-[#525252]'}`}>
                 {subtitle}
               </p>
             )}
-            <div className={`space-y-4 text-[15px] leading-relaxed max-[330px]:text-[13px] ${dark ? 'text-white/70' : 'text-[#525252]'}`}>
+            <div className={`space-y-4 text-[15px] leading-relaxed max-[330px]:text-[13px] ${dark ? 'text-[#F4F0E7]/88' : 'text-[#525252]'}`}>
               {children}
             </div>
           </div>
@@ -72,10 +72,10 @@ export function SEOCallToAction({ title, description, buttonText, buttonHref }: 
   return (
     <section className="py-20 md:py-28 max-[330px]:py-14">
       <div className="container">
-        <div className="surface-dark p-10 text-center md:p-20 max-[330px]:p-5">
+        <div className="surface-dark seo-dark-surface p-10 text-center md:p-20 max-[330px]:p-5">
           <div className="mx-auto max-w-2xl space-y-6 max-[330px]:space-y-4">
             <h2 className="text-white text-balance">{title}</h2>
-            <p className="body-large text-white/60 text-pretty">{description}</p>
+            <p className="body-large text-[#F4F0E7]/88 text-pretty">{description}</p>
             <div className="pt-4">
               <Link
                 href={buttonHref}

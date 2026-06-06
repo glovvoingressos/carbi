@@ -120,9 +120,16 @@ export default function OfferModal({ listingId, listingPrice, listingTitle, isOp
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="flex items-center justify-between p-6 pb-0">
-              <div>
-                <h3 className="text-xl font-bold text-[#0A0A0A]">Fazer Oferta</h3>
-                <p className="text-sm text-[#525252] mt-1">{listingTitle}</p>
+              <div className="min-w-0">
+                <p className="mb-1 text-[11px] font-black uppercase tracking-normal text-[#A3A3A3]">
+                  Anúncio
+                </p>
+                <p className="truncate text-[13px] font-semibold text-[#525252]">
+                  {listingTitle}
+                </p>
+                <h3 className="mt-2 text-[17px] font-bold tracking-normal text-[#0A0A0A]">
+                  Fazer Oferta
+                </h3>
               </div>
               <button onClick={handleClose} className="btn-icon bg-[#FAFAF9] hover:bg-[#EAEAE8] transition-colors">
                 <X className="w-4 h-4" />
@@ -161,10 +168,11 @@ export default function OfferModal({ listingId, listingPrice, listingTitle, isOp
               <div className="p-6 space-y-5">
                 <div>
                   <p className="label text-[#A3A3A3] mb-2">Valor da oferta</p>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A3A3A3] font-medium text-[15px]">R$</span>
+                  <div className="flex items-center gap-3 rounded-2xl border-2 border-[#17170F] bg-white px-4 py-3 shadow-sm focus-within:border-[#17170F]">
+                    <span className="shrink-0 text-[15px] font-semibold text-[#525252]">R$</span>
                     <input
-                      className="input pl-10 text-[17px] font-semibold"
+                      className="min-w-0 flex-1 border-0 bg-transparent p-0 text-[17px] font-semibold tracking-normal outline-none placeholder:text-[#A3A3A3] max-[330px]:text-[15px]"
+                      inputMode="decimal"
                       placeholder="0,00"
                       value={amount}
                       onChange={(e) => {

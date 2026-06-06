@@ -61,9 +61,9 @@ export default function AppRankingPage() {
           <Badge className="mb-6 bg-white/10 text-white border-white/20">Guia 2026 — Inteligência de Mercado</Badge>
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter mb-8 leading-none">
             melhor carro para <br />
-            <span className="text-white/60">aplicativo 2026</span>
+            <span className="text-[#F4F0E7]/88">aplicativo 2026</span>
           </h1>
-          <p className="max-w-2xl mx-auto text-white/60 text-lg md:text-xl font-medium leading-relaxed">
+          <p className="max-w-2xl mx-auto text-[#F4F0E7]/88 text-lg md:text-xl font-medium leading-relaxed">
             Economia por KM, custo de manutenção e ROI. Analisamos os dados técnicos dos modelos 2026 para você faturar mais e gastar menos.
           </p>
         </div>
@@ -77,7 +77,7 @@ export default function AppRankingPage() {
                  <div className="p-3 bg-[#0A0A0A] rounded-2xl"><Zap className="w-6 h-6 text-white" /></div>
                  <h3 className="text-2xl font-black uppercase tracking-tight">Cenário Elétrico</h3>
               </div>
-              <p className="text-[#525252] font-medium mb-8 leading-relaxed">
+              <p className="text-[#F4F0E7]/88 font-medium mb-8 leading-relaxed">
                  Embora o investimento inicial seja maior, o custo por KM rodado é imbatível. Em 2026, com o aumento da rede de recarga, o elétrico se torna a escolha óbvia para quem roda mais de 3.000km/mês.
               </p>
               <ul className="space-y-4">
@@ -94,7 +94,7 @@ export default function AppRankingPage() {
                  <div className="p-3 bg-[#0A0A0A] rounded-2xl"><DollarSign className="w-6 h-6 text-white" /></div>
                  <h3 className="text-2xl font-black uppercase tracking-tight">Cenário Combustão</h3>
               </div>
-              <p className="text-[#525252] font-medium mb-8 leading-relaxed">
+              <p className="text-[#F4F0E7]/88 font-medium mb-8 leading-relaxed">
                  O baixo custo de aquisição e a facilidade de reparo em qualquer oficina do Brasil continuam seduzindo. Para quem quer flexibilidade total sem depender de pontos de carga.
               </p>
               <ul className="space-y-4">
@@ -137,7 +137,7 @@ export default function AppRankingPage() {
                                </div>
                             </div>
                          </td>
-                         <td className="py-8 px-4 text-[#525252] font-medium max-w-xs">{item.reason}</td>
+                         <td className="py-8 px-4 text-[#F4F0E7]/88 font-medium max-w-xs">{item.reason}</td>
                          <td className="py-8 px-4 text-center">
                             <span className="text-lg font-black text-[#0A0A0A]">{item.costPerKm}</span>
                          </td>

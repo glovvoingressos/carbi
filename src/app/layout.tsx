@@ -1,20 +1,27 @@
 import type { Metadata } from 'next'
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
+import { DM_Mono, DM_Sans } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
 import { OrganizationSchema, WebSiteSchema } from '@/components/seo/JSONLD'
 
-const font = Inter({
+const font = DM_Sans({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700'],
   variable: '--font-sans',
   display: 'swap',
 })
 
-const fontHeading = Plus_Jakarta_Sans({
+const fontHeading = DM_Sans({
   subsets: ['latin'],
   weight: ['500', '600', '700'],
   variable: '--font-heading',
+  display: 'swap',
+})
+
+const fontMono = DM_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-mono',
   display: 'swap',
 })
 
@@ -65,7 +72,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR" className={`${font.variable} ${fontHeading.variable}`}>
+    <html lang="pt-BR" className={`${font.variable} ${fontHeading.variable} ${fontMono.variable}`}>
       <body className={font.className}>
         <WebSiteSchema />
         <OrganizationSchema />

@@ -18,6 +18,7 @@ interface MarketplaceClientProps {
   initialTotal: number
   initialPage: number
   initialTotalPages: number
+  defaultFilters?: Partial<ListingsPageInput>
   filterOptions: {
     brands: string[]
     fuels: string[]
@@ -111,6 +112,7 @@ export default function MarketplaceClient({
   initialTotal,
   initialPage,
   initialTotalPages,
+  defaultFilters,
   filterOptions
 }: MarketplaceClientProps) {
   const router = useRouter()
@@ -123,29 +125,49 @@ export default function MarketplaceClient({
   const [showFilters, setShowFilters] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
 
-  const [q, setQ] = useState(searchParams.get('q') || '')
+  const getDefaultArray = (value: unknown): string[] => {
+    if (Array.isArray(value)) return value.filter(Boolean).map(String)
+    if (typeof value === 'string' && value.trim()) return [value.trim()]
+    return []
+  }
+
+  const getSearchArray = (key: string, fallback: unknown = []) => {
+    const values = searchParams.getAll(key)
+    if (values.length > 0) return values
+    return getDefaultArray(fallback)
+  }
+
+  const getSearchNumber = (key: string, fallback: number) => {
+    const raw = searchParams.get(key)
+    if (raw === null || raw === '') return fallback
+    const parsed = Number(raw)
+    return Number.isFinite(parsed) ? parsed : fallback
+  }
+
+  const [q, setQ] = useState(searchParams.get('q') || (typeof defaultFilters?.q === 'string' ? defaultFilters.q : ''))
   const [selectedVehicleType, setSelectedVehicleType] = useState<string>(() => {
     const urlVehicle = searchParams.get('vehicle_type')
-    return urlVehicle || ''
+    if (urlVehicle) return urlVehicle
+    return typeof defaultFilters?.vehicle_type === 'string' ? defaultFilters.vehicle_type : ''
   })
-  const [selectedBrands, setSelectedBrands] = useState<string[]>(searchParams.getAll('brand'))
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(getSearchArray('brand', defaultFilters?.brand))
   const [availableModels, setAvailableModels] = useState<string[]>([])
-  const [selectedModels, setSelectedModels] = useState<string[]>(searchParams.getAll('model'))
+  const [selectedModels, setSelectedModels] = useState<string[]>(getSearchArray('model', defaultFilters?.model))
   const [priceRange, setPriceRange] = useState<[number, number]>([
-    Number(searchParams.get('price_min')) || 0,
-    Number(searchParams.get('price_max')) || 1000000,
+    getSearchNumber('price_min', typeof defaultFilters?.priceMin === 'number' ? defaultFilters.priceMin : 0),
+    getSearchNumber('price_max', typeof defaultFilters?.priceMax === 'number' ? defaultFilters.priceMax : 1000000),
   ])
   const [yearRange, setYearRange] = useState<[number, number]>([
-    Number(searchParams.get('year_min')) || 1990,
-    Number(searchParams.get('year_max')) || new Date().getFullYear() + 1,
+    getSearchNumber('year_min', typeof defaultFilters?.yearMin === 'number' ? defaultFilters.yearMin : 1990),
+    getSearchNumber('year_max', typeof defaultFilters?.yearMax === 'number' ? defaultFilters.yearMax : new Date().getFullYear() + 1),
   ])
-  const [mileageMax, setMileageMax] = useState<number>(Number(searchParams.get('mileage_max')) || 300000)
-  const [selectedFuels, setSelectedFuels] = useState<string[]>(searchParams.getAll('fuel'))
-  const [selectedTransmissions, setSelectedTransmissions] = useState<string[]>(searchParams.getAll('transmission'))
-  const [selectedColors, setSelectedColors] = useState<string[]>(searchParams.getAll('color'))
-  const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>(searchParams.getAll('body_type'))
-  const [selectedOptionals, setSelectedOptionals] = useState<string[]>(searchParams.getAll('optional'))
-  const [sort, setSort] = useState<ListingSort>((searchParams.get('ordem') as ListingSort) || 'recent')
+  const [mileageMax, setMileageMax] = useState<number>(getSearchNumber('mileage_max', typeof defaultFilters?.mileageMax === 'number' ? defaultFilters.mileageMax : 300000))
+  const [selectedFuels, setSelectedFuels] = useState<string[]>(getSearchArray('fuel', defaultFilters?.fuel))
+  const [selectedTransmissions, setSelectedTransmissions] = useState<string[]>(getSearchArray('transmission', defaultFilters?.transmission))
+  const [selectedColors, setSelectedColors] = useState<string[]>(getSearchArray('color', defaultFilters?.color))
+  const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>(getSearchArray('body_type', defaultFilters?.bodyType))
+  const [selectedOptionals, setSelectedOptionals] = useState<string[]>(getSearchArray('optional', defaultFilters?.optionalItems))
+  const [sort, setSort] = useState<ListingSort>((searchParams.get('ordem') as ListingSort) || defaultFilters?.sort || 'recent')
 
   const updateResults = useCallback(async (overrides: Partial<ListingsPageInput> = {}) => {
     setIsSearching(true)

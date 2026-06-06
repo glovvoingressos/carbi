@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     const limitParam = req.nextUrl.searchParams.get('limit')
     const excludeId = req.nextUrl.searchParams.get('excludeId')
 
-    const limit = Math.min(Number(limitParam || '8') || 8, 20)
+    const limit = Math.min(Number(limitParam || '8') || 8, 48)
 
     const data = await queryPublicListings({
       brand: brand || undefined,
