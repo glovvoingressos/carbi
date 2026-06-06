@@ -56,6 +56,17 @@ export async function POST(req: NextRequest) {
 
     const supabase = getSupabaseServerClient(auth.accessToken)
 
+    // Limite de anúncios grátis
+    const { count: activeCount, error: countError } = await supabase
+      .from('vehicle_listings')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', auth.userId)
+      .eq('status', 'active')
+
+    if (!countError && activeCount !== null && activeCount >= 5) {
+      return NextResponse.json({ error: 'Você já atingiu o limite de 5 anúncios grátis. Remova ou arquive um anúncio antes de criar outro.' }, { status: 403 })
+    }
+
     const vehiclePayload = {
       owner_user_id: auth.userId,
       brand: payload.brand.trim(),
