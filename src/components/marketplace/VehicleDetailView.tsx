@@ -9,6 +9,7 @@ import {
   Share2, Heart, MessageCircle, Phone,
   Info, ArrowRight, HandCoins, BadgeCheck,
 } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
 import { motion, Variants } from 'framer-motion'
 import { ListingPublic } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
@@ -42,9 +43,11 @@ export default function VehicleDetailView({
   const [showOfferModal, setShowOfferModal] = useState(false)
   const [sessionUserId, setSessionUserId] = useState<string | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [pageUrl, setPageUrl] = useState('')
   const isSeller = sessionUserId === listing.user_id
 
   useEffect(() => {
+    setPageUrl(window.location.href)
     if (!isSupabaseBrowserConfigured()) return
     const supabase = getSupabaseBrowserClient()
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -170,12 +173,6 @@ export default function VehicleDetailView({
           <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
             <div className="surface-strong p-6 max-[330px]:p-4">
               <p className="eyebrow mb-2">Preço</p>
-              <p className="text-[17px] font-bold leading-tight tracking-normal text-[#0A0A0A] max-[380px]:text-[15px] max-[330px]:text-[14px]">
-                {listing.brand} {listing.model}
-              </p>
-              <p className="mt-1 text-[12px] font-medium tracking-normal text-[#52607A] max-[330px]:text-[11px]">
-                {listing.version || 'Versão Standard'} · {listing.year}/{listing.year_model} · {listing.city}, {listing.state}
-              </p>
               <p className="text-[44px] font-semibold tracking-normal text-[#0A0A0A] leading-none max-[380px]:text-[36px] max-[330px]:text-[30px]">
                 {formatBRL(Number(listing.price))}
               </p>
@@ -276,6 +273,28 @@ export default function VehicleDetailView({
                 Anunciando desde {new Date(sellerInfo?.memberSince || Date.now()).getFullYear()}
               </p>
             </div>
+
+            {/* QR Code */}
+            {pageUrl && (
+              <div className="surface p-6 max-[330px]:p-4">
+                <p className="eyebrow mb-3">Compartilhe</p>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="rounded-2xl bg-white p-3 shadow-sm border border-[#17170F]/8">
+                    <QRCodeSVG
+                      value={pageUrl}
+                      size={140}
+                      bgColor="#FFFFFF"
+                      fgColor="#0A0A0A"
+                      level="M"
+                      includeMargin={false}
+                    />
+                  </div>
+                  <p className="text-[11px] text-[#8A95A8] tracking-tight text-center leading-relaxed">
+                    Escaneie com seu celular para <br />acessar este anúncio
+                  </p>
+                </div>
+              </div>
+            )}
           </aside>
         </div>
       </motion.section>
