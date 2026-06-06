@@ -289,7 +289,7 @@ export default async function HomePage() {
             {priceBands.map((band) => {
               const count = listings.filter((listing) => Number(listing.price) <= band.max).length
               return (
-                <Link href={`/carros-a-venda?priceMax=${band.max}`} key={band.key} className={`ref-band-card ${band.className}`}>
+                <Link href={`/carros-a-venda?price_max=${band.max}`} key={band.key} className={`ref-band-card ${band.className}`}>
                   <div>
                     <div className="ref-band-label">{band.label}</div>
                     <div className="ref-band-price">{band.price}</div>
@@ -313,7 +313,7 @@ export default async function HomePage() {
           </div>
           <div className="ref-price-tabs">
             <Link className="ref-price-tab active" href="/carros-a-venda">Todos</Link>
-            {priceBands.map((band) => <Link key={`tab-${band.key}`} className="ref-price-tab" href={`/carros-a-venda?priceMax=${band.max}`}>{band.price}</Link>)}
+            {priceBands.map((band) => <Link key={`tab-${band.key}`} className="ref-price-tab" href={`/carros-a-venda?price_max=${band.max}`}>{band.price}</Link>)}
           </div>
           <div className="ref-cars-grid">
             {shownListings.map((listing, index) => <ListingReferenceCard key={listing.id} listing={listing} index={index} />)}
