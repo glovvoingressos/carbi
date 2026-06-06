@@ -1,34 +1,71 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
-  TrendingDown, TrendingUp, Calendar,
-  MapPin, Gauge, Fuel, Zap,
-  Settings2, ShieldCheck, Check,
-  Share2, Heart, MessageCircle, Phone,
-  Info, ArrowRight, HandCoins, BadgeCheck,
+  BadgeCheck,
+  Calendar,
+  Check,
+  Copy,
+  Fuel,
+  Gauge,
+  HandCoins,
+  Heart,
+  MapPin,
+  MessageCircle,
+  Share2,
+  ShieldCheck,
+  TrendingDown,
+  TrendingUp,
 } from 'lucide-react'
-import { QRCodeSVG } from 'qrcode.react'
-import { motion, Variants } from 'framer-motion'
 import { ListingPublic } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
 import ListingImageGallery from './ListingImageGallery'
 import ChatStarter from './ChatStarter'
-import ListingCard from './ListingCard'
 import OfferModal from './OfferModal'
 import OfferHistory from './OfferHistory'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
+import { getCarImageUrl, resolveMarketplaceCarImage } from '@/lib/car-image-fallback'
 
 interface VehicleDetailViewProps {
   listing: ListingPublic
-  sellerInfo: any
+  sellerInfo: {
+    id: string
+    name: string | null
+    avatarUrl: string | null
+    memberSince: string
+    activeListings: number
+    totalListings: number
+  } | null
   relatedListings: ListingPublic[]
   enrichment: any
   comparison: {
     status: 'below' | 'near' | 'above' | 'unknown'
     diffPercent: number | null
+    diffValue?: number | null
   }
+}
+
+function formatDate(value: string | null | undefined) {
+  if (!value) return 'Data não informada'
+  return new Date(value).toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+function initials(name: string | null | undefined) {
+  const clean = (name || 'Particular').trim()
+  const parts = clean.split(/\s+/).filter(Boolean)
+  return `${parts[0]?.[0] || 'P'}${parts[1]?.[0] || ''}`.toUpperCase()
+}
+
+function getFipeLabel(status: VehicleDetailViewProps['comparison']['status']) {
+  if (status === 'below') return 'Abaixo da FIPE'
+  if (status === 'near') return 'Na média da FIPE'
+  if (status === 'above') return 'Acima da FIPE'
+  return 'FIPE indisponível'
 }
 
 export default function VehicleDetailView({
@@ -36,14 +73,14 @@ export default function VehicleDetailView({
   sellerInfo,
   relatedListings,
   enrichment,
-  comparison
+  comparison,
 }: VehicleDetailViewProps) {
-  const [showFullDescription, setShowFullDescription] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const [showOfferModal, setShowOfferModal] = useState(false)
   const [sessionUserId, setSessionUserId] = useState<string | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [pageUrl, setPageUrl] = useState('')
+  const [copied, setCopied] = useState(false)
   const isSeller = sessionUserId === listing.user_id
 
   useEffect(() => {
@@ -58,461 +95,305 @@ export default function VehicleDetailView({
     })
   }, [])
 
-  const mainSpecs = [
-    { label: 'Ano', value: `${listing.year}/${listing.year_model}`, icon: Calendar },
-    { label: 'Quilometragem', value: `${listing.mileage.toLocaleString('pt-BR')} km`, icon: Gauge },
-    { label: 'Câmbio', value: listing.transmission, icon: Settings2 },
-    { label: 'Combustível', value: listing.fuel, icon: Fuel },
-  ]
+  const listingImages = useMemo(() => listing.images?.map((img) => img.url).filter(Boolean) || [], [listing.images])
+  const fipePrice = listing.fipe_price ? Number(listing.fipe_price) : null
+  const price = Number(listing.price)
+  const diffValue = fipePrice ? price - fipePrice : null
+  const diffPercent = fipePrice ? (diffValue! / fipePrice) * 100 : null
+  const fipeStatus = getFipeLabel(comparison.status)
+  const fipeBarWidth = diffPercent == null ? 50 : Math.max(12, Math.min(88, 50 + diffPercent * 2.5))
+  const dealPercentLabel = diffPercent == null ? null : `${diffPercent > 0 ? '+' : ''}${diffPercent.toFixed(1).replace('.', ',')}%`
 
-  const technicalSpecs = [
+  const detailItems = [
+    { label: 'Ano', value: `${listing.year}/${listing.year_model}` },
+    { label: 'Quilometragem', value: `${listing.mileage.toLocaleString('pt-BR')} km` },
+    { label: 'Câmbio', value: Array.isArray(listing.transmission) ? listing.transmission.join(', ') : listing.transmission },
+    { label: 'Combustível', value: listing.fuel },
     { label: 'Cor', value: listing.color },
-    { label: 'Final da placa', value: listing.plate_final || 'Não informado' },
-    { label: 'Carroceria', value: listing.body_type },
+    { label: 'Carroceria', value: listing.body_type || 'Não informado' },
+    { label: 'Motor', value: listing.engine || enrichment?.powertrain?.engine || 'Não informado' },
     { label: 'Portas', value: listing.doors ? `${listing.doors} portas` : 'Não informado' },
-    { label: 'Motor', value: listing.engine || 'Não informado' },
-    { label: 'Localização', value: `${listing.city}/${listing.state}` },
+    { label: 'Final da placa', value: listing.plate_final || 'Não informado' },
   ]
 
-  const handleShare = () => {
+  const fipeCompareItems = [
+    { label: 'Preço anunciado', value: formatBRL(price), highlight: false },
+    { label: 'Diferença', value: diffValue == null ? 'Sem referência' : `${diffValue > 0 ? '+ ' : '- '}${formatBRL(Math.abs(diffValue))}`, highlight: comparison.status === 'below' },
+    { label: 'Percentual', value: dealPercentLabel || 'Sem referência', highlight: comparison.status === 'below' },
+  ]
+
+  const sellerName = sellerInfo?.name || 'Vendedor particular'
+  const sellerYears = Math.max(0, new Date().getFullYear() - new Date(sellerInfo?.memberSince || Date.now()).getFullYear())
+  const publicPath = pageUrl ? pageUrl.replace(/^https?:\/\//, '') : `carbi.com.br/anuncios/${listing.slug}`
+
+  const handleShare = async () => {
     if (navigator.share) {
-      navigator.share({
-        title: listing.title,
-        url: window.location.href,
-      })
-    } else {
-      navigator.clipboard?.writeText(window.location.href)
+      await navigator.share({ title: listing.title, url: window.location.href })
+      return
     }
+    await navigator.clipboard?.writeText(window.location.href)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1800)
   }
 
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 }
-    }
+  const handleCopy = async () => {
+    await navigator.clipboard?.writeText(window.location.href)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1800)
   }
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 12 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
-    }
-  }
-
-  const isGoodDeal = comparison.status === 'below'
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="vehicle-detail-ref min-h-screen"
-    >
-      {/* ── GALLERY + SIDEBAR ── */}
-      <motion.section variants={itemVariants} className="container pt-8 pb-12">
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_400px] lg:gap-8">
-          <div>
-            <ListingImageGallery
-              images={listing.images?.map(img => img.url) || []}
-              title={listing.title}
-            />
-          </div>
+    <div className="ref-ad-detail">
+      <div className="ref-ad-page-container">
+        <div className="ref-ad-left-col">
+          <ListingImageGallery
+            images={listingImages}
+            title={listing.title}
+            badgeLabel={listing.badges?.[0]?.label || 'Anúncio Carbi'}
+            fipeBadgeLabel={fipePrice ? fipeStatus : undefined}
+          />
 
-          {/* ── Sticky Price & Seller Card ── */}
-          <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
-            <div className="surface-strong p-6 max-[330px]:p-4">
-              <div className="mb-5 border-b border-white/70 pb-5">
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <div className="flex flex-wrap gap-2">
-                    {listing.badges?.slice(0, 3).map(badge => (
-                      <span key={badge.key} className="badge badge-neutral">
-                        {badge.label}
-                      </span>
-                    ))}
-                    {isGoodDeal && (
-                      <span className="badge badge-brand">
-                        {comparison.diffPercent && Math.abs(comparison.diffPercent).toFixed(0)}% abaixo da FIPE
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <button
-                      onClick={handleShare}
-                      className="btn-icon bg-white/70 border border-white/70 shadow-sm"
-                      aria-label="Compartilhar"
-                    >
-                      <Share2 className="w-[18px] h-[18px]" strokeWidth={1.75} />
-                    </button>
-                    <button
-                      onClick={() => setIsFavorite(!isFavorite)}
-                      className="btn-icon bg-white/70 border border-white/70 shadow-sm"
-                      aria-label="Favoritar"
-                    >
-                      <Heart
-                        className={`w-[18px] h-[18px] ${isFavorite ? 'fill-[#DC2626] text-[#DC2626]' : ''}`}
-                        strokeWidth={1.75}
-                      />
-                    </button>
-                  </div>
+          <section className="ref-ad-card">
+            <div className="ref-ad-card-title">Detalhes do veículo</div>
+            <div className="ref-ad-details-grid">
+              {detailItems.map((item) => (
+                <div className="ref-ad-detail-item" key={item.label}>
+                  <div className="ref-ad-detail-label">{item.label}</div>
+                  <div className="ref-ad-detail-value">{item.value}</div>
                 </div>
-                <div
-                  className="vehicle-price-card-title"
-                  role="heading"
-                  aria-level={1}
-                  style={{
-                    color: '#10131D',
-                    fontSize: 22,
-                    fontWeight: 650,
-                    lineHeight: 1.12,
-                    letterSpacing: 0,
-                  }}
-                >
-                  {listing.brand} {listing.model}
-                </div>
-                <p className="mt-2 text-[13px] font-medium leading-relaxed text-[#525252] tracking-tight max-[330px]:text-[12px]">
-                  {listing.version || 'Versão não informada'} · {listing.year}/{listing.year_model} · {listing.city}, {listing.state} · Anunciado em{' '}
-                  {new Date(listing.created_at).toLocaleDateString('pt-BR', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </p>
+              ))}
+            </div>
+          </section>
+
+          {fipePrice ? (
+            <section className="ref-ad-fipe-card">
+              <div className="ref-ad-fipe-header">
+                <h3>Comparativo FIPE</h3>
+                <span className="ref-ad-fipe-badge">{fipeStatus}</span>
               </div>
-              <p className="eyebrow mb-1">Preço</p>
-              <p className="text-[44px] font-semibold tracking-normal text-[#0A0A0A] leading-none max-[380px]:text-[36px] max-[330px]:text-[30px]">
-                {formatBRL(Number(listing.price))}
-              </p>
-
-              {/* FIPE comparison */}
-              {listing.fipe_price && (
-                <div className="mt-5 pt-5 border-t border-white/70">
-                  <div className="mb-3 flex items-center justify-between gap-3 text-[13px] max-[330px]:text-[12px]">
-                    <span className="text-[#52607A]">Tabela FIPE</span>
-                    <span className="text-[#0A0A0A] font-medium">{formatBRL(Number(listing.fipe_price))}</span>
+              <div className="ref-ad-fipe-row">
+                <span className="ref-ad-fipe-val-main">{formatBRL(fipePrice)}</span>
+                <span className="ref-ad-fipe-val-label">Tabela FIPE</span>
+              </div>
+              <div className="ref-ad-fipe-compare">
+                {fipeCompareItems.map((item) => (
+                  <div className="ref-ad-fipe-compare-item" key={item.label}>
+                    <div className="lbl">{item.label}</div>
+                    <div className={`val ${item.highlight ? 'green' : ''}`}>{item.value}</div>
                   </div>
-                  {comparison.status !== 'unknown' && (
-                    <div className={`flex items-center gap-2 text-[13px] font-medium ${
-                      comparison.status === 'below' ? 'text-[#10B981]' :
-                      comparison.status === 'near' ? 'text-[#F59E0B]' :
-                      'text-[#DC2626]'
-                    }`}>
-                      {comparison.status === 'below' ? <TrendingDown className="w-4 h-4" strokeWidth={2} /> : <TrendingUp className="w-4 h-4" strokeWidth={2} />}
-                      {comparison.status === 'below' ? 'Abaixo da FIPE' :
-                       comparison.status === 'near' ? 'Na média da FIPE' : 'Acima da FIPE'}
-                    </div>
-                  )}
-                  {listing.fipe_reference_month && (
-                    <p className="mt-2 text-[11px] text-[#8A95A8] tracking-tight">
-                      Referência: {listing.fipe_reference_month}
-                    </p>
-                  )}
+                ))}
+              </div>
+              <div className="ref-ad-fipe-bar-wrap">
+                <div className="ref-ad-fipe-bar-label">
+                  <span>Abaixo da FIPE</span>
+                  <span>Acima da FIPE</span>
                 </div>
-              )}
-
-              {/* Negotiation indicators */}
-              <div className="mt-5 pt-5 border-t border-white/70">
-                <div className="flex flex-wrap gap-2">
-                  {listing.accepts_offers !== false && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#10B981]/20 bg-[#ECFDF5] px-3 py-1.5 text-[11px] font-semibold text-[#10B981]">
-                      <BadgeCheck className="w-3 h-3" strokeWidth={2} />
-                      Aceita ofertas
-                    </span>
-                  )}
-                  {listing.negotiable === 'low' && (
-                    <span className="rounded-full border border-[#F59E0B]/20 bg-[#FFF8DF] px-3 py-1.5 text-[11px] font-semibold text-[#F59E0B]">
-                      Pouco negociável
-                    </span>
-                  )}
-                  {listing.negotiable === 'firm' && (
-                    <span className="rounded-full border border-[#DC2626]/20 bg-[#FEF2F2] px-3 py-1.5 text-[11px] font-semibold text-[#DC2626]">
-                      Valor firme
-                    </span>
-                  )}
-                  {listing.accepts_trade && (
-                    <span className="rounded-full border border-[#8B5CF6]/20 bg-[#F5F3FF] px-3 py-1.5 text-[11px] font-semibold text-[#8B5CF6]">
-                      Aceita troca
-                    </span>
-                  )}
+                <div className="ref-ad-fipe-bar-track">
+                  <div className="ref-ad-fipe-bar-fill" style={{ width: `${fipeBarWidth}%` }} />
+                  <div className="ref-ad-fipe-bar-marker" style={{ left: '50%' }} />
                 </div>
               </div>
+              <div className="ref-ad-fipe-ref">
+                Referência {listing.fipe_reference_month || 'mensal'} · Atualizado pela FIPE
+              </div>
+            </section>
+          ) : null}
 
-              {/* Actions */}
-              <div className="mt-6 space-y-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowOfferModal(true)}
-                  className="btn btn-primary w-full shadow-sm"
-                >
-                  <HandCoins className="w-4 h-4" strokeWidth={1.75} /> Fazer Oferta
+          {listing.optional_items?.length > 0 ? (
+            <section className="ref-ad-card">
+              <div className="ref-ad-card-title">Opcionais e equipamentos</div>
+              <div className="ref-ad-optionals-grid">
+                {listing.optional_items.map((item) => (
+                  <div className="ref-ad-optional-item" key={item}>
+                    <div className="ref-ad-optional-check"><Check size={12} strokeWidth={2.4} /></div>
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {listing.description ? (
+            <section className="ref-ad-card">
+              <div className="ref-ad-card-title">Descrição do vendedor</div>
+              <p className="ref-ad-desc-text">{listing.description}</p>
+            </section>
+          ) : null}
+
+          <section className="ref-ad-card-sm">
+            <div className="ref-ad-card-title">Histórico de preço</div>
+            <div className="ref-ad-price-history-head">
+              <span>{formatBRL(price)}</span>
+              <small>preço atual</small>
+              <em>{listing.price_history?.has_changes ? `${listing.price_history.changes_last_30d} alterações registradas` : 'Sem alterações registradas'}</em>
+            </div>
+            <svg viewBox="0 0 400 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="ref-ad-price-svg">
+              <defs>
+                <linearGradient id={`priceGrad-${listing.id}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#5a47d1" stopOpacity=".18" />
+                  <stop offset="100%" stopColor="#5a47d1" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M0 44 L80 43 L160 44 L240 43 L320 44 L400 43 L400 80 L0 80 Z" fill={`url(#priceGrad-${listing.id})`} />
+              <path d="M0 44 L80 43 L160 44 L240 43 L320 44 L400 43" stroke="#5a47d1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+              <circle cx="400" cy="43" r="5" fill="#5a47d1" />
+              <line x1="0" y1="70" x2="400" y2="70" stroke="rgba(0,0,0,.06)" strokeWidth="1" />
+            </svg>
+          </section>
+
+          <section className="ref-ad-card-sm">
+            <div className="ref-ad-card-title">Segurança na compra</div>
+            <div className="ref-ad-safety-list">
+              <div className="ref-ad-safety-item">
+                <div className="ref-ad-safety-icon"><ShieldCheck size={16} /></div>
+                <div><strong>Negocie pelo chat interno.</strong> Evite compartilhar telefone, e-mail ou dados bancários antes de verificar o veículo.</div>
+              </div>
+              <div className="ref-ad-safety-item">
+                <div className="ref-ad-safety-icon"><Calendar size={16} /></div>
+                <div>Faça test drive e vistoria antes de fechar negócio. Prefira encontros em locais movimentados.</div>
+              </div>
+              <div className="ref-ad-safety-item">
+                <div className="ref-ad-safety-icon"><BadgeCheck size={16} /></div>
+                <div>Confira documentação, chassi e histórico antes de transferir qualquer valor.</div>
+              </div>
+            </div>
+          </section>
+
+          {relatedListings.length > 0 ? (
+            <section className="ref-ad-similar-section">
+              <div className="ref-ad-similar-header">
+                <div>
+                  <div className="ref-ad-card-title">Similares</div>
+                  <h2>Você também pode gostar</h2>
+                </div>
+                <Link href="/carros-a-venda" className="ref-ad-btn ref-ad-btn-ghost">Ver mais</Link>
+              </div>
+              <div className="ref-ad-similar-grid">
+                {relatedListings.slice(0, 3).map((item) => {
+                  const cover = getCarImageUrl(resolveMarketplaceCarImage({
+                    brand: item.brand,
+                    model: item.model,
+                    year: item.year_model,
+                    preferredUrl: item.images?.[0]?.url || null,
+                  }))
+                  return (
+                    <Link href={`/anuncios/${item.slug}`} className="ref-ad-sim-card" key={item.id}>
+                      <div className="ref-ad-sim-img">
+                        {cover ? <img src={cover} alt={item.title} /> : <Gauge size={44} />}
+                      </div>
+                      <div className="ref-ad-sim-body">
+                        <div className="ref-ad-sim-make">{item.brand}</div>
+                        <div className="ref-ad-sim-name">{item.model} {item.version}</div>
+                        <div className="ref-ad-sim-price">{formatBRL(Number(item.price))}</div>
+                        {item.fipe_price ? <div className="ref-ad-sim-fipe">FIPE {formatBRL(Number(item.fipe_price))}</div> : null}
+                        <div className="ref-ad-sim-meta"><span>{item.year_model}</span><span>·</span><span>{item.mileage.toLocaleString('pt-BR')} km</span><span>·</span><span>{item.state}</span></div>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            </section>
+          ) : null}
+        </div>
+
+        <aside className="ref-ad-right-col">
+          <section className="ref-ad-price-panel">
+            <div className="ref-ad-price-panel-make">{listing.brand} · {listing.model}</div>
+            <h1 className="ref-ad-price-panel-name">{listing.version || 'Versão não informada'}</h1>
+            <div className="ref-ad-price-panel-version">{listing.year}/{listing.year_model} · {listing.color} · {listing.body_type || 'Particular'}</div>
+            <div className="ref-ad-price-main">{formatBRL(price)}</div>
+            {fipePrice ? (
+              <div className="ref-ad-price-fipe-row">
+                <span className="ref-ad-price-fipe-val">FIPE {formatBRL(fipePrice)}</span>
+                {dealPercentLabel ? <span className="ref-ad-price-fipe-chip">{dealPercentLabel}</span> : null}
+              </div>
+            ) : null}
+            <div className="ref-ad-price-panel-divider" />
+            <div className="ref-ad-spec-pills">
+              <span>{listing.year_model}</span>
+              <span>{listing.mileage.toLocaleString('pt-BR')} km</span>
+              <span>{Array.isArray(listing.transmission) ? listing.transmission[0] : listing.transmission}</span>
+              <span>{listing.fuel}</span>
+            </div>
+            <div className="ref-ad-location-row"><span /> {listing.city} / {listing.state}</div>
+            <div className="ref-ad-views-row">
+              <div><span /> Anúncio ativo</div>
+              <span>Anunciado em {formatDate(listing.created_at)}</span>
+            </div>
+            <div className="ref-ad-cta-block">
+              <button type="button" className="ref-ad-cta-offer" onClick={() => setShowOfferModal(true)}>
+                <HandCoins size={18} /> Fazer oferta
+              </button>
+              <div className="ref-ad-chat-wrap">
+                <ChatStarter listingId={listing.id} label="Chat na Carbi" />
+              </div>
+              <div className="ref-ad-cta-secondary">
+                <button type="button" onClick={() => setIsFavorite((value) => !value)}>
+                  <Heart size={14} className={isFavorite ? 'fill-current' : ''} /> Salvar
                 </button>
-                <ChatStarter listingId={listing.id} />
-                <button className="btn btn-secondary w-full">
-                  <Phone className="w-4 h-4" strokeWidth={1.75} /> Ver telefone
-                </button>
+                <button type="button" onClick={handleShare}><Share2 size={14} /> Compartilhar</button>
               </div>
+              <div className="ref-ad-cta-notice">Contato protegido pelo chat interno</div>
             </div>
+          </section>
 
-            {/* Seller card */}
-            <div className="surface p-6 max-[330px]:p-4">
-              <p className="eyebrow mb-3">Vendedor</p>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[#FFF8DF] flex items-center justify-center text-[#0A0A0A] border border-[#17170F]/10">
-                  {sellerInfo?.avatarUrl ? (
-                    <img src={sellerInfo.avatarUrl} alt={sellerInfo.name} className="w-full h-full rounded-full object-cover" />
-                  ) : (
-                    <span className="text-[15px] font-semibold">
-                      {(sellerInfo?.name || 'P').charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-[#0A0A0A] tracking-tight truncate">
-                    {sellerInfo?.name || 'Particular'}
-                  </p>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" strokeWidth={2} />
-                    <span className="text-[11px] text-[#52607A] tracking-tight">Perfil verificado</span>
-                  </div>
-                </div>
+          <section className="ref-ad-card ref-ad-seller-card">
+            <div className="ref-ad-card-title">Vendedor</div>
+            <div className="ref-ad-seller-top">
+              <div className="ref-ad-seller-avatar">
+                {sellerInfo?.avatarUrl ? <img src={sellerInfo.avatarUrl} alt={sellerName} /> : initials(sellerName)}
               </div>
-              <p className="mt-4 text-[11px] text-[#8A95A8] tracking-tight">
-                Anunciando desde {new Date(sellerInfo?.memberSince || Date.now()).getFullYear()}
-              </p>
-            </div>
-
-            {/* QR Code */}
-            {pageUrl && (
-              <div className="surface p-6 max-[330px]:p-4">
-                <p className="eyebrow mb-3">Compartilhe</p>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="rounded-2xl bg-white p-3 shadow-sm border border-[#17170F]/8">
-                    <QRCodeSVG
-                      value={pageUrl}
-                      size={140}
-                      bgColor="#FFFFFF"
-                      fgColor="#0A0A0A"
-                      level="M"
-                      includeMargin={false}
-                    />
-                  </div>
-                  <p className="text-[11px] text-[#8A95A8] tracking-tight text-center leading-relaxed">
-                    Escaneie com seu celular para <br />acessar este anúncio
-                  </p>
-                </div>
-              </div>
-            )}
-          </aside>
-        </div>
-      </motion.section>
-
-      {/* ── MAIN SPECS ── */}
-      <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
-        <h2 className="text-balance mb-8">Visão geral</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {mainSpecs.map(spec => {
-            const Icon = spec.icon
-            return (
-              <div key={spec.label} className="surface p-6">
-                <Icon className="w-5 h-5 text-[#17170F] mb-3" strokeWidth={1.5} />
-                <p className="eyebrow mb-1">{spec.label}</p>
-                <p className="text-[15px] font-semibold text-[#0A0A0A] tracking-tight">{spec.value}</p>
-              </div>
-            )
-          })}
-        </div>
-      </motion.section>
-
-      {/* ── TECHNICAL SPECS ── */}
-      <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
-        <h2 className="text-balance mb-8">Ficha técnica</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0 max-w-4xl">
-          {technicalSpecs.map(spec => (
-            <div key={spec.label} className="flex items-center justify-between py-4 border-b border-white/70">
-              <span className="text-[14px] text-[#52607A] tracking-tight">{spec.label}</span>
-              <span className="text-[14px] font-medium text-[#0A0A0A] tracking-tight">{spec.value}</span>
-            </div>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* ── ENRICHMENT (SPECS) ── */}
-      {enrichment && (
-        <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
-          <h2 className="text-balance mb-8">Especificações técnicas</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl">
-            {enrichment.powertrain && (
               <div>
-                <p className="eyebrow mb-4">Motor e performance</p>
-                <div className="space-y-0">
-                  {enrichment.powertrain.engine && (
-                    <div className="flex justify-between py-3 border-b border-white/70">
-                      <span className="text-[14px] text-[#52607A]">Motor</span>
-                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.powertrain.engine}</span>
-                    </div>
-                  )}
-                  {enrichment.powertrain.horsepower && (
-                    <div className="flex justify-between py-3 border-b border-white/70">
-                      <span className="text-[14px] text-[#52607A]">Potência</span>
-                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.powertrain.horsepower} cv</span>
-                    </div>
-                  )}
-                  {enrichment.powertrain.transmission && (
-                    <div className="flex justify-between py-3 border-b border-white/70">
-                      <span className="text-[14px] text-[#52607A]">Transmissão</span>
-                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.powertrain.transmission}</span>
-                    </div>
-                  )}
-                </div>
+                <div className="ref-ad-seller-name">{sellerName}</div>
+                <div className="ref-ad-seller-type">Vendedor particular</div>
               </div>
-            )}
-            {enrichment.dimensions && (
-              <div>
-                <p className="eyebrow mb-4">Dimensões e capacidade</p>
-                <div className="space-y-0">
-                  {enrichment.dimensions.cargoCapacity && (
-                    <div className="flex justify-between py-3 border-b border-white/70">
-                      <span className="text-[14px] text-[#52607A]">Porta-malas</span>
-                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.dimensions.cargoCapacity}L</span>
-                    </div>
-                  )}
-                  {enrichment.dimensions.curbWeight && (
-                    <div className="flex justify-between py-3 border-b border-white/70">
-                      <span className="text-[14px] text-[#52607A]">Peso</span>
-                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.dimensions.curbWeight} kg</span>
-                    </div>
-                  )}
-                  {enrichment.dimensions.length && (
-                    <div className="flex justify-between py-3 border-b border-white/70">
-                      <span className="text-[14px] text-[#52607A]">Comprimento</span>
-                      <span className="text-[14px] font-medium text-[#0A0A0A]">{enrichment.dimensions.length} mm</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </motion.section>
-      )}
-
-      {/* ── OPTIONALS ── */}
-      {listing.optional_items?.length > 0 && (
-        <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
-          <h2 className="text-balance mb-8">Opcionais e acessórios</h2>
-          <div className="flex flex-wrap gap-2">
-            {listing.optional_items.map(item => (
-              <div key={item} className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-[#17170F]/12 rounded-full">
-                <Check className="w-3.5 h-3.5 text-[#17170F]" strokeWidth={2.5} />
-                <span className="text-[13px] font-medium text-[#0A0A0A] tracking-tight">{item}</span>
-              </div>
-            ))}
-          </div>
-        </motion.section>
-      )}
-
-      {/* ── DESCRIPTION ── */}
-      {listing.description && (
-        <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
-          <h2 className="text-balance mb-6">Descrição do anunciante</h2>
-          <div className={`relative ${!showFullDescription && listing.description.length > 500 ? 'max-h-72 overflow-hidden' : ''}`}>
-            <p className="text-[16px] text-[#52607A] leading-relaxed whitespace-pre-wrap text-pretty">
-              {listing.description}
-            </p>
-            {!showFullDescription && listing.description.length > 500 && (
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#F6F7FB] to-transparent pointer-events-none" />
-            )}
-          </div>
-          {listing.description.length > 500 && (
-            <button
-              onClick={() => setShowFullDescription(!showFullDescription)}
-              className="mt-5 text-[14px] font-medium text-[#0A0A0A] hover:opacity-70 transition-opacity"
-            >
-              {showFullDescription ? 'Ver menos' : 'Ver descrição completa →'}
-            </button>
-          )}
-        </motion.section>
-      )}
-
-      {/* ── RECALLS ── */}
-      {enrichment?.recalls?.count > 0 && (
-        <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-[#FEF2F2] rounded-xl flex items-center justify-center">
-              <Info className="w-5 h-5 text-[#DC2626]" strokeWidth={1.75} />
             </div>
-            <h2>Avisos de recall</h2>
-          </div>
-          <div className="space-y-3">
-            {enrichment.recalls.items.slice(0, 2).map((recall: any, idx: number) => (
-              <div key={idx} className="border border-[#FECACA] bg-[#FEF2F2] rounded-2xl p-5">
-                <p className="font-semibold text-[#0A0A0A] mb-1.5 tracking-tight">{recall.title}</p>
-                <p className="text-[14px] text-[#525252] leading-relaxed">{recall.description}</p>
-              </div>
-            ))}
-          </div>
-        </motion.section>
-      )}
-
-      {/* ── RELATED ── */}
-      {relatedListings.length > 0 && (
-        <motion.section variants={itemVariants} className="container py-12 border-t border-white/70">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <p className="eyebrow mb-2">Veículos semelhantes</p>
-              <h2 className="text-balance">Você também pode gostar</h2>
+            <div className="ref-ad-seller-badges">
+              <span><i /> Chat interno</span>
+              <span><i /> Dados protegidos</span>
             </div>
-            <Link href="/carros-a-venda" className="hidden sm:inline-flex items-center gap-1.5 text-[14px] font-medium text-[#0A0A0A] hover:opacity-70">
-              Ver todos <ArrowRight className="w-4 h-4" strokeWidth={2} />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {relatedListings.slice(0, 4).map(item => (
-              <ListingCard key={item.id} listing={item} />
-            ))}
-          </div>
-        </motion.section>
-      )}
+            <div className="ref-ad-seller-stats">
+              <div><span>{sellerInfo?.activeListings ?? 1}</span><small>anúncios</small></div>
+              <div><span>{sellerInfo?.totalListings ?? 1}</span><small>total</small></div>
+              <div><span>{sellerYears || 1} ano{sellerYears > 1 ? 's' : ''}</span><small>no Carbi</small></div>
+            </div>
+          </section>
 
-      {/* ── OFFER HISTORY ── */}
-      {accessToken && (
-        <OfferHistory
-          listingId={listing.id}
-          isSeller={isSeller}
-          accessToken={accessToken}
-        />
-      )}
+          <section className="ref-ad-card-sm">
+            <div className="ref-ad-card-title">Compartilhar anúncio</div>
+            <div className="ref-ad-share-row">
+              <span>Link</span>
+              <button type="button" className="ref-ad-copy-link" onClick={handleCopy}>{copied ? 'Link copiado!' : publicPath}</button>
+              <button type="button" className="ref-ad-share-btn" onClick={handleCopy} title="Copiar link"><Copy size={14} /></button>
+            </div>
+          </section>
 
-      {/* ── OFFER MODAL ── */}
+          <div className="ref-ad-report-wrap">
+            <button type="button">Denunciar este anúncio</button>
+          </div>
+        </aside>
+      </div>
+
+      <div className="ref-ad-mobile-cta">
+        <div>
+          <strong>{formatBRL(price)}</strong>
+          {fipePrice ? <span>FIPE {formatBRL(fipePrice)}</span> : null}
+        </div>
+        <button type="button" onClick={() => setShowOfferModal(true)}><HandCoins size={16} /> Oferta</button>
+        <div className="ref-ad-mobile-chat"><ChatStarter listingId={listing.id} label="Chat" /></div>
+      </div>
+
+      {accessToken ? (
+        <OfferHistory listingId={listing.id} isSeller={isSeller} accessToken={accessToken} />
+      ) : null}
+
       <OfferModal
         listingId={listing.id}
-        listingPrice={Number(listing.price)}
+        listingPrice={price}
         listingTitle={`${listing.brand} ${listing.model} ${listing.year_model}`}
         isOpen={showOfferModal}
         onClose={() => setShowOfferModal(false)}
       />
-
-      {/* ── MOBILE STICKY CTA ── */}
-      <div className="lg:hidden fixed inset-x-0 bottom-0 z-[60] bg-white/82 backdrop-blur-2xl border-t border-white/70 p-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
-        <div className="flex items-center gap-3">
-          <div className="flex-1 min-w-0">
-            <p className="text-[18px] font-semibold text-[#0A0A0A] tracking-tight truncate">
-              {formatBRL(Number(listing.price))}
-            </p>
-            {isGoodDeal && (
-              <p className="text-[11px] text-[#16855C] font-bold tracking-tight">Abaixo da FIPE</p>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowOfferModal(true)}
-            className="btn btn-primary shadow-sm"
-          >
-            <HandCoins className="w-4 h-4" strokeWidth={1.75} /> Fazer Oferta
-          </button>
-        </div>
-      </div>
-    </motion.div>
+    </div>
   )
 }

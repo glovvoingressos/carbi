@@ -6,7 +6,15 @@ import { MessageCircle, Loader2 } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
 
-export default function ChatStarter({ listingId, fullWidth = true }: { listingId: string; fullWidth?: boolean }) {
+export default function ChatStarter({
+  listingId,
+  fullWidth = true,
+  label = 'Conversar com vendedor',
+}: {
+  listingId: string
+  fullWidth?: boolean
+  label?: string
+}) {
   const supabaseReady = isSupabaseBrowserConfigured()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -65,7 +73,7 @@ export default function ChatStarter({ listingId, fullWidth = true }: { listingId
         className={`btn btn-primary ${fullWidth ? 'w-full' : ''} shadow-sm max-[330px]:px-4 max-[330px]:text-[13px]`}
       >
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" strokeWidth={1.75} />}
-        Conversar com vendedor
+        {label}
       </button>
       {error && <p className="text-[12px] text-[#DC2626] text-center tracking-tight">{error}</p>}
     </div>
