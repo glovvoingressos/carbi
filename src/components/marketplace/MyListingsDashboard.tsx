@@ -13,6 +13,7 @@ import {
   LISTING_MAX_IMAGES,
   LISTING_MAX_IMAGE_SIZE_MB,
   parseMoneyInputToNumber,
+  parseBrazilianInt,
   validateListingPayload,
 } from '@/lib/marketplace'
 import AuthCard from '@/components/marketplace/AuthCard'
@@ -286,11 +287,11 @@ export default function MyListingsDashboard() {
       const sanitizedPayload = {
         ...formData,
         price: typeof formData.price === 'string' ? parseMoneyInputToNumber(formData.price) : Number(formData.price),
-        mileage: formData.mileage ? Math.round(Number(String(formData.mileage).replace(/\./g, ''))) : undefined,
-        year: formData.year ? Math.round(Number(formData.year)) : undefined,
-        year_model: formData.year_model ? Math.round(Number(formData.year_model)) : undefined,
-        horsepower: formData.horsepower ? Math.round(Number(formData.horsepower)) : undefined,
-        doors: formData.doors ? Math.round(Number(formData.doors)) : undefined,
+        mileage: formData.mileage ? parseBrazilianInt(formData.mileage) : undefined,
+        year: formData.year ? parseBrazilianInt(formData.year) : undefined,
+        year_model: formData.year_model ? parseBrazilianInt(formData.year_model) : undefined,
+        horsepower: formData.horsepower ? parseBrazilianInt(formData.horsepower) : undefined,
+        doors: formData.doors ? parseBrazilianInt(formData.doors) : undefined,
       }
 
       const response = await fetch(`/api/marketplace/listings/${selectedListing.id}`, {
@@ -702,7 +703,7 @@ export default function MyListingsDashboard() {
                           type="number"
                           className="w-full h-14 px-6 rounded-2xl bg-white/80 border-transparent border-2 focus:border-[#17170F] transition-all font-bold text-[#0A0A0A] focus:outline-none"
                           value={formData.year || ''}
-                          onChange={(e) => updateField('year', Number(e.target.value))}
+                          onChange={(e) => updateField('year', parseBrazilianInt(e.target.value))}
                         />
                       </div>
                       <div className="space-y-1.5">
@@ -711,7 +712,7 @@ export default function MyListingsDashboard() {
                           type="number"
                           className="w-full h-14 px-6 rounded-2xl bg-white/80 border-transparent border-2 focus:border-[#17170F] transition-all font-bold text-[#0A0A0A] focus:outline-none"
                           value={formData.year_model || ''}
-                          onChange={(e) => updateField('year_model', Number(e.target.value))}
+                          onChange={(e) => updateField('year_model', parseBrazilianInt(e.target.value))}
                         />
                       </div>
                     </div>
@@ -777,10 +778,7 @@ export default function MyListingsDashboard() {
                           step="1"
                           className={`w-full h-14 px-6 rounded-2xl bg-[#FAFAF9] border-2 transition-all font-bold text-[#0A0A0A] focus:outline-none ${errors.mileage ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-[#10B981]'}`}
                           value={formData.mileage || ''}
-                          onChange={(e) => {
-                            const raw = e.target.value.replace(/\./g, '')
-                            updateField('mileage', Math.round(Number(raw)))
-                          }}
+                          onChange={(e) => updateField('mileage', parseBrazilianInt(e.target.value))}
                         />
                       {errors.mileage && <p className="text-[10px] font-bold text-red-500 ml-4">{errors.mileage}</p>}
                     </div>

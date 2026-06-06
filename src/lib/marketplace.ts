@@ -121,6 +121,13 @@ export function parseMoneyInputToNumber(value: string): number {
   return Number.isFinite(parsed) ? parsed : 0
 }
 
+export function parseBrazilianInt(value: string | number): number {
+  if (typeof value === 'number') return Math.round(value)
+  const normalized = value.replace(/\./g, '').replace(',', '.')
+  const parsed = Number(normalized)
+  return Number.isFinite(parsed) ? Math.round(parsed) : 0
+}
+
 export function normalizeOptionalItems(raw: string): string[] {
   return raw
     .split(',')

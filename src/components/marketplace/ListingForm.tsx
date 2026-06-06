@@ -14,6 +14,7 @@ import {
   buildFipeSnapshot,
   getFipeComparison,
   normalizeOptionalItems,
+  parseBrazilianInt,
   parseMoneyInputToNumber,
 } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
@@ -744,9 +745,9 @@ export default function ListingForm() {
           brand: form.brand,
           model: form.model,
           version: form.version,
-          year: Number(form.year),
-          year_model: Number(form.yearModel),
-          mileage: Number(form.mileage),
+          year: parseBrazilianInt(form.year),
+          year_model: parseBrazilianInt(form.yearModel),
+          mileage: parseBrazilianInt(form.mileage),
           price: parseMoneyInputToNumber(form.price),
           transmission: resolvedTransmission,
           fuel: resolvedFuel,
