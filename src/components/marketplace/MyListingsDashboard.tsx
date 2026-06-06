@@ -820,6 +820,15 @@ export default function MyListingsDashboard() {
                       </select>
                     </div>
                     <div className="space-y-1.5">
+                      <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Motor</label>
+                      <input 
+                        className="w-full h-12 px-4 rounded-xl bg-[#FAFAF9] font-bold text-[#0A0A0A] focus:outline-none border-none"
+                        value={formData.engine || ''}
+                        onChange={(e) => updateField('engine', e.target.value)}
+                        placeholder="Ex: 2.0 Turbo"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
                       <label className="text-xs font-medium uppercase tracking-wider text-[#A3A3A3] ml-4">Cor</label>
                       <input 
                         className="w-full h-12 px-4 rounded-xl bg-[#FAFAF9] font-bold text-[#0A0A0A] focus:outline-none border-none"
