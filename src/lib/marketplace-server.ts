@@ -397,16 +397,13 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
     .select(`
       id,
       user_id,
-      vehicle_id,
       title,
       description,
-      vehicle_type,
       brand,
       model,
       version,
       year,
       year_model,
-      vin,
       mileage,
       price,
       transmission,
@@ -428,22 +425,7 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
       slug,
       published_at,
       created_at,
-      updated_at,
-      price_updated_at,
-      truck_type,
-      load_capacity,
-      axles,
-      truck_body_type,
-      accepts_offers,
-      negotiable,
-      accepts_counter,
-      accepts_trade,
-      images:vehicle_listing_images(
-        id,
-        public_url,
-        sort_order,
-        is_primary
-      )
+      updated_at
     `, { count: 'exact' })
     .eq('status', 'active')
     .range(from, to)
@@ -512,10 +494,33 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
 
   const { data, error, count } = await query
   if (error || !Array.isArray(data)) {
+    if (error) console.error('fetchPublicListingsPage query error:', error.message, error.details, error.hint)
     return { items: [] as ListingPublic[], total: 0, page, pageSize }
   }
 
-  const normalized = (data as ListingRow[]).map(normalizeTableRow)
+  const listingIds = data.map(r => r.id)
+  const { data: imagesData } = listingIds.length > 0 ? await supabase
+    .from('vehicle_listing_images')
+    .select('listing_id, id, public_url, sort_order, is_primary')
+    .in('listing_id', listingIds)
+    .order('sort_order', { ascending: true }) : { data: null }
+
+  const imagesByListing = new Map<string, ListingImageRow[]>()
+  if (imagesData) {
+    for (const img of imagesData) {
+      const list = imagesByListing.get(img.listing_id) || []
+      list.push({ id: img.id, public_url: img.public_url, sort_order: img.sort_order, is_primary: img.is_primary })
+      imagesByListing.set(img.listing_id, list)
+    }
+  }
+
+  const dataWithImages = (data as ListingRow[]).map(row => ({
+    ...row,
+    vehicle_type: (row as any).vehicle_type || 'car',
+    images: imagesByListing.get(row.id) || [],
+  }))
+
+  const normalized = dataWithImages.map(normalizeTableRow)
   const items = await enrichListingSignals(normalized)
   return { items, total: count || 0, page, pageSize }
 }
