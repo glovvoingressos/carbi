@@ -49,11 +49,16 @@ export default function ConversationInbox() {
   const [loadingMessages, setLoadingMessages] = useState(false)
   const [messageText, setMessageText] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [brokenThumbs, setBrokenThumbs] = useState<Record<string, boolean>>({})
 
   const selectedConversation = useMemo(
     () => conversations.find((item) => item.id === selectedId) || null,
     [conversations, selectedId],
   )
+
+  const markThumbBroken = (key: string) => {
+    setBrokenThumbs((current) => (current[key] ? current : { ...current, [key]: true }))
+  }
 
   useEffect(() => {
     if (!supabaseReady) {
@@ -225,6 +230,8 @@ export default function ConversationInbox() {
             {conversations.map((conversation) => {
               const isActive = selectedId === conversation.id
               const imageUrl = conversation.vehicle_listings_public.images?.[0]?.url
+              const thumbKey = `list-${conversation.id}`
+              const thumbBroken = brokenThumbs[thumbKey]
               return (
                 <button
                   key={conversation.id}
@@ -233,8 +240,12 @@ export default function ConversationInbox() {
                   className={`conversation-thread-card ${isActive ? 'is-active' : ''}`}
                 >
                   <span className="conversation-thread-thumb">
-                    {imageUrl ? (
-                      <img src={imageUrl} alt={conversation.vehicle_listings_public.title} />
+                    {imageUrl && !thumbBroken ? (
+                      <img
+                        src={imageUrl}
+                        alt={conversation.vehicle_listings_public.title}
+                        onError={() => markThumbBroken(thumbKey)}
+                      />
                     ) : (
                       <CarFront className="h-5 w-5" strokeWidth={1.6} />
                     )}
@@ -278,8 +289,12 @@ export default function ConversationInbox() {
             <div className="conversation-chat-head">
               <div className="conversation-chat-car">
                 <span className="conversation-chat-thumb">
-                  {selectedConversation.vehicle_listings_public.images?.[0]?.url ? (
-                    <img src={selectedConversation.vehicle_listings_public.images[0].url} alt={selectedConversation.vehicle_listings_public.title} />
+                  {selectedConversation.vehicle_listings_public.images?.[0]?.url && !brokenThumbs[`chat-${selectedConversation.id}`] ? (
+                    <img
+                      src={selectedConversation.vehicle_listings_public.images[0].url}
+                      alt={selectedConversation.vehicle_listings_public.title}
+                      onError={() => markThumbBroken(`chat-${selectedConversation.id}`)}
+                    />
                   ) : (
                     <CarFront className="h-5 w-5" strokeWidth={1.6} />
                   )}

@@ -2748,13 +2748,14 @@ p {
   border-color: transparent;
   border-radius: 20px 20px 6px 20px;
   background: var(--ink);
-  color: var(--white);
+  color: #FFFDF3;
 }
 
 .conversation-bubble p {
   font-size: 14px;
   line-height: 1.55;
   overflow-wrap: anywhere;
+  color: inherit;
 }
 
 .conversation-bubble time {
@@ -2766,7 +2767,15 @@ p {
 }
 
 .conversation-bubble.is-mine time {
-  color: rgba(255,255,255,.58);
+  color: rgba(255,253,243,.7);
+}
+
+.conversation-bubble.is-mine p {
+  color: #FFFDF3;
+}
+
+.conversation-bubble:not(.is-mine) p {
+  color: #0A0A0A;
 }
 
 .conversation-composer-wrap {
