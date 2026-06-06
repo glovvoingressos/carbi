@@ -55,6 +55,11 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = getSupabaseServerClient(auth.accessToken)
+    const generatedTitle = `${payload.brand} ${payload.model} ${payload.year_model}${payload.version ? ` ${payload.version}` : ''}`
+      .replace(/\s+/g, ' ')
+      .trim()
+    const resolvedTitle = payload.title?.trim() || generatedTitle
+    const resolvedBodyType = payload.body_type?.trim() || 'Não informado'
 
     // Limite de anúncios grátis
     const { count: activeCount, error: countError } = await supabase
@@ -79,7 +84,7 @@ export async function POST(req: NextRequest) {
       transmission: payload.transmission.trim(),
       fuel: payload.fuel.trim(),
       color: payload.color.trim(),
-      body_type: payload.body_type.trim(),
+      body_type: resolvedBodyType,
       engine: payload.engine?.trim() || null,
       horsepower: payload.horsepower || null,
       doors: payload.doors || null,
@@ -105,8 +110,8 @@ export async function POST(req: NextRequest) {
     const insertPayload = {
       user_id: auth.userId,
       vehicle_id: vehicle.id,
-      title: payload.title.trim(),
-      description: payload.description.trim(),
+      title: resolvedTitle,
+      description: payload.description?.trim() || '',
       brand: payload.brand.trim(),
       model: payload.model.trim(),
       version: payload.version?.trim() || null,
@@ -117,7 +122,7 @@ export async function POST(req: NextRequest) {
       transmission: payload.transmission.trim(),
       fuel: payload.fuel.trim(),
       color: payload.color.trim(),
-      body_type: payload.body_type.trim(),
+      body_type: resolvedBodyType,
       city: payload.city.trim(),
       state: payload.state.trim().toUpperCase(),
       optional_items: payload.optional_items || [],

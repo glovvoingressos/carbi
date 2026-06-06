@@ -20,10 +20,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: errors[0], details: errors }, { status: 400 })
     }
 
-    const supabase = getSupabaseServerClient(auth.accessToken)
+    const listingReader = getSupabaseServerClient()
 
-    const { data: listing, error: listingError } = await supabase
-      .from('vehicle_listings')
+    const { data: listing, error: listingError } = await listingReader
+      .from('vehicle_listings_public')
       .select('id, user_id, status, accepts_offers, price')
       .eq('id', body.listing_id)
       .single()
@@ -43,6 +43,8 @@ export async function POST(req: NextRequest) {
     if (listing.accepts_offers === false) {
       return NextResponse.json({ error: 'Este vendedor não está aceitando ofertas no momento.' }, { status: 400 })
     }
+
+    const supabase = getSupabaseServerClient(auth.accessToken)
 
     const { data: existingPending, error: pendingError } = await supabase
       .from('offers')
@@ -105,6 +107,7 @@ export async function GET(req: NextRequest) {
     }
 
     const supabase = getSupabaseServerClient(auth.accessToken)
+    const listingReader = getSupabaseServerClient()
     const listingId = req.nextUrl.searchParams.get('listingId')
     const role = req.nextUrl.searchParams.get('role')
 
@@ -115,8 +118,8 @@ export async function GET(req: NextRequest) {
 
     if (listingId) {
       query = query.eq('listing_id', listingId)
-      const { data: listing } = await supabase
-        .from('vehicle_listings')
+      const { data: listing } = await listingReader
+        .from('vehicle_listings_public')
         .select('user_id')
         .eq('id', listingId)
         .single()

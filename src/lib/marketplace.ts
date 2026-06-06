@@ -170,16 +170,12 @@ export function getFipeComparison(
 export function validateListingPayload(payload: ListingFormPayload): string[] {
   const errors: string[] = []
 
-  if (!payload.title || payload.title.trim().length < 8) errors.push('Título deve ter pelo menos 8 caracteres.')
-  if (payload.description && payload.description.trim().length > 0 && payload.description.trim().length < 20) {
-    errors.push('Descrição, quando informada, deve ter pelo menos 20 caracteres.')
-  }
   if (!payload.brand?.trim()) errors.push('Marca é obrigatória.')
   if (!payload.model?.trim()) errors.push('Modelo é obrigatório.')
+  if (!payload.version?.trim()) errors.push('Versão é obrigatória.')
   if (!payload.transmission?.trim()) errors.push('Câmbio é obrigatório.')
   if (!payload.fuel?.trim()) errors.push('Combustível é obrigatório.')
   if (!payload.color?.trim()) errors.push('Cor é obrigatória.')
-  if (!payload.body_type?.trim()) errors.push('Carroceria é obrigatória.')
   if (!payload.city?.trim()) errors.push('Cidade é obrigatória.')
   if (!/^[A-Za-z]{2}$/.test(payload.state || '')) errors.push('Estado deve conter 2 letras.')
   if (!Number.isFinite(payload.year) || payload.year < 1950 || payload.year > 2100) errors.push('Ano inválido.')

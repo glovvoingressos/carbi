@@ -434,6 +434,7 @@ export default function ListingForm() {
     setForm((prev) => ({
       ...prev,
       fuel: selected?.fuelType || prev.fuel,
+      version: selected?.name || prev.version,
     }))
   }, [selectedYear, selectedVersionCode, versions])
 
@@ -578,6 +579,42 @@ export default function ListingForm() {
   }, [fipeResult])
   const comparison = useMemo(() => getFipeComparison(priceNumber, fipeNumber), [priceNumber, fipeNumber])
   const hasAskingPrice = form.price.trim().length > 0 && priceNumber > 0
+  const resolvedTransmissionValue = form.transmission || (technical.transmission !== 'Não informado' ? technical.transmission : '')
+  const resolvedFuelValue = form.fuel || (technical.fuel !== 'Não informado' ? technical.fuel : '')
+  const resolvedBodyTypeValue = form.bodyType || (technical.category !== 'Não informado' ? technical.category : '')
+  const requiredItems = [
+    { label: 'Marca', complete: Boolean(form.brand.trim()) },
+    { label: 'Modelo', complete: Boolean(form.model.trim()) },
+    { label: 'Versão', complete: Boolean(form.version.trim()) },
+    { label: 'Ano', complete: Boolean(form.year.trim() && form.yearModel.trim()) },
+    { label: 'Quilometragem', complete: Boolean(form.mileage.trim()) },
+    { label: 'Combustível', complete: Boolean(resolvedFuelValue.trim()) },
+    { label: 'Câmbio', complete: Boolean(resolvedTransmissionValue.trim()) },
+    { label: 'Cor', complete: Boolean(form.color.trim()) },
+    { label: 'Preço', complete: hasAskingPrice },
+    { label: 'Cidade', complete: Boolean(form.city.trim()) },
+    { label: 'Estado', complete: /^[A-Za-z]{2}$/.test(form.state) },
+    { label: 'Fotos', complete: images.length > 0 },
+  ]
+  const recommendedItems = [
+    { label: 'Descrição', complete: form.description.trim().length >= 20 },
+    { label: 'Opcionais', complete: normalizeOptionalItems(form.optionalItems).length > 0 },
+    { label: 'FIPE consultada', complete: Boolean(fipeResult?.price) },
+    { label: 'Categoria', complete: Boolean(resolvedBodyTypeValue.trim()) },
+    { label: 'Motor', complete: Boolean(form.engine.trim() || technical.engine !== 'Não informado') },
+    { label: 'Potência', complete: Boolean(form.horsepower.trim() || technical.horsepower !== 'Não informado') },
+    { label: 'Final de placa', complete: Boolean(form.plateFinal.trim()) },
+    { label: 'Portas', complete: Boolean(form.doors.trim()) },
+    { label: 'VIN', complete: Boolean(form.vin.trim()) },
+  ]
+  const requiredCompleted = requiredItems.filter((item) => item.complete).length
+  const recommendedCompleted = recommendedItems.filter((item) => item.complete).length
+  const missingRequiredLabels = requiredItems.filter((item) => !item.complete).map((item) => item.label)
+  const qualityScore = Math.min(
+    100,
+    Math.round((requiredCompleted / requiredItems.length) * 65 + (recommendedCompleted / recommendedItems.length) * 35),
+  )
+  const qualityLabel = qualityScore >= 100 ? 'Máxima Transparência' : qualityScore >= 95 ? 'Anúncio Completo' : 'Anúncio Básico'
 
   const handleInput = (field: keyof FormState, value: string) => {
     if (field === 'title') setTitleTouched(true)
@@ -645,20 +682,23 @@ export default function ListingForm() {
       if (!form.vehicle_type) {
         return 'Selecione o tipo de veículo.'
       }
-      if (!selectedBrandCode || !selectedModelCode || !selectedYear || !form.brand || !form.model || !form.year || !form.yearModel) {
-        return 'Selecione marca, modelo e ano para continuar.'
+      if (!selectedBrandCode || !selectedModelCode || !selectedYear || !form.brand || !form.model || !form.year || !form.yearModel || !form.version.trim()) {
+        return 'Selecione marca, modelo, ano e versão para continuar.'
       }
     }
 
     if (step === 2) {
-      if (!form.price || !form.mileage || !form.city || !form.state || !form.description.trim()) {
-        return 'Preencha preço, quilometragem, cidade, estado e descrição.'
+      if (!form.price || !form.mileage || !form.city || !form.state || !form.color || !resolvedFuelValue || !resolvedTransmissionValue) {
+        return 'Preencha preço, quilometragem, combustível, câmbio, cor, cidade e estado.'
       }
+      if (images.length === 0) {
+        return 'Adicione pelo menos 1 foto para publicar.'
       }
+    }
 
     if (step === 3) {
-      if (!form.price || !form.mileage || !form.city || !form.state || !form.description.trim()) {
-        return 'Complete preço, quilometragem, localização e descrição antes de publicar.'
+      if (missingRequiredLabels.length > 0) {
+        return `Complete os dados obrigatórios: ${missingRequiredLabels.join(', ')}.`
       }
     }
 
@@ -735,12 +775,16 @@ export default function ListingForm() {
         : technical.horsepower !== 'Não informado'
           ? Number(technical.horsepower.replace(/[^\d]/g, ''))
           : null
+      const generatedTitle = `${form.brand} ${form.model} ${form.yearModel}${form.version ? ` ${form.version}` : ''}`
+        .replace(/\s+/g, ' ')
+        .trim()
+      const resolvedTitle = form.title.trim().length >= 8 ? form.title.trim() : generatedTitle
 
       const createResponse = await fetch('/api/marketplace/listings', {
         method: 'POST',
         headers: authHeader(session.access_token),
         body: JSON.stringify({
-          title: form.title,
+          title: resolvedTitle,
           description: form.description,
           vehicle_type: form.vehicle_type,
           brand: form.brand,
@@ -786,30 +830,30 @@ export default function ListingForm() {
 
       const uploaded: Array<{ storage_path: string; public_url: string; sort_order: number; is_primary: boolean }> = []
 
-      for (let i = 0; i < images.length; i += 1) {
-        const image = images[i]
-        const sanitizedName = image.file.name.replace(/[^a-zA-Z0-9_.-]/g, '-')
-        const storagePath = `${session.user.id}/${created.id}/${String(i + 1).padStart(2, '0')}-${Date.now()}-${sanitizedName}`
+      try {
+        for (let i = 0; i < images.length; i += 1) {
+          const image = images[i]
+          const sanitizedName = image.file.name.replace(/[^a-zA-Z0-9_.-]/g, '-')
+          const storagePath = `${session.user.id}/${created.id}/${String(i + 1).padStart(2, '0')}-${Date.now()}-${sanitizedName}`
 
-        const { error: uploadError } = await supabase.storage
-          .from('vehicle-listings')
-          .upload(storagePath, image.file, { upsert: false, contentType: image.file.type })
+          const { error: uploadError } = await supabase.storage
+            .from('vehicle-listings')
+            .upload(storagePath, image.file, { upsert: false, contentType: image.file.type })
 
-        if (uploadError) {
-          throw new Error(`Falha no upload de imagem: ${uploadError.message}`)
+          if (uploadError) {
+            throw new Error(`Falha no upload de imagem: ${uploadError.message}`)
+          }
+
+          const { data: urlData } = supabase.storage.from('vehicle-listings').getPublicUrl(storagePath)
+
+          uploaded.push({
+            storage_path: storagePath,
+            public_url: urlData.publicUrl,
+            sort_order: i,
+            is_primary: i === 0,
+          })
         }
 
-        const { data: urlData } = supabase.storage.from('vehicle-listings').getPublicUrl(storagePath)
-
-        uploaded.push({
-          storage_path: storagePath,
-          public_url: urlData.publicUrl,
-          sort_order: i,
-          is_primary: i === 0,
-        })
-      }
-
-      if (uploaded.length > 0) {
         const imageResponse = await fetch(`/api/marketplace/listings/${created.id}/images`, {
           method: 'POST',
           headers: authHeader(session.access_token),
@@ -820,6 +864,16 @@ export default function ListingForm() {
           const body = await imageResponse.json().catch(() => ({}))
           throw new Error(body.error || 'Falha ao persistir imagens do anúncio.')
         }
+      } catch (imageError) {
+        const uploadedPaths = uploaded.map((image) => image.storage_path).filter(Boolean)
+        if (uploadedPaths.length > 0) {
+          await supabase.storage.from('vehicle-listings').remove(uploadedPaths)
+        }
+        await fetch(`/api/marketplace/listings/${created.id}`, {
+          method: 'DELETE',
+          headers: authHeader(session.access_token),
+        }).catch(() => null)
+        throw imageError
       }
 
       localStorage.removeItem(DRAFT_KEY)
@@ -871,7 +925,7 @@ export default function ListingForm() {
         </div>
         <p className="label text-[#10B981]">
           {currentStep === 1 && 'Etapa 1 de 3: Selecione seu carro'}
-          {currentStep === 2 && 'Etapa 2 de 3: Preço, descrição e fotos'}
+          {currentStep === 2 && 'Etapa 2 de 3: Preço, dados básicos e fotos'}
           {currentStep === 3 && 'Etapa 3 de 3: Revisar e publicar'}
         </p>
       </div>
@@ -1054,8 +1108,14 @@ export default function ListingForm() {
                       <span className="ml-3 text-sm text-[#525252]">Carregando versões...</span>
                     </div>
                   ) : (
-                    <div className="text-center py-6">
+                    <div className="text-center py-6 space-y-3">
                       <p className="text-sm text-[#525252]">Nenhuma versão encontrada para esta combinação.</p>
+                      <input
+                        className="input text-center"
+                        placeholder="Informe a versão do veículo"
+                        value={form.version}
+                        onChange={(e) => handleInput('version', e.target.value)}
+                      />
                       <button type="button" onClick={prevStep} className="text-sm text-[#10B981] font-medium mt-2 hover:underline">
                         Voltar e escolher outro ano
                       </button>
@@ -1106,21 +1166,30 @@ export default function ListingForm() {
         {currentStep === 2 && (
           <div className="space-y-8 max-[330px]:space-y-5">
             <div>
-              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Preço e descrição</h3>
+              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Dados essenciais</h3>
               <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
-                Preencha os detalhes para atrair mais compradores.
+                Só pedimos o necessário para publicar rápido. O restante pode ser completado depois.
               </p>
             </div>
             
             <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
               <input className="input" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} />
               <input className="input" placeholder="Quilometragem" value={formatBrazilianInt(form.mileage)} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
+              <input className="input" placeholder="Combustível" value={form.fuel || resolvedFuelValue} onChange={(e) => handleInput('fuel', e.target.value)} />
+              <input className="input" placeholder="Câmbio" value={form.transmission || resolvedTransmissionValue} onChange={(e) => handleInput('transmission', e.target.value)} />
+              <input className="input" placeholder="Cor" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
               <input className="input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
               <input className="input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
             </div>
 
-            <textarea className="input min-h-[120px] py-3 resize-none leading-relaxed max-[330px]:min-h-[100px]" placeholder="Descrição do veículo... Destaque os pontos fortes, manutenções recentes e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
-            <input className="input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
+            <div className="rounded-[24px] border border-[#EAEAE8] bg-[#FAFAF9] p-4 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="label text-[#16855C]">Recomendado, não obrigatório</p>
+                <span className="text-[11px] font-bold text-[#525252]">Pode completar depois</span>
+              </div>
+              <textarea className="input min-h-[120px] py-3 resize-none leading-relaxed max-[330px]:min-h-[100px]" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
+              <input className="input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
+            </div>
 
 
 
@@ -1139,7 +1208,7 @@ export default function ListingForm() {
               <span className="badge badge-brand text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens</span>
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
             </label>
-            <p className="text-xs text-[#A3A3A3] text-center">Você pode publicar sem foto e enviar depois no painel.</p>
+            <p className="text-xs text-[#525252] text-center">Inclua pelo menos 1 foto para publicar. Você pode reorganizar e completar até 10 fotos depois.</p>
 
             {images.length > 0 && (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8 max-[330px]:grid-cols-1 max-[330px]:gap-4">
@@ -1172,6 +1241,38 @@ export default function ListingForm() {
               <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
                 Confira os detalhes antes de finalizar.
               </p>
+            </div>
+
+            <div className="rounded-[28px] border border-[#17170F]/10 bg-[#D9F85F] p-5 shadow-sm max-[330px]:p-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <p className="label text-[#1A2F1E]">{qualityLabel}</p>
+                  <h4 className="mt-2 text-3xl font-black tracking-[-0.04em] text-[#17170F] max-[330px]:text-2xl">
+                    {qualityScore}/100
+                  </h4>
+                </div>
+                <div className="min-w-[180px] flex-1">
+                  <div className="h-3 overflow-hidden rounded-full bg-white/70">
+                    <div className="h-full rounded-full bg-[#1A2F1E] transition-all duration-500" style={{ width: `${qualityScore}%` }} />
+                  </div>
+                  <p className="mt-2 text-xs font-bold text-[#1A2F1E]/80">
+                    Seu anúncio pode ser publicado como básico. Depois, complete mais dados para aumentar a confiança.
+                  </p>
+                </div>
+              </div>
+              {missingRequiredLabels.length > 0 ? (
+                <p className="mt-4 rounded-2xl bg-white/70 p-3 text-xs font-bold text-[#1A2F1E]">
+                  Faltam obrigatórios: {missingRequiredLabels.join(', ')}.
+                </p>
+              ) : (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {recommendedItems.filter((item) => !item.complete).slice(0, 4).map((item) => (
+                    <span key={item.label} className="rounded-full bg-white/75 px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#1A2F1E]">
+                      Completar {item.label.toLowerCase()}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             
             <div className="card p-5 relative overflow-hidden max-[330px]:p-4">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
 import { getCarImageUrl } from '@/lib/car-image-fallback'
 
@@ -17,38 +17,38 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
   const [activeIndex, setActiveIndex] = useState(0)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const failedRef = useRef<Set<string>>(new Set())
-  const trackRef = useRef<HTMLDivElement | null>(null)
   const [, forceRender] = useState(0)
-
-  useEffect(() => {
-    if (!gallery.length) return
-    const nextIndex = Math.min(activeIndex, gallery.length - 1)
-    const slide = trackRef.current?.children[nextIndex] as HTMLElement | undefined
-    slide?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
-  }, [activeIndex, gallery.length])
+  const visibleGallery = gallery.filter((url) => !failedRef.current.has(url))
 
   const handleImageError = useCallback((url: string) => {
     if (!failedRef.current.has(url)) {
       failedRef.current.add(url)
-      setActiveIndex((currentIndex) => {
-        const currentUrl = gallery[currentIndex]
-        if (currentUrl === url && currentIndex < gallery.length - 1) {
-          return currentIndex + 1
-        }
-        return currentIndex
-      })
       forceRender((n) => n + 1)
     }
-  }, [gallery])
-
-  const hasFailed = useCallback((url: string) => failedRef.current.has(url), [])
+  }, [])
 
   if (!gallery.length) return null
+  if (visibleGallery.length === 0) {
+    return (
+      <div className="space-y-3 max-[330px]:space-y-2">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[32px] bg-[#FFF8DF] shadow-xl border border-white/70 max-[330px]:rounded-[24px]">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/80 border border-white/70 shadow-sm">
+              <ImageIcon className="h-8 w-8 text-[#8A95A8]" />
+            </div>
+            <p className="text-[12px] font-bold uppercase tracking-[0.24em] text-[#525252]">
+              Imagem indisponível
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
-  const safeIndex = Math.min(activeIndex, gallery.length - 1)
+  const safeIndex = Math.min(activeIndex, visibleGallery.length - 1)
 
-  const goPrev = () => setActiveIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1))
-  const goNext = () => setActiveIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1))
+  const goPrev = () => setActiveIndex((prev) => (prev === 0 ? visibleGallery.length - 1 : prev - 1))
+  const goNext = () => setActiveIndex((prev) => (prev === visibleGallery.length - 1 ? 0 : prev + 1))
 
   return (
     <div className="space-y-3 max-[330px]:space-y-2">
@@ -67,48 +67,27 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
         }}
       >
         <div
-          ref={trackRef}
-          className="no-scrollbar flex h-full w-full overflow-x-auto scroll-smooth snap-x snap-mandatory"
-          onScroll={(event) => {
-            const track = event.currentTarget
-            const childWidth = track.clientWidth
-            if (!childWidth) return
-            const index = Math.round(track.scrollLeft / childWidth)
-            setActiveIndex((current) => (current === index ? current : index))
-          }}
+          className="flex h-full w-full transition-transform duration-500 ease-out"
+          style={{ transform: `translateX(-${safeIndex * 100}%)` }}
         >
-          {gallery.map((image, index) => {
-            const isFailed = hasFailed(image)
-            return (
-              <div key={`${image}-${index}`} className="relative h-full w-full flex-shrink-0 snap-start">
-                {isFailed ? (
-                  <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center gap-2 bg-[#FFF8DF] p-4">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/70 border border-white/70">
-                      <ImageIcon className="h-7 w-7 text-[#8A95A8]" />
-                    </div>
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-[#8A95A8]">
-                      Imagem indisponível
-                    </p>
-                  </div>
-                ) : (
-                  <img
-                    src={image}
-                    alt={`${title} foto ${index + 1}`}
-                    width={1080}
-                    height={1080}
-                    className="block h-full w-full object-cover object-center"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
-                    loading={index === 0 ? 'eager' : 'lazy'}
-                    decoding="async"
-                    onError={() => handleImageError(image)}
-                  />
-                )}
-              </div>
-            )
-          })}
+          {visibleGallery.map((image, index) => (
+            <div key={`${image}-${index}`} className="relative h-full w-full flex-shrink-0">
+              <img
+                src={image}
+                alt={`${title} foto ${index + 1}`}
+                width={1080}
+                height={1080}
+                className="block h-full w-full object-cover object-center"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+                onError={() => handleImageError(image)}
+              />
+            </div>
+          ))}
         </div>
 
-        {gallery.length > 1 ? (
+        {visibleGallery.length > 1 ? (
           <>
             <button
               type="button"
@@ -128,7 +107,7 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
             </button>
 
             <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/60 bg-white/80 px-3 py-2 shadow-lg backdrop-blur-sm">
-              {gallery.map((_, index) => (
+              {visibleGallery.map((_, index) => (
                 <button
                   key={`dot-${index}`}
                   type="button"
@@ -143,11 +122,10 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
         ) : null}
       </div>
 
-      {gallery.length > 1 ? (
+      {visibleGallery.length > 1 ? (
         <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1 max-[330px]:gap-1.5">
-          {gallery.map((image, index) => {
+          {visibleGallery.map((image, index) => {
             const isActive = index === safeIndex
-            const thumbFailed = hasFailed(image)
             return (
               <button
                 key={`${image}-${index}`}
@@ -158,23 +136,17 @@ export default function ListingImageGallery({ images, title }: ListingImageGalle
                 }`}
                 aria-label={`Abrir foto ${index + 1}`}
               >
-                {thumbFailed ? (
-                  <div className="flex h-full w-full items-center justify-center bg-[#FFF8DF]">
-                    <ImageIcon className="h-5 w-5 text-[#8A95A8]" />
-                  </div>
-                ) : (
-                  <img
-                    src={image}
-                    alt={`${title} miniatura ${index + 1}`}
-                    width={1080}
-                    height={1080}
-                    className="block h-full w-full object-cover object-center"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
-                    loading="lazy"
-                    decoding="async"
-                    onError={() => handleImageError(image)}
-                  />
-                )}
+                <img
+                  src={image}
+                  alt={`${title} miniatura ${index + 1}`}
+                  width={1080}
+                  height={1080}
+                  className="block h-full w-full object-cover object-center"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+                  loading="lazy"
+                  decoding="async"
+                  onError={() => handleImageError(image)}
+                />
               </button>
             )
           })}

@@ -21,9 +21,10 @@ export async function POST(
     const body = (await req.json().catch(() => ({}))) as { firstMessage?: string }
 
     const supabase = getSupabaseServerClient(auth.accessToken)
+    const listingReader = getSupabaseServerClient()
 
-    const { data: listing, error: listingError } = await supabase
-      .from('vehicle_listings')
+    const { data: listing, error: listingError } = await listingReader
+      .from('vehicle_listings_public')
       .select('id, user_id, status')
       .eq('id', listingId)
       .single()
