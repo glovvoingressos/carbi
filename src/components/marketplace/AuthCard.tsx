@@ -10,12 +10,13 @@ interface Props {
   onAuthenticated?: () => void
   compact?: boolean
   redirectTo?: string
+  defaultMode?: 'login' | 'signup'
 }
 
-export default function AuthCard({ onAuthenticated, compact = false, redirectTo }: Props) {
+export default function AuthCard({ onAuthenticated, compact = false, redirectTo, defaultMode = 'login' }: Props) {
   const router = useRouter()
   const supabaseReady = isSupabaseBrowserConfigured()
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
+  const [mode, setMode] = useState<'login' | 'signup'>(defaultMode)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -77,7 +78,11 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo 
   }
 
   return (
-    <div className={`surface-strong ${compact ? 'p-6' : 'p-8 md:p-10'}`}>
+    <div className={`surface-strong auth-card-shell ${compact ? 'p-6' : 'p-8 md:p-10'}`}>
+      <div className="auth-card-topline">
+        <span>{mode === 'login' ? 'Acesso rápido' : 'Anúncio grátis'}</span>
+        <span>FIPE integrada</span>
+      </div>
       <h2 className="text-[24px] md:text-[28px] font-semibold tracking-tight text-[#0A0A0A] text-balance">
         {mode === 'login' ? 'Entre na sua conta' : 'Crie sua conta'}
       </h2>

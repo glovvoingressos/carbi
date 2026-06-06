@@ -14,7 +14,7 @@ type ProfileRow = {
 
 export default function ProfilePanel() {
   const supabaseReady = isSupabaseBrowserConfigured()
-  const [sessionReady, setSessionReady] = useState(false)
+  const [sessionReady, setSessionReady] = useState(!supabaseReady)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [email, setEmail] = useState('')
@@ -27,8 +27,6 @@ export default function ProfilePanel() {
 
   useEffect(() => {
     if (!supabaseReady) {
-      setSessionReady(true)
-      setIsAuthenticated(false)
       return
     }
 
@@ -157,23 +155,47 @@ export default function ProfilePanel() {
   }
 
   return (
-    <section className="surface-strong p-8 md:p-10">
-      <h1 className="text-[28px] font-semibold tracking-tight text-[#0A0A0A]">Configurações</h1>
-      <p className="mt-2 text-[15px] text-[#52607A]">Atualize seu nome e sua foto de perfil.</p>
+    <section className="profile-panel surface-strong p-8 md:p-10">
+      <div className="profile-panel-head">
+        <div>
+          <span className="auth-hero-kicker">Perfil do usuário</span>
+          <h2>Configurações</h2>
+          <p>Atualize seu nome e sua foto de perfil.</p>
+        </div>
+        <span className="profile-panel-chip">Conta ativa</span>
+      </div>
 
-      <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-5">
-        {avatarUrl ? (
-          <img src={avatarUrl} alt="Foto de perfil" className="w-24 h-24 rounded-full object-cover border border-white/70 shadow-sm" />
-        ) : (
-          <div className="w-24 h-24 rounded-full bg-[#FFF8DF] flex items-center justify-center border border-[#17170F]/10">
-            <User className="w-9 h-9 text-[#8A95A8]" strokeWidth={1.5} />
+      <div className="profile-panel-split">
+        <div className="profile-avatar-card">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="Foto de perfil" />
+          ) : (
+            <div className="profile-avatar-fallback">
+              <User className="w-9 h-9 text-[#8A95A8]" strokeWidth={1.5} />
+            </div>
+          )}
+          <label className="btn btn-secondary cursor-pointer profile-avatar-button">
+            <Upload className="w-4 h-4" strokeWidth={1.75} />
+            <span>{uploading ? 'Enviando...' : 'Trocar foto'}</span>
+            <input type="file" className="hidden" accept="image/png,image/jpeg,image/webp" onChange={handleAvatarUpload} />
+          </label>
+        </div>
+
+        <div className="profile-summary-card">
+          <p className="profile-summary-label">Resumo da conta</p>
+          <div className="profile-summary-row">
+            <span>Nome</span>
+            <strong>{fullName || 'Não informado'}</strong>
           </div>
-        )}
-        <label className="btn btn-secondary cursor-pointer">
-          <Upload className="w-4 h-4" strokeWidth={1.75} />
-          <span>{uploading ? 'Enviando...' : 'Trocar foto'}</span>
-          <input type="file" className="hidden" accept="image/png,image/jpeg,image/webp" onChange={handleAvatarUpload} />
-        </label>
+          <div className="profile-summary-row">
+            <span>E-mail</span>
+            <strong>{email || 'Não informado'}</strong>
+          </div>
+          <div className="profile-summary-row">
+            <span>Status</span>
+            <strong>Chat interno ativo</strong>
+          </div>
+        </div>
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -196,10 +218,13 @@ export default function ProfilePanel() {
         </div>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-8 flex flex-wrap items-center gap-3">
         <button onClick={saveProfile} disabled={saving || uploading} className="btn btn-primary">
           {saving ? 'Salvando...' : 'Salvar alterações'}
         </button>
+        <p className="text-[12px] text-[#8A95A8] tracking-tight">
+          Alterações salvas no banco real e refletidas no perfil da conta.
+        </p>
       </div>
 
       {error && <p className="mt-4 text-[13px] text-[#DC2626] tracking-tight">{error}</p>}

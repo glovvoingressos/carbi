@@ -13,53 +13,53 @@ export const metadata: Metadata = {
 
 export default function MinhaContaPage() {
   return (
-    <main className="min-h-screen pb-16 pt-28">
-      <div className="container max-w-4xl">
-        <section className="hero-bento p-8 sm:p-12">
-          <p className="section-kicker">Minha conta</p>
-          <h1 className="mt-3 text-balance">Seu painel de perfil</h1>
-          <p className="mt-3 text-lg font-medium text-[#52607A]">
-            Acesse seus anúncios, chats e ação rápida para publicar um novo veículo.
+    <main className="profile-page-shell">
+      <div className="profile-page-grid">
+        <section className="profile-hero surface-strong">
+          <span className="auth-hero-kicker">Minha conta</span>
+          <h1 className="auth-hero-title">Organize anúncios, conversas e dados do perfil em um só lugar.</h1>
+          <p className="auth-hero-copy">
+            Uma área de conta consistente com a home e com a página do anúncio, focada em gestão rápida e leitura limpa.
           </p>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            <Link href="/minha-conta/anuncios" className="surface p-6 transition-all hover:-translate-y-1 hover:border-[#17170F]/30 hover:bg-[#D9F85F] group">
-              <div className="flex items-center gap-3 text-[#0A0A0A] group-hover:text-white transition-colors">
+          <div className="profile-actions-grid">
+            <Link href="/minha-conta/anuncios" className="profile-action-card">
+              <div className="profile-action-top">
                 <LayoutDashboard className="h-5 w-5" />
-                <span className="text-base font-black">Meus anúncios</span>
+                <span>Meus anúncios</span>
               </div>
-              <p className="mt-2 text-sm font-medium text-[#52607A] group-hover:text-[#52607A] transition-colors">Editar fotos, preço e descrição.</p>
+              <p>Editar fotos, preço, descrição e status.</p>
             </Link>
 
-            <Link href="/minha-conta/conversas" className="surface p-6 transition-all hover:-translate-y-1 hover:border-[#17170F]/30 hover:bg-[#D9F85F] group">
-              <div className="flex items-center gap-3 text-[#0A0A0A] group-hover:text-white transition-colors">
+            <Link href="/minha-conta/conversas" className="profile-action-card">
+              <div className="profile-action-top">
                 <MessageCircle className="h-5 w-5" />
-                <span className="text-base font-black">Meus chats</span>
+                <span>Meus chats</span>
               </div>
-              <p className="mt-2 text-sm font-medium text-[#52607A] group-hover:text-[#52607A] transition-colors">Acompanhar conversas com compradores.</p>
+              <p>Acompanhar conversas com compradores.</p>
             </Link>
 
-            <Link href="/anunciar-carro" className="surface p-6 transition-all hover:-translate-y-1 hover:border-[#17170F]/30 hover:bg-[#D9F85F] group">
-              <div className="flex items-center gap-3 text-[#0A0A0A] group-hover:text-white transition-colors">
+            <Link href="/anunciar-carro" className="profile-action-card">
+              <div className="profile-action-top">
                 <CarFront className="h-5 w-5" />
-                <span className="text-base font-black">Anunciar carro</span>
+                <span>Anunciar carro</span>
               </div>
-              <p className="mt-2 text-sm font-medium text-[#52607A] group-hover:text-[#52607A] transition-colors">Publicar novo anúncio em poucos passos.</p>
+              <p>Publicar novo anúncio em poucos passos.</p>
             </Link>
 
-            <Link href="/entrar" className="surface p-6 transition-all hover:-translate-y-1 hover:border-[#17170F]/30 hover:bg-[#D9F85F] group">
-              <div className="flex items-center gap-3 text-[#0A0A0A] group-hover:text-white transition-colors">
+            <Link href="/entrar" className="profile-action-card">
+              <div className="profile-action-top">
                 <UserRound className="h-5 w-5" />
-                <span className="text-base font-black">Login / Segurança</span>
+                <span>Login / Segurança</span>
               </div>
-              <p className="mt-2 text-sm font-medium text-[#52607A] group-hover:text-[#52607A] transition-colors">Entrar ou trocar de conta.</p>
+              <p>Entrar ou trocar de conta com segurança.</p>
             </Link>
           </div>
         </section>
 
-        <div className="mt-6">
+        <section className="profile-panel-wrap">
           <ProfilePanel />
-        </div>
+        </section>
       </div>
     </main>
   )

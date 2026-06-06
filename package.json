@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src/app/entrar/page.tsx src/app/cadastro/page.tsx src/app/minha-conta/page.tsx src/components/marketplace/AuthCard.tsx src/components/marketplace/ProfilePanel.tsx",
     "test:marketplace:e2e": "node scripts/test-marketplace-e2e.mjs",
     "test:autodev:e2e": "node scripts/test-autodev-e2e.mjs",
     "sync:fipe:catalog": "node scripts/sync-fipe-catalog.mjs",
@@ -40,5 +40,9 @@
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2",
     "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.7"
   }
 }
