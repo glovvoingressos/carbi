@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Fragment } from 'react'
 import Link from 'next/link'
+import { BadgeDollarSign, Megaphone, Share2 } from 'lucide-react'
 import FAQSection from '@/components/layout/FAQSection'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
 import { getLatestPublicListings } from '@/lib/marketplace-server'
@@ -81,83 +82,6 @@ function CarSilhouette({ dark = false }: { dark?: boolean }) {
       <circle cx="107" cy="51" r="10" fill={dark ? '#3a4058' : '#8898b8'} />
       <circle cx="107" cy="51" r="5" fill={dark ? '#c8f45a' : '#eef2fb'} />
       <path d="M46 18 L62 28 L80 28 L94 18 Z" fill={dark ? 'rgba(200,244,90,.3)' : '#c8d8ff'} fillOpacity=".7" />
-    </svg>
-  )
-}
-
-function ShareScene() {
-  return (
-    <svg viewBox="0 0 520 300" className="h-full w-full" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
-      <rect x="34" y="28" width="452" height="244" rx="42" fill="#1A2F1E" />
-      <rect x="184" y="48" width="152" height="212" rx="34" fill="#fbfbf9" />
-      <rect x="204" y="72" width="112" height="74" rx="18" fill="#C8F45A" />
-      <path d="M236 96h48" stroke="#1A2F1E" strokeWidth="10" strokeLinecap="round" />
-      <path d="M260 72v48" stroke="#1A2F1E" strokeWidth="10" strokeLinecap="round" />
-      <rect x="204" y="166" width="112" height="16" rx="8" fill="rgba(26,47,30,.82)" />
-      <rect x="204" y="194" width="88" height="14" rx="7" fill="rgba(26,47,30,.24)" />
-      <rect x="204" y="220" width="64" height="14" rx="7" fill="rgba(26,47,30,.16)" />
-      <rect x="64" y="92" width="126" height="112" rx="28" fill="#fbfbf9" />
-      <path d="M112 156H92c-14 0-25-11-25-25s11-25 25-25h20" stroke="#1A2F1E" strokeWidth="9" strokeLinecap="round" />
-      <path d="M138 106h20c14 0 25 11 25 25s-11 25-25 25h-20" stroke="#1A2F1E" strokeWidth="9" strokeLinecap="round" />
-      <path d="M108 131h52" stroke="#1A2F1E" strokeWidth="9" strokeLinecap="round" />
-      <rect x="354" y="92" width="126" height="112" rx="28" fill="#fbfbf9" />
-      <rect x="386" y="120" width="18" height="18" rx="4" fill="#1A2F1E" />
-      <rect x="414" y="120" width="18" height="18" rx="4" fill="#1A2F1E" />
-      <rect x="386" y="148" width="18" height="18" rx="4" fill="#1A2F1E" />
-      <rect x="414" y="148" width="18" height="18" rx="4" fill="#C8F45A" />
-      <path d="M190 150h38" stroke="#C8F45A" strokeWidth="8" strokeLinecap="round" strokeDasharray="2 16" />
-      <path d="M336 150h38" stroke="#C8F45A" strokeWidth="8" strokeLinecap="round" strokeDasharray="2 16" />
-    </svg>
-  )
-}
-
-function MonetizeScene() {
-  return (
-    <svg viewBox="0 0 560 300" className="h-full w-full" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
-      <rect x="36" y="30" width="492" height="238" rx="40" fill="#1A2F1E" />
-      <rect x="66" y="60" width="212" height="172" rx="28" fill="#fbfbf9" />
-      <text x="92" y="104" fill="#1A2F1E" fontSize="28" fontWeight="800" fontFamily="var(--font-sans)">R$ 29</text>
-      <text x="92" y="130" fill="rgba(26,47,30,.58)" fontSize="18" fontWeight="700" fontFamily="var(--font-sans)">por anúncio</text>
-      <path d="M92 190l34-28 30 12 48-52" stroke="#1A2F1E" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="92" cy="190" r="9" fill="#C8F45A" stroke="#1A2F1E" strokeWidth="5" />
-      <circle cx="126" cy="162" r="9" fill="#C8F45A" stroke="#1A2F1E" strokeWidth="5" />
-      <circle cx="156" cy="174" r="9" fill="#C8F45A" stroke="#1A2F1E" strokeWidth="5" />
-      <circle cx="204" cy="122" r="9" fill="#C8F45A" stroke="#1A2F1E" strokeWidth="5" />
-      <rect x="310" y="64" width="170" height="32" rx="16" fill="#fbfbf9" />
-      <rect x="310" y="112" width="170" height="32" rx="16" fill="#fbfbf9" />
-      <rect x="310" y="160" width="170" height="32" rx="16" fill="#fbfbf9" />
-      <rect x="310" y="208" width="170" height="32" rx="16" fill="#fbfbf9" />
-      <rect x="330" y="74" width="86" height="12" rx="6" fill="#1A2F1E" />
-      <rect x="330" y="122" width="116" height="12" rx="6" fill="#1A2F1E" />
-      <rect x="330" y="170" width="72" height="12" rx="6" fill="#1A2F1E" />
-      <rect x="330" y="218" width="102" height="12" rx="6" fill="#1A2F1E" />
-      <circle cx="462" cy="80" r="9" fill="#C8F45A" />
-      <circle cx="462" cy="128" r="9" fill="#C8F45A" />
-      <circle cx="462" cy="176" r="9" fill="#C8F45A" />
-      <circle cx="462" cy="224" r="9" fill="#C8F45A" />
-    </svg>
-  )
-}
-
-function ReachScene() {
-  return (
-    <svg viewBox="0 0 560 340" className="h-full w-full" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
-      <rect x="36" y="34" width="492" height="272" rx="42" fill="#1A2F1E" />
-      <circle cx="280" cy="170" r="52" fill="#C8F45A" />
-      <path d="M246 170h68" stroke="#1A2F1E" strokeWidth="9" strokeLinecap="round" />
-      <path d="M280 136v68" stroke="#1A2F1E" strokeWidth="9" strokeLinecap="round" />
-      <rect x="74" y="72" width="150" height="70" rx="22" fill="#fbfbf9" />
-      <rect x="336" y="72" width="150" height="70" rx="22" fill="#fbfbf9" />
-      <rect x="74" y="220" width="150" height="70" rx="22" fill="#fbfbf9" />
-      <rect x="336" y="220" width="150" height="70" rx="22" fill="#fbfbf9" />
-      <text x="102" y="114" fill="#1A2F1E" fontSize="22" fontWeight="800" fontFamily="var(--font-sans)">WhatsApp</text>
-      <text x="360" y="114" fill="#1A2F1E" fontSize="22" fontWeight="800" fontFamily="var(--font-sans)">Instagram</text>
-      <text x="114" y="262" fill="#1A2F1E" fontSize="22" fontWeight="800" fontFamily="var(--font-sans)">QR Code</text>
-      <text x="364" y="262" fill="#1A2F1E" fontSize="22" fontWeight="800" fontFamily="var(--font-sans)">Link único</text>
-      <path d="M224 118C244 130 258 144 266 156" stroke="#fbfbf9" strokeWidth="7" strokeLinecap="round" />
-      <path d="M336 118C316 130 302 144 294 156" stroke="#fbfbf9" strokeWidth="7" strokeLinecap="round" />
-      <path d="M224 252C244 240 258 224 266 204" stroke="#fbfbf9" strokeWidth="7" strokeLinecap="round" />
-      <path d="M336 252C316 240 302 224 294 204" stroke="#fbfbf9" strokeWidth="7" strokeLinecap="round" />
     </svg>
   )
 }
@@ -429,22 +353,22 @@ export default async function HomePage() {
       <section className="ref-sec-marble" style={{ padding: '0 40px 80px' }}>
         <div className="ref-container"><div className="ref-cards-grid">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-            <Link href="/anunciar-carro" className="ref-card-block ref-card-lavender" style={{ minWidth: 'unset', width: '100%', gap: 40 }}>
-              <div className="ref-card-img-area" style={{ overflow: 'hidden' }}>
-                <ShareScene />
+            <Link href="/anunciar-carro" className="ref-card-block ref-card-lavender ref-card-icon-only" style={{ minWidth: 'unset', width: '100%' }}>
+              <div className="ref-card-icon-badge">
+                <Share2 aria-hidden="true" />
               </div>
               <h3>Compartilhe tudo em um só link. Acesse de qualquer plataforma.</h3>
             </Link>
-            <Link href="/carros-a-venda" className="ref-card-block ref-card-lime" style={{ minWidth: 'unset', width: '100%', gap: 40 }}>
-              <div className="ref-card-img-area" style={{ overflow: 'hidden' }}>
-                <MonetizeScene />
+            <Link href="/carros-a-venda" className="ref-card-block ref-card-lime ref-card-icon-only" style={{ minWidth: 'unset', width: '100%' }}>
+              <div className="ref-card-icon-badge">
+                <BadgeDollarSign aria-hidden="true" />
               </div>
               <h3>Venda, receba pagamentos e monetize seu inventário.</h3>
             </Link>
           </div>
-          <Link href="/carros-a-venda" className="ref-card-block ref-card-iris" style={{ flex: 1.2, gap: 40 }}>
-            <div className="ref-card-img-area" style={{ height: 240, overflow: 'hidden' }}>
-              <ReachScene />
+          <Link href="/carros-a-venda" className="ref-card-block ref-card-iris ref-card-icon-only" style={{ flex: 1.2 }}>
+            <div className="ref-card-icon-badge">
+              <Megaphone aria-hidden="true" />
             </div>
             <h3>Cresça, alcance e engaje compradores em todos os canais.</h3>
           </Link>

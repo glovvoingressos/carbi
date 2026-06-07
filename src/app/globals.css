@@ -1221,7 +1221,20 @@ p {
 .ref-card-lavender .ref-card-img-area,
 .ref-card-lime .ref-card-img-area,
 .ref-card-iris .ref-card-img-area { background: transparent; }
-.ref-card-img-area svg { width: 100%; height: 100%; opacity: 1; display: block; transform: scale(1.24); transform-origin: center; }
+.ref-card-icon-only { min-height: 260px; justify-content: space-between; gap: 36px !important; }
+.ref-card-icon-badge {
+  width: 88px;
+  height: 88px;
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(251,251,249,.78);
+  color: var(--ink);
+  box-shadow: 0 14px 34px rgba(0,0,0,.12);
+}
+.ref-card-icon-badge svg { width: 42px; height: 42px; stroke-width: 1.8; }
+.ref-card-iris .ref-card-icon-badge { background: rgba(217,248,95,.95); color: #1A2F1E; }
 .ref-plans-grid { display: flex; gap: 20px; }
 .ref-plan-card { flex: 1; background: var(--white); border: 2px solid transparent; border-radius: 24px; padding: 36px 32px; transition: all .25s; }
 .ref-plan-card:hover { border-color: var(--iris); transform: translateY(-4px); }
