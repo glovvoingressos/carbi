@@ -1148,7 +1148,7 @@ p {
 .ref-content-half, .ref-img-half { flex: 1; min-width: 0; }
 .ref-section-h2 { font-size: clamp(36px, 4vw, 54px); font-weight: 700; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 20px; }
 .ref-section-p { font-size: 17px; line-height: 1.7; margin-bottom: 32px; }
-.ref-sec-hydrangea { background: var(--hydrangea); color: var(--white); }
+.ref-sec-hydrangea { background: #5A47D1; color: var(--white); }
 .ref-sec-hydrangea .ref-section-h2 { color: var(--chartreuse); }
 .ref-sec-hydrangea .ref-section-p { color: rgba(255,255,255,.7); }
 .ref-dashboard-mock { background: rgba(0,0,0,.25); border-radius: 24px; padding: 32px; border: 1px solid rgba(255,255,255,.1); min-height: 360px; }

@@ -7,6 +7,7 @@ import { ArrowUpRight, CarFront, Loader2, MessageSquare, Send, ShieldCheck } fro
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
+import { getCarImageUrl, resolveMarketplaceCarImage } from '@/lib/car-image-fallback'
 
 interface ConversationItem {
   id: string
@@ -17,6 +18,11 @@ interface ConversationItem {
   vehicle_listings_public: {
     slug: string
     title: string
+    brand: string
+    model: string
+    version: string | null
+    year: number
+    year_model: number
     price: number
     city: string
     state: string
@@ -49,7 +55,7 @@ export default function ConversationInbox() {
   const [loadingMessages, setLoadingMessages] = useState(false)
   const [messageText, setMessageText] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [brokenThumbs, setBrokenThumbs] = useState<Record<string, boolean>>({})
+  const [thumbStages, setThumbStages] = useState<Record<string, 'preferred' | 'fallback' | 'broken'>>({})
 
   const selectedConversation = useMemo(
     () => conversations.find((item) => item.id === selectedId) || null,
@@ -57,7 +63,25 @@ export default function ConversationInbox() {
   )
 
   const markThumbBroken = (key: string) => {
-    setBrokenThumbs((current) => (current[key] ? current : { ...current, [key]: true }))
+    setThumbStages((current) => (current[key] === 'broken' ? current : { ...current, [key]: 'broken' }))
+  }
+
+  const getConversationThumb = (
+    conversation: ConversationItem['vehicle_listings_public'],
+    key: string,
+  ) => {
+    const preferred = getCarImageUrl(conversation.images?.[0]?.url || null)
+    const fallback = resolveMarketplaceCarImage({
+      brand: conversation.brand,
+      model: conversation.model,
+      year: conversation.year_model || conversation.year,
+      preferredUrl: null,
+    })
+
+    const stage = thumbStages[key] || (preferred ? 'preferred' : fallback ? 'fallback' : 'broken')
+    const src = stage === 'preferred' ? preferred : fallback
+
+    return { src, stage, fallback }
   }
 
   useEffect(() => {
@@ -229,9 +253,8 @@ export default function ConversationInbox() {
           <div className="conversation-thread-stack">
             {conversations.map((conversation) => {
               const isActive = selectedId === conversation.id
-              const imageUrl = conversation.vehicle_listings_public.images?.[0]?.url
               const thumbKey = `list-${conversation.id}`
-              const thumbBroken = brokenThumbs[thumbKey]
+              const thumb = getConversationThumb(conversation.vehicle_listings_public, thumbKey)
               return (
                 <button
                   key={conversation.id}
@@ -240,11 +263,19 @@ export default function ConversationInbox() {
                   className={`conversation-thread-card ${isActive ? 'is-active' : ''}`}
                 >
                   <span className="conversation-thread-thumb">
-                    {imageUrl && !thumbBroken ? (
+                    {thumb.src ? (
                       <img
-                        src={imageUrl}
+                        src={thumb.src}
                         alt={conversation.vehicle_listings_public.title}
-                        onError={() => markThumbBroken(thumbKey)}
+                        loading="lazy"
+                        decoding="async"
+                        onError={() => {
+                          if (thumb.stage === 'preferred' && thumb.fallback) {
+                            setThumbStages((current) => ({ ...current, [thumbKey]: 'fallback' }))
+                            return
+                          }
+                          markThumbBroken(thumbKey)
+                        }}
                       />
                     ) : (
                       <CarFront className="h-5 w-5" strokeWidth={1.6} />
@@ -289,11 +320,21 @@ export default function ConversationInbox() {
             <div className="conversation-chat-head">
               <div className="conversation-chat-car">
                 <span className="conversation-chat-thumb">
-                  {selectedConversation.vehicle_listings_public.images?.[0]?.url && !brokenThumbs[`chat-${selectedConversation.id}`] ? (
+                  {getConversationThumb(selectedConversation.vehicle_listings_public, `chat-${selectedConversation.id}`).src ? (
                     <img
-                      src={selectedConversation.vehicle_listings_public.images[0].url}
+                      src={getConversationThumb(selectedConversation.vehicle_listings_public, `chat-${selectedConversation.id}`).src || ''}
                       alt={selectedConversation.vehicle_listings_public.title}
-                      onError={() => markThumbBroken(`chat-${selectedConversation.id}`)}
+                      loading="lazy"
+                      decoding="async"
+                      onError={() => {
+                        const key = `chat-${selectedConversation.id}`
+                        const thumb = getConversationThumb(selectedConversation.vehicle_listings_public, key)
+                        if (thumb.stage === 'preferred' && thumb.fallback) {
+                          setThumbStages((current) => ({ ...current, [key]: 'fallback' }))
+                          return
+                        }
+                        markThumbBroken(key)
+                      }}
                     />
                   ) : (
                     <CarFront className="h-5 w-5" strokeWidth={1.6} />

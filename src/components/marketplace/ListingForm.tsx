@@ -579,6 +579,42 @@ export default function ListingForm() {
   }, [fipeResult])
   const comparison = useMemo(() => getFipeComparison(priceNumber, fipeNumber), [priceNumber, fipeNumber])
   const hasAskingPrice = form.price.trim().length > 0 && priceNumber > 0
+  const fipeComparisonStatusLabel =
+    !fipeResult
+      ? 'Sem referência'
+      : !hasAskingPrice
+      ? 'Informe o preço'
+      : comparison.status === 'below'
+      ? 'Abaixo da FIPE'
+      : comparison.status === 'above'
+      ? 'Acima da FIPE'
+      : comparison.status === 'near'
+      ? 'Na média da FIPE'
+      : 'Sem referência'
+  const fipeComparisonStatusClass =
+    !fipeResult || !hasAskingPrice
+      ? 'bg-white/10 text-white/70 border-white/10'
+      : comparison.status === 'below'
+      ? 'bg-[#D9F85F] text-[#17170F] border-transparent'
+      : comparison.status === 'above'
+      ? 'bg-[#FFE08A] text-[#17170F] border-transparent'
+      : 'bg-white/10 text-white/90 border-white/10'
+  const fipeProgressWidth =
+    !fipeResult || !hasAskingPrice
+      ? '50%'
+      : comparison.status === 'below'
+      ? '34%'
+      : comparison.status === 'above'
+      ? '66%'
+      : '50%'
+  const fipeDiffValueLabel =
+    comparison.diffValue === null
+      ? null
+      : `${comparison.diffValue > 0 ? '+' : '-'} ${formatBRL(Math.abs(comparison.diffValue))}`
+  const fipeDiffPercentLabel =
+    comparison.diffPercent === null
+      ? null
+      : `${comparison.diffPercent > 0 ? '+' : '-'}${Math.abs(comparison.diffPercent).toFixed(1)}%`
   const resolvedTransmissionValue = form.transmission || (technical.transmission !== 'Não informado' ? technical.transmission : '')
   const resolvedFuelValue = form.fuel || (technical.fuel !== 'Não informado' ? technical.fuel : '')
   const resolvedBodyTypeValue = form.bodyType || (technical.category !== 'Não informado' ? technical.category : '')
@@ -888,15 +924,6 @@ export default function ListingForm() {
     }
   }
 
-  const fipeBadgeClass =
-    comparison.status === 'below'
-      ? 'bg-[#F2F2F7] text-[#0A0A0A] border border-[#E8E8E8]'
-      : comparison.status === 'above'
-      ? 'bg-[#F2F2F7] text-[#0A0A0A] border border-[#E8E8E8]'
-      : comparison.status === 'near'
-      ? 'bg-[#F2F2F7] text-[#0A0A0A] border border-[#E8E8E8]'
-      : 'bg-[#F2F2F7] text-[#525252] border border-[#E8E8E8]'
-
   if (!sessionReady) {
     return (
       <div className="listing-form-ref surface-strong p-8 text-center">
@@ -1181,6 +1208,68 @@ export default function ListingForm() {
               <input className="input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
               <input className="input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
             </div>
+
+            {fipeResult ? (
+              <div className="rounded-[28px] bg-[#1A2F1E] p-5 text-white shadow-lg shadow-[#1A2F1E]/15 max-[330px]:p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <p className="text-[12px] font-black uppercase tracking-[0.18em] text-white/65 max-[330px]:text-[11px]">
+                      Comparativo FIPE
+                    </p>
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                      <p className="text-[40px] font-black leading-none tracking-[-0.05em] text-white max-[330px]:text-[30px]">
+                        {fipeResult.price}
+                      </p>
+                      <span className="text-[16px] font-medium text-white/55 max-[330px]:text-[13px]">
+                        Tabela FIPE
+                      </span>
+                    </div>
+                  </div>
+                  <span className={`rounded-full border px-4 py-2 text-[12px] font-black tracking-[-0.01em] ${fipeComparisonStatusClass}`}>
+                    {fipeComparisonStatusLabel}
+                  </span>
+                </div>
+
+                <div className="mt-5 grid gap-3">
+                  <div className="rounded-[22px] bg-white/8 px-4 py-4 backdrop-blur-sm">
+                    <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/45">Preço anunciado</p>
+                    <p className="mt-2 text-[28px] font-black leading-none tracking-[-0.04em] text-white max-[330px]:text-[23px]">
+                      {hasAskingPrice ? formatBRL(priceNumber) : 'Informe abaixo'}
+                    </p>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-[22px] bg-white/8 px-4 py-4 backdrop-blur-sm">
+                      <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/45">Diferença</p>
+                      <p className="mt-2 text-[22px] font-black leading-none tracking-[-0.04em] text-[#D9F85F] max-[330px]:text-[19px]">
+                        {fipeDiffValueLabel ?? 'Preencha o preço'}
+                      </p>
+                    </div>
+                    <div className="rounded-[22px] bg-white/8 px-4 py-4 backdrop-blur-sm">
+                      <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/45">Percentual</p>
+                      <p className="mt-2 text-[22px] font-black leading-none tracking-[-0.04em] text-[#D9F85F] max-[330px]:text-[19px]">
+                        {fipeDiffPercentLabel ?? '—'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-[22px] bg-white/5 px-4 py-4 backdrop-blur-sm">
+                    <div className="flex items-center justify-between gap-4 text-[13px] font-medium text-white/55">
+                      <span>Abaixo da FIPE</span>
+                      <span>Acima da FIPE</span>
+                    </div>
+                    <div className="mt-3 h-2 rounded-full bg-white/10 overflow-hidden">
+                      <div className="h-full rounded-full bg-[#D9F85F] transition-all duration-500" style={{ width: fipeProgressWidth }} />
+                    </div>
+                    <p className="mt-3 text-[12px] leading-relaxed text-white/60">
+                      {fipeResult.referenceMonth
+                        ? `Referência ${fipeResult.referenceMonth} • Atualizado pela FIPE.`
+                        : 'Atualizado pela FIPE.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             <div className="rounded-[24px] border border-[#EAEAE8] bg-[#FAFAF9] p-4 space-y-3">
               <div className="flex items-center justify-between gap-3">
