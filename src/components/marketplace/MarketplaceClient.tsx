@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import {
   Search, SlidersHorizontal, X, ChevronDown,
@@ -124,6 +124,8 @@ export default function MarketplaceClient({
   const [totalPages, setTotalPages] = useState(initialTotalPages)
   const [showFilters, setShowFilters] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const didRunInitialTextSearch = useRef(false)
+  const didRunInitialFilterSearch = useRef(false)
 
   const getDefaultArray = (value: unknown): string[] => {
     if (Array.isArray(value)) return value.filter(Boolean).map(String)
@@ -219,6 +221,11 @@ export default function MarketplaceClient({
   }, [q, selectedBrands, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, priceRange, yearRange, mileageMax, sort, currentPage, router, pathname, selectedVehicleType, selectedModels])
 
   useEffect(() => {
+    if (!didRunInitialTextSearch.current) {
+      didRunInitialTextSearch.current = true
+      return
+    }
+
     const timer = setTimeout(() => {
       if (!isSearching) updateResults({ page: 1 })
     }, 250)
@@ -226,6 +233,11 @@ export default function MarketplaceClient({
   }, [q, priceRange, yearRange, mileageMax, sort])
 
   useEffect(() => {
+    if (!didRunInitialFilterSearch.current) {
+      didRunInitialFilterSearch.current = true
+      return
+    }
+
     updateResults({ page: 1 })
   }, [selectedBrands, selectedModels, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, selectedVehicleType])
 

@@ -351,8 +351,8 @@ export default async function HomePage() {
       </section>
 
       <section className="ref-sec-marble" style={{ padding: '0 40px 80px' }}>
-        <div className="ref-container"><div className="ref-cards-grid">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
+        <div className="ref-container"><div className="ref-cards-grid ref-cards-grid-balanced">
+          <div className="ref-cards-stack">
             <Link href="/anunciar-carro" className="ref-card-block ref-card-lavender ref-card-icon-only" style={{ minWidth: 'unset', width: '100%' }}>
               <div className="ref-card-icon-badge">
                 <Share2 aria-hidden="true" />
@@ -366,7 +366,7 @@ export default async function HomePage() {
               <h3>Venda, receba pagamentos e monetize seu inventário.</h3>
             </Link>
           </div>
-          <Link href="/carros-a-venda" className="ref-card-block ref-card-iris ref-card-icon-only" style={{ flex: 1.2 }}>
+          <Link href="/carros-a-venda" className="ref-card-block ref-card-iris ref-card-icon-only ref-card-balanced-large">
             <div className="ref-card-icon-badge">
               <Megaphone aria-hidden="true" />
             </div>
@@ -377,11 +377,16 @@ export default async function HomePage() {
 
       <section className="ref-sec-marble" style={{ padding: '80px 40px' }}>
         <div className="ref-container">
-          <div style={{ textAlign: 'center', marginBottom: 60 }}><div className="ref-sec-label" style={{ justifyContent: 'center' }}>Planos</div><h2 style={{ fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 700, letterSpacing: '-1.5px' }}>Rápido, amigável e poderoso.<br />Escolha seu plano.</h2><p style={{ fontSize: 17, color: '#666', marginTop: 12 }}>Comece grátis. Escale quando precisar.</p></div>
+          <div style={{ textAlign: 'center', marginBottom: 60 }}>
+            <div className="ref-sec-label" style={{ justifyContent: 'center' }}>Planos</div>
+            <div className="ref-launch-badge">Lançamento grátis por tempo limitado</div>
+            <h2 style={{ fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 700, letterSpacing: '-1.5px' }}>Anuncie sem pagar nada<br />durante o lançamento.</h2>
+            <p style={{ fontSize: 17, color: '#666', marginTop: 12 }}>Todos os recursos principais estão liberados agora. Depois, você escolhe se quer escalar.</p>
+          </div>
           <div className="ref-plans-grid">
             <div className="ref-plan-card"><div className="ref-plan-name">Gratuito</div><div className="ref-plan-price">R$ 0 <sub>/mês</sub></div><div className="ref-plan-desc">Para quem quer anunciar sem complicação.</div><ul className="ref-plan-features"><li>5 anúncios ativos</li><li>Fotos e dados básicos</li><li>Comparativo FIPE</li><li>Chat com compradores</li></ul><Link href="/anunciar-carro" className="ref-btn ref-btn-forest" style={{ width: '100%', justifyContent: 'center' }}>Começar grátis</Link></div>
-            <div className="ref-plan-card featured"><div className="ref-plan-badge">Mais popular</div><div className="ref-plan-name">Pro</div><div className="ref-plan-price">R$ 29 <sub>/mês</sub></div><div className="ref-plan-desc">Para quem vende com frequência ou quer mais destaque.</div><ul className="ref-plan-features"><li>10 anúncios simultâneos</li><li>Destaque nos resultados</li><li>Analytics completo</li><li>QR code de alta resolução</li><li>Selo de vendedor verificado</li></ul><Link href="/anunciar-carro" className="ref-btn ref-btn-chartreuse ref-btn-wide" style={{ width: '100%', justifyContent: 'center' }}>Assinar Pro</Link></div>
-            <div className="ref-plan-card"><div className="ref-plan-name">Revendedor</div><div className="ref-plan-price">R$ 89 <sub>/mês</sub></div><div className="ref-plan-desc">Para lojas, revendedoras e corretores.</div><ul className="ref-plan-features"><li>Anúncios ilimitados</li><li>Painel multi-usuário</li><li>API de integração</li><li>Suporte prioritário</li><li>Vitrine de loja própria</li></ul><Link href="/anunciar-carro" className="ref-btn ref-btn-iris" style={{ width: '100%', justifyContent: 'center', color: '#fff' }}>Falar com vendas</Link></div>
+            <div className="ref-plan-card featured"><div className="ref-plan-badge">Grátis no lançamento</div><div className="ref-plan-name">Pro</div><div className="ref-plan-price">R$ 0 <sub>agora</sub></div><div className="ref-plan-desc">Recursos Pro liberados por tempo limitado durante o lançamento.</div><ul className="ref-plan-features"><li>10 anúncios simultâneos</li><li>Destaque nos resultados</li><li>Analytics completo</li><li>QR code de alta resolução</li><li>Selo de vendedor verificado</li></ul><Link href="/anunciar-carro" className="ref-btn ref-btn-chartreuse ref-btn-wide" style={{ width: '100%', justifyContent: 'center' }}>Aproveitar grátis</Link></div>
+            <div className="ref-plan-card"><div className="ref-plan-badge ghost">Também grátis agora</div><div className="ref-plan-name">Revendedor</div><div className="ref-plan-price">R$ 0 <sub>agora</sub></div><div className="ref-plan-desc">Para lojas, revendedoras e corretores testarem a plataforma sem custo.</div><ul className="ref-plan-features"><li>Anúncios ilimitados no lançamento</li><li>Painel multi-usuário</li><li>API de integração</li><li>Suporte prioritário</li><li>Vitrine de loja própria</li></ul><Link href="/anunciar-carro" className="ref-btn ref-btn-iris" style={{ width: '100%', justifyContent: 'center', color: '#fff' }}>Começar grátis</Link></div>
           </div>
         </div>
       </section>

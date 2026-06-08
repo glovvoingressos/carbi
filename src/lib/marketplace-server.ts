@@ -76,6 +76,30 @@ function isMissingRelationError(message?: string): boolean {
     || message.includes('relation')
 }
 
+function getSearchTermGroups(query?: string): string[][] {
+  if (!query) return []
+  const rawTerms = query
+    .split(/[^\p{L}\p{N}]+/u)
+    .map((term) => term.trim())
+    .filter((term) => term.length >= 2)
+
+  return rawTerms.slice(0, 6).map((term) => Array.from(new Set([
+    term,
+    term.normalize('NFD').replace(/[\u0300-\u036f]/g, ''),
+  ])))
+}
+
+function applyTextSearch<T>(query: T, inputQuery?: string): T {
+  const termGroups = getSearchTermGroups(inputQuery)
+  if (termGroups.length === 0) return query
+
+  const fields = ['brand', 'model', 'title', 'version', 'city', 'state', 'fuel', 'transmission', 'body_type']
+  return termGroups.reduce((currentQuery: any, terms) => {
+    const clause = terms.flatMap((term) => fields.map((field) => `${field}.ilike.%${term}%`)).join(',')
+    return currentQuery.or(clause)
+  }, query as any) as T
+}
+
 function normalizeTableRow(row: ListingRow): ListingPublic {
   const category = classifyVehicleCategory(row.body_type, row.brand, row.model) 
     || classifyByFuelType(row.fuel)
@@ -234,7 +258,7 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
   if (input.slug) viewQuery = viewQuery.eq('slug', input.slug)
   if (input.brand) viewQuery = viewQuery.ilike('brand', `%${input.brand}%`)
   if (input.model) viewQuery = viewQuery.ilike('model', `%${input.model}%`)
-  if (input.q) viewQuery = viewQuery.or(`brand.ilike.%${input.q}%,model.ilike.%${input.q}%`)
+  viewQuery = applyTextSearch(viewQuery, input.q)
   if (input.yearModel) viewQuery = viewQuery.eq('year_model', input.yearModel)
   if (input.excludeId) viewQuery = viewQuery.neq('id', input.excludeId)
 
@@ -313,7 +337,7 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
   if (input.slug) tableQuery = tableQuery.eq('slug', input.slug)
   if (input.brand) tableQuery = tableQuery.ilike('brand', `%${input.brand}%`)
   if (input.model) tableQuery = tableQuery.ilike('model', `%${input.model}%`)
-  if (input.q) tableQuery = tableQuery.or(`brand.ilike.%${input.q}%,model.ilike.%${input.q}%`)
+  tableQuery = applyTextSearch(tableQuery, input.q)
   if (input.yearModel) tableQuery = tableQuery.eq('year_model', input.yearModel)
   if (input.excludeId) tableQuery = tableQuery.neq('id', input.excludeId)
 
@@ -430,10 +454,7 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
     .eq('status', 'active')
     .range(from, to)
 
-  if (input.q) {
-    let searchQuery = `brand.ilike.%${input.q}%,model.ilike.%${input.q}%,title.ilike.%${input.q}%`
-    query = query.or(searchQuery)
-  }
+  query = applyTextSearch(query, input.q)
   
   if (input.vehicle_type) {
     if (Array.isArray(input.vehicle_type)) query = query.in('vehicle_type', input.vehicle_type)
@@ -658,4 +679,3 @@ export async function getFilterOptions() {
     optionalItems: distinctOptionals
   }
 }
-
