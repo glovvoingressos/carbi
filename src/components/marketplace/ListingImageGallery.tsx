@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
-import { getCarImageUrl } from '@/lib/car-image-fallback'
+import { getCarImageCandidates } from '@/lib/car-image-fallback'
 
 type ListingImageGalleryProps = {
   images: string[]
@@ -13,7 +13,7 @@ type ListingImageGalleryProps = {
 
 export default function ListingImageGallery({ images, title, badgeLabel, fipeBadgeLabel }: ListingImageGalleryProps) {
   const gallery = useMemo(
-    () => images.filter(Boolean).map((url) => getCarImageUrl(url) || url),
+    () => getCarImageCandidates(images),
     [images],
   )
   const [activeIndex, setActiveIndex] = useState(0)

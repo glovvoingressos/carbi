@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { ImageIcon } from 'lucide-react'
-import { getCarImageUrl, resolveMarketplaceCarImage } from '@/lib/car-image-fallback'
+import { resolveMarketplaceCarImageCandidates } from '@/lib/car-image-fallback'
 
 function isValidUrl(url: string | null | undefined) {
   return Boolean(url && url.trim())
@@ -27,18 +27,10 @@ export default function MarketplaceListingImage({
   className = 'h-full w-full object-cover',
   priority = false,
 }: MarketplaceListingImageProps) {
-  const uploadedSources = useMemo(
-    () => imageUrls.map((url) => getCarImageUrl(url) || null).filter((url): url is string => Boolean(url)),
-    [imageUrls],
+  const sources = useMemo(
+    () => resolveMarketplaceCarImageCandidates({ brand, model, year, preferredUrls: imageUrls }),
+    [brand, model, year, imageUrls],
   )
-  const assetFallback = useMemo(
-    () => getCarImageUrl(resolveMarketplaceCarImage({ brand, model, year, preferredUrl: null })) || null,
-    [brand, model, year],
-  )
-  const sources = useMemo(() => {
-    if (uploadedSources.length > 0) return uploadedSources
-    return assetFallback ? [assetFallback] : []
-  }, [uploadedSources, assetFallback])
   const [sourceIndex, setSourceIndex] = useState(0)
   const [failedFallback, setFailedFallback] = useState(false)
 

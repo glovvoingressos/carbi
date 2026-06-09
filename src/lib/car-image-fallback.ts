@@ -11,6 +11,28 @@ export function getCarImageUrl(url: string | null | undefined, size: number = CA
   return url
 }
 
+function addUniqueUrl(urls: string[], url: string | null | undefined) {
+  const value = url?.trim()
+  if (!value || urls.includes(value)) return
+  urls.push(value)
+}
+
+export function getCarImageCandidates(
+  urls: Array<string | null | undefined>,
+  size: number = CAR_IMAGE_SIZE,
+): string[] {
+  const candidates: string[] = []
+
+  for (const url of urls) {
+    const value = url?.trim()
+    if (!value) continue
+    addUniqueUrl(candidates, getCarImageUrl(value, size))
+    addUniqueUrl(candidates, value)
+  }
+
+  return candidates
+}
+
 function slug(value: string): string {
   return value
     .toLowerCase()
@@ -73,4 +95,26 @@ export function resolveMarketplaceCarImage(params: {
     .sort((a, b) => b.score - a.score)
 
   return ranked[0]?.assetPath || null
+}
+
+export function resolveMarketplaceCarImageCandidates(params: {
+  brand: string
+  model: string
+  year?: number
+  preferredUrls?: Array<string | null | undefined>
+  preferredUrl?: string | null
+}): string[] {
+  const uploaded = getCarImageCandidates([
+    ...(params.preferredUrls || []),
+    params.preferredUrl,
+  ])
+
+  const fallback = resolveMarketplaceCarImage({
+    brand: params.brand,
+    model: params.model,
+    year: params.year,
+    preferredUrl: null,
+  })
+
+  return getCarImageCandidates([...uploaded, fallback])
 }

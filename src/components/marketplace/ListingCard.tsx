@@ -2,21 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Heart, Gauge, Calendar, MapPin, ImageIcon } from 'lucide-react'
+import { Heart, Gauge, Calendar, MapPin } from 'lucide-react'
 import { ListingPublic } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
-import { resolveMarketplaceCarImage, getCarImageUrl } from '@/lib/car-image-fallback'
+import MarketplaceListingImage from './MarketplaceListingImage'
 
 export default function ListingCard({ listing, priority = false }: { listing: ListingPublic; priority?: boolean }) {
-  const [imgError, setImgError] = useState(false)
   const [favorited, setFavorited] = useState(false)
-
-  const cover = !imgError ? getCarImageUrl(resolveMarketplaceCarImage({
-    brand: listing.brand,
-    model: listing.model,
-    year: listing.year_model,
-    preferredUrl: listing.images?.[0]?.url || null,
-  })) : null
 
   const hasFipe = typeof listing.fipe_price === 'number' && listing.fipe_price > 0
   const isGoodDeal = hasFipe && Number(listing.price) <= Number(listing.fipe_price) * 0.9
@@ -31,23 +23,15 @@ export default function ListingCard({ listing, priority = false }: { listing: Li
       <article className="surface-strong overflow-hidden transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
         {/* Image */}
         <div className="relative aspect-square w-full overflow-hidden bg-[#FFF8DF]">
-          {cover ? (
-            <img
-              src={cover}
-              alt={listing.title}
-              width={1080}
-              height={1080}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-              loading={priority ? 'eager' : 'lazy'}
-              decoding="async"
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <div className="h-full w-full flex flex-col items-center justify-center text-[#A3A3A3]">
-              <ImageIcon className="w-8 h-8 mb-2" strokeWidth={1.5} />
-              <span className="text-xs font-medium">Sem imagem</span>
-            </div>
-          )}
+          <MarketplaceListingImage
+            brand={listing.brand}
+            model={listing.model}
+            year={listing.year_model}
+            imageUrls={listing.images?.map((image) => image.url) || []}
+            alt={listing.title}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            priority={priority}
+          />
 
           {/* Top-left badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">

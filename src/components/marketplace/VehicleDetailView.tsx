@@ -8,7 +8,6 @@ import {
   Check,
   Copy,
   Fuel,
-  Gauge,
   HandCoins,
   Heart,
   MapPin,
@@ -25,7 +24,7 @@ import ChatStarter from './ChatStarter'
 import OfferModal from './OfferModal'
 import OfferHistory from './OfferHistory'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
-import { getCarImageUrl, resolveMarketplaceCarImage } from '@/lib/car-image-fallback'
+import MarketplaceListingImage from './MarketplaceListingImage'
 
 interface VehicleDetailViewProps {
   listing: ListingPublic
@@ -269,17 +268,17 @@ export default function VehicleDetailView({
                 <Link href="/carros-a-venda" className="ref-ad-btn ref-ad-btn-ghost">Ver mais</Link>
               </div>
               <div className="ref-ad-similar-grid">
-                {relatedListings.slice(0, 3).map((item) => {
-                  const cover = getCarImageUrl(resolveMarketplaceCarImage({
-                    brand: item.brand,
-                    model: item.model,
-                    year: item.year_model,
-                    preferredUrl: item.images?.[0]?.url || null,
-                  }))
-                  return (
+                {relatedListings.slice(0, 3).map((item) => (
                     <Link href={`/anuncios/${item.slug}`} className="ref-ad-sim-card" key={item.id}>
                       <div className="ref-ad-sim-img">
-                        {cover ? <img src={cover} alt={item.title} /> : <Gauge size={44} />}
+                        <MarketplaceListingImage
+                          brand={item.brand}
+                          model={item.model}
+                          year={item.year_model}
+                          imageUrls={item.images?.map((image) => image.url) || []}
+                          alt={item.title}
+                          className="h-full w-full object-cover"
+                        />
                       </div>
                       <div className="ref-ad-sim-body">
                         <div className="ref-ad-sim-make">{item.brand}</div>
@@ -289,8 +288,7 @@ export default function VehicleDetailView({
                         <div className="ref-ad-sim-meta"><span>{item.year_model}</span><span>·</span><span>{item.mileage.toLocaleString('pt-BR')} km</span><span>·</span><span>{item.state}</span></div>
                       </div>
                     </Link>
-                  )
-                })}
+                ))}
               </div>
             </section>
           ) : null}
