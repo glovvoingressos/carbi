@@ -26,8 +26,8 @@ export function getCarImageCandidates(
   for (const url of urls) {
     const value = url?.trim()
     if (!value) continue
-    addUniqueUrl(candidates, getCarImageUrl(value, size))
     addUniqueUrl(candidates, value)
+    addUniqueUrl(candidates, getCarImageUrl(value, size))
   }
 
   return candidates
@@ -108,6 +108,27 @@ export function resolveMarketplaceCarImageCandidates(params: {
     ...(params.preferredUrls || []),
     params.preferredUrl,
   ])
+
+  if (uploaded.length > 0) return uploaded
+
+  // Anuncios reais nunca devem cair em imagem de catalogo/IA.
+  // Sem foto cadastrada valida, a UI deve exibir placeholder neutro.
+  return []
+}
+
+export function resolveCatalogCarImageCandidates(params: {
+  brand: string
+  model: string
+  year?: number
+  preferredUrls?: Array<string | null | undefined>
+  preferredUrl?: string | null
+}): string[] {
+  const uploaded = getCarImageCandidates([
+    ...(params.preferredUrls || []),
+    params.preferredUrl,
+  ])
+
+  if (uploaded.length > 0) return uploaded
 
   const fallback = resolveMarketplaceCarImage({
     brand: params.brand,

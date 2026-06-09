@@ -7,7 +7,7 @@ import { ArrowUpRight, CarFront, Loader2, MessageSquare, Send, ShieldCheck } fro
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
-import { resolveMarketplaceCarImage } from '@/lib/car-image-fallback'
+import { getCarImageCandidates } from '@/lib/car-image-fallback'
 
 interface ConversationItem {
   id: string
@@ -70,13 +70,9 @@ export default function ConversationInbox() {
     conversation: ConversationItem['vehicle_listings_public'],
     key: string,
   ) => {
-    const preferred = conversation.images?.[0]?.url || null
-    const fallback = resolveMarketplaceCarImage({
-      brand: conversation.brand,
-      model: conversation.model,
-      year: conversation.year_model || conversation.year,
-      preferredUrl: null,
-    })
+    const candidates = getCarImageCandidates([conversation.images?.[0]?.url || null])
+    const preferred = candidates[0] || null
+    const fallback = candidates[1] || null
 
     const stage = thumbStages[key] || (preferred ? 'preferred' : fallback ? 'fallback' : 'broken')
     const src = stage === 'preferred' ? preferred : fallback

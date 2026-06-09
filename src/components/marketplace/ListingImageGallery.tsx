@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
-import { getCarImageCandidates } from '@/lib/car-image-fallback'
+import { getCarImageUrl } from '@/lib/car-image-fallback'
 
 type ListingImageGalleryProps = {
   images: string[]
@@ -13,16 +13,29 @@ type ListingImageGalleryProps = {
 
 export default function ListingImageGallery({ images, title, badgeLabel, fipeBadgeLabel }: ListingImageGalleryProps) {
   const gallery = useMemo(
-    () => getCarImageCandidates(images),
+    () => Array.from(new Set(images.map((url) => url?.trim()).filter((url): url is string => Boolean(url)))),
     [images],
   )
   const [activeIndex, setActiveIndex] = useState(0)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const failedRef = useRef<Set<string>>(new Set())
+  const retriedRef = useRef<Set<string>>(new Set())
   const [, forceRender] = useState(0)
   const visibleGallery = gallery.filter((url) => !failedRef.current.has(url))
 
+  const getDisplaySrc = useCallback((url: string) => {
+    if (!retriedRef.current.has(url)) return url
+    return getCarImageUrl(url) || url
+  }, [])
+
   const handleImageError = useCallback((url: string) => {
+    const retryUrl = getCarImageUrl(url)
+    if (retryUrl && retryUrl !== url && !retriedRef.current.has(url)) {
+      retriedRef.current.add(url)
+      forceRender((n) => n + 1)
+      return
+    }
+
     if (!failedRef.current.has(url)) {
       failedRef.current.add(url)
       forceRender((n) => n + 1)
@@ -77,7 +90,7 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
           {visibleGallery.map((image, index) => (
             <div key={`${image}-${index}`} className="relative h-full w-full flex-shrink-0">
               <img
-                src={image}
+                src={getDisplaySrc(image)}
                 alt={`${title} foto ${index + 1}`}
                 width={1080}
                 height={1080}
@@ -128,7 +141,7 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
                 aria-label={`Abrir foto ${index + 1}`}
               >
                 <img
-                  src={image}
+                  src={getDisplaySrc(image)}
                   alt={`${title} miniatura ${index + 1}`}
                   width={1080}
                   height={1080}
