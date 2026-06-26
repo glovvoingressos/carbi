@@ -1,12 +1,17 @@
 import { availableCarAssetPaths } from '@/data/carAssetManifest'
 
-export const CAR_IMAGE_SIZE = 1080
+export const CAR_IMAGE_WIDTH = 1920
+export const CAR_IMAGE_HEIGHT = 1080
 
-export function getCarImageUrl(url: string | null | undefined, size: number = CAR_IMAGE_SIZE): string | null {
+export function getCarImageUrl(
+  url: string | null | undefined,
+  width: number = CAR_IMAGE_WIDTH,
+  height: number = width,
+): string | null {
   if (!url) return null
   if (url.includes('supabase.co/storage/')) {
     const sep = url.includes('?') ? '&' : '?'
-    return `${url}${sep}width=${size}&height=${size}&resize=cover&quality=80`
+    return `${url}${sep}width=${width}&height=${height}&resize=cover&quality=80`
   }
   return url
 }
@@ -19,15 +24,22 @@ function addUniqueUrl(urls: string[], url: string | null | undefined) {
 
 export function getCarImageCandidates(
   urls: Array<string | null | undefined>,
-  size: number = CAR_IMAGE_SIZE,
+  width: number = CAR_IMAGE_WIDTH,
+  height: number = width,
+  preferTransformed: boolean = false,
 ): string[] {
   const candidates: string[] = []
 
   for (const url of urls) {
     const value = url?.trim()
     if (!value) continue
-    addUniqueUrl(candidates, value)
-    addUniqueUrl(candidates, getCarImageUrl(value, size))
+    if (preferTransformed) {
+      addUniqueUrl(candidates, getCarImageUrl(value, width, height))
+      addUniqueUrl(candidates, value)
+    } else {
+      addUniqueUrl(candidates, value)
+      addUniqueUrl(candidates, getCarImageUrl(value, width, height))
+    }
   }
 
   return candidates
@@ -103,11 +115,14 @@ export function resolveMarketplaceCarImageCandidates(params: {
   year?: number
   preferredUrls?: Array<string | null | undefined>
   preferredUrl?: string | null
+  width?: number
+  height?: number
+  preferTransformed?: boolean
 }): string[] {
   const uploaded = getCarImageCandidates([
     ...(params.preferredUrls || []),
     params.preferredUrl,
-  ])
+  ], params.width, params.height, params.preferTransformed)
 
   if (uploaded.length > 0) return uploaded
 

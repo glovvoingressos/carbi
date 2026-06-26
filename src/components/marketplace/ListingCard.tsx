@@ -22,7 +22,7 @@ export default function ListingCard({ listing, priority = false }: { listing: Li
     >
       <article className="surface-strong overflow-hidden transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
         {/* Image */}
-        <div className="relative aspect-square w-full overflow-hidden bg-[#FFF8DF]">
+        <div className="relative aspect-video w-full overflow-hidden bg-[#FFF8DF]">
           <MarketplaceListingImage
             brand={listing.brand}
             model={listing.model}

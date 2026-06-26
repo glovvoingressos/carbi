@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
-import { getCarImageUrl } from '@/lib/car-image-fallback'
+import { CAR_IMAGE_HEIGHT, CAR_IMAGE_WIDTH, getCarImageUrl } from '@/lib/car-image-fallback'
 
 type ListingImageGalleryProps = {
   images: string[]
@@ -12,6 +12,8 @@ type ListingImageGalleryProps = {
 }
 
 export default function ListingImageGallery({ images, title, badgeLabel, fipeBadgeLabel }: ListingImageGalleryProps) {
+  const imageWidth = CAR_IMAGE_WIDTH
+  const imageHeight = CAR_IMAGE_HEIGHT
   const gallery = useMemo(
     () => Array.from(new Set(images.map((url) => url?.trim()).filter((url): url is string => Boolean(url)))),
     [images],
@@ -24,13 +26,12 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
   const visibleGallery = gallery.filter((url) => !failedRef.current.has(url))
 
   const getDisplaySrc = useCallback((url: string) => {
-    if (!retriedRef.current.has(url)) return url
-    return getCarImageUrl(url) || url
+    if (!retriedRef.current.has(url)) return getCarImageUrl(url, imageWidth, imageHeight) || url
+    return url
   }, [])
 
   const handleImageError = useCallback((url: string) => {
-    const retryUrl = getCarImageUrl(url)
-    if (retryUrl && retryUrl !== url && !retriedRef.current.has(url)) {
+    if (!retriedRef.current.has(url)) {
       retriedRef.current.add(url)
       forceRender((n) => n + 1)
       return
@@ -40,7 +41,7 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
       failedRef.current.add(url)
       forceRender((n) => n + 1)
     }
-  }, [])
+  }, [imageWidth, imageHeight])
 
   if (!gallery.length) return null
   if (visibleGallery.length === 0) {
@@ -92,8 +93,8 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
               <img
                 src={getDisplaySrc(image)}
                 alt={`${title} foto ${index + 1}`}
-                width={1080}
-                height={1080}
+                width={imageWidth}
+                height={imageHeight}
                 className="block h-full w-full object-cover object-center"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
                 loading={index === 0 ? 'eager' : 'lazy'}
@@ -143,8 +144,8 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
                 <img
                   src={getDisplaySrc(image)}
                   alt={`${title} miniatura ${index + 1}`}
-                  width={1080}
-                  height={1080}
+                  width={imageWidth}
+                  height={imageHeight}
                   className="block h-full w-full object-cover object-center"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
                   loading="lazy"

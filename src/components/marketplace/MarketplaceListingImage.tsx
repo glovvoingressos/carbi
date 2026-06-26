@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { ImageIcon } from 'lucide-react'
-import { resolveMarketplaceCarImageCandidates } from '@/lib/car-image-fallback'
+import { CAR_IMAGE_HEIGHT, CAR_IMAGE_WIDTH, resolveMarketplaceCarImageCandidates } from '@/lib/car-image-fallback'
 
 function isValidUrl(url: string | null | undefined) {
   return Boolean(url && url.trim())
@@ -16,6 +16,9 @@ type MarketplaceListingImageProps = {
   alt: string
   className?: string
   priority?: boolean
+  width?: number
+  height?: number
+  preferTransformed?: boolean
 }
 
 export default function MarketplaceListingImage({
@@ -26,10 +29,13 @@ export default function MarketplaceListingImage({
   alt,
   className = 'h-full w-full object-cover',
   priority = false,
+  width = CAR_IMAGE_WIDTH,
+  height = CAR_IMAGE_HEIGHT,
+  preferTransformed = true,
 }: MarketplaceListingImageProps) {
   const sources = useMemo(
-    () => resolveMarketplaceCarImageCandidates({ brand, model, year, preferredUrls: imageUrls }),
-    [brand, model, year, imageUrls],
+    () => resolveMarketplaceCarImageCandidates({ brand, model, year, preferredUrls: imageUrls, width, height, preferTransformed }),
+    [brand, model, year, imageUrls, width, height, preferTransformed],
   )
   const [sourceIndex, setSourceIndex] = useState(0)
   const [failedFallback, setFailedFallback] = useState(false)
@@ -54,8 +60,8 @@ export default function MarketplaceListingImage({
     <img
       src={src!}
       alt={alt}
-      width={1080}
-      height={1080}
+      width={width}
+      height={height}
       className={className}
       loading={priority ? 'eager' : 'lazy'}
       decoding="async"

@@ -980,9 +980,9 @@ export default function MyListingsDashboard() {
                         <Reorder.Item 
                           key={img.id} 
                           value={img}
-                          className="relative aspect-square rounded-2xl overflow-hidden group cursor-grab active:cursor-grabbing border border-[#EAEAE8] bg-[#FAFAF9]"
+                          className="relative aspect-video rounded-2xl overflow-hidden group cursor-grab active:cursor-grabbing border border-[#EAEAE8] bg-[#FAFAF9]"
                         >
-                          <img src={img.previewUrl} className="w-full h-full object-cover select-none" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                          <img src={img.previewUrl} width={1920} height={1080} className="w-full h-full object-cover select-none" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
                           
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
                             <div className="flex justify-between items-start">

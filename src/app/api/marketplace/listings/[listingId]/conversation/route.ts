@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { safeSanitizeMessage } from '@/lib/marketplace'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
+import { sendNewMessageEmail } from '@/lib/email'
 
 export async function POST(
   req: NextRequest,
@@ -25,7 +26,7 @@ export async function POST(
 
     const { data: listing, error: listingError } = await listingReader
       .from('vehicle_listings_public')
-      .select('id, user_id, status')
+      .select('id, user_id, status, title, brand, model')
       .eq('id', listingId)
       .single()
 
@@ -67,6 +68,35 @@ export async function POST(
       if (msgError) {
         return NextResponse.json({ error: msgError.message }, { status: 500 })
       }
+
+      // Processamento assíncrono para enviar notificação por e-mail ao vendedor
+      ;(async () => {
+        try {
+          const { data: users } = await supabase
+            .from('users')
+            .select('id, email, full_name')
+            .in('id', [listing.user_id, auth.userId])
+
+          if (users) {
+            const seller = users.find(u => u.id === listing.user_id)
+            const buyer = users.find(u => u.id === auth.userId)
+
+            if (seller?.email) {
+              const title = listing.title || `${listing.brand} ${listing.model}`
+              await sendNewMessageEmail({
+                recipientEmail: seller.email,
+                recipientName: seller.full_name || 'Vendedor',
+                senderName: buyer?.full_name || 'Um interessado',
+                vehicleTitle: title,
+                messageContent: firstMessage,
+                conversationId: conversation.id
+              })
+            }
+          }
+        } catch (emailErr) {
+          console.error('Falha ao notificar vendedor por e-mail sobre nova conversa:', emailErr)
+        }
+      })()
     }
 
     return NextResponse.json({ conversationId: conversation.id }, { status: 201 })

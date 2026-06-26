@@ -4,25 +4,42 @@ import { ChevronRight } from 'lucide-react'
 import { BreadcrumbSchema } from '@/components/seo/JSONLD'
 import ListingCard from '@/components/marketplace/ListingCard'
 import { fetchPublicListingsPage } from '@/lib/marketplace-server'
-import { normalizeBrandKey, pickPreferredBrandName } from '@/lib/brand-utils'
+import { normalizeBrandKey, pickPreferredBrandName, slugifyBrand } from '@/lib/brand-utils'
+import { getAllCars } from '@/lib/data-fetcher'
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
+
+export async function generateStaticParams() {
+  try {
+    const cars = await getAllCars()
+    const uniqueBrands = Array.from(new Set(cars.map((car) => slugifyBrand(car.brand)))).filter(Boolean)
+    return uniqueBrands.map((brand) => ({ brand }))
+  } catch (error) {
+    console.error('Erro ao gerar static params para marcas:', error)
+    return []
+  }
+}
+
+export const dynamicParams = true
 
 export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }): Promise<Metadata> {
   const resolved = await params
   const brandName = resolved.brand.replace(/-/g, ' ')
   const titleBrand = brandName.replace(/\b\w/g, (match) => match.toUpperCase())
+  const canonicalUrl = `${SITE_URL}/marcas/${resolved.brand}`
 
   return {
     title: `Carros ${titleBrand} à venda | Carbi`,
     description: `Veja carros ${titleBrand} à venda com anúncios reais, fotos quadradas, comparação FIPE e negociação via chat interno.`,
     keywords: [`carros ${titleBrand}`, `${titleBrand} à venda`, 'carros à venda', 'seminovos à venda'],
     alternates: {
-      canonical: `/marcas/${resolved.brand}`,
+      canonical: canonicalUrl,
     },
     openGraph: {
       title: `Carros ${titleBrand} à venda | Carbi`,
       description: `Veja carros ${titleBrand} à venda com anúncios reais, fotos quadradas, comparação FIPE e negociação via chat interno.`,
       type: 'website',
-      url: `/marcas/${resolved.brand}`,
+      url: canonicalUrl,
     },
   }
 }

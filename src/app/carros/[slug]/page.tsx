@@ -4,9 +4,25 @@ import MarketplaceClient from '@/components/marketplace/MarketplaceClient'
 import { BreadcrumbSchema } from '@/components/seo/JSONLD'
 import { fetchPublicListingsPage, getFilterOptions, ListingSort, ListingsPageInput } from '@/lib/marketplace-server'
 import { ALLOWED_SORTS, MARKETPLACE_SEO_SLUGS, resolveSeoPreset } from '@/lib/marketplace-seo'
+import { getAllCars } from '@/lib/data-fetcher'
+import { slugifyBrand } from '@/lib/brand-utils'
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 
 export async function generateStaticParams() {
-  return MARKETPLACE_SEO_SLUGS.map((slug) => ({ slug }))
+  try {
+    const staticPresets = MARKETPLACE_SEO_SLUGS.map((slug) => ({ slug }))
+    
+    // Adiciona marcas dinâmicas do catálogo
+    const cars = await getAllCars()
+    const uniqueBrands = Array.from(new Set(cars.map((car) => slugifyBrand(car.brand)))).filter(Boolean)
+    const brandPresets = uniqueBrands.map((brand) => ({ slug: `marca-${brand}` }))
+    
+    return [...staticPresets, ...brandPresets]
+  } catch (error) {
+    console.error('Erro ao gerar static params para carros/[slug]:', error)
+    return MARKETPLACE_SEO_SLUGS.map((slug) => ({ slug }))
+  }
 }
 
 export const dynamicParams = true
@@ -25,17 +41,19 @@ export async function generateMetadata({
     }
   }
 
+  const canonicalUrl = `${SITE_URL}/carros/${preset.slug}`
+
   return {
     title: preset.title,
     description: preset.description,
     keywords: ['carros à venda', 'seminovos à venda', 'carros usados', preset.h1.toLowerCase()],
     alternates: {
-      canonical: `/carros/${preset.slug}`,
+      canonical: canonicalUrl,
     },
     openGraph: {
       title: preset.title,
       description: preset.description,
-      url: `/carros/${preset.slug}`,
+      url: canonicalUrl,
       type: 'website',
     },
   }

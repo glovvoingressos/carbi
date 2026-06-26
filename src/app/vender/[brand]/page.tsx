@@ -1,30 +1,55 @@
 import { Metadata } from 'next'
 import SEOPageClient from '@/components/seo/SEOPageClient'
-import { BadgeDollarSign, Car, ShieldCheck } from 'lucide-react'
 import { fetchPublicListingsPage } from '@/lib/marketplace-server'
+import { getAllCars } from '@/lib/data-fetcher'
+import { slugifyBrand } from '@/lib/brand-utils'
+import { BreadcrumbSchema, FAQSchema } from '@/components/seo/JSONLD'
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 
 function titleCase(value: string) {
+  // Trata casos específicos como RAM, BMW, BYD, GWM em caixa alta
+  const upperCaseBrands = new Set(['ram', 'bmw', 'byd', 'gwm'])
+  const normalized = value.toLowerCase()
+  if (upperCaseBrands.has(normalized)) {
+    return normalized.toUpperCase()
+  }
+
   return value
     .replace(/-/g, ' ')
     .replace(/\b\w/g, (match) => match.toUpperCase())
 }
 
+export async function generateStaticParams() {
+  try {
+    const cars = await getAllCars()
+    const uniqueBrands = Array.from(new Set(cars.map((car) => slugifyBrand(car.brand)))).filter(Boolean)
+    return uniqueBrands.map((brand) => ({ brand }))
+  } catch (error) {
+    console.error('Erro ao gerar static params para marcas de venda:', error)
+    return []
+  }
+}
+
+export const dynamicParams = true
+
 export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }): Promise<Metadata> {
   const { brand } = await params
   const capitalizedBrand = titleCase(brand)
+  const canonicalUrl = `${SITE_URL}/vender/${brand}`
 
   return {
     title: `Vender ${capitalizedBrand}: Anuncie seu ${capitalizedBrand} rápido na Carbi`,
     description: `Quer vender seu ${capitalizedBrand}? Na Carbi você anuncia seu ${capitalizedBrand} usado ou seminovo com segurança e alcança compradores reais.`,
     keywords: [`vender ${capitalizedBrand}`, `anunciar ${capitalizedBrand}`, 'vender carro', 'anunciar carro grátis', 'seminovos à venda'],
     alternates: {
-      canonical: `/vender/${brand}`,
+      canonical: canonicalUrl,
     },
     openGraph: {
       title: `Vender ${capitalizedBrand}: Anuncie seu ${capitalizedBrand} rápido na Carbi`,
       description: `Quer vender seu ${capitalizedBrand}? Na Carbi você anuncia seu ${capitalizedBrand} usado ou seminovo com segurança e alcança compradores reais.`,
       type: 'website',
-      url: `/vender/${brand}`,
+      url: canonicalUrl,
     },
   }
 }
@@ -64,5 +89,17 @@ export default async function VenderBrandPage({ params }: { params: Promise<{ br
     ],
   }
 
-  return <SEOPageClient data={data} ctaHref="/anunciar-carro" />
+  return (
+    <>
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Vender Carro', url: '/vender-carro' },
+          { name: `Vender ${capitalizedBrand}`, url: `/vender/${brand}` },
+        ]}
+      />
+      <FAQSchema items={data.faqs} />
+      <SEOPageClient data={data} ctaHref="/anunciar-carro" />
+    </>
+  )
 }
