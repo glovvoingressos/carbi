@@ -3,6 +3,7 @@ import { Resend } from 'resend'
 const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key')
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Carbi <onboarding@resend.dev>'
 
 // Função utilitária para formatar valores em Real (BRL)
 function formatBRL(value: number): string {
@@ -34,7 +35,7 @@ export async function sendNewMessageEmail(params: NewMessageEmailParams) {
     const chatLink = `${SITE_URL}/painel/mensagens/${conversationId}`
 
     const data = await resend.emails.send({
-      from: 'CarDecision Notificações <onboarding@resend.dev>',
+      from: FROM_EMAIL,
       to: recipientEmail,
       subject: `Você recebeu uma nova mensagem sobre o ${vehicleTitle}`,
       html: `
@@ -93,7 +94,7 @@ export async function sendNewOfferEmail(params: NewOfferEmailParams) {
     const offerLink = `${SITE_URL}/painel/propostas/${offerId}`
 
     const data = await resend.emails.send({
-      from: 'CarDecision Propostas <onboarding@resend.dev>',
+      from: FROM_EMAIL,
       to: sellerEmail,
       subject: `Nova proposta de ${formatBRL(offerAmount)} para o seu ${vehicleTitle}`,
       html: `
@@ -180,7 +181,7 @@ export async function sendOfferStatusUpdateEmail(params: OfferStatusUpdateEmailP
     }
 
     const data = await resend.emails.send({
-      from: 'CarDecision Propostas <onboarding@resend.dev>',
+      from: FROM_EMAIL,
       to: recipientEmail,
       subject,
       html: `
@@ -253,7 +254,7 @@ export async function sendListingCreatedEmail(params: ListingCreatedEmailParams)
     const listingLink = `${SITE_URL}/anuncios/${listingSlug}`
 
     const data = await resend.emails.send({
-      from: 'CarDecision Anúncios <onboarding@resend.dev>',
+      from: FROM_EMAIL,
       to: userEmail,
       subject: `Seu anúncio do ${vehicleTitle} está no ar! 🚀`,
       html: `
@@ -319,7 +320,7 @@ export async function sendListingDeletedEmail(params: ListingDeletedEmailParams)
 
   try {
     const data = await resend.emails.send({
-      from: 'CarDecision Anúncios <onboarding@resend.dev>',
+      from: FROM_EMAIL,
       to: userEmail,
       subject: `Seu anúncio do ${vehicleTitle} foi removido`,
       html: `
