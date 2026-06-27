@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
+import { sendListingDeletedEmail } from '@/lib/email'
 
 type ListingPatchPayload = {
   title?: string
@@ -175,7 +176,7 @@ export async function DELETE(
     const supabase = getSupabaseServerClient(auth.accessToken)
     const { data: listing, error: listingError } = await supabase
       .from('vehicle_listings')
-      .select('id, user_id')
+      .select('id, user_id, title')
       .eq('id', listingId)
       .single()
 
@@ -204,6 +205,27 @@ export async function DELETE(
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    // Processamento assíncrono para enviar notificação de exclusão de anúncio por e-mail
+    ;(async () => {
+      try {
+        const { data: userProfile } = await supabase
+          .from('users')
+          .select('email, full_name')
+          .eq('id', auth.userId)
+          .single()
+
+        if (userProfile?.email) {
+          await sendListingDeletedEmail({
+            userEmail: userProfile.email,
+            userName: userProfile.full_name || 'Anunciante',
+            vehicleTitle: listing.title || 'Veículo'
+          })
+        }
+      } catch (emailErr) {
+        console.error('Falha ao enviar e-mail de exclusão de anúncio:', emailErr)
+      }
+    })()
 
     return NextResponse.json({ ok: true })
   } catch (error) {

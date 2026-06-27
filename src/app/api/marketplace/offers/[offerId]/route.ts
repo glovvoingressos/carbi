@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { CounterOfferPayload, validateCounterPayload } from '@/lib/offers'
+import { sendOfferStatusUpdateEmail } from '@/lib/email'
 
 export async function GET(
   req: NextRequest,
@@ -75,6 +76,10 @@ export async function PATCH(
       return NextResponse.json({ error: 'Oferta não encontrada.' }, { status: 404 })
     }
 
+    let updated: any = null
+    let recipientId: string | null = null
+    let emailStatus: 'accepted' | 'rejected' | 'countered' | null = null
+
     if (action === 'accept') {
       if (offer.seller_user_id === auth.userId && offer.status !== 'pending') {
         return NextResponse.json({ error: 'Esta oferta não está mais pendente.' }, { status: 400 })
@@ -88,50 +93,37 @@ export async function PATCH(
         return NextResponse.json({ error: 'Acesso negado.' }, { status: 403 })
       }
 
-      if (offer.seller_user_id === auth.userId && offer.status === 'pending') {
-        const { data: updated, error } = await supabase
-          .from('offers')
-          .update({
-            status: 'accepted',
-            accepted_at: new Date().toISOString(),
-            resolved_at: new Date().toISOString(),
-          })
-          .eq('id', offerId)
-          .select()
-          .single()
+      const isSeller = offer.seller_user_id === auth.userId
+      const { data, error } = await supabase
+        .from('offers')
+        .update({
+          status: 'accepted',
+          accepted_at: new Date().toISOString(),
+          resolved_at: new Date().toISOString(),
+        })
+        .eq('id', offerId)
+        .select()
+        .single()
 
-        if (error) return NextResponse.json({ error: 'Erro ao aceitar oferta.' }, { status: 500 })
-        return NextResponse.json(updated)
-      }
-
-      if (offer.buyer_user_id === auth.userId && offer.status === 'countered') {
-        const { data: updated, error } = await supabase
-          .from('offers')
-          .update({
-            status: 'accepted',
-            accepted_at: new Date().toISOString(),
-            resolved_at: new Date().toISOString(),
-          })
-          .eq('id', offerId)
-          .select()
-          .single()
-
-        if (error) return NextResponse.json({ error: 'Erro ao aceitar contraproposta.' }, { status: 500 })
-        return NextResponse.json(updated)
-      }
+      if (error) return NextResponse.json({ error: isSeller ? 'Erro ao aceitar oferta.' : 'Erro ao aceitar contraproposta.' }, { status: 500 })
+      
+      updated = data
+      recipientId = isSeller ? offer.buyer_user_id : offer.seller_user_id
+      emailStatus = 'accepted'
     }
 
-    if (action === 'reject') {
+    else if (action === 'reject') {
       if (offer.seller_user_id !== auth.userId && offer.buyer_user_id !== auth.userId) {
         return NextResponse.json({ error: 'Acesso negado.' }, { status: 403 })
       }
 
-      const validStatuses = offer.seller_user_id === auth.userId ? ['pending'] : ['countered']
+      const isSeller = offer.seller_user_id === auth.userId
+      const validStatuses = isSeller ? ['pending'] : ['countered']
       if (!validStatuses.includes(offer.status)) {
         return NextResponse.json({ error: 'Esta oferta não pode ser recusada.' }, { status: 400 })
       }
 
-      const { data: updated, error } = await supabase
+      const { data, error } = await supabase
         .from('offers')
         .update({
           status: 'rejected',
@@ -142,10 +134,13 @@ export async function PATCH(
         .single()
 
       if (error) return NextResponse.json({ error: 'Erro ao recusar oferta.' }, { status: 500 })
-      return NextResponse.json(updated)
+      
+      updated = data
+      recipientId = isSeller ? offer.buyer_user_id : offer.seller_user_id
+      emailStatus = 'rejected'
     }
 
-    if (action === 'counter') {
+    else if (action === 'counter') {
       if (offer.seller_user_id !== auth.userId) {
         return NextResponse.json({ error: 'Acesso negado.' }, { status: 403 })
       }
@@ -165,7 +160,7 @@ export async function PATCH(
         return NextResponse.json({ error: errors[0], details: errors }, { status: 400 })
       }
 
-      const { data: updated, error } = await supabase
+      const { data, error } = await supabase
         .from('offers')
         .update({
           status: 'countered',
@@ -177,10 +172,55 @@ export async function PATCH(
         .single()
 
       if (error) return NextResponse.json({ error: 'Erro ao enviar contraproposta.' }, { status: 500 })
-      return NextResponse.json(updated)
+      
+      updated = data
+      recipientId = offer.buyer_user_id
+      emailStatus = 'countered'
     }
 
-    return NextResponse.json({ error: 'Ação inválida.' }, { status: 400 })
+    if (updated && recipientId && emailStatus) {
+      // Dispara notificação por e-mail assíncrona
+      ;(async () => {
+        try {
+          const { data: users } = await supabase
+            .from('users')
+            .select('id, email, full_name')
+            .in('id', [recipientId, auth.userId])
+
+          if (users) {
+            const recipient = users.find(u => u.id === recipientId)
+            const sender = users.find(u => u.id === auth.userId)
+
+            if (recipient?.email) {
+              const listingReader = getSupabaseServerClient()
+              const { data: carData } = await listingReader
+                .from('vehicle_listings_public')
+                .select('title, brand, model')
+                .eq('id', offer.listing_id)
+                .single()
+
+              const title = carData?.title || `${carData?.brand} ${carData?.model}` || 'Veículo'
+
+              await sendOfferStatusUpdateEmail({
+                recipientEmail: recipient.email,
+                recipientName: recipient.full_name || 'Cliente',
+                senderName: sender?.full_name || 'Usuário',
+                vehicleTitle: title,
+                status: emailStatus!,
+                originalAmount: offer.amount,
+                counterAmount: updated.counter_amount || undefined,
+                message: (emailStatus === 'countered' ? updated.seller_message : (emailStatus === 'rejected' ? 'Proposta recusada.' : 'Proposta aceita!')) || undefined,
+                offerId: offerId
+              })
+            }
+          }
+        } catch (emailErr) {
+          console.error('Falha ao enviar e-mail de atualização de proposta:', emailErr)
+        }
+      })()
+    }
+
+    return NextResponse.json(updated)
   } catch (error) {
     console.error('[OFFER_PATCH]', error)
     return NextResponse.json({ error: 'Erro interno do servidor.' }, { status: 500 })

@@ -4,6 +4,7 @@ import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-se
 import { ListingFormPayload, validateListingPayload } from '@/lib/marketplace'
 import { queryPublicListings } from '@/lib/marketplace-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
+import { sendListingCreatedEmail } from '@/lib/email'
 
 export async function GET(req: NextRequest) {
   try {
@@ -150,6 +151,29 @@ export async function POST(req: NextRequest) {
       await supabase.from('vehicles').delete().eq('id', vehicle.id)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    // Processamento assíncrono para enviar confirmação de anúncio criado por e-mail
+    ;(async () => {
+      try {
+        const { data: userProfile } = await supabase
+          .from('users')
+          .select('email, full_name')
+          .eq('id', auth.userId)
+          .single()
+
+        if (userProfile?.email) {
+          await sendListingCreatedEmail({
+            userEmail: userProfile.email,
+            userName: userProfile.full_name || 'Anunciante',
+            vehicleTitle: resolvedTitle,
+            price: payload.price,
+            listingSlug: data.slug
+          })
+        }
+      } catch (emailErr) {
+        console.error('Falha ao enviar e-mail de confirmação de anúncio ativo:', emailErr)
+      }
+    })()
 
     if (payload.vin) {
       const sync = await runAutoDevSync({

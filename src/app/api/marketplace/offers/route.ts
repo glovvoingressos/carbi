@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { CreateOfferPayload, validateOfferPayload } from '@/lib/offers'
+import { sendNewOfferEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
   try {
@@ -87,6 +88,44 @@ export async function POST(req: NextRequest) {
     if (insertError) {
       return NextResponse.json({ error: 'Erro ao criar oferta. Tente novamente.' }, { status: 500 })
     }
+
+    // Processamento assíncrono para enviar notificação de nova proposta por e-mail ao vendedor
+    ;(async () => {
+      try {
+        const { data: users } = await supabase
+          .from('users')
+          .select('id, email, full_name')
+          .in('id', [listing.user_id, auth.userId])
+
+        if (users) {
+          const seller = users.find(u => u.id === listing.user_id)
+          const buyer = users.find(u => u.id === auth.userId)
+
+          if (seller?.email) {
+            const { data: carData } = await listingReader
+              .from('vehicle_listings_public')
+              .select('title, brand, model')
+              .eq('id', body.listing_id)
+              .single()
+
+            const title = carData?.title || `${carData?.brand} ${carData?.model}` || 'Veículo'
+
+            await sendNewOfferEmail({
+              sellerEmail: seller.email,
+              sellerName: seller.full_name || 'Vendedor',
+              buyerName: buyer?.full_name || 'Um interessado',
+              vehicleTitle: title,
+              offerAmount: body.amount,
+              paymentMethod: body.payment_method,
+              buyerMessage: body.message || undefined,
+              offerId: offer.id
+            })
+          }
+        }
+      } catch (emailErr) {
+        console.error('Falha ao enviar e-mail de nova proposta:', emailErr)
+      }
+    })()
 
     return NextResponse.json(offer, { status: 201 })
   } catch (error) {
