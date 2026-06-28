@@ -5,14 +5,10 @@ export const CAR_IMAGE_HEIGHT = 1080
 
 export function getCarImageUrl(
   url: string | null | undefined,
-  width: number = CAR_IMAGE_WIDTH,
-  height: number = width,
+  _width?: number,
+  _height?: number,
 ): string | null {
   if (!url) return null
-  if (url.includes('supabase.co/storage/')) {
-    const sep = url.includes('?') ? '&' : '?'
-    return `${url}${sep}width=${width}&height=${height}&resize=cover&quality=80`
-  }
   return url
 }
 
@@ -24,22 +20,16 @@ function addUniqueUrl(urls: string[], url: string | null | undefined) {
 
 export function getCarImageCandidates(
   urls: Array<string | null | undefined>,
-  width: number = CAR_IMAGE_WIDTH,
-  height: number = width,
-  preferTransformed: boolean = false,
+  _width?: number,
+  _height?: number,
+  _preferTransformed?: boolean,
 ): string[] {
   const candidates: string[] = []
 
   for (const url of urls) {
-    const value = url?.trim()
+    const value = getCarImageUrl(url)
     if (!value) continue
-    if (preferTransformed) {
-      addUniqueUrl(candidates, getCarImageUrl(value, width, height))
-      addUniqueUrl(candidates, value)
-    } else {
-      addUniqueUrl(candidates, value)
-      addUniqueUrl(candidates, getCarImageUrl(value, width, height))
-    }
+    addUniqueUrl(candidates, value)
   }
 
   return candidates
