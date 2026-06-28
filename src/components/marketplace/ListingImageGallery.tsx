@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
-import { CAR_IMAGE_HEIGHT, CAR_IMAGE_WIDTH, getCarImageUrl } from '@/lib/car-image-fallback'
+import { useMemo, useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import SafeMarketplaceImage from './SafeMarketplaceImage'
 
 type ListingImageGalleryProps = {
   images: string[]
@@ -12,59 +12,19 @@ type ListingImageGalleryProps = {
 }
 
 export default function ListingImageGallery({ images, title, badgeLabel, fipeBadgeLabel }: ListingImageGalleryProps) {
-  const imageWidth = CAR_IMAGE_WIDTH
-  const imageHeight = CAR_IMAGE_HEIGHT
   const gallery = useMemo(
     () => Array.from(new Set(images.map((url) => url?.trim()).filter((url): url is string => Boolean(url)))),
     [images],
   )
   const [activeIndex, setActiveIndex] = useState(0)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
-  const failedRef = useRef<Set<string>>(new Set())
-  const retriedRef = useRef<Set<string>>(new Set())
-  const [, forceRender] = useState(0)
-  const visibleGallery = gallery.filter((url) => !failedRef.current.has(url))
-
-  const getDisplaySrc = useCallback((url: string) => {
-    if (!retriedRef.current.has(url)) return getCarImageUrl(url, imageWidth, imageHeight) || url
-    return url
-  }, [])
-
-  const handleImageError = useCallback((url: string) => {
-    if (!retriedRef.current.has(url)) {
-      retriedRef.current.add(url)
-      forceRender((n) => n + 1)
-      return
-    }
-
-    if (!failedRef.current.has(url)) {
-      failedRef.current.add(url)
-      forceRender((n) => n + 1)
-    }
-  }, [imageWidth, imageHeight])
 
   if (!gallery.length) return null
-  if (visibleGallery.length === 0) {
-    return (
-      <div className="ref-ad-gallery">
-        <div className="ref-ad-gallery-main">
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/80 border border-white/70 shadow-sm">
-              <ImageIcon className="h-8 w-8 text-[#8A95A8]" />
-            </div>
-            <p className="text-[12px] font-bold uppercase tracking-[0.24em] text-[#525252]">
-              Imagem indisponível
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
-  const safeIndex = Math.min(activeIndex, visibleGallery.length - 1)
+  const safeIndex = Math.min(activeIndex, gallery.length - 1)
 
-  const goPrev = () => setActiveIndex((prev) => (prev === 0 ? visibleGallery.length - 1 : prev - 1))
-  const goNext = () => setActiveIndex((prev) => (prev === visibleGallery.length - 1 ? 0 : prev + 1))
+  const goPrev = () => setActiveIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1))
+  const goNext = () => setActiveIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1))
 
   return (
     <div className="ref-ad-gallery">
@@ -88,24 +48,21 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
           className="flex h-full w-full transition-transform duration-500 ease-out"
           style={{ transform: `translateX(-${safeIndex * 100}%)` }}
         >
-          {visibleGallery.map((image, index) => (
+          {gallery.map((image, index) => (
             <div key={`${image}-${index}`} className="relative h-full w-full flex-shrink-0">
-              <img
-                src={getDisplaySrc(image)}
+              <SafeMarketplaceImage
+                sources={[image]}
                 alt={`${title} foto ${index + 1}`}
-                width={imageWidth}
-                height={imageHeight}
+                containerClassName="h-full w-full"
                 className="block h-full w-full object-cover object-center"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
-                loading={index === 0 ? 'eager' : 'lazy'}
-                decoding="async"
-                onError={() => handleImageError(image)}
+                priority={index === 0}
+                loadingLabel={`Carregando foto ${index + 1}`}
               />
             </div>
           ))}
         </div>
 
-        {visibleGallery.length > 1 ? (
+        {gallery.length > 1 ? (
           <>
             <button
               type="button"
@@ -124,14 +81,14 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
               <ChevronRight className="h-5 w-5" />
             </button>
 
-            <div className="ref-ad-gallery-count">{safeIndex + 1}/{visibleGallery.length}</div>
+            <div className="ref-ad-gallery-count">{safeIndex + 1}/{gallery.length}</div>
           </>
         ) : null}
       </div>
 
-      {visibleGallery.length > 1 ? (
+      {gallery.length > 1 ? (
         <div className="ref-ad-gallery-thumbs">
-          {visibleGallery.map((image, index) => {
+          {gallery.map((image, index) => {
             const isActive = index === safeIndex
             return (
               <button
@@ -141,16 +98,12 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
                 className={`ref-ad-thumb ${isActive ? 'active' : ''}`}
                 aria-label={`Abrir foto ${index + 1}`}
               >
-                <img
-                  src={getDisplaySrc(image)}
+                <SafeMarketplaceImage
+                  sources={[image]}
                   alt={`${title} miniatura ${index + 1}`}
-                  width={imageWidth}
-                  height={imageHeight}
+                  containerClassName="h-full w-full"
                   className="block h-full w-full object-cover object-center"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
-                  loading="lazy"
-                  decoding="async"
-                  onError={() => handleImageError(image)}
+                  loadingLabel={`Carregando miniatura ${index + 1}`}
                 />
               </button>
             )

@@ -1,12 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { ImageIcon } from 'lucide-react'
+import { useMemo } from 'react'
 import { CAR_IMAGE_HEIGHT, CAR_IMAGE_WIDTH, resolveMarketplaceCarImageCandidates } from '@/lib/car-image-fallback'
-
-function isValidUrl(url: string | null | undefined) {
-  return Boolean(url && url.trim())
-}
+import SafeMarketplaceImage from './SafeMarketplaceImage'
 
 type MarketplaceListingImageProps = {
   brand: string
@@ -37,41 +33,15 @@ export default function MarketplaceListingImage({
     () => resolveMarketplaceCarImageCandidates({ brand, model, year, preferredUrls: imageUrls, width, height, preferTransformed }),
     [brand, model, year, imageUrls, width, height, preferTransformed],
   )
-  const [sourceIndex, setSourceIndex] = useState(0)
-  const [failedFallback, setFailedFallback] = useState(false)
-
-  useEffect(() => {
-    setSourceIndex(0)
-    setFailedFallback(false)
-  }, [sources])
-
-  const src = sources[sourceIndex] || null
-
-  if (!isValidUrl(src) || failedFallback) {
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-[#FFF8DF] text-[#8A95A8]">
-        <ImageIcon className="h-8 w-8" />
-        <span className="text-xs font-semibold uppercase tracking-widest">Sem imagem</span>
-      </div>
-    )
-  }
 
   return (
-    <img
-      src={src!}
+    <SafeMarketplaceImage
+      sources={sources}
       alt={alt}
-      width={width}
-      height={height}
       className={className}
-      loading={priority ? 'eager' : 'lazy'}
-      decoding="async"
-      onError={() => {
-        if (sourceIndex < sources.length - 1) {
-          setSourceIndex((current) => Math.min(current + 1, sources.length - 1))
-          return
-        }
-        setFailedFallback(true)
-      }}
+      containerClassName="h-full w-full"
+      priority={priority}
+      loadingLabel={`Carregando imagem de ${alt}`}
     />
   )
 }
