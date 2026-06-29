@@ -107,6 +107,7 @@ export default function MyListingsDashboard() {
   const [isDraggingPhotos, setIsDraggingPhotos] = useState(false)
 
   const syncImagesTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const localImagesRef = useRef<UploadImageItem[]>([])
   const dragCounter = useRef(0)
 
   const selectedListing = useMemo(
@@ -234,6 +235,10 @@ export default function MyListingsDashboard() {
     setErrors({})
   }, [selectedListing?.id])
 
+  useEffect(() => {
+    localImagesRef.current = localImages
+  }, [localImages])
+
   // --- Unsaved changes warning ---
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -359,10 +364,11 @@ export default function MyListingsDashboard() {
 
     if (accepted.length > 0) {
       setLocalImages(next)
+      localImagesRef.current = next
       setIsDirty(true)
       setPendingUploads(accepted.length)
       setImageError(null)
-      scheduleAutoSync()
+      scheduleAutoSync(next)
     }
 
     if (rejected.length > 0) {
@@ -371,10 +377,10 @@ export default function MyListingsDashboard() {
     }
   }
 
-  const scheduleAutoSync = () => {
+  const scheduleAutoSync = (imagesSnapshot: UploadImageItem[] = localImagesRef.current) => {
     if (syncImagesTimer.current) clearTimeout(syncImagesTimer.current)
     syncImagesTimer.current = setTimeout(() => {
-      syncImages()
+      syncImages(imagesSnapshot)
     }, 700)
   }
 
@@ -382,14 +388,16 @@ export default function MyListingsDashboard() {
     setLocalImages(prev => {
       const filtered = prev.filter(img => img.id !== id)
       // Re-order remaining
-      return filtered.map((img, idx) => ({
+      const next = filtered.map((img, idx) => ({
         ...img,
         sort_order: idx,
         is_primary: idx === 0
       }))
+      localImagesRef.current = next
+      return next
     })
     setIsDirty(true)
-    scheduleAutoSync()
+    scheduleAutoSync(localImagesRef.current)
   }
 
   const setPrimary = (id: string) => {
@@ -402,10 +410,11 @@ export default function MyListingsDashboard() {
         sort_order: idx,
         is_primary: idx === 0
       }))
+      localImagesRef.current = sorted
       return sorted
     })
     setIsDirty(true)
-    scheduleAutoSync()
+    scheduleAutoSync(localImagesRef.current)
   }
 
   const handlePhotosDragEnter = (e: React.DragEvent) => {
@@ -443,7 +452,7 @@ export default function MyListingsDashboard() {
     }
   }
 
-  const syncImages = async () => {
+  const syncImages = async (imagesSnapshot: UploadImageItem[] = localImagesRef.current) => {
     if (!selectedListing) return
     if (isUploading) return
     setIsUploading(true)
@@ -457,8 +466,8 @@ export default function MyListingsDashboard() {
 
       const finalImages: any[] = []
 
-      for (let i = 0; i < localImages.length; i++) {
-        const item = localImages[i]
+      for (let i = 0; i < imagesSnapshot.length; i++) {
+        const item = imagesSnapshot[i]
         if (item.isExisting && item.originalImage) {
           finalImages.push({
             ...item.originalImage,
@@ -927,7 +936,9 @@ export default function MyListingsDashboard() {
                         <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { handleImageSelect(e.target.files); e.target.value = '' }} />
                       </label>
                       <button
-                        onClick={syncImages}
+                        onClick={() => {
+                          void syncImages()
+                        }}
                         disabled={!isDirty || isUploading}
                         className="btn btn-primary btn-sm px-8"
                       >
@@ -971,8 +982,9 @@ export default function MyListingsDashboard() {
                           is_primary: idx === 0,
                         }))
                         setLocalImages(reordered)
+                        localImagesRef.current = reordered
                         setIsDirty(true)
-                        scheduleAutoSync()
+                        scheduleAutoSync(reordered)
                       }}
                       className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"
                     >
