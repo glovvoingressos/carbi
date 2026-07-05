@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type DragEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2, Check } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
@@ -750,7 +751,6 @@ export default function ListingForm() {
     }
     setError(null)
     setValidationDetails([])
-    setListingSubStep(1)
     setCurrentStep((prev) => Math.min(3, prev + 1))
   }
 
@@ -942,24 +942,41 @@ export default function ListingForm() {
   }
 
   return (
-    <div className="listing-form-ref space-y-8 pb-4 max-w-3xl mx-auto max-[330px]:space-y-6 max-[330px]:pb-20">
-      <div className="space-y-3">
-        <div className="h-1.5 bg-[#FAFAF9] rounded-full overflow-hidden">
-          <div
-            className="h-full bg-[#10B981] rounded-full transition-all duration-500"
-            style={{ width: `${(currentStep / 3) * 100}%` }}
-          />
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      className="listing-form-ref space-y-6 pb-4 max-w-3xl mx-auto max-[330px]:space-y-5 max-[330px]:pb-20"
+    >
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            {[1, 2, 3].map((s) => (
+              <div key={s} className="flex-1">
+                <div className={`h-1.5 rounded-full transition-all duration-700 ${s <= currentStep ? 'bg-[#17170F]' : 'bg-[#EAEAE8]'}`} />
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="label text-[#17170F]">
+              {currentStep === 1 && 'Escolha do veículo'}
+              {currentStep === 2 && 'Dados e fotos'}
+              {currentStep === 3 && 'Revisão e publicação'}
+            </p>
+            <p className="label text-[#A3A3A3]">{currentStep}/3</p>
+          </div>
         </div>
-        <p className="label text-[#10B981]">
-          {currentStep === 1 && 'Etapa 1 de 3: Selecione seu carro'}
-          {currentStep === 2 && 'Etapa 2 de 3: Preço, dados básicos e fotos'}
-          {currentStep === 3 && 'Etapa 3 de 3: Revisar e publicar'}
-        </p>
-      </div>
 
       <div className="surface-strong p-6 sm:p-8 space-y-8 max-[330px]:p-4 max-[330px]:space-y-6">
-        {currentStep === 1 && (
-          <div className="space-y-6 max-[330px]:space-y-5">
+        <AnimatePresence mode="wait">
+          {currentStep === 1 && (
+            <motion.div
+              key="step-1"
+              initial={{ opacity: 0, x: -24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+              className="space-y-6 max-[330px]:space-y-5"
+            >
             <div>
               <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Selecione seu veículo</h3>
               <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
@@ -967,131 +984,198 @@ export default function ListingForm() {
               </p>
             </div>
 
-            {/* Step indicator */}
-            <div className="flex items-center gap-2">
+          {/* Step indicator */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="flex items-center gap-2"
+            >
               {[1, 2, 3, 4].map((s) => (
                 <div key={s} className="flex items-center gap-2 flex-1">
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-[12px] font-bold transition-all ${
-                    listingSubStep === s
-                      ? 'bg-[#17170F] text-white scale-110 shadow-md'
-                      : listingSubStep > s
-                      ? 'bg-[#10B981] text-white'
-                      : 'bg-[#EAEAE8] text-[#A3A3A3]'
-                  }`}>
+                  <motion.div
+                    layout
+                    initial={{ scale: 0.65, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    whileHover={{ scale: 1.12 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+                    className={`flex items-center justify-center w-8 h-8 rounded-full text-[12px] font-bold transition-all cursor-default ${
+                      listingSubStep === s
+                        ? 'bg-[#17170F] text-white shadow-lg shadow-[#17170F]/20'
+                        : listingSubStep > s
+                        ? 'bg-[#10B981] text-white'
+                        : 'bg-[#FAFAF9] text-[#A3A3A3] border border-[#EAEAE8]'
+                    }`}
+                  >
                     {listingSubStep > s ? <Check className="w-4 h-4" /> : s}
-                  </div>
-                  {s < 4 && <div className={`h-0.5 flex-1 rounded-full transition-colors ${listingSubStep > s ? 'bg-[#10B981]' : 'bg-[#EAEAE8]'}`} />}
+                  </motion.div>
+                  {s < 4 && <div className={`h-0.5 flex-1 rounded-full transition-colors duration-500 ${listingSubStep > s ? 'bg-[#17170F]' : 'bg-[#EAEAE8]'}`} />}
                 </div>
               ))}
-            </div>
-            <div className="flex justify-between text-[11px] font-medium text-[#A3A3A3] -mt-2">
-              <span className={listingSubStep >= 1 ? 'text-[#17170F]' : ''}>Marca</span>
-              <span className={listingSubStep >= 2 ? 'text-[#17170F]' : ''}>Modelo</span>
-              <span className={listingSubStep >= 3 ? 'text-[#17170F]' : ''}>Ano</span>
-              <span className={listingSubStep >= 4 ? 'text-[#17170F]' : ''}>Versão</span>
-            </div>
-
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+              className="flex justify-between text-[11px] font-bold tracking-[0.06em] text-[#A3A3A3] -mt-2"
+            >
+              <motion.span animate={{ color: listingSubStep >= 1 ? '#17170F' : '#A3A3A3' }} transition={{ duration: 0.25 }}>Marca</motion.span>
+              <motion.span animate={{ color: listingSubStep >= 2 ? '#17170F' : '#A3A3A3' }} transition={{ duration: 0.25 }}>Modelo</motion.span>
+              <motion.span animate={{ color: listingSubStep >= 3 ? '#17170F' : '#A3A3A3' }} transition={{ duration: 0.25 }}>Ano</motion.span>
+              <motion.span animate={{ color: listingSubStep >= 4 ? '#17170F' : '#A3A3A3' }} transition={{ duration: 0.25 }}>Versão</motion.span>
+            </motion.div>
             <input type="hidden" value={form.vehicle_type} />
 
             {/* Sub-step 1: Brand */}
             {listingSubStep === 1 && (
-              <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3"
+              >
                 <div className="flex items-center justify-between gap-3">
                   <p className="label text-[#10B981]">Marca</p>
                   <span className="badge badge-brand text-[10px]">Passo 1 de 4</span>
                 </div>
-                <select
-                  className="input text-[15px]"
-                  value={selectedBrandCode}
-                  onChange={(e) => {
-                    const code = e.target.value
-                    setSelectedBrandCode(code)
-                    const selected = brands.find((item) => item.code === code)
-                    handleInput('brand', selected?.name || '')
-                  }}
-                >
-                  <option value="">Selecione a marca</option>
-                  {brands.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
-                </select>
+                <div className="relative">
+                  <select
+                    className="input text-[15px] appearance-none pr-10"
+                    value={selectedBrandCode}
+                    onChange={(e) => {
+                      const code = e.target.value
+                      setSelectedBrandCode(code)
+                      const selected = brands.find((item) => item.code === code)
+                      handleInput('brand', selected?.name || '')
+                    }}
+                  >
+                    <option value="">Selecione a marca</option>
+                    {brands.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
+                  </select>
+                  <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A3A3A3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </div>
                 {selectedBrandCode && (
-                  <button type="button" onClick={handleSubStepNext} className="btn btn-primary w-full mt-2">
+                  <motion.button
+                    type="button"
+                    onClick={handleSubStepNext}
+                    className="btn btn-primary w-full mt-2"
+                    whileHover={{ scale: 1.015, y: -1 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     Continuar
                     <ArrowRight className="h-4 w-4" />
-                  </button>
+                  </motion.button>
                 )}
-              </div>
+              </motion.div>
             )}
 
             {/* Sub-step 2: Model */}
             {listingSubStep === 2 && (
-              <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3"
+              >
                 <div className="flex items-center justify-between gap-3">
                   <p className="label text-[#10B981]">Modelo</p>
                   <span className="badge badge-brand text-[10px]">Passo 2 de 4</span>
                 </div>
-                <select
-                  className="input text-[15px]"
-                  value={selectedModelCode}
-                  onChange={(e) => {
-                    const code = e.target.value
-                    setSelectedModelCode(code)
-                    const selected = models.find((item) => item.code === code)
-                    const rawName = selected?.name || ''
-                    handleInput('model', resolveCatalogModelName(form.brand, rawName))
-                  }}
-                  disabled={models.length === 0}
-                >
-                  <option value="">Selecione o modelo</option>
-                  {models.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
-                </select>
+                <div className="relative">
+                  <select
+                    className="input text-[15px] appearance-none pr-10"
+                    value={selectedModelCode}
+                    onChange={(e) => {
+                      const code = e.target.value
+                      setSelectedModelCode(code)
+                      const selected = models.find((item) => item.code === code)
+                      const rawName = selected?.name || ''
+                      handleInput('model', resolveCatalogModelName(form.brand, rawName))
+                    }}
+                    disabled={models.length === 0}
+                  >
+                    <option value="">Selecione o modelo</option>
+                    {models.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
+                  </select>
+                  <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A3A3A3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </div>
                 {selectedModelCode && (
-                  <button type="button" onClick={handleSubStepNext} className="btn btn-primary w-full mt-2">
+                  <motion.button
+                    type="button"
+                    onClick={handleSubStepNext}
+                    className="btn btn-primary w-full mt-2"
+                    whileHover={{ scale: 1.015, y: -1 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     Continuar
                     <ArrowRight className="h-4 w-4" />
-                  </button>
+                  </motion.button>
                 )}
-              </div>
+              </motion.div>
             )}
 
             {/* Sub-step 3: Year */}
             {listingSubStep === 3 && (
-              <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3"
+              >
                 <div className="flex items-center justify-between gap-3">
                   <p className="label text-[#10B981]">Ano</p>
                   <span className="badge badge-brand text-[10px]">Passo 3 de 4</span>
                 </div>
-                <select
-                  className="input text-[15px]"
-                  value={selectedYear ?? ''}
-                  onChange={(e) => {
-                    const code = e.target.value
-                    setSelectedYear(Number(code))
-                    setSelectedVersionCode('')
-                    handleInput('year', code)
-                    handleInput('yearModel', code)
-                  }}
-                >
-                  <option value="">Selecione o ano</option>
-                  {years.map((year) => <option key={year} value={year}>{year}</option>)}
-                </select>
+                <div className="relative">
+                  <select
+                    className="input text-[15px] appearance-none pr-10"
+                    value={selectedYear ?? ''}
+                    onChange={(e) => {
+                      const code = e.target.value
+                      setSelectedYear(Number(code))
+                      setSelectedVersionCode('')
+                      handleInput('year', code)
+                      handleInput('yearModel', code)
+                    }}
+                  >
+                    <option value="">Selecione o ano</option>
+                    {years.map((year) => <option key={year} value={year}>{year}</option>)}
+                  </select>
+                  <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A3A3A3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </div>
                 {selectedYear && (
-                  <button type="button" onClick={handleSubStepNext} className="btn btn-primary w-full mt-2">
+                  <motion.button
+                    type="button"
+                    onClick={handleSubStepNext}
+                    className="btn btn-primary w-full mt-2"
+                    whileHover={{ scale: 1.015, y: -1 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     Continuar
                     <ArrowRight className="h-4 w-4" />
-                  </button>
+                  </motion.button>
                 )}
-              </div>
+              </motion.div>
             )}
 
             {/* Sub-step 4: Version + FIPE */}
             {listingSubStep === 4 && (
-              <div className="space-y-4 animate-fade-in">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-4"
+              >
                 <div className="surface p-5 space-y-4 max-[330px]:p-4">
                   <div className="flex items-center justify-between gap-3">
                     <p className="label text-[#10B981]">Versões disponíveis</p>
                     <span className="badge badge-brand text-[10px]">Passo 4 de 4</span>
                   </div>
-                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-wrap items-center gap-x-6 gap-y-2 max-[330px]:p-3">
+                  <div className="bg-[#FAFAF9] rounded-[25px] p-4 flex flex-wrap items-center gap-x-6 gap-y-2 max-[330px]:p-3">
                     <div>
                       <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Marca</span>
                       <p className="text-sm font-bold text-[#0A0A0A]">{form.brand || '-'}</p>
@@ -1108,7 +1192,7 @@ export default function ListingForm() {
                   {versions.length > 0 ? (
                     <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                       {versions.map((v) => (
-                        <button
+                        <motion.button
                           key={v.code}
                           type="button"
                           onClick={() => {
@@ -1116,17 +1200,22 @@ export default function ListingForm() {
                             handleInput('version', v.name)
                             handleInput('title', `${form.brand} ${form.model} ${form.yearModel} ${v.name}`.trim())
                           }}
-                          className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          whileHover={{ y: -2 }}
+                          whileTap={{ scale: 0.985 }}
+                          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                          className={`w-full text-left p-4 rounded-[25px] border-2 transition-all ${
                             selectedVersionCode === v.code
-                              ? 'border-[#17170F] bg-[#17170F]/5 shadow-sm'
-                              : 'border-[#EAEAE8] hover:border-[#17170F]/30 bg-white'
+                              ? 'border-[#17170F] bg-[#17170F]/5 shadow-md shadow-[#17170F]/10'
+                              : 'border-[#EAEAE8] hover:border-[#17170F]/30 hover:-translate-y-0.5 hover:shadow-sm bg-white'
                           }`}
                         >
                           <p className="text-[14px] font-bold text-[#0A0A0A]">{v.name}</p>
                           {v.code !== selectedVersionCode && selectedVersionCode && (
                             <p className="text-[11px] text-[#A3A3A3] mt-0.5">Clique para selecionar</p>
                           )}
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
                   ) : fipeLoading ? (
@@ -1137,15 +1226,23 @@ export default function ListingForm() {
                   ) : (
                     <div className="text-center py-6 space-y-3">
                       <p className="text-sm text-[#525252]">Nenhuma versão encontrada para esta combinação.</p>
-                      <input
-                        className="input text-center"
-                        placeholder="Informe a versão do veículo"
-                        value={form.version}
-                        onChange={(e) => handleInput('version', e.target.value)}
-                      />
-                      <button type="button" onClick={prevStep} className="text-sm text-[#10B981] font-medium mt-2 hover:underline">
+                      <div className="relative inline-block">
+                        <input
+                          className="input text-center"
+                          placeholder="Informe a versão do veículo"
+                          value={form.version}
+                          onChange={(e) => handleInput('version', e.target.value)}
+                        />
+                        <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A3A3A3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        </div>
+                      <motion.button
+                        type="button"
+                        onClick={prevStep}
+                        className="text-sm text-[#10B981] font-medium mt-2 hover:underline"
+                        whileHover={{ x: -2 }}
+                      >
                         Voltar e escolher outro ano
-                      </button>
+                      </motion.button>
                     </div>
                   )}
                 </div>
@@ -1163,9 +1260,9 @@ export default function ListingForm() {
                 </span>
               </div>
               {!selectedYear ? (
-                <p className="text-sm font-medium text-[#525252] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8] max-[330px]:text-[13px] max-[330px]:p-3">Complete marca, modelo e ano para carregar os dados automáticos.</p>
+                <p className="text-sm font-medium text-[#525252] bg-[#FAFAF9] p-4 rounded-[25px] border border-[#EAEAE8] max-[330px]:text-[13px] max-[330px]:p-3">Complete marca, modelo e ano para carregar os dados automáticos.</p>
               ) : fipeLoading ? (
-                <p className="text-sm font-medium text-[#10B981] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8] flex items-center gap-2 max-[330px]:text-[13px] max-[330px]:p-3"><Loader2 className="w-4 h-4 animate-spin" /> Consultando valor atualizado...</p>
+                <p className="text-sm font-medium text-[#10B981] bg-[#FAFAF9] p-4 rounded-[25px] border border-[#EAEAE8] flex items-center gap-2 max-[330px]:text-[13px] max-[330px]:p-3"><Loader2 className="w-4 h-4 animate-spin" /> Consultando valor atualizado...</p>
               ) : fipeResult ? (
                 <div className="grid gap-3 text-sm font-medium text-[#525252] max-[330px]:gap-2.5 max-[330px]:text-[13px]">
                   <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#A3A3A3]">Versão automática:</span> <strong className="text-[#0A0A0A]">{form.version || 'Não informada'}</strong></div>
@@ -1179,269 +1276,19 @@ export default function ListingForm() {
                   ) : null}
                 </div>
               ) : (
-                <p className="text-sm font-medium text-red-700 bg-red-50 p-4 rounded-xl border border-red-200">
+                <p className="text-sm font-medium text-red-700 bg-red-50 p-4 rounded-[25px] border border-red-200">
                   Não foi possível carregar referência FIPE para essa combinação, mas você pode continuar normalmente.
                 </p>
               )}
             </div>
-              </div>
-        )}
-
-          </div>
-        )}
-
-        {currentStep === 2 && (
-          <div className="space-y-8 max-[330px]:space-y-5">
-            <div>
-              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Dados essenciais</h3>
-              <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
-                Só pedimos o necessário para publicar rápido. O restante pode ser completado depois.
-              </p>
-            </div>
-            
-            <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
-              <input className="input" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} />
-              <input className="input" placeholder="Quilometragem" value={formatBrazilianInt(form.mileage)} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
-              <input className="input" placeholder="Combustível" value={form.fuel || resolvedFuelValue} onChange={(e) => handleInput('fuel', e.target.value)} />
-              <input className="input" placeholder="Câmbio" value={form.transmission || resolvedTransmissionValue} onChange={(e) => handleInput('transmission', e.target.value)} />
-              <input className="input" placeholder="Cor" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
-              <input className="input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
-              <input className="input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
-            </div>
-
-            {fipeResult ? (
-              <div className="rounded-[28px] bg-[#1A2F1E] p-5 text-white shadow-lg shadow-[#1A2F1E]/15 max-[330px]:p-4">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="space-y-1">
-                    <p className="text-[12px] font-black uppercase tracking-[0.18em] text-white/65 max-[330px]:text-[11px]">
-                      Comparativo FIPE
-                    </p>
-                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <p className="text-[40px] font-black leading-none tracking-[-0.05em] text-white max-[330px]:text-[30px]">
-                        {fipeResult.price}
-                      </p>
-                      <span className="text-[16px] font-medium text-white/55 max-[330px]:text-[13px]">
-                        Tabela FIPE
-                      </span>
-                    </div>
-                  </div>
-                  <span className={`rounded-full border px-4 py-2 text-[12px] font-black tracking-[-0.01em] ${fipeComparisonStatusClass}`}>
-                    {fipeComparisonStatusLabel}
-                  </span>
-                </div>
-
-                <div className="mt-5 grid gap-3">
-                  <div className="rounded-[22px] bg-white/8 px-4 py-4 backdrop-blur-sm">
-                    <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/45">Preço anunciado</p>
-                    <p className="mt-2 text-[28px] font-black leading-none tracking-[-0.04em] text-white max-[330px]:text-[23px]">
-                      {hasAskingPrice ? formatBRL(priceNumber) : 'Informe abaixo'}
-                    </p>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-[22px] bg-white/8 px-4 py-4 backdrop-blur-sm">
-                      <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/45">Diferença</p>
-                      <p className="mt-2 text-[22px] font-black leading-none tracking-[-0.04em] text-[#D9F85F] max-[330px]:text-[19px]">
-                        {fipeDiffValueLabel ?? 'Preencha o preço'}
-                      </p>
-                    </div>
-                    <div className="rounded-[22px] bg-white/8 px-4 py-4 backdrop-blur-sm">
-                      <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/45">Percentual</p>
-                      <p className="mt-2 text-[22px] font-black leading-none tracking-[-0.04em] text-[#D9F85F] max-[330px]:text-[19px]">
-                        {fipeDiffPercentLabel ?? '—'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-[22px] bg-white/5 px-4 py-4 backdrop-blur-sm">
-                    <div className="flex items-center justify-between gap-4 text-[13px] font-medium text-white/55">
-                      <span>Abaixo da FIPE</span>
-                      <span>Acima da FIPE</span>
-                    </div>
-                    <div className="mt-3 h-2 rounded-full bg-white/10 overflow-hidden">
-                      <div className="h-full rounded-full bg-[#D9F85F] transition-all duration-500" style={{ width: fipeProgressWidth }} />
-                    </div>
-                    <p className="mt-3 text-[12px] leading-relaxed text-white/60">
-                      {fipeResult.referenceMonth
-                        ? `Referência ${fipeResult.referenceMonth} • Atualizado pela FIPE.`
-                        : 'Atualizado pela FIPE.'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
-            <div className="rounded-[24px] border border-[#EAEAE8] bg-[#FAFAF9] p-4 space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <p className="label text-[#16855C]">Recomendado, não obrigatório</p>
-                <span className="text-[11px] font-bold text-[#525252]">Pode completar depois</span>
-              </div>
-              <textarea className="input min-h-[120px] py-3 resize-none leading-relaxed max-[330px]:min-h-[100px]" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
-              <input className="input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
-            </div>
-
-
-
-            <label
-              className="surface border-2 border-dashed border-[#17170F]/18 p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] hover:border-[#17170F]/30 hover:bg-[#D9F85F] transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px]"
-              onDragOver={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-              }}
-              onDrop={onDropFiles}
-            >
-              <div className="w-14 h-14 rounded-full bg-[#FFF8DF] flex items-center justify-center group-hover:scale-110 transition-transform max-[330px]:w-12 max-[330px]:h-12">
-                <ImagePlus className="h-6 w-6 text-[#17170F]" />
-              </div>
-              <span className="text-sm text-[#0A0A0A] mt-1 max-[330px]:text-[13px]">Arraste fotos ou clique ({images.length}/{LISTING_MAX_IMAGES})</span>
-              <span className="badge badge-brand text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens</span>
-              <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
-            </label>
-            <p className="text-xs text-[#525252] text-center">Inclua pelo menos 1 foto para publicar. Você pode reorganizar e completar até 10 fotos depois.</p>
-
-            {images.length > 0 && (
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8 max-[330px]:grid-cols-1 max-[330px]:gap-4">
-                {images.map((image, index) => (
-                  <div key={image.previewUrl} className="surface p-3 hover:shadow-md transition-shadow max-[330px]:p-2.5">
-                    <img src={image.previewUrl} alt={`Preview ${index + 1}`} width={1920} height={1080} className="aspect-video w-full rounded-xl object-cover" />
-                    <p className="mt-4 px-2 text-[10px] font-black uppercase tracking-widest text-[#525252] max-[330px]:mt-3">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
-                    <div className="mt-3 flex items-center gap-2 px-2 pb-1 max-[330px]:gap-1.5">
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#10B981] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, -1)} disabled={index === 0}>
-                        <MoveLeft className="h-4 w-4" />
-                      </button>
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#10B981] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1}>
-                        <MoveRight className="h-4 w-4" />
-                      </button>
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors ml-auto max-[330px]:h-9 max-[330px]:w-9" onClick={() => removeImage(index)}>
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {currentStep === 3 && (
-          <div className="space-y-8 max-[330px]:space-y-5">
-            <div>
-              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Revisar e publicar</h3>
-              <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
-                Confira os detalhes antes de finalizar.
-              </p>
-            </div>
-
-            <div className="rounded-[28px] border border-[#17170F]/10 bg-[#D9F85F] p-5 shadow-sm max-[330px]:p-4">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <p className="label text-[#1A2F1E]">{qualityLabel}</p>
-                  <h4 className="mt-2 text-3xl font-black tracking-[-0.04em] text-[#17170F] max-[330px]:text-2xl">
-                    {qualityScore}/100
-                  </h4>
-                </div>
-                <div className="min-w-[180px] flex-1">
-                  <div className="h-3 overflow-hidden rounded-full bg-white/70">
-                    <div className="h-full rounded-full bg-[#1A2F1E] transition-all duration-500" style={{ width: `${qualityScore}%` }} />
-                  </div>
-                  <p className="mt-2 text-xs font-bold text-[#1A2F1E]/80">
-                    Seu anúncio pode ser publicado como básico. Depois, complete mais dados para aumentar a confiança.
-                  </p>
-                </div>
-              </div>
-              {missingRequiredLabels.length > 0 ? (
-                <p className="mt-4 rounded-2xl bg-white/70 p-3 text-xs font-bold text-[#1A2F1E]">
-                  Faltam obrigatórios: {missingRequiredLabels.join(', ')}.
-                </p>
-              ) : (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {recommendedItems.filter((item) => !item.complete).slice(0, 4).map((item) => (
-                    <span key={item.label} className="rounded-full bg-white/75 px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#1A2F1E]">
-                      Completar {item.label.toLowerCase()}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            <div className="card p-5 relative overflow-hidden max-[330px]:p-4">
-              <p className="label text-[#16855C] mb-4">Informações</p>
-              <div className="grid gap-4 text-sm sm:grid-cols-2 max-[330px]:grid-cols-1 max-[330px]:gap-3">
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#A3A3A3]">Veículo</span><strong className="text-sm text-[#0A0A0A]">{form.brand} {form.model} {form.version}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#A3A3A3]">Ano</span><strong className="text-sm text-[#0A0A0A]">{form.year}/{form.yearModel}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#A3A3A3]">Preço</span><strong className="text-sm text-[#0A0A0A]">{form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado'}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#A3A3A3]">Quilometragem</span><strong className="text-sm text-[#0A0A0A]">{form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Não informado'}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#A3A3A3]">Cidade/UF</span><strong className="text-sm text-[#0A0A0A]">{form.city || '-'}{form.state ? `/${form.state}` : ''}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#A3A3A3]">Fotos</span><strong className="text-sm text-[#0A0A0A]">{images.length} de {LISTING_MAX_IMAGES}</strong></div>
-                <div className="sm:col-span-2 flex flex-col gap-2 mt-1"><span className="text-xs text-[#A3A3A3]">Descrição</span><p className="text-sm text-[#0A0A0A] bg-[#FAFAF9] p-4 rounded-xl leading-relaxed">{form.description.trim() || 'Não informada'}</p></div>
-              </div>
-            </div>
-
-            <div className="surface p-5 max-[330px]:p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="w-7 h-7 rounded-full bg-[#ECFDF5] flex items-center justify-center text-[#10B981] font-bold text-[10px]">AI</span>
-                <p className="label">Ficha técnica automática</p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 max-[330px]:grid-cols-1">
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5 max-[330px]:p-2.5">
-                  <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Motor</span>
-                  <input
-                    className="text-sm font-semibold text-[#0A0A0A] bg-transparent border border-[#EAEAE8] rounded-lg px-2 py-1 w-full outline-none focus:border-[#10B981]"
-                    value={form.engine || (technical.engine !== 'Não informado' ? technical.engine : '')}
-                    onChange={(e) => handleInput('engine', e.target.value)}
-                    placeholder="Ex: 2.0 Turbo"
-                  />
-                </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
-                  <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Potência</span>
-                  <strong className="text-sm font-semibold text-[#0A0A0A]">{technical.horsepower}</strong>
-                </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
-                  <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Torque</span>
-                  <strong className="text-sm font-semibold text-[#0A0A0A]">{technical.torque}</strong>
-                </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
-                  <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Combustível</span>
-                  <strong className="text-sm font-semibold text-[#0A0A0A]">{technical.fuel}</strong>
-                </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
-                  <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Câmbio</span>
-                  <strong className="text-sm font-bold text-[#0A0A0A]">{technical.transmission}</strong>
-                </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5 lg:col-span-2 max-[330px]:p-2.5">
-                  <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Consumo</span>
-                  <strong className="text-sm font-bold text-[#0A0A0A]">{technical.consumption}</strong>
-                </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
-                  <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Categoria</span>
-                  <strong className="text-sm font-bold text-[#0A0A0A]">{technical.category}</strong>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#E9FFF2] border border-[#16855C]/20 rounded-2xl p-4 flex items-center justify-center text-center max-[330px]:p-3">
-              <p className="text-xs font-bold text-[#16855C] max-[330px]:text-[11px]">
-                Seu contato direto não é exibido. Toda negociação acontece via chat seguro da plataforma.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {error ? (
-          <div className="bg-red-50 rounded-2xl border border-red-100 p-6 shadow-sm">
-            <p className="text-sm font-bold text-red-600">{error}</p>
-            {validationDetails.length > 0 ? (
-              <ul className="mt-3 space-y-1.5 text-xs font-bold text-red-600/80 bg-white/50 p-4 rounded-xl">
-                {validationDetails.map((detail) => (
-                  <li key={detail}>• {detail}</li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
+            </motion.div>
+            </motion.div>
+        </AnimatePresence>
+    </div>
         ) : null}
 
         {success ? (
-          <div className="bg-[#E9FFF2] rounded-2xl border border-[#16855C]/20 p-6 shadow-sm text-center">
+          <div className="bg-[#E9FFF2] rounded-[25px] border border-[#16855C]/20 p-6 shadow-sm text-center">
             <p className="text-base font-black text-[#16855C]">{success}</p>
           </div>
         ) : null}
@@ -1498,6 +1345,6 @@ export default function ListingForm() {
       </div>
 
 
-    </div>
+    </motion.div>
   )
 }
