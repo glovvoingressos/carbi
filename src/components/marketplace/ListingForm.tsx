@@ -1284,7 +1284,6 @@ export default function ListingForm() {
             </motion.div>
             )}
         </AnimatePresence>
-        ) : null}
 
         {success ? (
           <div className="bg-[#E9FFF2] rounded-[25px] border border-[#16855C]/20 p-6 shadow-sm text-center">
