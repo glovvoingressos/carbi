@@ -1284,7 +1284,6 @@ export default function ListingForm() {
             </motion.div>
             )}
         </AnimatePresence>
-      </div>
         ) : null}
 
         {success ? (
