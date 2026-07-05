@@ -5,6 +5,7 @@ import { BadgeDollarSign, Megaphone, Share2 } from 'lucide-react'
 import FAQSection from '@/components/layout/FAQSection'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
 import ScrollReveal from '@/components/animations/ScrollReveal'
+import SearchBar from '@/components/animations/SearchBar'
 import { getLatestPublicListings } from '@/lib/marketplace-server'
 import { formatBRL } from '@/data/cars'
 
@@ -186,10 +187,7 @@ export default async function HomePage() {
             <div className="ref-hero-badge"><span className="ref-dot" /> Ao vivo agora · {listings.length.toLocaleString('pt-BR')} anúncios</div>
             <h1>Seu próximo carro<br />{' '}<em>em um só lugar.</em></h1>
             <p>Compre, compare e anuncie seminovos com preço, FIPE e dados reais. Rápido, amigável e feito para o Brasil.</p>
-            <form className="ref-search-bar" action="/carros-a-venda">
-              <input name="q" type="text" placeholder="Busque por marca, modelo ou cidade…" />
-              <button type="submit">Buscar</button>
-            </form>
+            <SearchBar />
             <div className="ref-hero-ctas">
               <Link href="/anunciar-carro" className="ref-btn ref-btn-chartreuse ref-btn-wide">Anunciar grátis</Link>
               <Link href="/carros-a-venda" className="ref-btn ref-btn-wide" style={{ color: '#fff', border: '1.5px solid rgba(255,255,255,.25)', background: 'transparent' }}>Explorar ofertas</Link>

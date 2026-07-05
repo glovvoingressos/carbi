@@ -152,11 +152,11 @@ export default function VehicleDetailView({
             fipeBadgeLabel={fipePrice ? fipeStatus : undefined}
           />
 
-          <section className="ref-ad-card">
-            <div className="ref-ad-card-title">Detalhes do veículo</div>
-            <div className="ref-ad-details-grid ref-stagger">
+          <section className="ref-ad-card" aria-labelledby="details-title">
+            <div className="ref-ad-card-title" id="details-title">Detalhes do veículo</div>
+            <div className="ref-ad-details-grid ref-stagger" role="list">
               {detailItems.map((item) => (
-                <div className="ref-ad-detail-item" key={item.label}>
+                <div className="ref-ad-detail-item" key={item.label} role="listitem">
                   <div className="ref-ad-detail-label">{item.label}</div>
                   <div className="ref-ad-detail-value">{item.value}</div>
                 </div>
@@ -165,10 +165,10 @@ export default function VehicleDetailView({
           </section>
 
           {fipePrice ? (
-            <section className="ref-ad-fipe-card">
+            <section className="ref-ad-fipe-card" aria-labelledby="fipe-title">
               <div className="ref-ad-fipe-header">
-                <h3>Comparativo FIPE</h3>
-                <span className="ref-ad-fipe-badge">{fipeStatus}</span>
+                <h3 id="fipe-title">Comparativo FIPE</h3>
+                <span className="ref-ad-fipe-badge" aria-label={fipeStatus}>{fipeStatus}</span>
               </div>
               <div className="ref-ad-fipe-row">
                 <span className="ref-ad-fipe-val-main">{formatBRL(fipePrice)}</span>
@@ -199,12 +199,12 @@ export default function VehicleDetailView({
           ) : null}
 
           {listing.optional_items?.length > 0 ? (
-            <section className="ref-ad-card">
-              <div className="ref-ad-card-title">Opcionais e equipamentos</div>
-              <div className="ref-ad-optionals-grid ref-stagger">
+            <section className="ref-ad-card" aria-labelledby="optionals-title">
+              <div className="ref-ad-card-title" id="optionals-title">Opcionais e equipamentos</div>
+              <div className="ref-ad-optionals-grid ref-stagger" role="list">
                 {listing.optional_items.map((item) => (
-                  <div className="ref-ad-optional-item" key={item}>
-                    <div className="ref-ad-optional-check"><Check size={12} strokeWidth={2.4} /></div>
+                  <div className="ref-ad-optional-item" key={item} role="listitem">
+                    <div className="ref-ad-optional-check" aria-hidden="true"><Check size={12} strokeWidth={2.4} /></div>
                     {item}
                   </div>
                 ))}
@@ -240,32 +240,32 @@ export default function VehicleDetailView({
             </svg>
           </section>
 
-          <section className="ref-ad-card-sm">
-            <div className="ref-ad-card-title">Segurança na compra</div>
-            <div className="ref-ad-safety-list">
-              <div className="ref-ad-safety-item">
-                <div className="ref-ad-safety-icon"><ShieldCheck size={16} /></div>
+          <section className="ref-ad-card-sm" aria-labelledby="safety-title">
+            <div className="ref-ad-card-title" id="safety-title">Segurança na compra</div>
+            <div className="ref-ad-safety-list" role="list">
+              <div className="ref-ad-safety-item" role="listitem">
+                <div className="ref-ad-safety-icon" aria-hidden="true"><ShieldCheck size={16} /></div>
                 <div><strong>Negocie pelo chat interno.</strong> Evite compartilhar telefone, e-mail ou dados bancários antes de verificar o veículo.</div>
               </div>
-              <div className="ref-ad-safety-item">
-                <div className="ref-ad-safety-icon"><Calendar size={16} /></div>
+              <div className="ref-ad-safety-item" role="listitem">
+                <div className="ref-ad-safety-icon" aria-hidden="true"><Calendar size={16} /></div>
                 <div>Faça test drive e vistoria antes de fechar negócio. Prefira encontros em locais movimentados.</div>
               </div>
-              <div className="ref-ad-safety-item">
-                <div className="ref-ad-safety-icon"><BadgeCheck size={16} /></div>
+              <div className="ref-ad-safety-item" role="listitem">
+                <div className="ref-ad-safety-icon" aria-hidden="true"><BadgeCheck size={16} /></div>
                 <div>Confira documentação, chassi e histórico antes de transferir qualquer valor.</div>
               </div>
             </div>
           </section>
 
           {relatedListings.length > 0 ? (
-            <section className="ref-ad-similar-section">
+            <section className="ref-ad-similar-section" aria-labelledby="similar-title">
               <div className="ref-ad-similar-header">
                 <div>
-                  <div className="ref-ad-card-title">Similares</div>
+                  <div className="ref-ad-card-title" id="similar-title">Similares</div>
                   <h2>Você também pode gostar</h2>
                 </div>
-                <Link href="/carros-a-venda" className="ref-ad-btn ref-ad-btn-ghost">Ver mais</Link>
+                <Link href="/carros-a-venda" className="ref-ad-btn ref-ad-btn-ghost" aria-label="Ver mais carros similares">Ver mais</Link>
               </div>
               <div className="ref-ad-similar-grid ref-stagger">
                 {relatedListings.slice(0, 3).map((item) => (

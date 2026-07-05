@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2 } from 'lucide-react'
 import ListingForm from '@/components/marketplace/ListingForm'
+import FlowProgress from '@/components/animations/FlowProgress'
 
 export const metadata: Metadata = {
   title: 'Anunciar meu carro | Carbi',
@@ -30,14 +31,7 @@ export default function AnunciarFluxoPage() {
             Ver ofertas <ArrowRight size={16} />
           </Link>
         </div>
-        <div className="ref-flow-steps" aria-label="Etapas do anúncio">
-          {flow.map((item, index) => (
-            <div className="ref-flow-step" key={item}>
-              <span>{index + 1}</span>
-              <strong>{item}</strong>
-            </div>
-          ))}
-        </div>
+        <FlowProgress steps={flow} currentStep={0} />
       </section>
 
       <section className="ref-flow-form-section">
