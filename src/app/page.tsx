@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { BadgeDollarSign, Megaphone, Share2 } from 'lucide-react'
 import FAQSection from '@/components/layout/FAQSection'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
+import ScrollReveal from '@/components/animations/ScrollReveal'
 import { getLatestPublicListings } from '@/lib/marketplace-server'
 import { formatBRL } from '@/data/cars'
 
@@ -30,11 +31,10 @@ export const metadata: Metadata = {
 type Listing = Awaited<ReturnType<typeof getLatestPublicListings>>[number]
 
 const priceBands = [
-  { key: '50k', label: 'Entrada acessível', price: 'Até R$ 50.000', max: 50000, className: 'ref-band-c1' },
-  { key: '100k', label: 'Custo-benefício', price: 'Até R$ 100.000', max: 100000, className: 'ref-band-c2' },
-  { key: '200k', label: 'Intermediário', price: 'Até R$ 200.000', max: 200000, className: 'ref-band-c3' },
-  { key: '500k', label: 'Premium', price: 'Até R$ 500.000', max: 500000, className: 'ref-band-c4' },
-  { key: '1m', label: 'Alto luxo', price: 'Até R$ 1.000.000', max: 1000000, className: 'ref-band-c5' },
+  { key: '50k', label: 'Entrada', price: 'Até R$ 50k', max: 50000, className: 'ref-band-c1' },
+  { key: '100k', label: 'Custo-benefício', price: 'Até R$ 100k', max: 100000, className: 'ref-band-c2' },
+  { key: '200k', label: 'Intermediário', price: 'Até R$ 200k', max: 200000, className: 'ref-band-c3' },
+  { key: '500k', label: 'Premium', price: 'Até R$ 500k', max: 500000, className: 'ref-band-c4' },
 ]
 
 const audienceTop = ['compradores', 'vendedores', 'amantes de SUV', 'motoristas de app', 'colecionadores', 'entusiastas', 'elétricos']
@@ -86,27 +86,49 @@ function CarSilhouette({ dark = false }: { dark?: boolean }) {
   )
 }
 
-function QrMock() {
-  const cells = [
-    [10,10,30,30],[60,10,30,30],[10,60,30,30],[44,10,6,6],[52,10,6,6],[44,18,6,6],[44,26,6,6],[52,26,6,6],
-    [44,44,6,6],[52,44,6,6],[60,44,6,6],[68,44,6,6],[44,52,6,6],[60,52,6,6],[68,52,6,6],[76,52,6,6],
-    [44,60,6,6],[52,60,6,6],[76,60,6,6],[60,68,6,6],[68,68,6,6],[44,76,6,6],[60,76,6,6],[76,76,6,6],
-  ]
+function AdMock() {
   return (
-    <svg className="ref-qr-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {cells.map(([x, y, w, h], i) => (
-        <rect key={`${x}-${y}-${i}`} x={x} y={y} width={w} height={h} rx={w > 10 ? 3 : 1} fill="#1e2330" />
-      ))}
-      {[10, 60, 10].map((x, i) => {
-        const y = i === 2 ? 60 : 10
-        return (
-          <g key={`${x}-${y}`}>
-            <rect x={x + 4} y={y + 4} width="22" height="22" rx="2" fill="#fbfbf9" />
-            <rect x={x + 8} y={y + 8} width="14" height="14" rx="1" fill="#1e2330" />
-          </g>
-        )
-      })}
-    </svg>
+    <div className="ref-ad-mock">
+      <div className="ref-ad-header">
+        <span className="ref-ad-status" />
+        <span>Campanha ativa</span>
+      </div>
+      <div className="ref-ad-preview">
+        <div className="ref-ad-card">
+          <div className="ref-ad-card-img">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="18" width="40" height="16" rx="4" fill="#d1d5db"/>
+              <path d="M10 18l4-8h20l4 8" fill="#9ca3af"/>
+              <circle cx="14" cy="34" r="4" fill="#6b7280"/>
+              <circle cx="34" cy="34" r="4" fill="#6b7280"/>
+              <circle cx="14" cy="34" r="2" fill="#d1d5db"/>
+              <circle cx="34" cy="34" r="2" fill="#d1d5db"/>
+              <rect x="8" y="22" width="8" height="5" rx="1" fill="#93c5fd"/>
+              <rect x="32" y="22" width="8" height="5" rx="1" fill="#fca5a5"/>
+            </svg>
+          </div>
+          <div className="ref-ad-card-text">
+            <div className="ref-ad-card-title">Honda HR-V EXL 2021</div>
+            <div className="ref-ad-card-price">R$ 115.000</div>
+            <div className="ref-ad-card-sub">via Carbi · Anúncio verificado</div>
+          </div>
+        </div>
+      </div>
+      <div className="ref-ad-platforms">
+        <span className="ref-ad-platform ref-ad-google">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Google Ads
+        </span>
+        <span className="ref-ad-platform ref-ad-meta">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0022 12.06C22 6.53 17.5 2.04 12 2.04Z"/></svg>
+          Meta Ads
+        </span>
+      </div>
+      <div className="ref-ad-stats">
+        <div className="ref-ad-stat"><span className="ref-ad-stat-val">~5mil</span><span className="ref-ad-stat-lbl">impressões/mês</span></div>
+        <div className="ref-ad-stat"><span className="ref-ad-stat-val">200+</span><span className="ref-ad-stat-lbl">cliques/mês</span></div>
+      </div>
+    </div>
   )
 }
 
@@ -200,31 +222,33 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="ref-sec-price-bands">
-        <div className="ref-container">
-          <div className="ref-price-bands-header">
-            <div>
-              <div className="ref-sec-label">Explorar por orçamento</div>
-              <h2>Encontre pelo<br />seu orçamento</h2>
+      <ScrollReveal>
+        <section className="ref-sec-price-bands">
+          <div className="ref-container">
+            <div className="ref-price-bands-header">
+              <div>
+                <div className="ref-sec-label">Explorar por orçamento</div>
+                <h2>Encontre pelo<br />seu orçamento</h2>
+              </div>
+              <Link href="/carros-a-venda" className="ref-btn ref-btn-ghost">Ver todos os anúncios</Link>
             </div>
-            <Link href="/carros-a-venda" className="ref-btn ref-btn-ghost">Ver todos os anúncios</Link>
+            <div className="ref-bands-grid ref-stagger">
+              {priceBands.map((band) => {
+                const count = listings.filter((listing) => Number(listing.price) <= band.max).length
+                return (
+                  <Link href={`/carros-a-venda?price_max=${band.max}`} key={band.key} className={`ref-band-card ${band.className}`}>
+                    <div>
+                      <div className="ref-band-label">{band.label}</div>
+                      <div className="ref-band-price">{band.price}</div>
+                    </div>
+                    <div className="ref-band-count">{count} anúncio{count === 1 ? '' : 's'}</div>
+                  </Link>
+                )
+              })}
+            </div>
           </div>
-          <div className="ref-bands-grid">
-            {priceBands.map((band) => {
-              const count = listings.filter((listing) => Number(listing.price) <= band.max).length
-              return (
-                <Link href={`/carros-a-venda?price_max=${band.max}`} key={band.key} className={`ref-band-card ${band.className}`}>
-                  <div>
-                    <div className="ref-band-label">{band.label}</div>
-                    <div className="ref-band-price">{band.price}</div>
-                  </div>
-                  <div className="ref-band-count">{count} anúncio{count === 1 ? '' : 's'}</div>
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       <section className="ref-sec-recentes">
         <div className="ref-container">
@@ -245,84 +269,36 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="ref-sec-hydrangea ref-pad">
-        <div className="ref-container ref-flex-h">
-          <div className="ref-img-half">
-            <div className="ref-dashboard-mock">
-              <div className="ref-analytics-title">// painel do anúncio</div>
-              <div className="ref-dash-bar-row">
-                {dashData.map((height, index) => <div key={index} style={{ flex: 1, height: `${height}%`, borderRadius: '4px 4px 0 0', background: index === 5 ? 'var(--lavender)' : 'rgba(201,184,255,.3)' }} />)}
+      <ScrollReveal>
+        <section className="ref-sec-marble ref-pad">
+          <div className="ref-container">
+            <div style={{ textAlign: 'center', marginBottom: 48 }}>
+              <div className="ref-sec-label" style={{ justifyContent: 'center' }}>Como funciona</div>
+              <h2 style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', fontWeight: 700, letterSpacing: '-1.5px' }}>Tudo que você precisa para anunciar</h2>
+              <p style={{ fontSize: 17, color: '#666', marginTop: 12, maxWidth: 560, margin: '12px auto 0' }}>Fotos, FIPE, tráfego e chat — reunidos em uma plataforma que converte.</p>
+            </div>
+            <div className="ref-cards-grid ref-cards-grid-balanced ref-stagger">
+              <Link href="/anunciar-carro" className="ref-card-block ref-card-lavender ref-card-icon-only" style={{ minWidth: 'unset', width: '100%' }}>
+                <div className="ref-card-icon-badge"><Share2 aria-hidden="true" /></div>
+                <h3>Anúncio profissional</h3>
+                <p style={{ fontSize: 15, color: 'rgba(30,35,48,.7)', lineHeight: 1.5 }}>Fotos, dados técnicos e FIPE integrados. Pronto para converter em minutos.</p>
+              </Link>
+              <div className="ref-cards-stack">
+                <Link href="/anunciar-carro" className="ref-card-block ref-card-forest ref-card-icon-only" style={{ minWidth: 'unset', width: '100%' }}>
+                  <div className="ref-card-icon-badge" style={{ background: 'var(--chartreuse)', color: 'var(--ink)' }}><Megaphone aria-hidden="true" /></div>
+                  <h3>Tráfego pago grátis</h3>
+                  <p style={{ fontSize: 15, color: 'rgba(255,255,255,.7)', lineHeight: 1.5 }}>Divulgação no Google e Meta Ads sem custo durante o lançamento.</p>
+                </Link>
+                <Link href="/carros-a-venda" className="ref-card-block ref-card-iris ref-card-icon-only" style={{ minWidth: 'unset', width: '100%' }}>
+                  <div className="ref-card-icon-badge" style={{ background: 'var(--chartreuse)', color: 'var(--ink)' }}><BadgeDollarSign aria-hidden="true" /></div>
+                  <h3>FIPE + analytics</h3>
+                  <p style={{ fontSize: 15, color: 'rgba(255,255,255,.7)', lineHeight: 1.5 }}>Comparativo automático e painel de desempenho em tempo real.</p>
+                </Link>
               </div>
-              <div className="ref-dash-stat-row">
-                <div className="ref-dash-stat"><div className="val">{listings.length}</div><div className="lbl">anúncios</div></div>
-                <div className="ref-dash-stat"><div className="val">{brandStats.length}</div><div className="lbl">marcas</div></div>
-                <div className="ref-dash-stat"><div className="val">FIPE</div><div className="lbl">integrada</div></div>
-              </div>
             </div>
           </div>
-          <div className="ref-content-half">
-            <div className="ref-sec-label" style={{ color: 'rgba(255,255,255,.5)' }}>Anunciar</div>
-            <h2 className="ref-section-h2">Crie seu anúncio com cara de produto premium</h2>
-            <p className="ref-section-p">Fotos, dados técnicos, preço e comparação com FIPE organizados em uma apresentação limpa. Pronta para converter em minutos.</p>
-            <div className="ref-features-list">
-              <div className="ref-feature-item"><h3>Upload múltiplo de fotos</h3><p>Ordenação automática e galeria responsiva para todos os dispositivos.</p></div>
-              <div className="ref-feature-item"><h3>FIPE integrado automaticamente</h3><p>Preço de tabela aparece ao lado do seu preço pedido. Transparência total.</p></div>
-              <div className="ref-feature-item"><h3>Chat interno com compradores</h3><p>Conecte-se diretamente sem expor seu contato. Histórico salvo na plataforma.</p></div>
-            </div>
-            <div style={{ marginTop: 32 }}><Link href="/anunciar-carro" className="ref-btn ref-btn-chartreuse ref-btn-wide">Começar anúncio grátis</Link></div>
-          </div>
-        </div>
-      </section>
-
-      <section className="ref-sec-red ref-pad">
-        <div className="ref-container ref-flex-h reverse">
-          <div className="ref-content-half">
-            <div className="ref-sec-label" style={{ color: 'rgba(255,255,255,.5)' }}>Alcançar</div>
-            <h2 className="ref-section-h2" style={{ color: 'var(--chartreuse)' }}>Compartilhe seu anúncio em qualquer lugar</h2>
-            <p className="ref-section-p">Link único para seu anúncio. QR code para impressão ou compartilhamento no WhatsApp em um toque.</p>
-            <div className="ref-ctas-row">
-              <Link href="/anunciar-carro" className="ref-cta-link">Link único para cada anúncio <span>→</span></Link>
-              <Link href="/carros-a-venda" className="ref-cta-link">QR code em alta resolução <span>→</span></Link>
-              <Link href="/entrar" className="ref-cta-link">Compartilhe direto pelo WhatsApp <span>→</span></Link>
-            </div>
-            <div style={{ marginTop: 32 }}><Link href="/anunciar-carro" className="ref-btn ref-btn-chartreuse ref-btn-wide">Criar meu anúncio</Link></div>
-          </div>
-          <div className="ref-img-half">
-            <div className="ref-share-mock">
-              <div className="ref-share-url-row"><span className="ref-url-dot" />carbi.com.br/seu-carro</div>
-              <div className="ref-qr-block"><QrMock /></div>
-              <div className="ref-share-channels"><span className="ref-share-ch ref-ch-wpp">WhatsApp</span><span className="ref-share-ch ref-ch-ig">Instagram</span><span className="ref-share-ch ref-ch-qr">QR Code</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="ref-sec-lightgreen ref-pad">
-        <div className="ref-container ref-flex-h">
-          <div className="ref-img-half">
-            <div className="ref-analytics-mock">
-              <div className="ref-analytics-title">Desempenho do anúncio</div>
-              <div className="ref-chart-bars">{barsData.map((height, index) => <div className={`ref-bar ${index === 7 ? 'active' : ''}`} style={{ height: `${height}%` }} key={index} />)}</div>
-              <div className="ref-stats-row">
-                <div className="ref-stat-item"><div className="val">{listings.length}</div><div className="lbl">anúncios</div></div>
-                <div className="ref-stat-item"><div className="val">{brandStats.length}</div><div className="lbl">marcas</div></div>
-                <div className="ref-stat-item"><div className="val">FIPE</div><div className="lbl">referência</div></div>
-              </div>
-              <div className="ref-fipe-alert"><div className="ref-fipe-alert-dot" /><div><div className="ref-fipe-alert-title">Comparativo FIPE automático</div><div className="ref-fipe-alert-sub">Preço e referência conectados aos anúncios ativos</div></div></div>
-            </div>
-          </div>
-          <div className="ref-content-half">
-            <div className="ref-sec-label">Inteligência</div>
-            <h2 className="ref-section-h2">Dados para decidir com confiança</h2>
-            <p className="ref-section-p">Acompanhe visualizações, contatos e compare seu preço com a FIPE em tempo real. Descubra oportunidades sem esforço.</p>
-            <div className="ref-features-list">
-              <div className="ref-feature-item"><h3>Analytics em tempo real</h3><p>Visualizações, interações e taxa de conversão do seu anúncio em um painel simples.</p></div>
-              <div className="ref-feature-item"><h3>Comparativo FIPE automático</h3><p>Preço de tabela atualizado mensalmente. Saiba se seu carro está bem precificado.</p></div>
-            </div>
-            <div style={{ marginTop: 32 }}><Link href="/carros/mais-baratos" className="ref-btn ref-btn-forest ref-btn-wide">Ver oportunidades</Link></div>
-          </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       <section className="ref-sec-marble ref-pad">
         <div className="ref-container">
@@ -350,69 +326,49 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="ref-sec-marble" style={{ padding: '0 40px 80px' }}>
-        <div className="ref-container"><div className="ref-cards-grid ref-cards-grid-balanced">
-          <div className="ref-cards-stack">
-            <Link href="/anunciar-carro" className="ref-card-block ref-card-lavender ref-card-icon-only" style={{ minWidth: 'unset', width: '100%' }}>
-              <div className="ref-card-icon-badge">
-                <Share2 aria-hidden="true" />
-              </div>
-              <h3>Compartilhe tudo em um só link. Acesse de qualquer plataforma.</h3>
-            </Link>
-            <Link href="/carros-a-venda" className="ref-card-block ref-card-lime ref-card-icon-only" style={{ minWidth: 'unset', width: '100%' }}>
-              <div className="ref-card-icon-badge">
-                <BadgeDollarSign aria-hidden="true" />
-              </div>
-              <h3>Venda, receba pagamentos e monetize seu inventário.</h3>
-            </Link>
-          </div>
-          <Link href="/carros-a-venda" className="ref-card-block ref-card-iris ref-card-icon-only ref-card-balanced-large">
-            <div className="ref-card-icon-badge">
-              <Megaphone aria-hidden="true" />
-            </div>
-            <h3>Cresça, alcance e engaje compradores em todos os canais.</h3>
-          </Link>
-        </div></div>
-      </section>
-
       <section className="ref-sec-marble" style={{ padding: '80px 40px' }}>
         <div className="ref-container">
-          <div style={{ textAlign: 'center', marginBottom: 60 }}>
-            <div className="ref-sec-label" style={{ justifyContent: 'center' }}>Planos</div>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <div className="ref-launch-badge">Lançamento grátis por tempo limitado</div>
-            <h2 style={{ fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 700, letterSpacing: '-1.5px' }}>Anuncie sem pagar nada<br />durante o lançamento.</h2>
-            <p style={{ fontSize: 17, color: '#666', marginTop: 12 }}>Todos os recursos principais estão liberados agora. Depois, você escolhe se quer escalar.</p>
+            <h2 style={{ fontSize: 'clamp(28px,3.5vw,44px)', fontWeight: 700, letterSpacing: '-1.5px', marginTop: 16 }}>Anuncie sem pagar nada agora.</h2>
+            <p style={{ fontSize: 17, color: '#666', marginTop: 12, maxWidth: 480, margin: '12px auto 0' }}>Todos os recursos estão liberados. Depois, você escolhe se quer escalar.</p>
           </div>
-          <div className="ref-plans-grid">
-            <div className="ref-plan-card"><div className="ref-plan-name">Gratuito</div><div className="ref-plan-price">R$ 0 <sub>/mês</sub></div><div className="ref-plan-desc">Para quem quer anunciar sem complicação.</div><ul className="ref-plan-features"><li>5 anúncios ativos</li><li>Fotos e dados básicos</li><li>Comparativo FIPE</li><li>Chat com compradores</li></ul><Link href="/anunciar-carro" className="ref-btn ref-btn-forest" style={{ width: '100%', justifyContent: 'center' }}>Começar grátis</Link></div>
-            <div className="ref-plan-card featured"><div className="ref-plan-badge">Grátis no lançamento</div><div className="ref-plan-name">Pro</div><div className="ref-plan-price">R$ 0 <sub>agora</sub></div><div className="ref-plan-desc">Recursos Pro liberados por tempo limitado durante o lançamento.</div><ul className="ref-plan-features"><li>10 anúncios simultâneos</li><li>Destaque nos resultados</li><li>Analytics completo</li><li>QR code de alta resolução</li><li>Selo de vendedor verificado</li></ul><Link href="/anunciar-carro" className="ref-btn ref-btn-chartreuse ref-btn-wide" style={{ width: '100%', justifyContent: 'center' }}>Aproveitar grátis</Link></div>
-            <div className="ref-plan-card"><div className="ref-plan-badge ghost">Também grátis agora</div><div className="ref-plan-name">Revendedor</div><div className="ref-plan-price">R$ 0 <sub>agora</sub></div><div className="ref-plan-desc">Para lojas, revendedoras e corretores testarem a plataforma sem custo.</div><ul className="ref-plan-features"><li>Anúncios ilimitados no lançamento</li><li>Painel multi-usuário</li><li>API de integração</li><li>Suporte prioritário</li><li>Vitrine de loja própria</li></ul><Link href="/anunciar-carro" className="ref-btn ref-btn-iris" style={{ width: '100%', justifyContent: 'center', color: '#fff' }}>Começar grátis</Link></div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <Link href="/anunciar-carro" className="ref-btn ref-btn-chartreuse ref-btn-wide" style={{ padding: '16px 40px', fontSize: 17 }}>Começar grátis</Link>
+            <Link href="/carros-a-venda" className="ref-btn ref-btn-ghost ref-btn-wide" style={{ padding: '16px 40px', fontSize: 17 }}>Ver anúncios</Link>
           </div>
         </div>
       </section>
 
       <section className="ref-sec-marble" style={{ padding: '0 40px 80px' }}>
         <div className="ref-container">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}><div><div className="ref-sec-label">Marcas</div><h2 style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-1.5px', marginBottom: 4 }}>Comece pela marca</h2><p style={{ color: '#888', fontSize: 15 }}>Clique para ver todos os anúncios disponíveis</p></div><Link href="/marcas" className="ref-btn ref-btn-ghost">Ver todas as marcas</Link></div>
+          <div className="ref-brands-header">
+            <div>
+              <div className="ref-sec-label">Marcas</div>
+              <h2>Comece pela marca</h2>
+            </div>
+            <Link href="/marcas" className="ref-btn ref-btn-ghost">Ver todas</Link>
+          </div>
           <div className="ref-brands-grid">{brandStats.map(({ brand, count }) => <Link key={brand} href={`/carros-a-venda?brand=${encodeURIComponent(brand)}`} className="ref-brand-item"><div className="ref-brand-logo">{brandInitials(brand)}</div><span className="ref-brand-name">{brand}</span><span className="ref-brand-count">{count} anúncio{count === 1 ? '' : 's'}</span></Link>)}</div>
         </div>
       </section>
 
-      <section className="ref-sec-marble" style={{ padding: '0 40px 100px' }}>
-        <div className="ref-container"><div style={{ textAlign: 'center', marginBottom: 56 }}><div className="ref-sec-label" style={{ justifyContent: 'center' }}>Histórias reais</div><h2 style={{ fontSize: 'clamp(32px,3.5vw,48px)', fontWeight: 700, letterSpacing: '-1.5px' }}>De quem usa o Carbi</h2></div><div className="ref-testimonials-grid">
-          <div className="ref-testimonial-card ref-tc-lavender"><div className="ref-testimonial-bar" /><div className="ref-testimonial-body"><div className="ref-testimonial-quote">“A Carbi deixa a busca por seminovo simples. Entendi preço, FIPE e contato sem ficar pulando de tela.”</div><div className="ref-testimonial-author"><div className="name">Compra com contexto</div><div className="role">Dados reais do marketplace</div></div></div></div>
-          <div className="ref-testimonial-card ref-tc-chartreuse"><div className="ref-testimonial-bar" /><div className="ref-testimonial-body"><div className="ref-testimonial-quote">“Publiquei o carro com fotos e dados em poucos minutos. O anúncio ficou mais profissional que em classificados tradicionais.”</div><div className="ref-testimonial-author"><div className="name">Anúncio grátis</div><div className="role">Fluxo conectado ao banco</div></div></div></div>
-          <div className="ref-testimonial-card ref-tc-coral"><div className="ref-testimonial-bar" /><div className="ref-testimonial-body"><div className="ref-testimonial-quote">“O visual é limpo e rápido. Parece produto global, mas resolve um problema brasileiro: escolher carro com confiança.”</div><div className="ref-testimonial-author"><div className="name">Chat interno</div><div className="role">Contato protegido na plataforma</div></div></div></div>
-        </div></div>
-      </section>
+      <ScrollReveal>
+        <section className="ref-sec-marble" style={{ padding: '0 40px 100px' }}>
+          <div className="ref-container"><div style={{ textAlign: 'center', marginBottom: 56 }}><div className="ref-sec-label" style={{ justifyContent: 'center' }}>Quem usa, recomenda</div><h2 style={{ fontSize: 'clamp(28px,3.5vw,44px)', fontWeight: 700, letterSpacing: '-1.5px' }}>Direto de quem anuncia</h2></div><div className="ref-testimonials-grid ref-stagger">
+            <div className="ref-testimonial-card ref-tc-lavender"><div className="ref-testimonial-bar" /><div className="ref-testimonial-body"><div className="ref-testimonial-quote">"Vendi meu HR-V em 12 dias. O comprador viu o anúncio pelo Google e veio direto pelo chat da plataforma."</div><div className="ref-testimonial-author"><div className="name">Marcos, São Paulo</div><div className="role">Vendeu um Honda HR-V 2021</div></div></div></div>
+            <div className="ref-testimonial-card ref-tc-chartreuse"><div className="ref-testimonial-bar" /><div className="ref-testimonial-body"><div className="ref-testimonial-quote">"Comparei 8 Onix antes de decidir. A tabela FIPE junto do preço me deu confiança pra fechar negócio."</div><div className="ref-testimonial-author"><div className="name">Ana, Belo Horizonte</div><div className="role">Comprou um Chevrolet Onix 2022</div></div></div></div>
+            <div className="ref-testimonial-card ref-tc-coral"><div className="ref-testimonial-bar" /><div className="ref-testimonial-body"><div className="ref-testimonial-quote">"Já tentei OLX e WebMotors. A Carbi é mais simples e o tráfego grátis fez a diferença nos contatos."</div><div className="ref-testimonial-author"><div className="name">Pedro, Rio de Janeiro</div><div className="role">Revendedor de seminovos</div></div></div></div>
+          </div></div>
+        </section>
+      </ScrollReveal>
 
       <FAQSection />
 
       <section className="ref-sec-footer-cta">
-        <h2>Comece seu próximo<br />capítulo sobre rodas hoje.</h2>
-        <p>Busque, compare e anuncie. Tudo em um só lugar.</p>
-        <form className="ref-footer-cta-search" action="/carros-a-venda"><input name="q" type="text" placeholder="Busque marca, modelo ou cidade…" /><button type="submit">Buscar</button></form>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}><Link href="/anunciar-carro" className="ref-btn ref-btn-forest ref-btn-wide">Anunciar grátis</Link><Link href="/qual-carro" className="ref-btn ref-btn-ghost ref-btn-wide">Descobrir meu carro ideal</Link></div>
+        <h2>Pronto para anunciar?</h2>
+        <p>Cadastre seu carro grátis e comece a receber contatos hoje.</p>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginTop: 24 }}><Link href="/anunciar-carro" className="ref-btn ref-btn-chartreuse ref-btn-wide" style={{ padding: '16px 40px', fontSize: 17 }}>Anunciar grátis agora</Link></div>
       </section>
     </div>
   )

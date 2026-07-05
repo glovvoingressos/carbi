@@ -154,7 +154,7 @@ export default function VehicleDetailView({
 
           <section className="ref-ad-card">
             <div className="ref-ad-card-title">Detalhes do veículo</div>
-            <div className="ref-ad-details-grid">
+            <div className="ref-ad-details-grid ref-stagger">
               {detailItems.map((item) => (
                 <div className="ref-ad-detail-item" key={item.label}>
                   <div className="ref-ad-detail-label">{item.label}</div>
@@ -201,7 +201,7 @@ export default function VehicleDetailView({
           {listing.optional_items?.length > 0 ? (
             <section className="ref-ad-card">
               <div className="ref-ad-card-title">Opcionais e equipamentos</div>
-              <div className="ref-ad-optionals-grid">
+              <div className="ref-ad-optionals-grid ref-stagger">
                 {listing.optional_items.map((item) => (
                   <div className="ref-ad-optional-item" key={item}>
                     <div className="ref-ad-optional-check"><Check size={12} strokeWidth={2.4} /></div>
@@ -267,7 +267,7 @@ export default function VehicleDetailView({
                 </div>
                 <Link href="/carros-a-venda" className="ref-ad-btn ref-ad-btn-ghost">Ver mais</Link>
               </div>
-              <div className="ref-ad-similar-grid">
+              <div className="ref-ad-similar-grid ref-stagger">
                 {relatedListings.slice(0, 3).map((item) => (
                     <Link href={`/anuncios/${item.slug}`} className="ref-ad-sim-card" key={item.id}>
                       <div className="ref-ad-sim-img">
@@ -319,17 +319,17 @@ export default function VehicleDetailView({
               <span>Anunciado em {formatDate(listing.created_at)}</span>
             </div>
             <div className="ref-ad-cta-block">
-              <button type="button" className="ref-ad-cta-offer" onClick={() => setShowOfferModal(true)}>
+              <button type="button" className="ref-ad-cta-offer" onClick={() => setShowOfferModal(true)} aria-label="Fazer oferta para este veículo">
                 <HandCoins size={18} /> Fazer oferta
               </button>
               <div className="ref-ad-chat-wrap">
                 <ChatStarter listingId={listing.id} label="Chat na Carbi" />
               </div>
               <div className="ref-ad-cta-secondary">
-                <button type="button" onClick={() => setIsFavorite((value) => !value)}>
-                  <Heart size={14} className={isFavorite ? 'fill-current' : ''} /> Salvar
+                <button type="button" onClick={() => setIsFavorite((value) => !value)} aria-label={isFavorite ? 'Remover dos favoritos' : 'Salvar nos favoritos'}>
+                  <Heart size={14} className={isFavorite ? 'fill-current' : ''} /> {isFavorite ? 'Salvo' : 'Salvar'}
                 </button>
-                <button type="button" onClick={handleShare}><Share2 size={14} /> Compartilhar</button>
+                <button type="button" onClick={handleShare} aria-label="Compartilhar este anúncio"><Share2 size={14} /> Compartilhar</button>
               </div>
               <div className="ref-ad-cta-notice">Contato protegido pelo chat interno</div>
             </div>
@@ -372,12 +372,12 @@ export default function VehicleDetailView({
         </aside>
       </div>
 
-      <div className="ref-ad-mobile-cta">
+      <div className="ref-ad-mobile-cta" role="complementary" aria-label="Ações rápidas">
         <div>
           <strong>{formatBRL(price)}</strong>
           {fipePrice ? <span>FIPE {formatBRL(fipePrice)}</span> : null}
         </div>
-        <button type="button" onClick={() => setShowOfferModal(true)}><HandCoins size={16} /> Oferta</button>
+        <button type="button" onClick={() => setShowOfferModal(true)} aria-label="Fazer oferta"><HandCoins size={16} /> Oferta</button>
         <div className="ref-ad-mobile-chat"><ChatStarter listingId={listing.id} label="Chat" /></div>
       </div>
 

@@ -19,3 +19,15 @@ npm-debug.log*
 # vercel
 .vercel/
 .vercel
+
+# AI tools
+.agents/
+.claude/
+.codex/
+.cursor/
+.gemini/
+.impeccable/
+.opencode/
+
+# backup files
+*.bak
