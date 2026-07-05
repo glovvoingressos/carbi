@@ -1341,8 +1341,6 @@ export default function ListingForm() {
             </button>
           </div>
         ) : null}
-      </div>
-
 
     </motion.div>
   )
