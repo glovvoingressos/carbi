@@ -2981,6 +2981,10 @@ p {
   .ref-ad-gallery-arrow { width: 44px; height: 44px; }
   .ref-ad-gallery-arrow-left { left: 12px; }
   .ref-ad-gallery-arrow-right { right: 12px; }
+  .ref-ad-gallery-thumbs { gap: 6px; padding: 10px; }
+  .ref-ad-gallery-thumbs img { height: 60px; }
+  .ref-ad-gallery-main { height: 300px; }
+  .ref-ad-gallery-count { font-size: 12px; padding: 6px 10px; }
   .ref-ad-optionals-grid,
   .ref-ad-similar-grid { grid-template-columns: 1fr; }
   .ref-ad-details-grid { grid-template-columns: 1fr; }
@@ -3035,6 +3039,17 @@ p {
   .ref-ad-price-history-head span { font-size: 24px; }
   .ref-ad-price-history-head small { font-size: 12px; }
   .ref-ad-price-history-head em { font-size: 11px; }
+  .ref-ad-seller-badges { gap: 6px; }
+  .ref-ad-seller-badges span { padding: 6px 10px; font-size: 11px; }
+  .ref-ad-report-wrap { padding: 16px; text-align: center; }
+  .ref-ad-report-wrap button { font-size: 13px; color: #888; }
+  .ref-ad-fipe-bar-wrap { margin-top: 16px; }
+  .ref-ad-fipe-bar-label { font-size: 10px; }
+  .ref-ad-fipe-ref { font-size: 11px; }
+  .ref-ad-price-svg { height: 60px; }
+  .ref-ad-location-row { font-size: 13px; padding: 10px 0; }
+  .ref-ad-views-row { font-size: 12px; padding: 8px 0; }
+  .ref-ad-cta-notice { font-size: 11px; margin-top: 8px; }
   .auth-page-shell,
   .profile-page-shell { padding: 18px 14px 72px; }
   .auth-page-grid,
@@ -3704,6 +3719,161 @@ p {
   }
   .ref-success-modal h2 {
     font-size: 20px;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CONFIRM MODAL
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.ref-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-out);
+  padding: 20px;
+}
+.ref-confirm-overlay.visible {
+  opacity: 1;
+}
+.ref-confirm-modal {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 36px 32px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.4s var(--ease-spring);
+  position: relative;
+}
+.ref-confirm-modal.visible {
+  transform: scale(1) translateY(0);
+}
+.ref-confirm-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.ref-confirm-close:hover {
+  background: rgba(0,0,0,0.1);
+}
+.ref-confirm-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+.ref-confirm-icon.default {
+  background: rgba(90,71,209,0.1);
+  color: var(--iris);
+}
+.ref-confirm-icon.danger {
+  background: rgba(220,38,38,0.1);
+  color: #dc2626;
+}
+.ref-confirm-modal h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  letter-spacing: -0.3px;
+}
+.ref-confirm-modal p {
+  font-size: 15px;
+  color: #666;
+  margin: 0 0 28px;
+  line-height: 1.5;
+}
+.ref-confirm-actions {
+  display: flex;
+  gap: 12px;
+}
+.ref-confirm-actions .ref-btn {
+  flex: 1;
+  justify-content: center;
+  padding: 14px 20px;
+}
+.ref-btn-danger {
+  background: #dc2626;
+  color: white;
+  border: none;
+}
+.ref-btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* Tooltip */
+.ref-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.ref-tooltip-trigger {
+  cursor: help;
+  border-bottom: 1px dashed rgba(0,0,0,0.2);
+}
+.ref-tooltip-content {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--white);
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  z-index: 50;
+  pointer-events: none;
+}
+.ref-tooltip-content::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--ink);
+}
+.ref-tooltip-trigger:hover + .ref-tooltip-content,
+.ref-tooltip-wrap:hover .ref-tooltip-content {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Mobile tooltip */
+@media (max-width: 600px) {
+  .ref-tooltip-content {
+    position: fixed;
+    bottom: 80px;
+    left: 20px;
+    right: 20px;
+    white-space: normal;
+    text-align: center;
+    transform: none;
+  }
+  .ref-tooltip-content::after {
+    display: none;
   }
 }
 

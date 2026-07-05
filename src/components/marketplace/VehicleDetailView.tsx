@@ -25,6 +25,8 @@ import OfferModal from './OfferModal'
 import OfferHistory from './OfferHistory'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import MarketplaceListingImage from './MarketplaceListingImage'
+import ConfirmModal from '@/components/animations/ConfirmModal'
+import Tooltip from '@/components/animations/Tooltip'
 
 interface VehicleDetailViewProps {
   listing: ListingPublic
@@ -80,6 +82,7 @@ export default function VehicleDetailView({
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [pageUrl, setPageUrl] = useState('')
   const [copied, setCopied] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
   const isSeller = sessionUserId === listing.user_id
 
   useEffect(() => {
@@ -104,15 +107,15 @@ export default function VehicleDetailView({
   const dealPercentLabel = diffPercent == null ? null : `${diffPercent > 0 ? '+' : ''}${diffPercent.toFixed(1).replace('.', ',')}%`
 
   const detailItems = [
-    { label: 'Ano', value: `${listing.year}/${listing.year_model}` },
-    { label: 'Quilometragem', value: `${listing.mileage.toLocaleString('pt-BR')} km` },
-    { label: 'Câmbio', value: Array.isArray(listing.transmission) ? listing.transmission.join(', ') : listing.transmission },
-    { label: 'Combustível', value: listing.fuel },
+    { label: 'Ano', value: `${listing.year}/${listing.year_model}`, tooltip: 'Ano de fabricação / Ano do modelo' },
+    { label: 'Quilometragem', value: `${listing.mileage.toLocaleString('pt-BR')} km`, tooltip: 'Quilometragem atual do veículo' },
+    { label: 'Câmbio', value: Array.isArray(listing.transmission) ? listing.transmission.join(', ') : listing.transmission, tooltip: 'Tipo de câmbio: manual ou automático' },
+    { label: 'Combustível', value: listing.fuel, tooltip: 'Tipo de combustível: gasolina, etanol, flex, diesel ou elétrico' },
     { label: 'Cor', value: listing.color },
-    { label: 'Carroceria', value: listing.body_type || 'Não informado' },
-    { label: 'Motor', value: listing.engine || enrichment?.powertrain?.engine || 'Não informado' },
+    { label: 'Carroceria', value: listing.body_type || 'Não informado', tooltip: 'Tipo de carroceria: hatch, sedan, SUV, pickups etc.' },
+    { label: 'Motor', value: listing.engine || enrichment?.powertrain?.engine || 'Não informado', tooltip: 'Potência e tipo do motor' },
     { label: 'Portas', value: listing.doors ? `${listing.doors} portas` : 'Não informado' },
-    { label: 'Final da placa', value: listing.plate_final || 'Não informado' },
+    { label: 'Final da placa', value: listing.plate_final || 'Não informado', tooltip: 'Ajuda a identificar o veículo e evitar golpes' },
   ]
 
   const fipeCompareItems = [
@@ -157,7 +160,9 @@ export default function VehicleDetailView({
             <div className="ref-ad-details-grid ref-stagger" role="list">
               {detailItems.map((item) => (
                 <div className="ref-ad-detail-item" key={item.label} role="listitem">
-                  <div className="ref-ad-detail-label">{item.label}</div>
+                  <div className="ref-ad-detail-label">
+                    {item.tooltip ? <Tooltip content={item.tooltip}>{item.label}</Tooltip> : item.label}
+                  </div>
                   <div className="ref-ad-detail-value">{item.value}</div>
                 </div>
               ))}
@@ -347,8 +352,8 @@ export default function VehicleDetailView({
               </div>
             </div>
             <div className="ref-ad-seller-badges">
-              <span><i /> Chat interno</span>
-              <span><i /> Dados protegidos</span>
+              <span><MessageCircle size={12} /> Chat interno</span>
+              <span><ShieldCheck size={12} /> Dados protegidos</span>
             </div>
             <div className="ref-ad-seller-stats">
               <div><span>{sellerInfo?.activeListings ?? 1}</span><small>anúncios</small></div>
@@ -367,7 +372,7 @@ export default function VehicleDetailView({
           </section>
 
           <div className="ref-ad-report-wrap">
-            <button type="button">Denunciar este anúncio</button>
+            <button type="button" onClick={() => setShowReportModal(true)}>Denunciar este anúncio</button>
           </div>
         </aside>
       </div>
@@ -391,6 +396,20 @@ export default function VehicleDetailView({
         listingTitle={`${listing.brand} ${listing.model} ${listing.year_model}`}
         isOpen={showOfferModal}
         onClose={() => setShowOfferModal(false)}
+      />
+
+      <ConfirmModal
+        isOpen={showReportModal}
+        title="Denunciar anúncio"
+        message="Tem certeza que deseja denunciar este anúncio? Nossa equipe irá analisar e tomar as providências necessárias."
+        confirmLabel="Denunciar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={() => {
+          setShowReportModal(false)
+          // TODO: implement report API call
+        }}
+        onCancel={() => setShowReportModal(false)}
       />
     </div>
   )
