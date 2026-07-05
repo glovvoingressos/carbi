@@ -962,7 +962,7 @@ export default function ListingForm() {
               {currentStep === 2 && 'Dados e fotos'}
               {currentStep === 3 && 'Revisão e publicação'}
             </p>
-            <p className="label text-[#A3A3A3]">{currentStep}/3</p>
+            <p className="label text-[#767676]">{currentStep}/3</p>
           </div>
         </div>
 
@@ -1004,7 +1004,7 @@ export default function ListingForm() {
                         ? 'bg-[#17170F] text-white shadow-lg shadow-[#17170F]/20'
                         : listingSubStep > s
                         ? 'bg-[#10B981] text-white'
-                        : 'bg-[#FAFAF9] text-[#A3A3A3] border border-[#EAEAE8]'
+                        : 'bg-[#FAFAF9] text-[#767676] border border-[#EAEAE8]'
                     }`}
                   >
                     {listingSubStep > s ? <Check className="w-4 h-4" /> : s}
@@ -1017,7 +1017,7 @@ export default function ListingForm() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-              className="flex justify-between text-[11px] font-bold tracking-[0.06em] text-[#A3A3A3] -mt-2"
+              className="flex justify-between text-[11px] font-bold tracking-[0.06em] text-[#767676] -mt-2"
             >
               <motion.span animate={{ color: listingSubStep >= 1 ? '#17170F' : '#A3A3A3' }} transition={{ duration: 0.25 }}>Marca</motion.span>
               <motion.span animate={{ color: listingSubStep >= 2 ? '#17170F' : '#A3A3A3' }} transition={{ duration: 0.25 }}>Modelo</motion.span>
@@ -1053,7 +1053,7 @@ export default function ListingForm() {
                     <option value="">Selecione a marca</option>
                     {brands.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
                   </select>
-                  <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A3A3A3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#767676] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </div>
                 {selectedBrandCode && (
                   <motion.button
@@ -1099,7 +1099,7 @@ export default function ListingForm() {
                     <option value="">Selecione o modelo</option>
                     {models.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
                   </select>
-                  <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A3A3A3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#767676] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </div>
                 {selectedModelCode && (
                   <motion.button
@@ -1144,7 +1144,7 @@ export default function ListingForm() {
                     <option value="">Selecione o ano</option>
                     {years.map((year) => <option key={year} value={year}>{year}</option>)}
                   </select>
-                  <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A3A3A3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#767676] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </div>
                 {selectedYear && (
                   <motion.button
@@ -1177,15 +1177,15 @@ export default function ListingForm() {
                   </div>
                   <div className="bg-[#FAFAF9] rounded-[25px] p-4 flex flex-wrap items-center gap-x-6 gap-y-2 max-[330px]:p-3">
                     <div>
-                      <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Marca</span>
+                      <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Marca</span>
                       <p className="text-sm font-bold text-[#0A0A0A]">{form.brand || '-'}</p>
                     </div>
                     <div>
-                      <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Modelo</span>
+                      <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Modelo</span>
                       <p className="text-sm font-bold text-[#0A0A0A]">{form.model || '-'}</p>
                     </div>
                     <div>
-                      <span className="text-[10px] font-semibold text-[#A3A3A3] uppercase tracking-wider">Ano</span>
+                      <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Ano</span>
                       <p className="text-sm font-bold text-[#0A0A0A]">{form.year || '-'}</p>
                     </div>
                   </div>
@@ -1213,14 +1213,14 @@ export default function ListingForm() {
                         >
                           <p className="text-[14px] font-bold text-[#0A0A0A]">{v.name}</p>
                           {v.code !== selectedVersionCode && selectedVersionCode && (
-                            <p className="text-[11px] text-[#A3A3A3] mt-0.5">Clique para selecionar</p>
+                            <p className="text-[11px] text-[#767676] mt-0.5">Clique para selecionar</p>
                           )}
                         </motion.button>
                       ))}
                     </div>
                   ) : fipeLoading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin text-[#A3A3A3]" />
+                      <Loader2 className="h-6 w-6 animate-spin text-[#767676]" />
                       <span className="ml-3 text-sm text-[#525252]">Carregando versões...</span>
                     </div>
                   ) : (
@@ -1233,7 +1233,7 @@ export default function ListingForm() {
                           value={form.version}
                           onChange={(e) => handleInput('version', e.target.value)}
                         />
-                        <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A3A3A3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                        <svg className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#767676]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
         </div>
                       <motion.button
                         type="button"
@@ -1265,13 +1265,13 @@ export default function ListingForm() {
                 <p className="text-sm font-medium text-[#10B981] bg-[#FAFAF9] p-4 rounded-[25px] border border-[#EAEAE8] flex items-center gap-2 max-[330px]:text-[13px] max-[330px]:p-3"><Loader2 className="w-4 h-4 animate-spin" /> Consultando valor atualizado...</p>
               ) : fipeResult ? (
                 <div className="grid gap-3 text-sm font-medium text-[#525252] max-[330px]:gap-2.5 max-[330px]:text-[13px]">
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#A3A3A3]">Versão automática:</span> <strong className="text-[#0A0A0A]">{form.version || 'Não informada'}</strong></div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#A3A3A3]">Preço FIPE:</span> <strong className="text-[#0A0A0A]">{fipeResult.price}</strong></div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#A3A3A3]">Seu anúncio:</span> <strong className="text-[#0A0A0A]">{hasAskingPrice ? formatBRL(priceNumber) : 'Informe o preço na próxima etapa'}</strong></div>
+                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Versão automática:</span> <strong className="text-[#0A0A0A]">{form.version || 'Não informada'}</strong></div>
+                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Preço FIPE:</span> <strong className="text-[#0A0A0A]">{fipeResult.price}</strong></div>
+                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Seu anúncio:</span> <strong className="text-[#0A0A0A]">{hasAskingPrice ? formatBRL(priceNumber) : 'Informe o preço na próxima etapa'}</strong></div>
                   {hasAskingPrice ? (
                     <>
-                      <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#A3A3A3]">Diferença:</span> <strong className="text-[#0A0A0A]">{comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</strong></div>
-                      <div className="flex justify-between items-center py-2"><span className="text-[#A3A3A3]">Percentual:</span> <strong className="text-[#0A0A0A]">{comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</strong></div>
+                      <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Diferença:</span> <strong className="text-[#0A0A0A]">{comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</strong></div>
+                      <div className="flex justify-between items-center py-2"><span className="text-[#767676]">Percentual:</span> <strong className="text-[#0A0A0A]">{comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</strong></div>
                     </>
                   ) : null}
                 </div>
