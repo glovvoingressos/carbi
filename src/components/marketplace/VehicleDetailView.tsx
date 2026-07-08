@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
+  ArrowLeft,
   BadgeCheck,
   Calendar,
   Check,
@@ -16,6 +17,9 @@ import {
   ShieldCheck,
   TrendingDown,
   TrendingUp,
+  Gauge,
+  Car,
+  ChevronRight,
 } from 'lucide-react'
 import { ListingPublic } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
@@ -103,25 +107,16 @@ export default function VehicleDetailView({
   const diffValue = fipePrice ? price - fipePrice : null
   const diffPercent = fipePrice ? (diffValue! / fipePrice) * 100 : null
   const fipeStatus = getFipeLabel(comparison.status)
-  const fipeBarWidth = diffPercent == null ? 50 : Math.max(12, Math.min(88, 50 + diffPercent * 2.5))
   const dealPercentLabel = diffPercent == null ? null : `${diffPercent > 0 ? '+' : ''}${diffPercent.toFixed(1).replace('.', ',')}%`
 
   const detailItems = [
-    { label: 'Ano', value: `${listing.year}/${listing.year_model}`, tooltip: 'Ano de fabricação / Ano do modelo' },
-    { label: 'Quilometragem', value: `${listing.mileage.toLocaleString('pt-BR')} km`, tooltip: 'Quilometragem atual do veículo' },
-    { label: 'Câmbio', value: Array.isArray(listing.transmission) ? listing.transmission.join(', ') : listing.transmission, tooltip: 'Tipo de câmbio: manual ou automático' },
-    { label: 'Combustível', value: listing.fuel, tooltip: 'Tipo de combustível: gasolina, etanol, flex, diesel ou elétrico' },
-    { label: 'Cor', value: listing.color },
-    { label: 'Carroceria', value: listing.body_type || 'Não informado', tooltip: 'Tipo de carroceria: hatch, sedan, SUV, pickups etc.' },
-    { label: 'Motor', value: listing.engine || enrichment?.powertrain?.engine || 'Não informado', tooltip: 'Potência e tipo do motor' },
-    { label: 'Portas', value: listing.doors ? `${listing.doors} portas` : 'Não informado' },
-    { label: 'Final da placa', value: listing.plate_final || 'Não informado', tooltip: 'Ajuda a identificar o veículo e evitar golpes' },
-  ]
-
-  const fipeCompareItems = [
-    { label: 'Preço anunciado', value: formatBRL(price), highlight: false },
-    { label: 'Diferença', value: diffValue == null ? 'Sem referência' : `${diffValue > 0 ? '+ ' : '- '}${formatBRL(Math.abs(diffValue))}`, highlight: comparison.status === 'below' },
-    { label: 'Percentual', value: dealPercentLabel || 'Sem referência', highlight: comparison.status === 'below' },
+    { icon: Calendar, label: 'Ano', value: `${listing.year}/${listing.year_model}` },
+    { icon: Gauge, label: 'Quilometragem', value: `${listing.mileage.toLocaleString('pt-BR')} km` },
+    { icon: Car, label: 'Câmbio', value: Array.isArray(listing.transmission) ? listing.transmission.join(', ') : listing.transmission },
+    { icon: Fuel, label: 'Combustível', value: listing.fuel },
+    { icon: null, label: 'Cor', value: listing.color },
+    { icon: null, label: 'Carroceria', value: listing.body_type || 'Não informado' },
+    { icon: null, label: 'Motor', value: listing.engine || enrichment?.powertrain?.engine || 'Não informado' },
   ]
 
   const sellerName = sellerInfo?.name || 'Vendedor particular'
@@ -145,250 +140,247 @@ export default function VehicleDetailView({
   }
 
   return (
-    <div className="ref-ad-detail">
-      <div className="ref-ad-page-container">
-        <div className="ref-ad-left-col">
+    <div className="fingen-detail-page">
+      {/* Header */}
+      <header className="fingen-detail-header">
+        <Link href="/carros-a-venda" className="fingen-detail-back">
+          <ArrowLeft size={20} />
+        </Link>
+        <div className="fingen-detail-header-actions">
+          <button type="button" onClick={() => setIsFavorite(!isFavorite)} className="fingen-detail-action-btn">
+            <Heart size={18} className={isFavorite ? 'fill-current' : ''} />
+          </button>
+          <button type="button" onClick={handleShare} className="fingen-detail-action-btn">
+            <Share2 size={18} />
+          </button>
+        </div>
+      </header>
+
+      {/* Main Layout */}
+      <div className="fingen-detail-layout">
+        {/* Left Column - Gallery */}
+        <div className="fingen-detail-gallery">
           <ListingImageGallery
             images={listingImages}
             title={listing.title}
             badgeLabel={listing.badges?.[0]?.label || 'Anúncio Carbi'}
             fipeBadgeLabel={fipePrice ? fipeStatus : undefined}
           />
+        </div>
 
-          <section className="ref-ad-card" aria-labelledby="details-title">
-            <div className="ref-ad-card-title" id="details-title">Detalhes do veículo</div>
-            <div className="ref-ad-details-grid ref-stagger" role="list">
+        {/* Right Column - Content */}
+        <div className="fingen-detail-content">
+          {/* Price Card */}
+          <section className="fingen-detail-price-card">
+            <div className="fingen-detail-price-header">
+              <div className="fingen-detail-price-make">{listing.brand}</div>
+              <h1 className="fingen-detail-price-title">{listing.model} {listing.version || ''}</h1>
+              <div className="fingen-detail-price-sub">{listing.year}/{listing.year_model} · {listing.color}</div>
+            </div>
+
+            <div className="fingen-detail-price-row">
+              <div className="fingen-detail-price-main">{formatBRL(price)}</div>
+              {fipePrice && (
+                <div className="fingen-detail-price-fipe">
+                  <span>FIPE {formatBRL(fipePrice)}</span>
+                  {dealPercentLabel && (
+                    <span className="fingen-detail-price-badge">
+                      {dealPercentLabel}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="fingen-detail-specs-row">
+              <span><Calendar size={14} /> {listing.year_model}</span>
+              <span><Gauge size={14} /> {listing.mileage.toLocaleString('pt-BR')} km</span>
+              <span><Car size={14} /> {Array.isArray(listing.transmission) ? listing.transmission[0] : listing.transmission}</span>
+              <span><Fuel size={14} /> {listing.fuel}</span>
+            </div>
+
+            <div className="fingen-detail-location">
+              <MapPin size={14} />
+              {listing.city} / {listing.state}
+            </div>
+          </section>
+
+          {/* CTA Buttons */}
+          <section className="fingen-detail-cta">
+            <button type="button" className="fingen-detail-cta-primary" onClick={() => setShowOfferModal(true)}>
+              <HandCoins size={18} />
+              Fazer oferta
+            </button>
+            <div className="fingen-detail-cta-chat">
+              <ChatStarter listingId={listing.id} label="Chat na Carbi" />
+            </div>
+          </section>
+
+          {/* FIPE Comparison */}
+          {fipePrice && (
+            <section className="fingen-detail-card-dark">
+              <div className="fingen-detail-dark-header">
+                <h3>Comparativo FIPE</h3>
+                <span className={`fingen-detail-dark-badge ${comparison.status === 'below' ? 'success' : ''}`}>
+                  {fipeStatus}
+                </span>
+              </div>
+              <div className="fingen-detail-dark-value">{formatBRL(fipePrice)}</div>
+              <div className="fingen-detail-dark-label">Tabela FIPE referência</div>
+              {diffValue !== null && (
+                <div className="fingen-detail-dark-diff">
+                  <span className={diffValue <= 0 ? 'positive' : 'negative'}>
+                    {diffValue <= 0 ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
+                    {diffValue > 0 ? '+' : ''}{formatBRL(diffValue)}
+                  </span>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* Details */}
+          <section className="fingen-detail-card">
+            <h3 className="fingen-detail-card-title">Detalhes do veículo</h3>
+            <div className="fingen-detail-specs-grid">
               {detailItems.map((item) => (
-                <div className="ref-ad-detail-item" key={item.label} role="listitem">
-                  <div className="ref-ad-detail-label">
-                    {item.tooltip ? <Tooltip content={item.tooltip}>{item.label}</Tooltip> : item.label}
-                  </div>
-                  <div className="ref-ad-detail-value">{item.value}</div>
+                <div className="fingen-detail-spec-item" key={item.label}>
+                  <div className="fingen-detail-spec-label">{item.label}</div>
+                  <div className="fingen-detail-spec-value">{item.value}</div>
                 </div>
               ))}
             </div>
           </section>
 
-          {fipePrice ? (
-            <section className="ref-ad-fipe-card" aria-labelledby="fipe-title">
-              <div className="ref-ad-fipe-header">
-                <h3 id="fipe-title">Comparativo FIPE</h3>
-                <span className="ref-ad-fipe-badge" aria-label={fipeStatus}>{fipeStatus}</span>
-              </div>
-              <div className="ref-ad-fipe-row">
-                <span className="ref-ad-fipe-val-main">{formatBRL(fipePrice)}</span>
-                <span className="ref-ad-fipe-val-label">Tabela FIPE</span>
-              </div>
-              <div className="ref-ad-fipe-compare">
-                {fipeCompareItems.map((item) => (
-                  <div className="ref-ad-fipe-compare-item" key={item.label}>
-                    <div className="lbl">{item.label}</div>
-                    <div className={`val ${item.highlight ? 'green' : ''}`}>{item.value}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="ref-ad-fipe-bar-wrap">
-                <div className="ref-ad-fipe-bar-label">
-                  <span>Abaixo da FIPE</span>
-                  <span>Acima da FIPE</span>
-                </div>
-                <div className="ref-ad-fipe-bar-track">
-                  <div className="ref-ad-fipe-bar-fill" style={{ width: `${fipeBarWidth}%` }} />
-                  <div className="ref-ad-fipe-bar-marker" style={{ left: '50%' }} />
-                </div>
-              </div>
-              <div className="ref-ad-fipe-ref">
-                Referência {listing.fipe_reference_month || 'mensal'} · Atualizado pela FIPE
-              </div>
-            </section>
-          ) : null}
-
-          {listing.optional_items?.length > 0 ? (
-            <section className="ref-ad-card" aria-labelledby="optionals-title">
-              <div className="ref-ad-card-title" id="optionals-title">Opcionais e equipamentos</div>
-              <div className="ref-ad-optionals-grid ref-stagger" role="list">
+          {/* Optionals */}
+          {listing.optional_items && listing.optional_items.length > 0 && (
+            <section className="fingen-detail-card">
+              <h3 className="fingen-detail-card-title">Opcionais</h3>
+              <div className="fingen-detail-optionals-grid">
                 {listing.optional_items.map((item) => (
-                  <div className="ref-ad-optional-item" key={item} role="listitem">
-                    <div className="ref-ad-optional-check" aria-hidden="true"><Check size={12} strokeWidth={2.4} /></div>
+                  <div className="fingen-detail-optional-item" key={item}>
+                    <Check size={14} className="text-[var(--color-trust)]" />
                     {item}
                   </div>
                 ))}
               </div>
             </section>
-          ) : null}
+          )}
 
-          {listing.description ? (
-            <section className="ref-ad-card">
-              <div className="ref-ad-card-title">Descrição do vendedor</div>
-              <p className="ref-ad-desc-text">{listing.description}</p>
+          {/* Description */}
+          {listing.description && (
+            <section className="fingen-detail-card">
+              <h3 className="fingen-detail-card-title">Descrição</h3>
+              <p className="fingen-detail-description">{listing.description}</p>
             </section>
-          ) : null}
+          )}
 
-          <section className="ref-ad-card-sm">
-            <div className="ref-ad-card-title">Histórico de preço</div>
-            <div className="ref-ad-price-history-head">
-              <span>{formatBRL(price)}</span>
-              <small>preço atual</small>
-              <em>{listing.price_history?.has_changes ? `${listing.price_history.changes_last_30d} alterações registradas` : 'Sem alterações registradas'}</em>
-            </div>
-            <svg viewBox="0 0 400 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="ref-ad-price-svg">
-              <defs>
-                <linearGradient id={`priceGrad-${listing.id}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#5a47d1" stopOpacity=".18" />
-                  <stop offset="100%" stopColor="#5a47d1" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <path d="M0 44 L80 43 L160 44 L240 43 L320 44 L400 43 L400 80 L0 80 Z" fill={`url(#priceGrad-${listing.id})`} />
-              <path d="M0 44 L80 43 L160 44 L240 43 L320 44 L400 43" stroke="#5a47d1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              <circle cx="400" cy="43" r="5" fill="#5a47d1" />
-              <line x1="0" y1="70" x2="400" y2="70" stroke="rgba(0,0,0,.06)" strokeWidth="1" />
-            </svg>
-          </section>
-
-          <section className="ref-ad-card-sm" aria-labelledby="safety-title">
-            <div className="ref-ad-card-title" id="safety-title">Segurança na compra</div>
-            <div className="ref-ad-safety-list" role="list">
-              <div className="ref-ad-safety-item" role="listitem">
-                <div className="ref-ad-safety-icon" aria-hidden="true"><ShieldCheck size={16} /></div>
-                <div><strong>Negocie pelo chat interno.</strong> Evite compartilhar telefone, e-mail ou dados bancários antes de verificar o veículo.</div>
+          {/* Safety */}
+          <section className="fingen-detail-card">
+            <h3 className="fingen-detail-card-title">Segurança na compra</h3>
+            <div className="fingen-detail-safety-list">
+              <div className="fingen-detail-safety-item">
+                <ShieldCheck size={16} className="text-[var(--color-trust)]" />
+                <span>Negocie pelo chat interno. Evite compartilhar telefone antes de verificar o veículo.</span>
               </div>
-              <div className="ref-ad-safety-item" role="listitem">
-                <div className="ref-ad-safety-icon" aria-hidden="true"><Calendar size={16} /></div>
-                <div>Faça test drive e vistoria antes de fechar negócio. Prefira encontros em locais movimentados.</div>
+              <div className="fingen-detail-safety-item">
+                <Calendar size={16} className="text-[var(--color-trust)]" />
+                <span>Faça test drive e vistoria antes de fechar negócio.</span>
               </div>
-              <div className="ref-ad-safety-item" role="listitem">
-                <div className="ref-ad-safety-icon" aria-hidden="true"><BadgeCheck size={16} /></div>
-                <div>Confira documentação, chassi e histórico antes de transferir qualquer valor.</div>
+              <div className="fingen-detail-safety-item">
+                <BadgeCheck size={16} className="text-[var(--color-trust)]" />
+                <span>Confira documentação, chassi e histórico antes de transferir.</span>
               </div>
             </div>
           </section>
 
-          {relatedListings.length > 0 ? (
-            <section className="ref-ad-similar-section" aria-labelledby="similar-title">
-              <div className="ref-ad-similar-header">
-                <div>
-                  <div className="ref-ad-card-title" id="similar-title">Similares</div>
-                  <h2>Você também pode gostar</h2>
-                </div>
-                <Link href="/carros-a-venda" className="ref-ad-btn ref-ad-btn-ghost" aria-label="Ver mais carros similares">Ver mais</Link>
+          {/* Seller */}
+          <section className="fingen-detail-card">
+            <h3 className="fingen-detail-card-title">Vendedor</h3>
+            <div className="fingen-detail-seller">
+              <div className="fingen-detail-seller-avatar">
+                {sellerInfo?.avatarUrl ? (
+                  <img src={sellerInfo.avatarUrl} alt={sellerName} />
+                ) : (
+                  initials(sellerName)
+                )}
               </div>
-              <div className="ref-ad-similar-grid ref-stagger">
-                {relatedListings.slice(0, 3).map((item) => (
-                    <Link href={`/anuncios/${item.slug}`} className="ref-ad-sim-card" key={item.id}>
-                      <div className="ref-ad-sim-img">
-                        <MarketplaceListingImage
-                          brand={item.brand}
-                          model={item.model}
-                          year={item.year_model}
-                          imageUrls={item.images?.map((image) => image.url) || []}
-                          alt={item.title}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      <div className="ref-ad-sim-body">
-                        <div className="ref-ad-sim-make">{item.brand}</div>
-                        <div className="ref-ad-sim-name">{item.model} {item.version}</div>
-                        <div className="ref-ad-sim-price">{formatBRL(Number(item.price))}</div>
-                        {item.fipe_price ? <div className="ref-ad-sim-fipe">FIPE {formatBRL(Number(item.fipe_price))}</div> : null}
-                        <div className="ref-ad-sim-meta"><span>{item.year_model}</span><span>·</span><span>{item.mileage.toLocaleString('pt-BR')} km</span><span>·</span><span>{item.state}</span></div>
-                      </div>
-                    </Link>
-                ))}
+              <div className="fingen-detail-seller-info">
+                <div className="fingen-detail-seller-name">{sellerName}</div>
+                <div className="fingen-detail-seller-type">Vendedor particular</div>
               </div>
-            </section>
-          ) : null}
-        </div>
+            </div>
+            <div className="fingen-detail-seller-stats">
+              <div><strong>{sellerInfo?.activeListings ?? 1}</strong><span>anúncios</span></div>
+              <div><strong>{sellerYears || 1}</strong><span>no Carbi</span></div>
+            </div>
+          </section>
 
-        <aside className="ref-ad-right-col">
-          <section className="ref-ad-price-panel">
-            <div className="ref-ad-price-panel-make">{listing.brand} · {listing.model}</div>
-            <h1 className="ref-ad-price-panel-name">{listing.version || 'Versão não informada'}</h1>
-            <div className="ref-ad-price-panel-version">{listing.year}/{listing.year_model} · {listing.color} · {listing.body_type || 'Particular'}</div>
-            <div className="ref-ad-price-main">{formatBRL(price)}</div>
-            {fipePrice ? (
-              <div className="ref-ad-price-fipe-row">
-                <span className="ref-ad-price-fipe-val">FIPE {formatBRL(fipePrice)}</span>
-                {dealPercentLabel ? <span className="ref-ad-price-fipe-chip">{dealPercentLabel}</span> : null}
-              </div>
-            ) : null}
-            <div className="ref-ad-price-panel-divider" />
-            <div className="ref-ad-spec-pills">
-              <span>{listing.year_model}</span>
-              <span>{listing.mileage.toLocaleString('pt-BR')} km</span>
-              <span>{Array.isArray(listing.transmission) ? listing.transmission[0] : listing.transmission}</span>
-              <span>{listing.fuel}</span>
-            </div>
-            <div className="ref-ad-location-row"><span /> {listing.city} / {listing.state}</div>
-            <div className="ref-ad-views-row">
-              <div><span /> Anúncio ativo</div>
-              <span>Anunciado em {formatDate(listing.created_at)}</span>
-            </div>
-            <div className="ref-ad-cta-block">
-              <button type="button" className="ref-ad-cta-offer" onClick={() => setShowOfferModal(true)} aria-label="Fazer oferta para este veículo">
-                <HandCoins size={18} /> Fazer oferta
+          {/* Share */}
+          <section className="fingen-detail-card">
+            <h3 className="fingen-detail-card-title">Compartilhar</h3>
+            <div className="fingen-detail-share">
+              <button type="button" onClick={handleCopy} className="fingen-detail-share-btn">
+                <Copy size={14} />
+                {copied ? 'Copiado!' : 'Copiar link'}
               </button>
-              <div className="ref-ad-chat-wrap">
-                <ChatStarter listingId={listing.id} label="Chat na Carbi" />
-              </div>
-              <div className="ref-ad-cta-secondary">
-                <button type="button" onClick={() => setIsFavorite((value) => !value)} aria-label={isFavorite ? 'Remover dos favoritos' : 'Salvar nos favoritos'}>
-                  <Heart size={14} className={isFavorite ? 'fill-current' : ''} /> {isFavorite ? 'Salvo' : 'Salvar'}
-                </button>
-                <button type="button" onClick={handleShare} aria-label="Compartilhar este anúncio"><Share2 size={14} /> Compartilhar</button>
-              </div>
-              <div className="ref-ad-cta-notice">Contato protegido pelo chat interno</div>
             </div>
           </section>
 
-          <section className="ref-ad-card ref-ad-seller-card">
-            <div className="ref-ad-card-title">Vendedor</div>
-            <div className="ref-ad-seller-top">
-              <div className="ref-ad-seller-avatar">
-                {sellerInfo?.avatarUrl ? <img src={sellerInfo.avatarUrl} alt={sellerName} /> : initials(sellerName)}
-              </div>
-              <div>
-                <div className="ref-ad-seller-name">{sellerName}</div>
-                <div className="ref-ad-seller-type">Vendedor particular</div>
-              </div>
-            </div>
-            <div className="ref-ad-seller-badges">
-              <span><MessageCircle size={12} /> Chat interno</span>
-              <span><ShieldCheck size={12} /> Dados protegidos</span>
-            </div>
-            <div className="ref-ad-seller-stats">
-              <div><span>{sellerInfo?.activeListings ?? 1}</span><small>anúncios</small></div>
-              <div><span>{sellerInfo?.totalListings ?? 1}</span><small>total</small></div>
-              <div><span>{sellerYears || 1} ano{sellerYears > 1 ? 's' : ''}</span><small>no Carbi</small></div>
-            </div>
-          </section>
-
-          <section className="ref-ad-card-sm">
-            <div className="ref-ad-card-title">Compartilhar anúncio</div>
-            <div className="ref-ad-share-row">
-              <span>Link</span>
-              <button type="button" className="ref-ad-copy-link" onClick={handleCopy}>{copied ? 'Link copiado!' : publicPath}</button>
-              <button type="button" className="ref-ad-share-btn" onClick={handleCopy} title="Copiar link"><Copy size={14} /></button>
-            </div>
-          </section>
-
-          <div className="ref-ad-report-wrap">
-            <button type="button" onClick={() => setShowReportModal(true)}>Denunciar este anúncio</button>
-          </div>
-        </aside>
-      </div>
-
-      <div className="ref-ad-mobile-cta" role="complementary" aria-label="Ações rápidas">
-        <div>
-          <strong>{formatBRL(price)}</strong>
-          {fipePrice ? <span>FIPE {formatBRL(fipePrice)}</span> : null}
+          {/* Report */}
+          <button type="button" onClick={() => setShowReportModal(true)} className="fingen-detail-report">
+            Denunciar anúncio
+          </button>
         </div>
-        <button type="button" onClick={() => setShowOfferModal(true)} aria-label="Fazer oferta"><HandCoins size={16} /> Oferta</button>
-        <div className="ref-ad-mobile-chat"><ChatStarter listingId={listing.id} label="Chat" /></div>
       </div>
 
-      {accessToken ? (
-        <OfferHistory listingId={listing.id} isSeller={isSeller} accessToken={accessToken} />
-      ) : null}
+      {/* Similar Cars */}
+      {relatedListings.length > 0 && (
+        <section className="fingen-detail-similar-section">
+          <div className="fingen-detail-section-header">
+            <h3>Similares</h3>
+            <Link href="/carros-a-venda">Ver todos <ChevronRight size={14} /></Link>
+          </div>
+          <div className="fingen-detail-similar-grid">
+            {relatedListings.slice(0, 4).map((item) => (
+              <Link href={`/anuncios/${item.slug}`} className="fingen-detail-similar-card" key={item.id}>
+                <div className="fingen-detail-similar-img">
+                  <MarketplaceListingImage
+                    brand={item.brand}
+                    model={item.model}
+                    year={item.year_model}
+                    imageUrls={item.images?.map((image) => image.url) || []}
+                    alt={item.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="fingen-detail-similar-body">
+                  <div className="fingen-detail-similar-brand">{item.brand}</div>
+                  <div className="fingen-detail-similar-name">{item.model}</div>
+                  <div className="fingen-detail-similar-price">{formatBRL(Number(item.price))}</div>
+                  <div className="fingen-detail-similar-meta">{item.year_model} · {item.mileage.toLocaleString('pt-BR')} km</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Mobile Bottom Bar */}
+      <div className="fingen-detail-mobile-bar">
+        <div className="fingen-detail-mobile-price">
+          <strong>{formatBRL(price)}</strong>
+          {fipePrice && <span>FIPE {formatBRL(fipePrice)}</span>}
+        </div>
+        <button type="button" className="fingen-detail-mobile-offer" onClick={() => setShowOfferModal(true)}>
+          <HandCoins size={16} /> Oferta
+        </button>
+        <div className="fingen-detail-mobile-chat">
+          <ChatStarter listingId={listing.id} label="Chat" />
+        </div>
+      </div>
+
+      {/* Modals */}
+      <OfferHistory listingId={listing.id} isSeller={isSeller} accessToken={accessToken} />
 
       <OfferModal
         listingId={listing.id}
@@ -401,14 +393,11 @@ export default function VehicleDetailView({
       <ConfirmModal
         isOpen={showReportModal}
         title="Denunciar anúncio"
-        message="Tem certeza que deseja denunciar este anúncio? Nossa equipe irá analisar e tomar as providências necessárias."
+        message="Tem certeza que deseja denunciar este anúncio?"
         confirmLabel="Denunciar"
         cancelLabel="Cancelar"
         variant="danger"
-        onConfirm={() => {
-          setShowReportModal(false)
-          // TODO: implement report API call
-        }}
+        onConfirm={() => setShowReportModal(false)}
         onCancel={() => setShowReportModal(false)}
       />
     </div>

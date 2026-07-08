@@ -1,41 +1,45 @@
 ---
 name: Carbi
-description: Marketplace moderno de seminovos com estética fintech automotiva
+description: Marketplace moderno de seminovos com estética Fingen-inspired
 colors:
-  primary: "#C8F45A"
-  primary-hover: "#B8E84A"
-  forest: "#1A2F1E"
-  forest-hover: "#2D3D32"
+  primary: "#D4F576"
+  primary-hover: "#C8E64E"
+  forest: "#1A1A1A"
+  forest-hover: "#2D2D2D"
   lavender: "#C9B8FF"
   iris: "#5A47D1"
   coral: "#FF6B52"
   mint: "#39E09B"
-  marble: "#F5F4F0"
-  white: "#FBFBF9"
-  ink: "#1E2330"
+  marble: "#F5F5F5"
+  white: "#FFFFFF"
+  ink: "#1A1A1A"
   text-secondary: "#3A3A3A"
-  text-tertiary: "#6F6B61"
+  text-tertiary: "#6F6F6F"
   trust: "#16855C"
   danger: "#DC2626"
   warning: "#F59E0B"
+  background: "#F5F5F5"
+  surface: "#FFFFFF"
+  dark: "#1A1A1A"
 typography:
   display:
     fontFamily: "DM Sans, system-ui, sans-serif"
-    fontSize: "clamp(36px, 5vw, 64px)"
-    fontWeight: 700
-    lineHeight: 1.05
-    letterSpacing: "-0.02em"
-  headline:
-    fontFamily: "DM Sans, system-ui, sans-serif"
-    fontSize: "clamp(28px, 3.5vw, 44px)"
+    fontSize: "clamp(36px, 8vw, 64px)"
     fontWeight: 700
     lineHeight: 1.1
-    letterSpacing: "-0.015em"
+    letterSpacing: "-0.03em"
+  headline:
+    fontFamily: "DM Sans, system-ui, sans-serif"
+    fontSize: "clamp(28px, 6vw, 48px)"
+    fontWeight: 700
+    lineHeight: 1.1
+    letterSpacing: "-0.02em"
   title:
     fontFamily: "DM Sans, system-ui, sans-serif"
-    fontSize: "22px"
-    fontWeight: 600
-    lineHeight: 1.3
+    fontSize: "24px"
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: "-0.01em"
   body:
     fontFamily: "DM Sans, system-ui, sans-serif"
     fontSize: "16px"
@@ -56,7 +60,8 @@ rounded:
   sm: "14px"
   md: "18px"
   lg: "24px"
-  xl: "30px"
+  xl: "28px"
+  2xl: "32px"
   full: "9999px"
 spacing:
   xs: "4px"
@@ -66,38 +71,41 @@ spacing:
   xl: "32px"
   2xl: "48px"
   3xl: "64px"
-  4xl: "96px"
 components:
   button-primary:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.ink}"
     rounded: "{rounded.full}"
-    padding: "10px 22px"
+    padding: "12px 24px"
   button-primary-hover:
     backgroundColor: "{colors.primary-hover}"
     textColor: "{colors.ink}"
     rounded: "{rounded.full}"
-    padding: "10px 22px"
-  button-forest:
-    backgroundColor: "{colors.forest}"
-    textColor: "{colors.primary}"
+    padding: "12px 24px"
+  button-dark:
+    backgroundColor: "{colors.dark}"
+    textColor: "{colors.white}"
     rounded: "{rounded.full}"
-    padding: "10px 22px"
+    padding: "12px 24px"
   button-ghost:
     backgroundColor: "transparent"
     textColor: "{colors.ink}"
     rounded: "{rounded.full}"
-    padding: "10px 22px"
-  card-block:
-    backgroundColor: "{colors.lavender}"
-    textColor: "{colors.ink}"
-    rounded: "32px"
-    padding: "48px 40px"
+    padding: "12px 24px"
+    border: "1.5px solid rgba(0,0,0,0.12)"
   search-bar:
-    backgroundColor: "{colors.white}"
+    backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
     rounded: "{rounded.full}"
-    padding: "6px"
+    padding: "12px 16px"
+  card:
+    backgroundColor: "{colors.surface}"
+    rounded: "{rounded.xl}"
+    border: "1px solid rgba(0,0,0,0.06)"
+  card-dark:
+    backgroundColor: "{colors.dark}"
+    textColor: "{colors.white}"
+    rounded: "{rounded.xl}"
 ---
 
 # Design System: Carbi
@@ -106,125 +114,134 @@ components:
 
 **Creative North Star: "Fintech Automotiva"**
 
-A Carbi combina a confiança e clareza de uma fintech com a paixão do universo automotivo. O sistema visual é minimalista e funcional — cada elemento existe por uma razão, sem decoração vazia. A estética é plana com camadas tonais, onde profundidade vem de contraste de cor, não de sombras pesadas.
-
-Superfícies em tons quentes e neutros (marble, white) criam um ambiente acolhedor. Acentos vibrantes (chartreuse, lavender, iris) trazem energia sem poluição visual. Tipografia forte e clara guia o olhar para onde importa: dados, preços e ações.
-
-O sistema rejeita explicitamente a estética de sites de concessionárias tradicionais: sem hierarquia fraca, sem excesso de texto, sem visual genérico. Cada屏面é pensada para uma decisão clara.
+A Carbi combina a confiança e clareza de uma fintech com a paixão do universo automotivo. O design é inspirado no Fingen — clean, minimalista, com foco em dados e ações claras.
 
 **Key Characteristics:**
-- Mobile-first com container responsivo (1320px max)
-- Cantos arredondados generosos (14-32px)
-- Paleta restrita com acentos pontuais
-- Tipografia DM Sans com hierarquia clara
-- Sombras mínimas, profundidade por camadas de cor
-- Uma ação principal por屏面
+- Mobile-first com bottom navigation
+- Balance card com número grande e badge de mudança
+- Quick actions com ícones circulares
+- CTA button escuro com ícone chartreuse
+- Cards com Glare Card effect (hover tracking)
+- Grid pattern sutil no hero
+- Dark cards para dados e estatísticas
 
 ## 2. Colors
 
-Paleta vibrante mas controlada, com tons quentes como base e acentos frios para destaque.
-
 ### Primary
-- **Chartreuse** (#C8F45A): Cor de destaque principal. Usada em CTAs, badges de preço, indicadores positivos. Rara mas impactante — sua raridade é o ponto.
+- **Chartreuse** (#D4F576): Acento principal. CTAs, badges, indicadores positivos.
+- **Chartreuse Hover** (#C8E64E): Estado hover do acento.
+
+### Dark
+- **Ink/Dark** (#1A1A1A): Texto principal, fundos escuros, CTA buttons.
+- **Hover** (#2D2D2D): Estado hover de elementos escuros.
 
 ### Secondary
-- **Lavender** (#C9B8FF): Cards de features, seções de anúncio, badges de estado. Traz suavidade sem perder personalidade.
-
-### Tertiary
-- **Iris** (#5A47D1): Links, ícones interativos, elementos de navegação. Confiança e sofisticação.
-
-### Neutral
-- **Ink** (#1E2330): Texto principal, fundo de botões escuros, elementos de alta confiança.
-- **Forest** (#1A2F1E): Hero sections, fundos escuros, botões primários invertidos.
-- **Marble** (#F5F4F0): Fundo principal, superfícies neutras.
-- **White** (#FBFBF9): Cards elevados, modais, sobreposições.
+- **Lavender** (#C9B8FF): Cards de features, badges de estado.
+- **Iris** (#5A47D1): Links, ícones interativos.
 
 ### Semantic
-- **Trust** (#16855C): Preços, status verificado, indicadores positivos.
-- **Coral** (#FF6B52): Alertas de oportunidade, badges "abaixo da FIPE".
-- **Mint** (#39E09B): Ações secundárias, micro-interações.
+- **Trust** (#16855C): Status verificado, indicadores positivos.
+- **Coral** (#FF6B52): Alertas, badges "abaixo da FIPE".
+
+### Neutral
+- **Background** (#F5F5F5): Fundo da página.
+- **Surface** (#FFFFFF): Cards, modais.
+- **Text Secondary** (#3A3A3A): Texto secundário.
+- **Text Tertiary** (#6F6F6F): Texto terciário, labels.
 
 ### Named Rules
-**The Chartreuse Rule.** O acento chartreuse é usado em ≤10% de qualquer屏面. Sua raridade é o ponto — quando aparece, é para guiar a ação principal.
+**The Chartreuse Rule.** Acento chartreuse em ≤10% da tela. Sua raridade é o ponto.
+
+**The Flat Rule.** Superfícies planas em repouso. Sombras só em hover/focus.
 
 ## 3. Typography
 
-**Display Font:** DM Sans (com system-ui fallback)
-**Body Font:** DM Sans (com system-ui fallback)
-**Label/Mono Font:** Plus Jakarta Sans (com DM Sans fallback)
-
-**Character:** Tipografia sans-serif moderna com personalidade. DM Sans traz calidez sem ser ingênua; Plus Jakarta Sans adiciona precisão técnica para labels e dados. Hierarquia forte baseada em peso e tamanho, não em família.
+**Display Font:** DM Sans (700-800)
+**Body Font:** DM Sans (400-600)
+**Label/Mono Font:** Plus Jakarta Sans
 
 ### Hierarchy
-- **Display** (700, clamp(36px, 5vw, 64px), 1.05): Headlines de hero, títulos de seção principal.
-- **Headline** (700, clamp(28px, 3.5vw, 44px), 1.1): Títulos de seção, cards grandes.
-- **Title** (600, 22px, 1.3): Títulos de componente, cards médios.
-- **Body** (400, 16px, 1.6): Texto corrido, descrições, parágrafos.
-- **Label** (600, 13px, 1.4, 0.3px): Badges, tags, metadados, navigation labels.
-- **Mono** (500, 13px): Códigos, preços small, dados técnicos.
-
-### Named Rules
-**The One Weight Rule.** Pesos de 400 a 700 cobrem todo o spectrum. Nunca usar below 400 (thin) ou above 800 (black). A hierarquia vem de tamanho + peso, não de família diferente.
+- **Display** (700, clamp(36px, 8vw, 64px)): Hero headlines
+- **Headline** (700, clamp(28px, 6vw, 48px)): Section titles
+- **Title** (700, 24px): Card titles
+- **Body** (400, 16px): Paragraphs, descriptions
+- **Label** (600, 13px): Badges, tags, metadata
 
 ## 4. Elevation
 
-Sistema flat com camadas tonais. Profundidade é comunicada por contraste de cor e sobreposição de superfícies, não por sombras estruturais.
-
 ### Shadow Vocabulary
-- **Ambient Low** (0 2px 0 rgba(23,23,15,0.14)): Bordas sutis em cards em repouso.
-- **Elevated** (0 8px 0 rgba(23,23,15,0.08), 0 18px 36px rgba(23,23,15,0.08)): Cards em hover, modais, dropdowns.
-- **Focus Ring** (0 0 0 4px rgba(217,248,95,0.60)): Indicador de foco acessível.
+- **Subtle** (0 1px 2px rgba(0,0,0,0.04)): Cards em repouso
+- **Elevated** (0 4px 16px rgba(0,0,0,0.08)): Cards em hover
+- **Focus** (0 0 0 3px rgba(212,245,118,0.5)): Indicador de foco
 
-### Named Rules
-**The Flat-By-Default Rule.** Superfícies são planas em repouso. Sombras aparecem apenas como resposta a estado (hover, elevação, foco). Nunca sombras decorativas.
+### Glare Card Effect
+Cards de veículos usam o efeito Glare Card do Aceternity UI:
+- Brilho radial que segue o mouse
+- Transição suave de opacidade
+- Cria interatividade e profundidade
 
 ## 5. Components
 
-### Buttons
-- **Shape:** Full round (9999px radius)
-- **Primary:** Background chartreuse (#C8F45A), texto ink (#1E2330), padding 10px 22px
-- **Hover:** Background #B8E84A, translateY(-1px)
-- **Forest:** Background forest (#1A2F1E), texto chartreuse
-- **Ghost:** Transparente, borda 1.5px solid rgba(0,0,0,0.18)
+### Balance Card (Hero)
+- **Label:** "Seu próximo carro" (16px, secundário)
+- **Amount:** Número grande (clamp(36px, 8vw, 64px), bold)
+- **Change Badge:** Chartreuse, pill-shaped, com ícone TrendingUp
+- **Subtitle:** Texto descritivo (15px, secundário)
 
-### Cards
-- **Corner Style:** 32px radius generoso
-- **Background:** Lavender (#C9B8FF), Lime, ou Iris (#5A47D1)
-- **Shadow Strategy:** Flat por padrão, elevated no hover com translateY(-4px)
-- **Internal Padding:** 48px 40px
+### Quick Actions
+- **Layout:** Flex, space-around
+- **Icon Button:** 56px circle, border sutil
+- **Label:** 13px, below icon
+- **Hover:** Background chartreuse, translateY(-2px)
 
-### Search Bar
-- **Shape:** Full round (9999px)
-- **Background:** White (#FBFBF9)
-- **Shadow:** 0 4px 40px rgba(0,0,0,0.3)
-- **Input:** Sem borda, fundo transparente, padding 18px 24px
-- **Button:** Chartreuse background, padding 12px 28px
+### CTA Button
+- **Style:** Dark (#1A1A1A), full width
+- **Icon:** Chartreuse circle, 44px
+- **Arrow:** Right chevron
+- **Dots:** 3 dots indicadores abaixo
 
-### Navigation
-- **Style:** Logo à esquerda, links centralizados, botões à direita
-- **Typography:** Logo em mono (22px, 500), links em body (15px, 500)
-- **Links:** Padding 8px 14px, radius 100px, hover com background sutil
-- **Mobile:** Links ocultos, botões condensados
+### Car Cards (Glare Effect)
+- **Border Radius:** 20px
+- **Border:** 1px solid rgba(0,0,0,0.06)
+- **Hover:** translateY(-4px), box-shadow
+- **Glare:** Radial gradient que segue o mouse
+- **Image:** 16:10 aspect ratio
+- **Badge:** Chartreuse pill para "abaixo FIPE"
+- **Favorite:** Heart icon, absolute position
 
-### Chips / Tags
-- **Style:** Background marble ou cor semântica, border-radius full
-- **Padding:** 8px 16px
-- **Typography:** Label (13px, 600)
+### Dark Cards (FIPE, Stats)
+- **Background:** #1A1A1A
+- **Border Radius:** 28px
+- **Text:** White
+- **Badge:** Semi-transparent bg
+
+### Bottom Navigation
+- **Height:** 80px
+- **Items:** 5 (Home, Buscar, Anunciar, Chat, Perfil)
+- **Active:** Chartreuse icon + bg
+- **Inactive:** Gray icon
+
+### Grid Pattern
+- **Background:** Subtle grid lines
+- **Color:** rgba(212,245,118,0.15)
+- **Mask:** Radial gradient
+- **Transform:** skew-y-12
 
 ## 6. Do's and Don'ts
 
 ### Do:
-- **Do** usar chartreuse como acento principal em ≤10% da屏面
-- **Do** manter hierarquia clara com peso e tamanho de tipografia
-- **Do** usar cantos arredondados generosos (14-32px) em todos os cards
-- **Do** manter contraste adequado para acessibilidade (WCAG AA)
-- **Do** usar mobile-first com container responsivo (1320px max)
-- **Do** priorizar uma ação principal por屏面
+- **Do** usar chartreuse como acento em ≤10% da tela
+- **Do** usar Glare Card effect nos cards de veículos
+- **Do** manter hierarchy clara com peso/tamanho
+- **Do** usar dark cards para dados e estatísticas
+- **Do** usar bottom navigation no mobile
+- **Do** usar grid pattern sutil no hero
+- **Do** manter superfícies planas em repouso
 
 ### Don't:
-- **Don't** usar sombras decorativas — sombras só em estado (hover, focus)
-- **Don't** poluir a屏面 com múltiplos acentos coloridos
-- **Don't** copiar a estética de sites de concessionárias tradicionais (visual genérico, sem hierarquia)
-- **Don't** usar tipografia thin (below 400) ou black (above 800)
-- **Don't** criar hierarquia com família de fonte diferente — usar peso e tamanho
-- **Don't** exceder 3 cores por屏画面exceto na paleta semântica
+- **Don** usar sombras decorativas — só em hover/focus
+- **Don't** poluir com múltiplos acentos
+- **Don't** copiar marketplaces genéricos
+- **Don't** usar glassmorphism como padrão
+- **Don't** usar gradient text
+- **Don't** usar border-left/right > 1px como acento

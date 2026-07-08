@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react'
 import ListingForm from '@/components/marketplace/ListingForm'
 import FlowProgress from '@/components/animations/FlowProgress'
 
@@ -22,13 +22,13 @@ export default function AnunciarFluxoPage() {
         <div className="ref-flow-hero-inner">
           <div>
             <span className="ref-hero-badge"><span className="ref-dot" /> Anúncio 100% grátis</span>
-            <h1>Monte seu anúncio com a mesma experiência premium da Carbi.</h1>
+            <h1>Publique seu anúncio em poucos minutos.</h1>
             <p>
-              Um fluxo guiado para selecionar veículo, consultar FIPE, enviar até 10 fotos e publicar com dados reais.
+              Fluxo guiado com consulta FIPE, upload de fotos e revisão final — tudo com a identidade premium da Carbi.
             </p>
           </div>
-          <Link href="/carros-a-venda" className="ref-btn ref-btn-lavender">
-            Ver ofertas <ArrowRight size={16} />
+          <Link href="/carros-a-venda" className="ref-btn ref-btn-ghost" style={{ border: '1px solid rgba(255,255,255,.2)', color: '#fff' }}>
+            <ArrowLeft size={16} /> Voltar ao marketplace
           </Link>
         </div>
         <FlowProgress steps={flow} currentStep={0} />
@@ -40,7 +40,7 @@ export default function AnunciarFluxoPage() {
             <span className="ref-sec-label">Onboarding</span>
             <h2>Preencha pouco, publique bem.</h2>
             <p>
-              O formulário usa FIPE real, valida fotos, salva o anúncio no banco e mantém contato por chat interno.
+              Dados estruturados, FIPE real no fluxo, até 10 fotos e contato protegido por chat interno.
             </p>
             <div className="ref-flow-side-list">
               {['FIPE durante o preenchimento', 'Upload real de imagens', 'Preview e revisão final', 'Negociação protegida'].map((item) => (

@@ -946,11 +946,11 @@ export default function ListingForm() {
       <div className="space-y-3">
         <div className="h-1.5 bg-[#FAFAF9] rounded-full overflow-hidden">
           <div
-            className="h-full bg-[#10B981] rounded-full transition-all duration-500"
+            className="h-full bg-[#D9F85F] rounded-full transition-all duration-500"
             style={{ width: `${(currentStep / 3) * 100}%` }}
           />
         </div>
-        <p className="label text-[#10B981]">
+        <p className="label">
           {currentStep === 1 && 'Etapa 1 de 3: Selecione seu carro'}
           {currentStep === 2 && 'Etapa 2 de 3: Preço, dados básicos e fotos'}
           {currentStep === 3 && 'Etapa 3 de 3: Revisar e publicar'}
@@ -975,12 +975,12 @@ export default function ListingForm() {
                     listingSubStep === s
                       ? 'bg-[#17170F] text-white scale-110 shadow-md'
                       : listingSubStep > s
-                      ? 'bg-[#10B981] text-white'
+                      ? 'bg-[#D9F85F] text-[#17170F]'
                       : 'bg-[#EAEAE8] text-[#767676]'
                   }`}>
                     {listingSubStep > s ? <Check className="w-4 h-4" /> : s}
                   </div>
-                  {s < 4 && <div className={`h-0.5 flex-1 rounded-full transition-colors ${listingSubStep > s ? 'bg-[#10B981]' : 'bg-[#EAEAE8]'}`} />}
+                  {s < 4 && <div className={`h-0.5 flex-1 rounded-full transition-colors ${listingSubStep > s ? 'bg-[#D9F85F]' : 'bg-[#EAEAE8]'}`} />}
                 </div>
               ))}
             </div>
@@ -997,7 +997,7 @@ export default function ListingForm() {
             {listingSubStep === 1 && (
               <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="label text-[#10B981]">Marca</p>
+                  <p className="label">Marca</p>
                   <span className="badge badge-brand text-[10px]">Passo 1 de 4</span>
                 </div>
                 <select
@@ -1026,7 +1026,7 @@ export default function ListingForm() {
             {listingSubStep === 2 && (
               <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="label text-[#10B981]">Modelo</p>
+                  <p className="label">Modelo</p>
                   <span className="badge badge-brand text-[10px]">Passo 2 de 4</span>
                 </div>
                 <select
@@ -1057,7 +1057,7 @@ export default function ListingForm() {
             {listingSubStep === 3 && (
               <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="label text-[#10B981]">Ano</p>
+                  <p className="label">Ano</p>
                   <span className="badge badge-brand text-[10px]">Passo 3 de 4</span>
                 </div>
                 <select
@@ -1088,7 +1088,7 @@ export default function ListingForm() {
               <div className="space-y-4 animate-fade-in">
                 <div className="surface p-5 space-y-4 max-[330px]:p-4">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="label text-[#10B981]">Versões disponíveis</p>
+                    <p className="label">Versões disponíveis</p>
                     <span className="badge badge-brand text-[10px]">Passo 4 de 4</span>
                   </div>
                   <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-wrap items-center gap-x-6 gap-y-2 max-[330px]:p-3">
@@ -1151,10 +1151,10 @@ export default function ListingForm() {
                 </div>
 
             <div className="surface-strong p-8 relative overflow-hidden max-[330px]:p-4">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#D9F85F]/50 rounded-bl-full -z-10" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#D9F85F]/30 rounded-bl-full" />
               <div className="flex items-center justify-between gap-3 mb-6 max-[330px]:mb-4 max-[330px]:gap-2">
-                <p className="text-lg font-semibold font-black text-[#0A0A0A] max-[330px]:text-[16px]">Referência FIPE</p>
-                <span className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest shadow-sm max-[330px]:px-3 max-[330px]:py-1.5 ${hasAskingPrice && comparison.status === 'below' ? 'bg-green-50 text-green-600 border-green-100' : hasAskingPrice && comparison.status === 'above' ? 'bg-red-50 text-red-600 border-red-100' : hasAskingPrice && comparison.status === 'near' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-[#FAFAF9] text-[#525252] border-[#EAEAE8]'}`}>
+                <p className="text-lg font-bold text-[#0A0A0A] max-[330px]:text-[16px]">Referência FIPE</p>
+                <span className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest shadow-sm max-[330px]:px-3 max-[330px]:py-1.5 ${hasAskingPrice && comparison.status === 'below' ? 'bg-[#D9F85F] text-[#17170F] border-[#D9F85F]' : hasAskingPrice && comparison.status === 'above' ? 'bg-red-50 text-red-600 border-red-100' : hasAskingPrice && comparison.status === 'near' ? 'bg-[#FFF8DF] text-[#17170F] border-[#FFE08A]' : 'bg-[#FAFAF9] text-[#525252] border-[#EAEAE8]'}`}>
                   {!hasAskingPrice && 'Preço pendente'}
                   {hasAskingPrice && comparison.status === 'below' && 'Abaixo'}
                   {hasAskingPrice && comparison.status === 'near' && 'Próximo'}
@@ -1191,9 +1191,9 @@ export default function ListingForm() {
         )}
 
         {currentStep === 2 && (
-          <div className="space-y-8 max-[330px]:space-y-5">
+          <div className="space-y-8 animate-fade-in max-[330px]:space-y-5">
             <div>
-              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Dados essenciais</h3>
+              <h3 className="text-xl font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Dados essenciais</h3>
               <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
                 Só pedimos o necessário para publicar rápido. O restante pode ser completado depois.
               </p>
@@ -1210,7 +1210,7 @@ export default function ListingForm() {
             </div>
 
             {fipeResult ? (
-              <div className="rounded-[28px] bg-[#1A2F1E] p-5 text-white shadow-lg shadow-[#1A2F1E]/15 max-[330px]:p-4">
+              <div className="rounded-[28px] bg-[#1A1A1A] p-5 text-white max-[330px]:p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-1">
                     <p className="text-[12px] font-black uppercase tracking-[0.18em] text-white/65 max-[330px]:text-[11px]">
@@ -1271,10 +1271,10 @@ export default function ListingForm() {
               </div>
             ) : null}
 
-            <div className="rounded-[24px] border border-[#EAEAE8] bg-[#FAFAF9] p-4 space-y-3">
+            <div className="surface p-4 space-y-3">
               <div className="flex items-center justify-between gap-3">
-                <p className="label text-[#16855C]">Recomendado, não obrigatório</p>
-                <span className="text-[11px] font-bold text-[#525252]">Pode completar depois</span>
+                <p className="label">Recomendado, não obrigatório</p>
+                <span className="badge badge-outline text-[10px]">Opcional</span>
               </div>
               <textarea className="input min-h-[120px] py-3 resize-none leading-relaxed max-[330px]:min-h-[100px]" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
               <input className="input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
@@ -1283,7 +1283,7 @@ export default function ListingForm() {
 
 
             <label
-              className="surface border-2 border-dashed border-[#17170F]/18 p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] hover:border-[#17170F]/30 hover:bg-[#D9F85F] transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px]"
+              className="surface-strong border-2 border-dashed border-[rgba(0,0,0,0.12)] p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] hover:border-[#D9F85F] hover:bg-[#D9F85F]/10 transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px]"
               onDragOver={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
@@ -1297,7 +1297,7 @@ export default function ListingForm() {
               <span className="badge badge-brand text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens</span>
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
             </label>
-            <p className="text-xs text-[#525252] text-center">Inclua pelo menos 1 foto para publicar. Você pode reorganizar e completar até 10 fotos depois.</p>
+            <p className="text-xs text-[#525252] text-center">Inclua pelo menos 1 foto para publicar.</p>
 
             {images.length > 0 && (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8 max-[330px]:grid-cols-1 max-[330px]:gap-4">
@@ -1324,9 +1324,9 @@ export default function ListingForm() {
         )}
 
         {currentStep === 3 && (
-          <div className="space-y-8 max-[330px]:space-y-5">
+          <div className="space-y-8 animate-fade-in max-[330px]:space-y-5">
             <div>
-              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Revisar e publicar</h3>
+              <h3 className="text-xl font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Revisar e publicar</h3>
               <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
                 Confira os detalhes antes de finalizar.
               </p>
@@ -1335,28 +1335,28 @@ export default function ListingForm() {
             <div className="rounded-[28px] border border-[#17170F]/10 bg-[#D9F85F] p-5 shadow-sm max-[330px]:p-4">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="label text-[#1A2F1E]">{qualityLabel}</p>
+                  <p className="label text-[#1A1A1A]">{qualityLabel}</p>
                   <h4 className="mt-2 text-3xl font-black tracking-[-0.04em] text-[#17170F] max-[330px]:text-2xl">
                     {qualityScore}/100
                   </h4>
                 </div>
                 <div className="min-w-[180px] flex-1">
                   <div className="h-3 overflow-hidden rounded-full bg-white/70">
-                    <div className="h-full rounded-full bg-[#1A2F1E] transition-all duration-500" style={{ width: `${qualityScore}%` }} />
+                    <div className="h-full rounded-full bg-[#1A1A1A] transition-all duration-500" style={{ width: `${qualityScore}%` }} />
                   </div>
-                  <p className="mt-2 text-xs font-bold text-[#1A2F1E]/80">
+                  <p className="mt-2 text-xs font-bold text-[#1A1A1A]/80">
                     Seu anúncio pode ser publicado como básico. Depois, complete mais dados para aumentar a confiança.
                   </p>
                 </div>
               </div>
               {missingRequiredLabels.length > 0 ? (
-                <p className="mt-4 rounded-2xl bg-white/70 p-3 text-xs font-bold text-[#1A2F1E]">
+                <p className="mt-4 rounded-2xl bg-white/70 p-3 text-xs font-bold text-[#1A1A1A]">
                   Faltam obrigatórios: {missingRequiredLabels.join(', ')}.
                 </p>
               ) : (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {recommendedItems.filter((item) => !item.complete).slice(0, 4).map((item) => (
-                    <span key={item.label} className="rounded-full bg-white/75 px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#1A2F1E]">
+                    <span key={item.label} className="rounded-full bg-white/75 px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#1A1A1A]">
                       Completar {item.label.toLowerCase()}
                     </span>
                   ))}
@@ -1364,8 +1364,8 @@ export default function ListingForm() {
               )}
             </div>
             
-            <div className="card p-5 relative overflow-hidden max-[330px]:p-4">
-              <p className="label text-[#16855C] mb-4">Informações</p>
+            <div className="surface p-5 max-[330px]:p-4">
+              <p className="label mb-4">Informações</p>
               <div className="grid gap-4 text-sm sm:grid-cols-2 max-[330px]:grid-cols-1 max-[330px]:gap-3">
                 <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Veículo</span><strong className="text-sm text-[#0A0A0A]">{form.brand} {form.model} {form.version}</strong></div>
                 <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Ano</span><strong className="text-sm text-[#0A0A0A]">{form.year}/{form.yearModel}</strong></div>
@@ -1379,7 +1379,7 @@ export default function ListingForm() {
 
             <div className="surface p-5 max-[330px]:p-4">
               <div className="flex items-center gap-2 mb-4">
-                <span className="w-7 h-7 rounded-full bg-[#ECFDF5] flex items-center justify-center text-[#10B981] font-bold text-[10px]">AI</span>
+                <span className="w-7 h-7 rounded-full bg-[#D9F85F] flex items-center justify-center text-[#17170F] font-bold text-[10px]">AI</span>
                 <p className="label">Ficha técnica automática</p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 max-[330px]:grid-cols-1">
@@ -1428,7 +1428,7 @@ export default function ListingForm() {
         )}
 
         {error ? (
-          <div className="bg-red-50 rounded-2xl border border-red-100 p-6 shadow-sm">
+          <div className="bg-red-50 rounded-2xl border border-red-100 p-5">
             <p className="text-sm font-bold text-red-600">{error}</p>
             {validationDetails.length > 0 ? (
               <ul className="mt-3 space-y-1.5 text-xs font-bold text-red-600/80 bg-white/50 p-4 rounded-xl">
@@ -1441,12 +1441,12 @@ export default function ListingForm() {
         ) : null}
 
         {success ? (
-          <div className="bg-[#E9FFF2] rounded-2xl border border-[#16855C]/20 p-6 shadow-sm text-center">
+          <div className="bg-[#E9FFF2] rounded-2xl border border-[#16855C]/20 p-5 text-center">
             <p className="text-base font-black text-[#16855C]">{success}</p>
           </div>
         ) : null}
 
-        <div className="mt-8 flex flex-col-reverse justify-between gap-3 sm:flex-row pt-6 border-t border-white/70 max-[330px]:mt-6 max-[330px]:pt-4">
+        <div className="mt-8 flex flex-col-reverse justify-between gap-3 sm:flex-row pt-6 border-t border-[rgba(0,0,0,0.06)] max-[330px]:mt-6 max-[330px]:pt-4">
           {currentStep > 1 ? (
             <button
               type="button"

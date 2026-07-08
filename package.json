@@ -27,8 +27,10 @@
     "animejs": "^4.3.6",
     "autoprefixer": "^10.4.27",
     "car-query": "^1.0.12",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",
+    "motion": "^12.42.2",
     "n": "^10.2.0",
     "next": "^16.2.3",
     "next-sitemap": "^4.2.3",
@@ -38,6 +40,7 @@
     "react-dom": "^19.2.4",
     "resend": "^6.16.0",
     "sharp": "^0.34.5",
+    "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2",
     "zod": "^4.3.6"
