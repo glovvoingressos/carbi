@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Search, TrendingUp, Plus, BarChart3, ChevronRight, Home, User, CreditCard, ArrowRight, Heart, MapPin, Fuel, Gauge, Calendar } from 'lucide-react'
+import { Search, TrendingUp, Plus, BarChart3, ChevronRight, Home, User, CreditCard, ArrowRight, Heart, MapPin, Fuel, Gauge, Calendar, Shield, MessageCircle, Eye, Car, CheckCircle2, Star, Zap } from 'lucide-react'
 import { getLatestPublicListings } from '@/lib/marketplace-server'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
@@ -272,6 +272,153 @@ export default async function HomePage() {
                 <p>{fetchError ? 'Carregando anúncios...' : 'Nenhum anúncio ainda'}</p>
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Como Funciona - Steps */}
+        <section className="fingen-section fingen-how-it-works">
+          <div className="fingen-section-header">
+            <div>
+              <div className="fingen-section-label">Como funciona</div>
+              <h2 className="fingen-section-title">Do jeito mais simples</h2>
+            </div>
+          </div>
+          <div className="fingen-steps-grid">
+            <div className="fingen-step-card">
+              <div className="fingen-step-number">01</div>
+              <div className="fingen-step-icon">
+                <Search size={22} />
+              </div>
+              <h3>Busque o carro ideal</h3>
+              <p>Filtre por marca, preço, ano e cidade. Compare com a FIPE e veja o histórico real do veículo.</p>
+            </div>
+            <div className="fingen-step-card">
+              <div className="fingen-step-number">02</div>
+              <div className="fingen-step-icon">
+                <MessageCircle size={22} />
+              </div>
+              <h3>Fale direto com o vendedor</h3>
+              <p>Chat interno, sem intermediários. Tire dúvidas, combine visita e negocie com segurança.</p>
+            </div>
+            <div className="fingen-step-card">
+              <div className="fingen-step-number">03</div>
+              <div className="fingen-step-icon">
+                <CheckCircle2 size={22} />
+              </div>
+              <h3>Fechou o negócio</h3>
+              <p>Dados verificados, preço justo, zero surpresas. O carro certo, no preço certo.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Por que a Carbi */}
+        <section className="fingen-section fingen-why-section">
+          <div className="fingen-why-card">
+            <div className="fingen-why-header">
+              <div className="fingen-section-label" style={{ color: 'rgba(255,255,255,0.5)' }}>Por que a Carbi</div>
+              <h2 className="fingen-section-title" style={{ color: '#fff' }}>Feito pra quem sabe o valor das coisas</h2>
+            </div>
+            <div className="fingen-why-grid">
+              <div className="fingen-why-item">
+                <div className="fingen-why-icon">
+                  <Eye size={20} />
+                </div>
+                <h4>FIPE integrado</h4>
+                <p>Preço de tabela ao lado do preço do vendedor. Você decide se vale a pena.</p>
+              </div>
+              <div className="fingen-why-item">
+                <div className="fingen-why-icon">
+                  <Shield size={20} />
+                </div>
+                <h4>Dados verificados</h4>
+                <p>Sinistros, quilometragem, donos anteriores. Tudo que precisa pra comprar com confiança.</p>
+              </div>
+              <div className="fingen-why-item">
+                <div className="fingen-why-icon">
+                  <Zap size={20} />
+                </div>
+                <h4>Tráfego grátis</h4>
+                <p>Anuncie sem custo. Seu carro é divulgado no Google e Meta Ads automaticamente.</p>
+              </div>
+              <div className="fingen-why-item">
+                <div className="fingen-why-icon">
+                  <MessageCircle size={20} />
+                </div>
+                <h4>Chat direto</h4>
+                <p>Sem WhatsApp spam. Conversa segura dentro da plataforma, com o vendedor certo.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Categorias por Estilo */}
+        <section className="fingen-section">
+          <div className="fingen-section-header">
+            <div>
+              <div className="fingen-section-label">Explore por tipo</div>
+              <h2 className="fingen-section-title">Encontre o estilo certo</h2>
+            </div>
+          </div>
+          <div className="fingen-categories-scroll">
+            {[
+              { label: 'SUV', icon: '🚙', filter: 'SUV' },
+              { label: 'Sedan', icon: '🚗', filter: 'Sedan' },
+              { label: 'Hatch', icon: '🏎️', filter: 'Hatch' },
+              { label: 'Pickup', icon: '🛻', filter: 'Pickup' },
+              { label: 'Esportivo', icon: '🏁', filter: 'Esportivo' },
+              { label: 'Elétrico', icon: '⚡', filter: 'Elétrico' },
+            ].map((cat) => (
+              <Link
+                key={cat.label}
+                href={`/carros-a-venda?body=${encodeURIComponent(cat.filter)}`}
+                className="fingen-category-chip"
+              >
+                <span className="fingen-category-emoji">{cat.icon}</span>
+                <span className="fingen-category-label">{cat.label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Depoimentos */}
+        <section className="fingen-section">
+          <div className="fingen-section-header">
+            <div>
+              <div className="fingen-section-label">Depoimentos</div>
+              <h2 className="fingen-section-title">Quem já comprou, recomenda</h2>
+            </div>
+          </div>
+          <div className="fingen-testimonials-grid">
+            <div className="fingen-testimonial-card">
+              <div className="fingen-testimonial-stars">
+                {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+              </div>
+              <p>&ldquo;Comprei meu HB20 2023 12% abaixo da FIPE. Sem dor de cabeça, dados todos ali.&rdquo;</p>
+              <div className="fingen-testimonial-author">
+                <strong>Marcos S.</strong>
+                <span>Belo Horizonte</span>
+              </div>
+            </div>
+            <div className="fingen-testimonial-card">
+              <div className="fingen-testimonial-stars">
+                {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+              </div>
+              <p>&ldquo;Anunciei meu Onix e vendi em 3 dias. O tráfego grátis fez toda a diferença.&rdquo;</p>
+              <div className="fingen-testimonial-author">
+                <strong>Ana Clara R.</strong>
+                <span>Contagem</span>
+              </div>
+            </div>
+            <div className="fingen-testimonial-card">
+              <div className="fingen-testimonial-stars">
+                {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+              </div>
+              <p>&ldquo;A comparação com a FIPE me deu confiança pra fechar. Finalmente uma plataforma séria.&rdquo;</p>
+              <div className="fingen-testimonial-author">
+                <strong>Pedro H.</strong>
+                <span>Uberlândia</span>
+              </div>
+            </div>
           </div>
         </section>
 
