@@ -50,14 +50,14 @@ const ranking = [
 
 export default function AppRankingPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="fingen-shell">
       {/* Hero SEO */}
-      <section className="bg-[#0A0A0A] text-white pt-32 pb-24 px-6 text-center overflow-hidden relative">
+      <section className="fingen-dark-hero" style={{ textAlign: "center" }}>
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
            <Zap className="w-96 h-96 absolute -top-10 -left-10 text-white" />
         </div>
         
-        <div className="container relative z-10">
+        <div className="fingen-shell-content" style={{ position: "relative", zIndex: 1 }}>
           <Badge className="mb-6 bg-white/10 text-white border-white/20">Guia 2026 — Inteligência de Mercado</Badge>
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter mb-8 leading-none">
             melhor carro para <br />
@@ -70,8 +70,8 @@ export default function AppRankingPage() {
       </section>
 
       {/* Comparisons Section */}
-      <section className="py-20 px-6 container">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
+      <section className="fingen-section">
+        <div className="fingen-grid-2" style={{ marginBottom: "64px" }}>
            <div className="p-10 bg-[#FAFAF9] rounded-2xl border border-[#EAEAE8]">
               <div className="flex items-center gap-4 mb-6">
                  <div className="p-3 bg-[#0A0A0A] rounded-2xl"><Zap className="w-6 h-6 text-white" /></div>
@@ -155,7 +155,7 @@ export default function AppRankingPage() {
         </div>
 
         {/* Action Banner */}
-        <div className="bg-[#121212] rounded-2xl p-12 md:p-20 relative overflow-hidden flex flex-col items-center text-center">
+        <div className="fingen-card-dark" style={{ textAlign: "center", padding: "clamp(40px, 6vw, 80px) 32px" }}>
             <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
                <ShieldCheck className="w-64 h-64 text-white" />
             </div>

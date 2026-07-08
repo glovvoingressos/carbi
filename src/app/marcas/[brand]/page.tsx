@@ -63,46 +63,50 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
 
   if (brandListings.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 text-center">
-        <h1 className="text-xl font-bold text-[#0A0A0A] mb-2">Marca não encontrada</h1>
-        <p className="text-sm text-[#525252] mb-6">Não foi possível encontrar anúncios ativos para a marca solicitada.</p>
-        <Link href="/marcas" className="text-sm text-[#17170F] hover:underline font-medium">&larr; Ver todas as marcas</Link>
+      <div className="fingen-shell">
+        <div className="fingen-shell-content" style={{ textAlign: 'center', paddingTop: '80px' }}>
+          <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>Marca não encontrada</h1>
+          <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>Não foi possível encontrar anúncios ativos para a marca solicitada.</p>
+          <Link href="/marcas" style={{ fontSize: '14px', color: 'var(--color-text-primary)', fontWeight: 600, textDecoration: 'underline' }}>&larr; Ver todas as marcas</Link>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-      <BreadcrumbSchema items={[
-        { name: 'Home', url: '/' },
-        { name: 'Marcas', url: '/marcas' },
-        { name: realBrandName, url: `/marcas/${brandSlug}` },
-      ]} />
-      <nav className="flex items-center gap-1 text-sm text-[#A3A3A3] mb-6 overflow-x-auto no-scrollbar">
-        <Link href="/" className="hover:text-[#0A0A0A] transition-colors shrink-0">Home</Link>
-        <ChevronRight className="w-3.5 h-3.5" />
-        <Link href="/marcas" className="hover:text-[#0A0A0A] transition-colors shrink-0">Marcas</Link>
-        <ChevronRight className="w-3.5 h-3.5" />
-        <span className="text-[#0A0A0A] font-medium">{realBrandName}</span>
-      </nav>
+    <div className="fingen-shell">
+      <div className="fingen-shell-content">
+        <BreadcrumbSchema items={[
+          { name: 'Home', url: '/' },
+          { name: 'Marcas', url: '/marcas' },
+          { name: realBrandName, url: `/marcas/${brandSlug}` },
+        ]} />
+        <div className="fingen-breadcrumb" style={{ paddingTop: '24px' }}>
+          <Link href="/">Home</Link>
+          <span>/</span>
+          <Link href="/marcas">Marcas</Link>
+          <span>/</span>
+          <span>{realBrandName}</span>
+        </div>
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-[#0A0A0A] mb-2">{realBrandName}</h1>
-        <p className="text-sm text-[#525252]">
-          {brandListings.length} anúncio{brandListings.length !== 1 ? 's' : ''} ativo{brandListings.length !== 1 ? 's' : ''} desta marca
-        </p>
-      </div>
+        <div className="fingen-shell-hero">
+          <h1 className="text-balance">{realBrandName}</h1>
+          <p>
+            {brandListings.length} anúncio{brandListings.length !== 1 ? 's' : ''} ativo{brandListings.length !== 1 ? 's' : ''} desta marca
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {brandListings.map((listing) => (
-          <ListingCard key={listing.id} listing={listing} />
-        ))}
-      </div>
+        <div className="fingen-grid-3">
+          {brandListings.map((listing) => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))}
+        </div>
 
-      <div className="mt-10 rounded-[28px] border border-[#EAEAE8] bg-white p-6">
-        <p className="text-sm leading-relaxed text-[#52607A]">
-          Esses resultados vêm diretamente dos anúncios ativos da plataforma. Se quiser uma lista mais ampla, use a busca ou a página geral de carros à venda.
-        </p>
+        <div className="fingen-card-white" style={{ marginTop: '32px' }}>
+          <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
+            Esses resultados vêm diretamente dos anúncios ativos da plataforma. Se quiser uma lista mais ampla, use a busca ou a página geral de carros à venda.
+          </p>
+        </div>
       </div>
     </div>
   )

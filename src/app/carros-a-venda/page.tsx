@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import MarketplaceClient from '@/components/marketplace/MarketplaceClient'
 import { fetchPublicListingsPage, ListingSort, getFilterOptions } from '@/lib/marketplace-server'
 import { BreadcrumbSchema, LocalBusinessSchema } from '@/components/seo/JSONLD'
@@ -131,21 +132,23 @@ export default async function CarrosAVendaPage({
   const totalPages = Math.max(1, Math.ceil(result.total / result.pageSize))
 
   return (
-    <main className="min-h-screen pt-28 pb-24">
+    <main className="fingen-shell">
       <LocalBusinessSchema />
       <BreadcrumbSchema items={[
         { name: 'Home', url: '/' },
         { name: 'Carros à venda', url: '/carros-a-venda' },
       ]} />
-      <div className="container">
-        <div className="hero-bento p-6 md:p-10 lg:p-12 mb-8">
-          <div className="section-heading">
-            <div className="section-kicker mb-4">Marketplace</div>
-            <h1 className="text-balance">Marketplace inteligente.</h1>
-            <p className="body-large mt-4 max-w-2xl text-pretty">
-              Encontre o veículo perfeito entre os {result.total} anúncios ativos na plataforma.
-            </p>
+      <div className="fingen-shell-content">
+        <div className="fingen-shell-hero">
+          <div className="fingen-breadcrumb">
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <span>Carros à venda</span>
           </div>
+          <h1 className="text-balance">Carros à venda</h1>
+          <p className="text-pretty">
+            Encontre o veículo perfeito entre os {result.total} anúncios ativos na plataforma. Compare com FIPE e negocie com segurança.
+          </p>
         </div>
 
         <MarketplaceClient 
@@ -157,21 +160,21 @@ export default async function CarrosAVendaPage({
         />
 
         {/* Bottom SEO Content */}
-        <div className="mt-20 md:mt-28">
-          <section className="surface-strong p-8 sm:p-12 md:p-16">
-            <h2 className="text-balance mb-8">Compre seu próximo carro com segurança</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <div className="space-y-6">
-                <p className="text-xl font-bold text-[#52607A] leading-relaxed">
+        <div className="mt-16 md:mt-24">
+          <section className="fingen-card-dark">
+            <h2 className="text-balance mb-6" style={{ color: '#fff' }}>Compre seu próximo carro com segurança</h2>
+            <div className="fingen-grid-2" style={{ gap: '32px' }}>
+              <div>
+                <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, marginBottom: '16px' }}>
                   O marketplace da Carbi foi desenhado para eliminar o atrito na compra e venda de veículos. Aqui, cada detalhe importa: desde a precisão dos dados técnicos até a segurança do chat interno.
                 </p>
-                <p className="text-lg font-medium text-[#52607A] leading-relaxed">
-                  Utilizamos inteligência de dados para comparar preços com a Tabela FIPE em tempo real, garantindo que você faça sempre o melhor negócio, seja comprando seu primeiro carro ou trocando o seminovo da família.
+                <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.7 }}>
+                  Utilizamos inteligência de dados para comparar preços com a Tabela FIPE em tempo real, garantindo que você faça sempre o melhor negócio.
                 </p>
               </div>
-              <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-[#0A0A0A]">Destaques da Plataforma</h3>
-                <ul className="space-y-4">
+              <div>
+                <h3 style={{ color: '#fff', fontSize: '18px', fontWeight: 700, marginBottom: '16px' }}>Destaques da Plataforma</h3>
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {[
                     'Verificação de procedência via dados técnicos',
                     'Comparação automática com preço de mercado',
@@ -179,8 +182,8 @@ export default async function CarrosAVendaPage({
                     'Negociação direta sem intermediários',
                     'Chat seguro com criptografia'
                   ].map(item => (
-                    <li key={item} className="flex items-center gap-3 text-lg font-bold text-[#52607A]">
-                      <div className="w-2 h-2 rounded-full bg-[#D9F85F]" />
+                    <li key={item} style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'rgba(255,255,255,0.8)', fontSize: '14px', fontWeight: 500 }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0 }} />
                       {item}
                     </li>
                   ))}
@@ -189,12 +192,12 @@ export default async function CarrosAVendaPage({
             </div>
           </section>
 
-          <FAQSection 
+          <FAQSection
             items={[
               { q: 'Como comprar um carro com segurança na Carbi?', a: 'Sempre utilize nosso chat interno para negociação, verifique as fotos detalhadas e agende visitas em locais públicos e movimentados.' },
               { q: 'Os preços dos carros são negociáveis?', a: 'Sim, a Carbi facilita a conexão direta entre comprador e vendedor, permitindo que vocês cheguem ao melhor valor sem taxas de corretagem.' },
               { q: 'Como saber se o carro está com preço justo?', a: 'Cada anúncio exibe uma comparação automática com a Tabela FIPE do mês vigente, indicando se o valor está abaixo, na média ou acima do mercado.' }
-            ]} 
+            ]}
           />
         </div>
       </div>

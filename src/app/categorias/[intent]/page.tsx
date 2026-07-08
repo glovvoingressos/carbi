@@ -126,40 +126,41 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
   const filteredListings = items.filter(data.filter).slice(0, 16)
 
   return (
-    <main className="min-h-screen bg-[#FAFAF9]">
+    <main className="fingen-shell">
       <BreadcrumbSchema items={[
         { name: 'Home', url: '/' },
         { name: 'Categorias', url: '/categorias/ate-50-mil' },
         { name: data.h1, url: `/categorias/${resolved.intent}` },
       ]} />
 
-      <section className="relative overflow-hidden bg-[#0A0A0A] pb-16 pt-24 text-white">
-        <div className="pointer-events-none absolute left-0 top-0 h-full w-full opacity-10">
-          <Sparkles className="absolute -left-10 -top-10 h-96 w-96 text-white" />
-        </div>
-        <div className="container relative z-10 mx-auto max-w-5xl px-4 text-center">
-          <Badge text="Seleção automática Carbi" />
-          <h1 className="mt-6 text-4xl font-black tracking-tight md:text-6xl">
-            {data.h1}
-          </h1>
-          <p className="mx-auto mt-6 max-w-3xl text-xl font-medium leading-relaxed text-[#F4F0E7]/88 md:text-2xl">
+      <section className="fingen-dark-hero">
+        <div className="fingen-shell-content" style={{ textAlign: 'center' }}>
+          <div className="fingen-breadcrumb" style={{ justifyContent: 'center', color: 'rgba(255,255,255,0.5)' }}>
+            <Link href="/" style={{ color: 'rgba(255,255,255,0.5)' }}>Home</Link>
+            <span style={{ color: 'rgba(255,255,255,0.3)' }}>/</span>
+            <Link href="/categorias/ate-50-mil" style={{ color: 'rgba(255,255,255,0.5)' }}>Categorias</Link>
+            <span style={{ color: 'rgba(255,255,255,0.3)' }}>/</span>
+            <span style={{ color: '#fff' }}>{data.h1}</span>
+          </div>
+          <h1 className="text-balance">{data.h1}</h1>
+          <p style={{ maxWidth: '600px', margin: '0 auto' }}>
             {data.desc}
           </p>
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="container mx-auto max-w-6xl px-4">
+      <section className="fingen-section">
+        <div className="fingen-shell-content">
           {filteredListings.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="fingen-grid-4">
               {filteredListings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}
             </div>
           ) : (
-            <div className="rounded-3xl bg-white py-20 text-center">
-              <p className="mb-4 text-xl font-bold text-[#0A0A0A]">Nenhum anúncio encontrado para este critério no momento.</p>
-              <Link href="/carros-a-venda" className="font-semibold text-[#17170F] underline underline-offset-4">
+            <div className="fingen-card-white" style={{ textAlign: 'center', padding: '64px 24px' }}>
+              <p style={{ fontSize: '16px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '12px' }}>Nenhum anúncio encontrado para este critério no momento.</p>
+              <Link href="/carros-a-venda" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', textDecoration: 'underline' }}>
                 Ver todos os anúncios
               </Link>
             </div>
@@ -167,16 +168,18 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
         </div>
       </section>
 
-      <section className="border-t border-[#EAEAE8] bg-white py-16">
-        <div className="container mx-auto max-w-4xl px-4">
-          <h2 className="mb-6 text-3xl font-black text-[#0A0A0A]">Por que confiar neste ranking?</h2>
-          <p className="mb-4 text-lg leading-relaxed text-[#525252]">
-            Esta lista de <strong>{data.h1.toLowerCase()}</strong> é construída automaticamente com anúncios reais,
-            usando filtros de preço, carroceria, combustível e sinais do próprio marketplace.
-          </p>
-          <p className="text-lg leading-relaxed text-[#525252]">
-            O objetivo é facilitar descoberta sem depender de catálogo estático.
-          </p>
+      <section className="fingen-section">
+        <div className="fingen-shell-content">
+          <div className="fingen-card-white">
+            <h2 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>Por que confiar neste ranking?</h2>
+            <p style={{ fontSize: '15px', color: 'var(--color-text-secondary)', lineHeight: 1.7, marginBottom: '12px' }}>
+              Esta lista de <strong>{data.h1.toLowerCase()}</strong> é construída automaticamente com anúncios reais,
+              usando filtros de preço, carroceria, combustível e sinais do próprio marketplace.
+            </p>
+            <p style={{ fontSize: '15px', color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
+              O objetivo é facilitar descoberta sem depender de catálogo estático.
+            </p>
+          </div>
         </div>
       </section>
     </main>

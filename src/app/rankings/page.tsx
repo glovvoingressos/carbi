@@ -98,60 +98,71 @@ export default async function RankingsPage({ searchParams }: { searchParams: Sea
   const activeProfile = profiles.find((profile) => profile.id === profileId)
 
   return (
-    <main className="min-h-screen bg-[#f5f5f3] pt-28 pb-20">
-      <div className="container mx-auto max-w-6xl px-4">
-        <header className="mb-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#EAEAE8] bg-white/70 px-3 py-1">
-            <Sparkles className="h-3.5 w-3.5 text-[#17170F]" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">Ranking real de anúncios</span>
+    <main className="fingen-shell">
+      <div className="fingen-shell-content">
+        <div className="fingen-shell-hero">
+          <div className="fingen-breadcrumb">
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <span>Rankings</span>
           </div>
-          <h1 className="mt-4 text-4xl font-black tracking-tight text-[#0A0A0A] sm:text-5xl">
-            Rankings
-          </h1>
-          <p className="mt-3 max-w-3xl text-[15px] font-medium leading-relaxed text-[#52607A] sm:text-[16px]">
+          <h1 className="text-balance">Rankings</h1>
+          <p>
             {activeProfile
               ? `Ranking por ${activeProfile.label.toLowerCase()} com base nos anúncios ativos da plataforma.`
               : query
                 ? `Resultados reais para "${query}".`
                 : 'Selecione um perfil ou faixa de preço para ordenar os anúncios reais da plataforma.'}
           </p>
-        </header>
+        </div>
 
-        <section className="mb-8 space-y-4 rounded-[28px] border border-[#EAEAE8] bg-white p-4 shadow-sm">
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-[#A3A3A3]" />
-            <span className="text-xs font-bold uppercase tracking-widest text-[#A3A3A3]">Perfil</span>
+        <section className="fingen-card-white" style={{ marginBottom: '32px', padding: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <Filter style={{ width: '16px', height: '16px', color: 'var(--color-text-tertiary)' }} />
+            <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-tertiary)' }}>Perfil</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '20px' }}>
             {profiles.map((profile) => (
               <Link
                 key={profile.id}
                 href={`/rankings?profile=${profile.id}`}
-                className={`rounded-full px-3.5 py-2 text-xs font-bold transition-colors ${
-                  profileId === profile.id
-                    ? 'bg-[#17170F] text-[#FFFDF3]'
-                    : 'border border-[#17170F]/10 bg-white text-[#4F4A3E] hover:bg-[#FFF8DF]'
-                }`}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  border: profileId === profile.id ? 'none' : '1px solid var(--color-border)',
+                  background: profileId === profile.id ? 'var(--color-text-primary)' : 'var(--color-bg-elevated)',
+                  color: profileId === profile.id ? 'var(--color-text-inverse)' : 'var(--color-text-secondary)',
+                  transition: 'all 0.15s ease',
+                }}
               >
                 {profile.label}
               </Link>
             ))}
           </div>
 
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-[#A3A3A3]" />
-            <span className="text-xs font-bold uppercase tracking-widest text-[#A3A3A3]">Preço</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <Filter style={{ width: '16px', height: '16px', color: 'var(--color-text-tertiary)' }} />
+            <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-tertiary)' }}>Preço</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {priceRanges.map((rangeItem) => (
               <Link
                 key={rangeItem.id}
                 href={`/rankings?priceRange=${rangeItem.id}`}
-                className={`rounded-full px-3.5 py-2 text-xs font-bold transition-colors ${
-                  priceRangeId === rangeItem.id
-                    ? 'bg-[#17170F] text-[#FFFDF3]'
-                    : 'border border-[#17170F]/10 bg-white text-[#4F4A3E] hover:bg-[#FFF8DF]'
-                }`}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  border: priceRangeId === rangeItem.id ? 'none' : '1px solid var(--color-border)',
+                  background: priceRangeId === rangeItem.id ? 'var(--color-text-primary)' : 'var(--color-bg-elevated)',
+                  color: priceRangeId === rangeItem.id ? 'var(--color-text-inverse)' : 'var(--color-text-secondary)',
+                  transition: 'all 0.15s ease',
+                }}
               >
                 {rangeItem.label}
               </Link>
@@ -159,9 +170,9 @@ export default async function RankingsPage({ searchParams }: { searchParams: Sea
           </div>
 
           {query && (
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#FFF8DF] px-3 py-2 text-xs font-bold text-[#17170F]">
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', padding: '8px 16px', borderRadius: 'var(--radius-full)', background: 'var(--color-accent-soft)', fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
               Busca ativa: {query}
-              <Link href="/rankings" className="text-[#857C6B] underline underline-offset-2">
+              <Link href="/rankings" style={{ color: 'var(--color-text-tertiary)', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
                 limpar
               </Link>
             </div>
@@ -169,12 +180,12 @@ export default async function RankingsPage({ searchParams }: { searchParams: Sea
         </section>
 
         {ranked.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="fingen-grid-3">
             {ranked.map((listing, index) => (
-              <div key={listing.id} className="relative">
+              <div key={listing.id} style={{ position: 'relative' }}>
                 <ListingCard listing={listing} priority={index < 2} />
                 {profileId && index === 0 && (
-                  <div className="pointer-events-none absolute left-4 top-4 rounded-full bg-[#D9F85F] px-3 py-1 text-[11px] font-black uppercase tracking-widest text-[#17170F] shadow-sm">
+                  <div style={{ position: 'absolute', top: '16px', left: '16px', padding: '4px 12px', background: 'var(--color-accent)', borderRadius: 'var(--radius-full)', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-primary)' }}>
                     Destaque do ranking
                   </div>
                 )}
@@ -182,18 +193,18 @@ export default async function RankingsPage({ searchParams }: { searchParams: Sea
             ))}
           </div>
         ) : (
-          <div className="rounded-[28px] border border-[#EAEAE8] bg-white p-10 text-center text-[#52607A]">
+          <div className="fingen-card-white" style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--color-text-secondary)' }}>
             Nenhum anúncio encontrado para os filtros atuais.
           </div>
         )}
 
-        <section className="mt-12 rounded-[28px] border border-[#EAEAE8] bg-white p-6">
-          <h2 className="text-xl font-black text-[#0A0A0A]">Por que este ranking é real</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[#52607A]">
+        <section className="fingen-card-white" style={{ marginTop: '48px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>Por que este ranking é real</h2>
+          <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.7, marginBottom: '8px' }}>
             Os cards acima vêm do marketplace ativo. Quando o perfil é selecionado, a ordenação usa sinais do anúncio
             como quilometragem, ano/modelo, diferença para a FIPE, opcionais e tipo de carroceria.
           </p>
-          <p className="mt-2 text-sm leading-relaxed text-[#52607A]">
+          <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
             Isso mantém a navegação útil para descoberta, sem depender de catálogo estático.
           </p>
         </section>

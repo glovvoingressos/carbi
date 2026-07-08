@@ -6880,6 +6880,128 @@ p {
   color: var(--color-text-tertiary);
 }
 
+/* ━━━ Shared Fingen Shell (non-home pages) ━━━ */
+.fingen-shell {
+  min-height: 100vh;
+  background: var(--color-bg);
+  padding-bottom: 48px;
+}
+
+.fingen-shell-hero {
+  padding: clamp(48px, 8vw, 80px) 0 clamp(32px, 6vw, 56px);
+}
+
+.fingen-shell-hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(28px, 6vw, 48px);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.fingen-shell-hero p {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+.fingen-shell-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.fingen-dark-hero {
+  background: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+  padding: clamp(48px, 8vw, 80px) 0 clamp(32px, 6vw, 56px);
+}
+
+.fingen-dark-hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(28px, 6vw, 48px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.fingen-dark-hero p {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+.fingen-card-white {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+}
+
+.fingen-card-dark {
+  background: var(--color-bg-inverse);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  color: var(--color-text-inverse);
+}
+
+.fingen-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.fingen-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.fingen-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .fingen-grid-2,
+  .fingen-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fingen-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+
+.fingen-breadcrumb a {
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.fingen-breadcrumb a:hover {
+  color: var(--color-text-primary);
+}
+
+.fingen-breadcrumb span:last-child {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
 /* Desktop Responsive */
 @media (min-width: 768px) {
   .fingen-header {
@@ -6887,6 +7009,10 @@ p {
   }
 
   .fingen-main {
+    padding: 0 32px;
+  }
+
+  .fingen-shell-content {
     padding: 0 32px;
   }
 

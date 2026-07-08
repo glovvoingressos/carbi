@@ -171,191 +171,271 @@ export default function QualCarroPage() {
   if (results) {
     const topResult = results[0]
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        <p className="text-sm font-medium text-[#17170F] mb-1">Resultado</p>
-        <h1 className="text-2xl font-bold text-[#0A0A0A] mb-6">Sua recomendação</h1>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)] gap-6 mb-6">
-          <div className="bg-[#FAFAF9] rounded-[32px] p-5 border border-[#EAEAE8]">
-            <p className="text-xs font-medium text-[#17170F] uppercase tracking-wider mb-3">Mais recomendado</p>
-            {topResult && <ListingCard listing={topResult.listing} priority />}
+      <div className="fingen-shell">
+        <div className="fingen-shell-content">
+          <div className="fingen-shell-hero">
+            <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-tertiary)', marginBottom: '4px' }}>Resultado</p>
+            <h1 className="text-balance">Sua recomendação</h1>
           </div>
 
-          <div className="bg-[#FAFAF9] rounded-[32px] p-5 border border-[#EAEAE8]">
-            <h2 className="text-sm font-bold text-[#0A0A0A] mb-3">Seu perfil</h2>
-            <ul className="text-xs text-[#525252] space-y-2">
-              {answers.orcamento && <li>Orçamento: {answers.orcamento.label}</li>}
-              {answers.usos.length > 0 && <li>Uso: {answers.usos.join(', ')}</li>}
-              {answers.passageiros && <li>Passageiros: {answers.passageiros}</li>}
-              {answers.prioridade && <li>Prioridade: {prioridades.find((p) => p.id === answers.prioridade)?.label}</li>}
-              {answers.tipo && answers.tipo !== 'Qualquer' && <li>Tipo: {answers.tipo}</li>}
-            </ul>
+          <div className="fingen-grid-2" style={{ marginBottom: '24px' }}>
+            <div className="fingen-card-white">
+              <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Mais recomendado</p>
+              {topResult && <ListingCard listing={topResult.listing} priority />}
+            </div>
+
+            <div className="fingen-card-white">
+              <h2 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>Seu perfil</h2>
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                {answers.orcamento && <li>Orçamento: {answers.orcamento.label}</li>}
+                {answers.usos.length > 0 && <li>Uso: {answers.usos.join(', ')}</li>}
+                {answers.passageiros && <li>Passageiros: {answers.passageiros}</li>}
+                {answers.prioridade && <li>Prioridade: {prioridades.find((p) => p.id === answers.prioridade)?.label}</li>}
+                {answers.tipo && answers.tipo !== 'Qualquer' && <li>Tipo: {answers.tipo}</li>}
+              </ul>
+            </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-          {results.slice(1).map((result) => (
-            <ListingCard key={result.listing.id} listing={result.listing} />
-          ))}
-        </div>
+          <div className="fingen-grid-4" style={{ marginBottom: '32px' }}>
+            {results.slice(1).map((result) => (
+              <ListingCard key={result.listing.id} listing={result.listing} />
+            ))}
+          </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button onClick={reset} className="flex items-center justify-center gap-2 text-sm font-medium text-[#525252] hover:text-[#0A0A0A] px-4 py-2.5 rounded-lg bg-[#FAFAF9] hover:bg-[#F4F4F2] transition-colors">
-            <RotateCcw className="w-4 h-4" /> Refazer teste
-          </button>
-          <Link href="/carros-a-venda" className="flex items-center justify-center gap-2 text-sm font-medium text-white bg-[#17170F] px-4 py-2.5 rounded-lg hover:opacity-90 transition-colors">
-            Ver mais anúncios <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <button onClick={reset} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '14px', fontWeight: 500, color: 'var(--color-text-secondary)', padding: '10px 20px', borderRadius: 'var(--radius-full)', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', cursor: 'pointer', transition: 'all 0.15s ease' }}>
+              <RotateCcw style={{ width: '16px', height: '16px' }} /> Refazer teste
+            </button>
+            <Link href="/carros-a-venda" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', padding: '10px 20px', borderRadius: 'var(--radius-full)', background: 'var(--color-bg-inverse)', textDecoration: 'none', transition: 'all 0.15s ease' }}>
+              Ver mais anúncios <ArrowRight style={{ width: '16px', height: '16px' }} />
+            </Link>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-xl mx-auto px-4 sm:px-6 py-8">
-      {catalogLoading && (
-        <div className="mb-4 flex items-center justify-center gap-2 rounded-xl bg-[#FAFAF9] px-4 py-3 text-sm font-semibold text-[#525252]">
-          <Loader2 className="h-4 w-4 animate-spin" /> Carregando anúncios...
+    <div className="fingen-shell">
+      <div className="fingen-shell-content" style={{ maxWidth: '560px' }}>
+        <div className="fingen-shell-hero" style={{ paddingBottom: '16px' }}>
+          <div className="fingen-breadcrumb">
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <span>Qual carro</span>
+          </div>
+          <h1 className="text-balance">Qual carro combina com você?</h1>
+          <p>Responda 5 perguntas rápidas e receba uma recomendação personalizada.</p>
         </div>
-      )}
-      {catalogError && (
-        <div className="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-          {catalogError}
+        {catalogLoading && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 16px', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', marginBottom: '16px', fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+            <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Carregando anúncios...
+          </div>
+        )}
+        {catalogError && (
+          <div style={{ padding: '12px 16px', background: 'var(--color-danger-bg)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: 'var(--radius-lg)', marginBottom: '16px', fontSize: '13px', fontWeight: 600, color: 'var(--color-danger)' }}>
+            {catalogError}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text-tertiary)' }}>Passo {step + 1} de {steps.length}</p>
+          <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{steps[step]}</p>
         </div>
-      )}
+        <div style={{ width: '100%', height: '6px', background: 'var(--color-bg-muted)', borderRadius: 'var(--radius-full)', marginBottom: '32px' }}>
+          <div style={{ height: '6px', background: 'var(--color-text-primary)', borderRadius: 'var(--radius-full)', transition: 'width 0.3s ease', width: `${((step + 1) / steps.length) * 100}%` }} />
+        </div>
 
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-sm font-medium text-[#A3A3A3]">Passo {step + 1} de {steps.length}</p>
-        <p className="text-sm font-medium text-[#17170F]">{steps[step]}</p>
-      </div>
-      <div className="w-full bg-[#EAEAE8] rounded-full h-1.5 mb-8">
-        <div className="bg-[#17170F] h-1.5 rounded-full transition-all duration-300" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
-      </div>
+        <div className="fingen-card-white" style={{ padding: '24px' }}>
+          {step === 0 && (
+            <>
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '16px' }}>Qual é seu orçamento?</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '8px' }}>
+                {orcamentos.map((o) => (
+                  <button
+                    key={o.label}
+                    onClick={() => setAnswers((prev) => ({ ...prev, orcamento: o }))}
+                    style={{
+                      padding: '14px',
+                      borderRadius: 'var(--radius-lg)',
+                      textAlign: 'left',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      border: answers.orcamento?.label === o.label ? '2px solid var(--color-text-primary)' : '1px solid var(--color-border)',
+                      background: answers.orcamento?.label === o.label ? 'var(--color-accent-soft)' : 'var(--color-bg-elevated)',
+                      color: answers.orcamento?.label === o.label ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
 
-      <div className="bg-[#FAFAF9] rounded-[32px] p-5 sm:p-6 border border-[#EAEAE8]">
-        {step === 0 && (
-          <>
-            <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">Qual é seu orçamento?</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {orcamentos.map((o) => (
-                <button
-                  key={o.label}
-                  onClick={() => setAnswers((prev) => ({ ...prev, orcamento: o }))}
-                  className={`p-3.5 rounded-lg text-left text-sm font-medium transition-all ${
-                    answers.orcamento?.label === o.label
-                      ? 'bg-[#ECFDF5] border-2 border-[#17170F] text-[#17170F]'
-                      : 'border border-[#EAEAE8] hover:border-[#17170F]/30 text-[#525252] bg-white'
-                  }`}
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+          {step === 1 && (
+            <>
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '16px' }}>Como você vai usar o carro?</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {usos.map((uso) => (
+                  <button
+                    key={uso}
+                    onClick={() => setAnswers((prev) => ({ ...prev, usos: prev.usos.includes(uso) ? prev.usos.filter((u) => u !== uso) : [...prev.usos, uso] }))}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: 'var(--radius-lg)',
+                      textAlign: 'left',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      border: answers.usos.includes(uso) ? '2px solid var(--color-text-primary)' : '1px solid var(--color-border)',
+                      background: answers.usos.includes(uso) ? 'var(--color-accent-soft)' : 'var(--color-bg-elevated)',
+                      color: answers.usos.includes(uso) ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {uso}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
 
-        {step === 1 && (
-          <>
-            <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">Como você vai usar o carro?</h2>
-            <div className="space-y-2">
-              {usos.map((uso) => (
-                <button
-                  key={uso}
-                  onClick={() => setAnswers((prev) => ({ ...prev, usos: prev.usos.includes(uso) ? prev.usos.filter((u) => u !== uso) : [...prev.usos, uso] }))}
-                  className={`w-full p-3.5 rounded-lg text-left text-sm font-medium transition-all ${
-                    answers.usos.includes(uso)
-                      ? 'bg-[#ECFDF5] border-2 border-[#17170F] text-[#17170F]'
-                      : 'border border-[#EAEAE8] hover:border-[#17170F]/30 text-[#525252] bg-white'
-                  }`}
-                >
-                  {uso}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+          {step === 2 && (
+            <>
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '16px' }}>Quantas pessoas você costuma levar?</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {passageiros.map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setAnswers((prev) => ({ ...prev, passageiros: p }))}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: 'var(--radius-lg)',
+                      textAlign: 'left',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      border: answers.passageiros === p ? '2px solid var(--color-text-primary)' : '1px solid var(--color-border)',
+                      background: answers.passageiros === p ? 'var(--color-accent-soft)' : 'var(--color-bg-elevated)',
+                      color: answers.passageiros === p ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
 
-        {step === 2 && (
-          <>
-            <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">Quantas pessoas você costuma levar?</h2>
-            <div className="space-y-2">
-              {passageiros.map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setAnswers((prev) => ({ ...prev, passageiros: p }))}
-                  className={`w-full p-3.5 rounded-lg text-left text-sm font-medium transition-all ${
-                    answers.passageiros === p
-                      ? 'bg-[#ECFDF5] border-2 border-[#17170F] text-[#17170F]'
-                      : 'border border-[#EAEAE8] hover:border-[#17170F]/30 text-[#525252] bg-white'
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+          {step === 3 && (
+            <>
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '16px' }}>O que mais pesa na decisão?</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {prioridades.map((prioridade) => (
+                  <button
+                    key={prioridade.id}
+                    onClick={() => setAnswers((prev) => ({ ...prev, prioridade: prioridade.id }))}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: 'var(--radius-lg)',
+                      textAlign: 'left',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      border: answers.prioridade === prioridade.id ? '2px solid var(--color-text-primary)' : '1px solid var(--color-border)',
+                      background: answers.prioridade === prioridade.id ? 'var(--color-accent-soft)' : 'var(--color-bg-elevated)',
+                      color: answers.prioridade === prioridade.id ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {prioridade.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
 
-        {step === 3 && (
-          <>
-            <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">O que mais pesa na decisão?</h2>
-            <div className="space-y-2">
-              {prioridades.map((prioridade) => (
-                <button
-                  key={prioridade.id}
-                  onClick={() => setAnswers((prev) => ({ ...prev, prioridade: prioridade.id }))}
-                  className={`w-full p-3.5 rounded-lg text-left text-sm font-medium transition-all ${
-                    answers.prioridade === prioridade.id
-                      ? 'bg-[#ECFDF5] border-2 border-[#17170F] text-[#17170F]'
-                      : 'border border-[#EAEAE8] hover:border-[#17170F]/30 text-[#525252] bg-white'
-                  }`}
-                >
-                  {prioridade.label}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+          {step === 4 && (
+            <>
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '16px' }}>Qual tipo de carro você quer?</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {tipos.map((tipo) => (
+                  <button
+                    key={tipo}
+                    onClick={() => setAnswers((prev) => ({ ...prev, tipo }))}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: 'var(--radius-lg)',
+                      textAlign: 'left',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      border: answers.tipo === tipo ? '2px solid var(--color-text-primary)' : '1px solid var(--color-border)',
+                      background: answers.tipo === tipo ? 'var(--color-accent-soft)' : 'var(--color-bg-elevated)',
+                      color: answers.tipo === tipo ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {tipo}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
 
-        {step === 4 && (
-          <>
-            <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">Qual tipo de carro você quer?</h2>
-            <div className="space-y-2">
-              {tipos.map((tipo) => (
-                <button
-                  key={tipo}
-                  onClick={() => setAnswers((prev) => ({ ...prev, tipo }))}
-                  className={`w-full p-3.5 rounded-lg text-left text-sm font-medium transition-all ${
-                    answers.tipo === tipo
-                      ? 'bg-[#ECFDF5] border-2 border-[#17170F] text-[#17170F]'
-                      : 'border border-[#EAEAE8] hover:border-[#17170F]/30 text-[#525252] bg-white'
-                  }`}
-                >
-                  {tipo}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-
-        <div className="mt-8 flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={prev}
-            disabled={step === 0}
-            className="inline-flex items-center gap-2 rounded-lg border border-[#EAEAE8] bg-white px-4 py-2.5 text-sm font-medium text-[#525252] disabled:opacity-40"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Voltar
-          </button>
-          <button
-            type="button"
-            onClick={next}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#17170F] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
-          >
-            {step === steps.length - 1 ? 'Ver recomendações' : 'Continuar'}
-            <ArrowRight className="h-4 w-4" />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: '32px' }}>
+            <button
+              type="button"
+              onClick={prev}
+              disabled={step === 0}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                borderRadius: 'var(--radius-full)',
+                border: '1px solid var(--color-border)',
+                background: 'var(--color-bg-elevated)',
+                fontSize: '14px',
+                fontWeight: 500,
+                color: 'var(--color-text-secondary)',
+                opacity: step === 0 ? 0.4 : 1,
+                cursor: 'pointer',
+              }}
+            >
+              <ArrowLeft style={{ width: '16px', height: '16px' }} />
+              Voltar
+            </button>
+            <button
+              type="button"
+              onClick={next}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                borderRadius: 'var(--radius-full)',
+                background: 'var(--color-bg-inverse)',
+                color: 'var(--color-text-inverse)',
+                fontSize: '14px',
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {step === steps.length - 1 ? 'Ver recomendações' : 'Continuar'}
+              <ArrowRight style={{ width: '16px', height: '16px' }} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

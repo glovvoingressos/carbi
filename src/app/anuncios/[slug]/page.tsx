@@ -58,8 +58,8 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   const sellerInfo = await getSellerInfo(listing.user_id)
 
   return (
-    <main className="ref-detail-page min-h-screen pb-24">
-      <div className="container">
+    <main className="fingen-shell">
+      <div className="fingen-shell-content">
         <VehicleSchema vehicle={listing} />
         <BreadcrumbSchema
           items={[
@@ -69,15 +69,15 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             { name: listing.model, url: `/anuncios/${listing.slug}` },
           ]}
         />
-        <div className="ref-detail-breadcrumb">
-          <Link href="/" className="hover:text-[#0A0A0A] transition-colors">Home</Link> 
-          <span className="text-[#0A0A0A]/10">/</span> 
-          <Link href="/carros-a-venda" className="hover:text-[#0A0A0A] transition-colors">Marketplace</Link> 
-          <span className="text-[#0A0A0A]/10">/</span> 
-          <span className="text-[#525252] truncate">{listing.brand} {listing.model}</span>
+        <div className="fingen-breadcrumb" style={{ paddingTop: '24px' }}>
+          <Link href="/">Home</Link>
+          <span>/</span>
+          <Link href="/carros-a-venda">Carros à venda</Link>
+          <span>/</span>
+          <span>{listing.brand} {listing.model}</span>
         </div>
 
-        <VehicleDetailView 
+        <VehicleDetailView
           listing={listing}
           sellerInfo={sellerInfo}
           relatedListings={related}

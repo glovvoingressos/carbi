@@ -38,22 +38,28 @@ export default async function MarcasPage() {
   ).sort((a, b) => a.label.localeCompare(b.label, 'pt-BR'))
 
   return (
-    <div>
+    <div className="fingen-shell">
       <BreadcrumbSchema items={[
         { name: 'Home', url: '/' },
         { name: 'Marcas', url: '/marcas' },
       ]} />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-20">
-        <div className="mb-12 text-center flex flex-col items-center">
-          <div className="bg-bg-muted mb-6 rounded-full px-5 py-2 text-[12px] font-bold uppercase tracking-normal text-[#0A0A0A] shadow-sm">Catálogo Oficial</div>
-          <h1 className="mb-4 text-4xl font-black uppercase tracking-normal text-[#0A0A0A] md:text-6xl max-[330px]:text-3xl">Marcas de<br/>Carros</h1>
-          <p className="text-base text-[#0A0A0A]/60 font-semibold max-w-lg mx-auto">Explore nosso catálogo premium com valor atualizado e dados detalhados para cada montadora.</p>
+      <div className="fingen-shell-content">
+        <div className="fingen-shell-hero" style={{ textAlign: 'center' }}>
+          <div className="fingen-breadcrumb" style={{ justifyContent: 'center' }}>
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <span>Marcas</span>
+          </div>
+          <h1 className="text-balance">Marcas de carros</h1>
+          <p style={{ maxWidth: '500px', margin: '0 auto' }}>
+            Explore nosso catálogo com valor atualizado e dados detalhados para cada montadora.
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div className="fingen-grid-4">
           {brands.map((brand, i) => {
             const slug = slugifyBrand(brand.label)
-            
+
             // Basic domain mapping for Clearbit Logo API
             const getDomain = (b: string) => {
               const normalized = normalizeBrandKey(b)
@@ -83,35 +89,36 @@ export default async function MarcasPage() {
               return map[normalized] || `${normalized.replace(/\s+/g, '')}.com`
             }
 
-            // Alternate colors for variety
-            const colors = ['#b4d2ff', '#E8D4FF', '#fff9d4', '#ffccd5']
-            const bgColor = colors[i % colors.length]
-            const cardColors = ['#eaf3ff', '#ecf9ef', '#fff8dc', '#f3efff']
-
             return (
               <Link
                 key={brand.key}
                 href={`/marcas/${slug}`}
-                className="group relative bg-[#FAFAF9] rounded-[32px] p-6 text-center transition-all hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center overflow-hidden"
-                style={{ backgroundColor: cardColors[i % cardColors.length] }}
+                className="fingen-card-white group"
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '28px 20px', textAlign: 'center', textDecoration: 'none', transition: 'all 0.25s ease' }}
               >
-                <div 
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 shadow-sm bg-white p-2 relative z-10"
-                  style={{ backgroundColor: bgColor }}
+                <div
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '16px',
+                    background: 'var(--color-bg-muted)',
+                    padding: '8px',
+                  }}
                 >
-                  <BrandLogo 
-                    brandName={brand.label} 
-                    domain={getDomain(brand.label)} 
-                    className="w-full h-full object-contain drop-shadow-sm" 
+                  <BrandLogo
+                    brandName={brand.label}
+                    domain={getDomain(brand.label)}
+                    className="w-full h-full object-contain"
                   />
                 </div>
-
-                <p className="text-xl font-black text-[#0A0A0A] tracking-tight relative z-10 uppercase">{brand.label}</p>
-                <div className="mt-3">
-                   <span className="bg-white/70 text-[#525252] font-bold text-[11px] px-3 py-1 rounded-full uppercase tracking-widest relative z-10 group-hover:bg-[#0A0A0A] group-hover:text-white transition-colors">
-                     {brand.count} modelo{brand.count !== 1 ? 's' : ''}
-                   </span>
-                </div>
+                <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>{brand.label}</p>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-tertiary)', background: 'var(--color-bg-muted)', padding: '4px 12px', borderRadius: 'var(--radius-full)' }}>
+                  {brand.count} modelo{brand.count !== 1 ? 's' : ''}
+                </span>
               </Link>
             )
           })}

@@ -26,85 +26,88 @@ export default async function CarrosUsadosBHPage() {
   const { items } = await fetchPublicListingsPage({ city: '%Belo Horizonte%', state: 'MG', page: 1, pageSize: 12, sort: 'recent' })
 
   return (
-    <div className="min-h-screen">
+    <div className="fingen-shell">
       <LocalBusinessBHTicketsSchema />
 
-      <section className="pt-16 pb-12 border-b border-white/70">
-        <div className="container max-w-5xl text-center">
-          <div className="section-kicker mb-6">
-            <MapPin className="w-3.5 h-3.5" /> Belo Horizonte e Região
+      <section className="fingen-dark-hero">
+        <div className="fingen-shell-content" style={{ textAlign: 'center' }}>
+          <div className="fingen-breadcrumb" style={{ justifyContent: 'center', color: 'rgba(255,255,255,0.5)' }}>
+            <Link href="/" style={{ color: 'rgba(255,255,255,0.5)' }}>Home</Link>
+            <span style={{ color: 'rgba(255,255,255,0.3)' }}>/</span>
+            <span style={{ color: '#fff' }}>Carros usados BH</span>
           </div>
-          <h1 className="text-balance mb-6">
-            O carro perfeito para você,<br className="hidden md:block" /> com a confiança que <span className="text-[#0A0A0A]">BH merece.</span>
+          <h1 className="text-balance">
+            Carros usados em BH
           </h1>
-          <p className="text-lg md:text-xl font-medium text-[#52607A] max-w-2xl mx-auto leading-relaxed mb-8">
+          <p style={{ maxWidth: '500px', margin: '0 auto' }}>
             Compare anúncios reais, confira valores atualizados e avance com mais confiança.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/anunciar-carro-bh" className="btn btn-primary px-8 flex items-center gap-2">
-              Quero Vender Meu Carro <ArrowRight className="w-4 h-4" />
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
+            <Link href="/anunciar-carro-bh" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: 'var(--radius-full)', background: 'var(--color-accent)', color: 'var(--color-text-primary)', fontWeight: 600, fontSize: '14px', textDecoration: 'none', transition: 'all 0.15s ease' }}>
+              Quero Vender Meu Carro <ArrowRight style={{ width: '16px', height: '16px' }} />
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="py-8">
-        <div className="container max-w-4xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-center gap-3 surface p-5">
-              <CheckCircle2 className="text-success w-6 h-6 flex-shrink-0" />
-              <div>
-                <h4 className="font-semibold text-[#0A0A0A]">Valor atualizado ao vivo</h4>
-                <p className="text-xs text-[#52607A] font-medium mt-1">Negociação apoiada por dados reais.</p>
+      <section className="fingen-section">
+        <div className="fingen-shell-content">
+          <div className="fingen-grid-3">
+            {[
+              { title: 'Valor atualizado ao vivo', desc: 'Negociação apoiada por dados reais.' },
+              { title: 'Atendimento local', desc: 'Compradores ativos em BH e região.' },
+              { title: 'Venda em 24h', desc: 'Foco em oferta e resposta rápida.' },
+            ].map((item) => (
+              <div key={item.title} className="fingen-card-white" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                <CheckCircle2 style={{ width: '24px', height: '24px', color: 'var(--color-trust)', flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                  <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '4px' }}>{item.title}</h4>
+                  <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>{item.desc}</p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3 surface p-5">
-              <CheckCircle2 className="text-success w-6 h-6 flex-shrink-0" />
-              <div>
-                <h4 className="font-semibold text-[#0A0A0A]">Atendimento local</h4>
-                <p className="text-xs text-[#52607A] font-medium mt-1">Compradores ativos em BH e região.</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 surface p-5">
-              <CheckCircle2 className="text-success w-6 h-6 flex-shrink-0" />
-              <div>
-                <h4 className="font-semibold text-[#0A0A0A]">Venda em 24h</h4>
-                <p className="text-xs text-[#52607A] font-medium mt-1">Foco em oferta e resposta rápida.</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="container max-w-6xl">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-display text-[#0A0A0A] tracking-tight">Veículos em destaque (BH)</h2>
-            <Link href="/carros-a-venda?city=Belo%20Horizonte&state=MG" className="hidden md:flex items-center gap-1 font-medium text-[#0A0A0A] hover:text-[#16855C] transition-colors">
-              Ver todos <ArrowRight className="w-4 h-4" />
+      <section className="fingen-section">
+        <div className="fingen-shell-content">
+          <div className="fingen-section-header">
+            <div>
+              <div className="fingen-section-label">BH e região</div>
+              <h2 className="fingen-section-title">Veículos em destaque</h2>
+            </div>
+            <Link href="/carros-a-venda?city=Belo%20Horizonte&state=MG" className="fingen-section-link">
+              Ver todos <ArrowRight style={{ width: '14px', height: '14px' }} />
             </Link>
           </div>
 
           {items.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
+            <div className="fingen-grid-4">
               {items.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}
             </div>
           ) : (
-            <div className="rounded-[28px] border border-[#EAEAE8] bg-white p-10 text-center text-[#52607A]">
+            <div className="fingen-card-white" style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--color-text-secondary)' }}>
               Nenhum anúncio ativo encontrado em Belo Horizonte no momento.
             </div>
           )}
         </div>
       </section>
 
-      <section className="py-16 border-t border-white/70">
-        <div className="container max-w-4xl text-[#0A0A0A]">
-          <h2 className="text-2xl font-display text-[#0A0A0A] mb-4">Comprar carro usado em Belo Horizonte</h2>
-          <div className="space-y-4 text-[#52607A]">
-            <p>O mercado de <strong>carros usados em BH</strong> é um dos mais aquecidos do Brasil. A página agora mostra anúncios reais da cidade, em vez de um catálogo auxiliar.</p>
-            <p>Se você quer vender, use o botão acima para publicar seu carro e aparecer para compradores na região.</p>
+      <section className="fingen-section">
+        <div className="fingen-shell-content">
+          <div className="fingen-card-white">
+            <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>Comprar carro usado em Belo Horizonte</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
+                O mercado de <strong style={{ color: 'var(--color-text-primary)' }}>carros usados em BH</strong> é um dos mais aquecidos do Brasil. A página agora mostra anúncios reais da cidade, em vez de um catálogo auxiliar.
+              </p>
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
+                Se você quer vender, use o botão acima para publicar seu carro e aparecer para compradores na região.
+              </p>
+            </div>
           </div>
         </div>
       </section>
