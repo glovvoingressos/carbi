@@ -59,9 +59,8 @@ export default function AppRankingPage() {
         
         <div className="fingen-shell-content" style={{ position: "relative", zIndex: 1 }}>
           <Badge className="mb-6 bg-white/10 text-white border-white/20">Guia 2026 — Inteligência de Mercado</Badge>
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter mb-8 leading-none">
-            melhor carro para <br />
-            <span className="text-[#F4F0E7]/88">aplicativo 2026</span>
+          <h1 className="text-balance">
+            Melhor carro para aplicativo 2026
           </h1>
           <p className="max-w-2xl mx-auto text-[#F4F0E7]/88 text-lg md:text-xl font-medium leading-relaxed">
             Economia por KM, custo de manutenção e ROI. Analisamos os dados técnicos dos modelos 2026 para você faturar mais e gastar menos.
@@ -159,8 +158,8 @@ export default function AppRankingPage() {
             <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
                <ShieldCheck className="w-64 h-64 text-white" />
             </div>
-            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-8 max-w-3xl">
-               Não decida antes de ver os dados técnicos.
+            <h2 style={{ fontSize: "clamp(24px, 5vw, 40px)", fontWeight: 700, color: "#fff", marginBottom: "24px", lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+              Não decida antes de ver os dados técnicos.
             </h2>
             <Link
               href="/qual-carro"

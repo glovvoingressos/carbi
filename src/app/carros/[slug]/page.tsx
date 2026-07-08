@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import MarketplaceClient from '@/components/marketplace/MarketplaceClient'
 import { BreadcrumbSchema } from '@/components/seo/JSONLD'
@@ -141,7 +142,7 @@ export default async function CarrosSeoPage({
   const filterOptions = await getFilterOptions()
 
   return (
-    <main className="min-h-screen bg-[#f5f5f3] pt-28 pb-20">
+    <main className="fingen-shell">
       <BreadcrumbSchema
         items={[
           { name: 'Home', url: '/' },
@@ -150,18 +151,18 @@ export default async function CarrosSeoPage({
         ]}
       />
 
-      <div className="container mx-auto max-w-6xl px-4">
-        <header className="mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#EAEAE8] bg-white/70 px-3 py-1">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">Marketplace real</span>
+      <div className="fingen-shell-content">
+        <div className="fingen-shell-hero">
+          <div className="fingen-breadcrumb">
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <Link href="/carros-a-venda">Carros à venda</Link>
+            <span>/</span>
+            <span>{preset.h1}</span>
           </div>
-          <h1 className="mt-4 text-4xl font-black tracking-tight text-[#0A0A0A] sm:text-5xl">
-            {preset.h1}
-          </h1>
-          <p className="mt-4 max-w-3xl text-[15px] font-medium leading-relaxed text-[#52607A] sm:text-[16px]">
-            {preset.intro}
-          </p>
-        </header>
+          <h1 className="text-balance">{preset.h1}</h1>
+          <p>{preset.intro}</p>
+        </div>
 
         <MarketplaceClient
           initialListings={listings.items}

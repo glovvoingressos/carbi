@@ -12,34 +12,36 @@ interface SEOPageClientProps {
 
 export default function SEOPageClient({ data, ctaHref }: SEOPageClientProps) {
   return (
-    <div className="min-h-screen">
+    <div className="fingen-shell">
       {/* Hero Section */}
-      <section className="pt-36 pb-24 overflow-hidden">
-        <div className="container max-w-6xl text-center">
+      <section className="fingen-dark-hero" style={{ textAlign: 'center' }}>
+        <div className="fingen-shell-content" style={{ position: 'relative', zIndex: 1 }}>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <span className="section-kicker mb-8">
-              Atrito Zero • Marketplace Inteligente
-            </span>
-            <h1 className="text-balance mb-8">
+            <div className="fingen-breadcrumb" style={{ justifyContent: 'center', color: 'rgba(255,255,255,0.5)' }}>
+              <Link href="/" style={{ color: 'rgba(255,255,255,0.5)' }}>Home</Link>
+              <span style={{ color: 'rgba(255,255,255,0.3)' }}>/</span>
+              <span style={{ color: '#fff' }}>{data.h1}</span>
+            </div>
+            <h1 className="text-balance">
               {data.h1}
             </h1>
-            <p className="text-xl sm:text-2xl font-semibold text-[#52607A] max-w-3xl mx-auto mb-12 leading-relaxed">
+            <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, maxWidth: '600px', margin: '0 auto' }}>
               {data.subtitle}
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link 
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '28px', flexWrap: 'wrap' }}>
+              <Link
                 href={ctaHref}
-                className="h-16 px-8 rounded-full bg-[#FFFDF3] border-2 border-[#17170F]/12 text-[#17170F] text-[15px] font-bold flex items-center justify-center hover:bg-[#D9F85F] hover:border-[#17170F]/25 transition-all shadow-sm group"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', borderRadius: 'var(--radius-full)', background: 'var(--color-accent)', color: 'var(--color-text-primary)', fontWeight: 600, fontSize: '15px', textDecoration: 'none', transition: 'all 0.2s ease' }}
               >
-                {data.ctaButtonText || 'Começar agora'} <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                {data.ctaButtonText || 'Começar agora'} <ArrowRight size={16} />
               </Link>
-              <a 
-                href="#detalhes" 
-                className="h-16 px-8 rounded-full bg-white border-2 border-[#17170F]/12 text-[#17170F] text-[15px] font-bold flex items-center justify-center hover:bg-[#D9F85F] hover:border-[#17170F]/30 transition-all shadow-sm"
+              <a
+                href="#detalhes"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', borderRadius: 'var(--radius-full)', background: 'transparent', color: '#fff', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1.5px solid rgba(255,255,255,0.2)', transition: 'all 0.2s ease' }}
               >
                 Saber mais
               </a>
@@ -52,7 +54,7 @@ export default function SEOPageClient({ data, ctaHref }: SEOPageClientProps) {
         <BenefitGrid items={data.benefits} />
 
         {data.sections.map((section: any, idx: number) => (
-          <SEOSection 
+          <SEOSection
             key={idx}
             badge={section.badge}
             title={section.title}
@@ -67,7 +69,7 @@ export default function SEOPageClient({ data, ctaHref }: SEOPageClientProps) {
 
       <FAQSection items={data.faqs} />
 
-      <SEOCallToAction 
+      <SEOCallToAction
         title={data.bottomCtaTitle || "Pronto para negociar seu veículo?"}
         description={data.bottomCtaDescription || "Junte-se a milhares de motoristas que já simplificaram sua vida com a Carbi."}
         buttonText={data.bottomCtaButtonText || "Começar hoje"}
