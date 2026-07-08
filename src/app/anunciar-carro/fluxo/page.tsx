@@ -1,8 +1,7 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, CheckCircle2 } from 'lucide-react'
 import ListingForm from '@/components/marketplace/ListingForm'
-import FlowProgress from '@/components/animations/FlowProgress'
 
 export const metadata: Metadata = {
   title: 'Anunciar meu carro | Carbi',
@@ -13,46 +12,73 @@ export const metadata: Metadata = {
   },
 }
 
-const flow = ['Marca', 'Modelo', 'Ano', 'Versão', 'Preço', 'FIPE', 'Fotos', 'Publicar']
-
 export default function AnunciarFluxoPage() {
   return (
-    <main className="ref-flow-page">
-      <section className="ref-flow-hero">
-        <div className="ref-flow-hero-inner">
-          <div>
-            <span className="ref-hero-badge"><span className="ref-dot" /> Anúncio 100% grátis</span>
-            <h1>Publique seu anúncio em poucos minutos.</h1>
+    <div className="fingen-flow-page">
+      <main className="fingen-main">
+        {/* Hero — mesmo padrão da home */}
+        <section className="fingen-flow-hero">
+          <div className="fingen-flow-hero-inner">
+            <div className="fingen-balance-header">
+              <span className="fingen-section-label">Anúncio gratuito</span>
+              <Link href="/carros-a-venda" className="fingen-section-link">
+                <ArrowLeft size={14} /> Voltar
+              </Link>
+            </div>
+            <h1>
+              Monte seu anúncio em
+              <br />
+              <span className="fingen-hero-title-accent">poucos minutos.</span>
+            </h1>
             <p>
               Fluxo guiado com consulta FIPE, upload de fotos e revisão final — tudo com a identidade premium da Carbi.
             </p>
-          </div>
-          <Link href="/carros-a-venda" className="ref-btn ref-btn-ghost" style={{ border: '1px solid rgba(255,255,255,.2)', color: '#fff' }}>
-            <ArrowLeft size={16} /> Voltar ao marketplace
-          </Link>
-        </div>
-        <FlowProgress steps={flow} currentStep={0} />
-      </section>
 
-      <section className="ref-flow-form-section">
-        <div className="ref-flow-form-grid">
-          <aside className="ref-flow-side-card">
-            <span className="ref-sec-label">Onboarding</span>
-            <h2>Preencha pouco, publique bem.</h2>
-            <p>
-              Dados estruturados, FIPE real no fluxo, até 10 fotos e contato protegido por chat interno.
-            </p>
-            <div className="ref-flow-side-list">
-              {['FIPE durante o preenchimento', 'Upload real de imagens', 'Preview e revisão final', 'Negociação protegida'].map((item) => (
-                <div key={item}><CheckCircle2 size={17} /> {item}</div>
-              ))}
+            {/* Banner de progresso — mesmo padrão fingen-banner */}
+            <div className="fingen-flow-progress-banner">
+              <div className="fingen-flow-progress-content">
+                <div className="fingen-flow-progress-icon">
+                  <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <div className="fingen-flow-progress-text">
+                  <strong>Fluxo guiado</strong>
+                  <span>3 etapas: veículo, dados e publicação</span>
+                </div>
+                <div className="fingen-flow-progress-bar">
+                  <div className="fingen-flow-progress-fill" style={{ width: '0%' }} />
+                </div>
+              </div>
             </div>
-          </aside>
-          <div className="ref-flow-form-wrap">
-            <ListingForm />
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
+
+        {/* Formulário + Side card */}
+        <section className="fingen-flow-form-section">
+          <div className="fingen-flow-form-grid">
+            {/* Side card — dark card */}
+            <aside className="fingen-flow-side-card">
+              <span className="fingen-section-label">Onboarding</span>
+              <h2>Preencha pouco, publique bem.</h2>
+              <p>
+                Dados estruturados, FIPE real no fluxo, até 10 fotos e contato protegido por chat interno.
+              </p>
+              <div className="fingen-flow-side-list">
+                {['FIPE durante o preenchimento', 'Upload real de imagens', 'Preview e revisão final', 'Negociação protegida'].map((item) => (
+                  <div key={item}><CheckCircle2 size={17} /> {item}</div>
+                ))}
+              </div>
+            </aside>
+
+            {/* Formulário */}
+            <div className="fingen-flow-form-wrap">
+              <ListingForm />
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   )
 }

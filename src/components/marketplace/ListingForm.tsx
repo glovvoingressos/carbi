@@ -926,8 +926,8 @@ export default function ListingForm() {
 
   if (!sessionReady) {
     return (
-      <div className="listing-form-ref surface-strong p-8 text-center">
-        <Loader2 className="mx-auto h-5 w-5 animate-spin text-[#0A0A0A]" />
+      <div className="listing-form-ref fingen-flow-form fingen-flow-form-card p-8 text-center">
+        <Loader2 className="mx-auto h-5 w-5 animate-spin text-[#1A1A1A]" />
         <p className="mt-2 text-sm text-[#525252]">Carregando sessão...</p>
       </div>
     )
@@ -935,34 +935,34 @@ export default function ListingForm() {
 
   if (!isAuthenticated) {
     return (
-      <div className="listing-form-ref">
+      <div className="listing-form-ref fingen-flow-form">
         <AuthCard onAuthenticated={() => setIsAuthenticated(true)} />
       </div>
     )
   }
 
   return (
-    <div className="listing-form-ref space-y-8 pb-4 max-w-3xl mx-auto max-[330px]:space-y-6 max-[330px]:pb-20">
+    <div className="listing-form-ref fingen-flow-form space-y-8 pb-4 max-w-3xl mx-auto max-[330px]:space-y-6 max-[330px]:pb-20">
       <div className="space-y-3">
-        <div className="h-1.5 bg-[#FAFAF9] rounded-full overflow-hidden">
+        <div className="fingen-flow-progress-bar-track">
           <div
-            className="h-full bg-[#D9F85F] rounded-full transition-all duration-500"
+            className="fingen-flow-progress-bar-fill"
             style={{ width: `${(currentStep / 3) * 100}%` }}
           />
         </div>
-        <p className="label">
+        <p className="fingen-flow-step-label">
           {currentStep === 1 && 'Etapa 1 de 3: Selecione seu carro'}
           {currentStep === 2 && 'Etapa 2 de 3: Preço, dados básicos e fotos'}
           {currentStep === 3 && 'Etapa 3 de 3: Revisar e publicar'}
         </p>
       </div>
 
-      <div className="surface-strong p-6 sm:p-8 space-y-8 max-[330px]:p-4 max-[330px]:space-y-6">
+      <div className="fingen-flow-form-card p-6 sm:p-8 space-y-8 max-[330px]:p-4 max-[330px]:space-y-6">
         {currentStep === 1 && (
           <div className="space-y-6 max-[330px]:space-y-5">
             <div>
-              <h3 className="text-xl font-semibold font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Selecione seu veículo</h3>
-              <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
+              <h3 className="fingen-flow-card-title max-[330px]:text-[18px]">Selecione seu veículo</h3>
+              <p className="fingen-flow-card-desc max-[330px]:text-[13px]">
                 Vamos guiar você passo a passo. Comece escolhendo a marca.
               </p>
             </div>
@@ -973,35 +973,35 @@ export default function ListingForm() {
                 <div key={s} className="flex items-center gap-2 flex-1">
                   <div className={`flex items-center justify-center w-8 h-8 rounded-full text-[12px] font-bold transition-all ${
                     listingSubStep === s
-                      ? 'bg-[#17170F] text-white scale-110 shadow-md'
+                      ? 'bg-[#1A1A1A] text-white scale-110 shadow-md'
                       : listingSubStep > s
-                      ? 'bg-[#D9F85F] text-[#17170F]'
+                      ? 'bg-[#D4F576] text-[#1A1A1A]'
                       : 'bg-[#EAEAE8] text-[#767676]'
                   }`}>
                     {listingSubStep > s ? <Check className="w-4 h-4" /> : s}
                   </div>
-                  {s < 4 && <div className={`h-0.5 flex-1 rounded-full transition-colors ${listingSubStep > s ? 'bg-[#D9F85F]' : 'bg-[#EAEAE8]'}`} />}
+                  {s < 4 && <div className={`h-0.5 flex-1 rounded-full transition-colors ${listingSubStep > s ? 'bg-[#D4F576]' : 'bg-[#EAEAE8]'}`} />}
                 </div>
               ))}
             </div>
             <div className="flex justify-between text-[11px] font-medium text-[#767676] -mt-2">
-              <span className={listingSubStep >= 1 ? 'text-[#17170F]' : ''}>Marca</span>
-              <span className={listingSubStep >= 2 ? 'text-[#17170F]' : ''}>Modelo</span>
-              <span className={listingSubStep >= 3 ? 'text-[#17170F]' : ''}>Ano</span>
-              <span className={listingSubStep >= 4 ? 'text-[#17170F]' : ''}>Versão</span>
+              <span className={listingSubStep >= 1 ? 'text-[#1A1A1A]' : ''}>Marca</span>
+              <span className={listingSubStep >= 2 ? 'text-[#1A1A1A]' : ''}>Modelo</span>
+              <span className={listingSubStep >= 3 ? 'text-[#1A1A1A]' : ''}>Ano</span>
+              <span className={listingSubStep >= 4 ? 'text-[#1A1A1A]' : ''}>Versão</span>
             </div>
 
             <input type="hidden" value={form.vehicle_type} />
 
             {/* Sub-step 1: Brand */}
             {listingSubStep === 1 && (
-              <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
+              <div className="fingen-flow-substep-card p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="label">Marca</p>
-                  <span className="badge badge-brand text-[10px]">Passo 1 de 4</span>
+                  <p className="fingen-flow-field-label">Marca</p>
+                  <span className="fingen-flow-badge-accent text-[10px]">Passo 1 de 4</span>
                 </div>
                 <select
-                  className="input text-[15px]"
+                  className="fingen-flow-input text-[15px]"
                   value={selectedBrandCode}
                   onChange={(e) => {
                     const code = e.target.value
@@ -1014,7 +1014,7 @@ export default function ListingForm() {
                   {brands.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
                 </select>
                 {selectedBrandCode && (
-                  <button type="button" onClick={handleSubStepNext} className="btn btn-primary w-full mt-2">
+                  <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
                     Continuar
                     <ArrowRight className="h-4 w-4" />
                   </button>
@@ -1024,13 +1024,13 @@ export default function ListingForm() {
 
             {/* Sub-step 2: Model */}
             {listingSubStep === 2 && (
-              <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
+              <div className="fingen-flow-substep-card p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="label">Modelo</p>
-                  <span className="badge badge-brand text-[10px]">Passo 2 de 4</span>
+                  <p className="fingen-flow-field-label">Modelo</p>
+                  <span className="fingen-flow-badge-accent text-[10px]">Passo 2 de 4</span>
                 </div>
                 <select
-                  className="input text-[15px]"
+                  className="fingen-flow-input text-[15px]"
                   value={selectedModelCode}
                   onChange={(e) => {
                     const code = e.target.value
@@ -1045,7 +1045,7 @@ export default function ListingForm() {
                   {models.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
                 </select>
                 {selectedModelCode && (
-                  <button type="button" onClick={handleSubStepNext} className="btn btn-primary w-full mt-2">
+                  <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
                     Continuar
                     <ArrowRight className="h-4 w-4" />
                   </button>
@@ -1055,13 +1055,13 @@ export default function ListingForm() {
 
             {/* Sub-step 3: Year */}
             {listingSubStep === 3 && (
-              <div className="surface p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
+              <div className="fingen-flow-substep-card p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="label">Ano</p>
-                  <span className="badge badge-brand text-[10px]">Passo 3 de 4</span>
+                  <p className="fingen-flow-field-label">Ano</p>
+                  <span className="fingen-flow-badge-accent text-[10px]">Passo 3 de 4</span>
                 </div>
                 <select
-                  className="input text-[15px]"
+                  className="fingen-flow-input text-[15px]"
                   value={selectedYear ?? ''}
                   onChange={(e) => {
                     const code = e.target.value
@@ -1075,7 +1075,7 @@ export default function ListingForm() {
                   {years.map((year) => <option key={year} value={year}>{year}</option>)}
                 </select>
                 {selectedYear && (
-                  <button type="button" onClick={handleSubStepNext} className="btn btn-primary w-full mt-2">
+                  <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
                     Continuar
                     <ArrowRight className="h-4 w-4" />
                   </button>
@@ -1086,23 +1086,23 @@ export default function ListingForm() {
             {/* Sub-step 4: Version + FIPE */}
             {listingSubStep === 4 && (
               <div className="space-y-4 animate-fade-in">
-                <div className="surface p-5 space-y-4 max-[330px]:p-4">
+                <div className="fingen-flow-substep-card p-5 space-y-4 max-[330px]:p-4">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="label">Versões disponíveis</p>
-                    <span className="badge badge-brand text-[10px]">Passo 4 de 4</span>
+                    <p className="fingen-flow-field-label">Versões disponíveis</p>
+                    <span className="fingen-flow-badge-accent text-[10px]">Passo 4 de 4</span>
                   </div>
-                  <div className="bg-[#FAFAF9] rounded-xl p-4 flex flex-wrap items-center gap-x-6 gap-y-2 max-[330px]:p-3">
+                  <div className="fingen-flow-fipe-summary p-4 flex flex-wrap items-center gap-x-6 gap-y-2 max-[330px]:p-3">
                     <div>
-                      <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Marca</span>
-                      <p className="text-sm font-bold text-[#0A0A0A]">{form.brand || '-'}</p>
+                      <span className="fingen-flow-fipe-summary-label">Marca</span>
+                      <p className="text-sm font-bold text-[#1A1A1A]">{form.brand || '-'}</p>
                     </div>
                     <div>
-                      <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Modelo</span>
-                      <p className="text-sm font-bold text-[#0A0A0A]">{form.model || '-'}</p>
+                      <span className="fingen-flow-fipe-summary-label">Modelo</span>
+                      <p className="text-sm font-bold text-[#1A1A1A]">{form.model || '-'}</p>
                     </div>
                     <div>
-                      <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Ano</span>
-                      <p className="text-sm font-bold text-[#0A0A0A]">{form.year || '-'}</p>
+                      <span className="fingen-flow-fipe-summary-label">Ano</span>
+                      <p className="text-sm font-bold text-[#1A1A1A]">{form.year || '-'}</p>
                     </div>
                   </div>
                   {versions.length > 0 ? (
@@ -1118,11 +1118,11 @@ export default function ListingForm() {
                           }}
                           className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                             selectedVersionCode === v.code
-                              ? 'border-[#17170F] bg-[#17170F]/5 shadow-sm'
-                              : 'border-[#EAEAE8] hover:border-[#17170F]/30 bg-white'
+                              ? 'border-[#1A1A1A] bg-[#1A1A1A]/5 shadow-sm'
+                              : 'border-[#EAEAE8] hover:border-[#1A1A1A]/30 bg-white'
                           }`}
                         >
-                          <p className="text-[14px] font-bold text-[#0A0A0A]">{v.name}</p>
+                          <p className="text-[14px] font-bold text-[#1A1A1A]">{v.name}</p>
                           {v.code !== selectedVersionCode && selectedVersionCode && (
                             <p className="text-[11px] text-[#767676] mt-0.5">Clique para selecionar</p>
                           )}
@@ -1138,23 +1138,23 @@ export default function ListingForm() {
                     <div className="text-center py-6 space-y-3">
                       <p className="text-sm text-[#525252]">Nenhuma versão encontrada para esta combinação.</p>
                       <input
-                        className="input text-center"
+                        className="fingen-flow-input text-center"
                         placeholder="Informe a versão do veículo"
                         value={form.version}
                         onChange={(e) => handleInput('version', e.target.value)}
                       />
-                      <button type="button" onClick={prevStep} className="text-sm text-[#10B981] font-medium mt-2 hover:underline">
+                      <button type="button" onClick={prevStep} className="text-sm text-[#D4F576] font-medium mt-2 hover:underline">
                         Voltar e escolher outro ano
                       </button>
                     </div>
                   )}
                 </div>
 
-            <div className="surface-strong p-8 relative overflow-hidden max-[330px]:p-4">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#D9F85F]/30 rounded-bl-full" />
+            <div className="fingen-flow-fipe-card p-8 relative overflow-hidden max-[330px]:p-4">
+              <div className="fingen-flow-fipe-card-deco" />
               <div className="flex items-center justify-between gap-3 mb-6 max-[330px]:mb-4 max-[330px]:gap-2">
-                <p className="text-lg font-bold text-[#0A0A0A] max-[330px]:text-[16px]">Referência FIPE</p>
-                <span className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest shadow-sm max-[330px]:px-3 max-[330px]:py-1.5 ${hasAskingPrice && comparison.status === 'below' ? 'bg-[#D9F85F] text-[#17170F] border-[#D9F85F]' : hasAskingPrice && comparison.status === 'above' ? 'bg-red-50 text-red-600 border-red-100' : hasAskingPrice && comparison.status === 'near' ? 'bg-[#FFF8DF] text-[#17170F] border-[#FFE08A]' : 'bg-[#FAFAF9] text-[#525252] border-[#EAEAE8]'}`}>
+                <p className="fingen-flow-fipe-card-title max-[330px]:text-[16px]">Referência FIPE</p>
+                <span className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest shadow-sm max-[330px]:px-3 max-[330px]:py-1.5 ${hasAskingPrice && comparison.status === 'below' ? 'fingen-flow-fipe-badge-below' : hasAskingPrice && comparison.status === 'above' ? 'fingen-flow-fipe-badge-above' : hasAskingPrice && comparison.status === 'near' ? 'fingen-flow-fipe-badge-near' : 'fingen-flow-fipe-badge-pending'}`}>
                   {!hasAskingPrice && 'Preço pendente'}
                   {hasAskingPrice && comparison.status === 'below' && 'Abaixo'}
                   {hasAskingPrice && comparison.status === 'near' && 'Próximo'}
@@ -1165,16 +1165,16 @@ export default function ListingForm() {
               {!selectedYear ? (
                 <p className="text-sm font-medium text-[#525252] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8] max-[330px]:text-[13px] max-[330px]:p-3">Complete marca, modelo e ano para carregar os dados automáticos.</p>
               ) : fipeLoading ? (
-                <p className="text-sm font-medium text-[#10B981] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8] flex items-center gap-2 max-[330px]:text-[13px] max-[330px]:p-3"><Loader2 className="w-4 h-4 animate-spin" /> Consultando valor atualizado...</p>
+                <p className="text-sm font-medium text-[#D4F576] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8] flex items-center gap-2 max-[330px]:text-[13px] max-[330px]:p-3"><Loader2 className="w-4 h-4 animate-spin" /> Consultando valor atualizado...</p>
               ) : fipeResult ? (
                 <div className="grid gap-3 text-sm font-medium text-[#525252] max-[330px]:gap-2.5 max-[330px]:text-[13px]">
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Versão automática:</span> <strong className="text-[#0A0A0A]">{form.version || 'Não informada'}</strong></div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Preço FIPE:</span> <strong className="text-[#0A0A0A]">{fipeResult.price}</strong></div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Seu anúncio:</span> <strong className="text-[#0A0A0A]">{hasAskingPrice ? formatBRL(priceNumber) : 'Informe o preço na próxima etapa'}</strong></div>
+                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Versão automática:</span> <strong className="text-[#1A1A1A]">{form.version || 'Não informada'}</strong></div>
+                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Preço FIPE:</span> <strong className="text-[#1A1A1A]">{fipeResult.price}</strong></div>
+                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Seu anúncio:</span> <strong className="text-[#1A1A1A]">{hasAskingPrice ? formatBRL(priceNumber) : 'Informe o preço na próxima etapa'}</strong></div>
                   {hasAskingPrice ? (
                     <>
-                      <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Diferença:</span> <strong className="text-[#0A0A0A]">{comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</strong></div>
-                      <div className="flex justify-between items-center py-2"><span className="text-[#767676]">Percentual:</span> <strong className="text-[#0A0A0A]">{comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</strong></div>
+                      <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Diferença:</span> <strong className="text-[#1A1A1A]">{comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</strong></div>
+                      <div className="flex justify-between items-center py-2"><span className="text-[#767676]">Percentual:</span> <strong className="text-[#1A1A1A]">{comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</strong></div>
                     </>
                   ) : null}
                 </div>
@@ -1193,31 +1193,31 @@ export default function ListingForm() {
         {currentStep === 2 && (
           <div className="space-y-8 animate-fade-in max-[330px]:space-y-5">
             <div>
-              <h3 className="text-xl font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Dados essenciais</h3>
-              <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
+              <h3 className="fingen-flow-card-title max-[330px]:text-[18px]">Dados essenciais</h3>
+              <p className="fingen-flow-card-desc max-[330px]:text-[13px]">
                 Só pedimos o necessário para publicar rápido. O restante pode ser completado depois.
               </p>
             </div>
             
             <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
-              <input className="input" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} />
-              <input className="input" placeholder="Quilometragem" value={formatBrazilianInt(form.mileage)} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
-              <input className="input" placeholder="Combustível" value={form.fuel || resolvedFuelValue} onChange={(e) => handleInput('fuel', e.target.value)} />
-              <input className="input" placeholder="Câmbio" value={form.transmission || resolvedTransmissionValue} onChange={(e) => handleInput('transmission', e.target.value)} />
-              <input className="input" placeholder="Cor" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
-              <input className="input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
-              <input className="input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
+              <input className="fingen-flow-input" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} />
+              <input className="fingen-flow-input" placeholder="Quilometragem" value={formatBrazilianInt(form.mileage)} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
+              <input className="fingen-flow-input" placeholder="Combustível" value={form.fuel || resolvedFuelValue} onChange={(e) => handleInput('fuel', e.target.value)} />
+              <input className="fingen-flow-input" placeholder="Câmbio" value={form.transmission || resolvedTransmissionValue} onChange={(e) => handleInput('transmission', e.target.value)} />
+              <input className="fingen-flow-input" placeholder="Cor" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
+              <input className="fingen-flow-input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
+              <input className="fingen-flow-input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
             </div>
 
             {fipeResult ? (
-              <div className="rounded-[28px] bg-[#1A1A1A] p-5 text-white max-[330px]:p-4">
+              <div className="fingen-flow-fipe-comparison-dark rounded-[28px] p-5 text-white max-[330px]:p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-1">
-                    <p className="text-[12px] font-black uppercase tracking-[0.18em] text-white/65 max-[330px]:text-[11px]">
+                    <p className="fingen-flow-fipe-dark-label max-[330px]:text-[11px]">
                       Comparativo FIPE
                     </p>
                     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <p className="text-[40px] font-black leading-none tracking-[-0.05em] text-white max-[330px]:text-[30px]">
+                      <p className="fingen-flow-fipe-dark-value max-[330px]:text-[30px]">
                         {fipeResult.price}
                       </p>
                       <span className="text-[16px] font-medium text-white/55 max-[330px]:text-[13px]">
@@ -1231,37 +1231,37 @@ export default function ListingForm() {
                 </div>
 
                 <div className="mt-5 grid gap-3">
-                  <div className="rounded-[22px] bg-white/8 px-4 py-4 backdrop-blur-sm">
-                    <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/45">Preço anunciado</p>
-                    <p className="mt-2 text-[28px] font-black leading-none tracking-[-0.04em] text-white max-[330px]:text-[23px]">
+                  <div className="fingen-flow-fipe-dark-stat">
+                    <p className="fingen-flow-fipe-dark-stat-label">Preço anunciado</p>
+                    <p className="fingen-flow-fipe-dark-stat-value max-[330px]:text-[23px]">
                       {hasAskingPrice ? formatBRL(priceNumber) : 'Informe abaixo'}
                     </p>
                   </div>
 
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-[22px] bg-white/8 px-4 py-4 backdrop-blur-sm">
-                      <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/45">Diferença</p>
-                      <p className="mt-2 text-[22px] font-black leading-none tracking-[-0.04em] text-[#D9F85F] max-[330px]:text-[19px]">
+                    <div className="fingen-flow-fipe-dark-stat">
+                      <p className="fingen-flow-fipe-dark-stat-label">Diferença</p>
+                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[19px]">
                         {fipeDiffValueLabel ?? 'Preencha o preço'}
                       </p>
                     </div>
-                    <div className="rounded-[22px] bg-white/8 px-4 py-4 backdrop-blur-sm">
-                      <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/45">Percentual</p>
-                      <p className="mt-2 text-[22px] font-black leading-none tracking-[-0.04em] text-[#D9F85F] max-[330px]:text-[19px]">
+                    <div className="fingen-flow-fipe-dark-stat">
+                      <p className="fingen-flow-fipe-dark-stat-label">Percentual</p>
+                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[19px]">
                         {fipeDiffPercentLabel ?? '—'}
                       </p>
                     </div>
                   </div>
 
-                  <div className="rounded-[22px] bg-white/5 px-4 py-4 backdrop-blur-sm">
+                  <div className="fingen-flow-fipe-dark-track">
                     <div className="flex items-center justify-between gap-4 text-[13px] font-medium text-white/55">
                       <span>Abaixo da FIPE</span>
                       <span>Acima da FIPE</span>
                     </div>
-                    <div className="mt-3 h-2 rounded-full bg-white/10 overflow-hidden">
-                      <div className="h-full rounded-full bg-[#D9F85F] transition-all duration-500" style={{ width: fipeProgressWidth }} />
+                    <div className="mt-3 fingen-flow-fipe-progress-bar">
+                      <div className="fingen-flow-fipe-progress-fill" style={{ width: fipeProgressWidth }} />
                     </div>
-                    <p className="mt-3 text-[12px] leading-relaxed text-white/60">
+                    <p className="mt-3 fingen-flow-fipe-dark-ref">
                       {fipeResult.referenceMonth
                         ? `Referência ${fipeResult.referenceMonth} • Atualizado pela FIPE.`
                         : 'Atualizado pela FIPE.'}
@@ -1271,30 +1271,30 @@ export default function ListingForm() {
               </div>
             ) : null}
 
-            <div className="surface p-4 space-y-3">
+            <div className="fingen-flow-substep-card p-4 space-y-3">
               <div className="flex items-center justify-between gap-3">
-                <p className="label">Recomendado, não obrigatório</p>
-                <span className="badge badge-outline text-[10px]">Opcional</span>
+                <p className="fingen-flow-field-label">Recomendado, não obrigatório</p>
+                <span className="fingen-flow-badge-outline text-[10px]">Opcional</span>
               </div>
-              <textarea className="input min-h-[120px] py-3 resize-none leading-relaxed max-[330px]:min-h-[100px]" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
-              <input className="input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
+              <textarea className="fingen-flow-input min-h-[120px] py-3 resize-none leading-relaxed max-[330px]:min-h-[100px]" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
+              <input className="fingen-flow-input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
             </div>
 
 
 
             <label
-              className="surface-strong border-2 border-dashed border-[rgba(0,0,0,0.12)] p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] hover:border-[#D9F85F] hover:bg-[#D9F85F]/10 transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px]"
+              className="fingen-flow-upload-area p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px]"
               onDragOver={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
               }}
               onDrop={onDropFiles}
             >
-              <div className="w-14 h-14 rounded-full bg-[#FFF8DF] flex items-center justify-center group-hover:scale-110 transition-transform max-[330px]:w-12 max-[330px]:h-12">
-                <ImagePlus className="h-6 w-6 text-[#17170F]" />
+              <div className="fingen-flow-upload-icon group-hover:scale-110 transition-transform max-[330px]:w-12 max-[330px]:h-12">
+                <ImagePlus className="h-6 w-6 text-[#1A1A1A]" />
               </div>
-              <span className="text-sm text-[#0A0A0A] mt-1 max-[330px]:text-[13px]">Arraste fotos ou clique ({images.length}/{LISTING_MAX_IMAGES})</span>
-              <span className="badge badge-brand text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens</span>
+              <span className="text-sm text-[#1A1A1A] mt-1 max-[330px]:text-[13px]">Arraste fotos ou clique ({images.length}/{LISTING_MAX_IMAGES})</span>
+              <span className="fingen-flow-badge-accent text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens</span>
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
             </label>
             <p className="text-xs text-[#525252] text-center">Inclua pelo menos 1 foto para publicar.</p>
@@ -1302,14 +1302,14 @@ export default function ListingForm() {
             {images.length > 0 && (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8 max-[330px]:grid-cols-1 max-[330px]:gap-4">
                 {images.map((image, index) => (
-                  <div key={image.previewUrl} className="surface p-3 hover:shadow-md transition-shadow max-[330px]:p-2.5">
+                  <div key={image.previewUrl} className="fingen-flow-substep-card p-3 hover:shadow-md transition-shadow max-[330px]:p-2.5">
                     <img src={image.previewUrl} alt={`Preview ${index + 1}`} width={1920} height={1080} className="aspect-video w-full rounded-xl object-cover" />
                     <p className="mt-4 px-2 text-[10px] font-black uppercase tracking-widest text-[#525252] max-[330px]:mt-3">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
                     <div className="mt-3 flex items-center gap-2 px-2 pb-1 max-[330px]:gap-1.5">
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#10B981] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, -1)} disabled={index === 0}>
+                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#D4F576] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, -1)} disabled={index === 0}>
                         <MoveLeft className="h-4 w-4" />
                       </button>
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#10B981] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1}>
+                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#D4F576] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1}>
                         <MoveRight className="h-4 w-4" />
                       </button>
                       <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors ml-auto max-[330px]:h-9 max-[330px]:w-9" onClick={() => removeImage(index)}>
@@ -1326,23 +1326,23 @@ export default function ListingForm() {
         {currentStep === 3 && (
           <div className="space-y-8 animate-fade-in max-[330px]:space-y-5">
             <div>
-              <h3 className="text-xl font-bold text-[#0A0A0A] mb-2 max-[330px]:text-[18px]">Revisar e publicar</h3>
-              <p className="text-sm text-[#525252] max-[330px]:text-[13px]">
+              <h3 className="fingen-flow-card-title max-[330px]:text-[18px]">Revisar e publicar</h3>
+              <p className="fingen-flow-card-desc max-[330px]:text-[13px]">
                 Confira os detalhes antes de finalizar.
               </p>
             </div>
 
-            <div className="rounded-[28px] border border-[#17170F]/10 bg-[#D9F85F] p-5 shadow-sm max-[330px]:p-4">
+            <div className="fingen-flow-quality-card rounded-[28px] p-5 shadow-sm max-[330px]:p-4">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="label text-[#1A1A1A]">{qualityLabel}</p>
-                  <h4 className="mt-2 text-3xl font-black tracking-[-0.04em] text-[#17170F] max-[330px]:text-2xl">
+                  <p className="fingen-flow-field-label">{qualityLabel}</p>
+                  <h4 className="mt-2 text-3xl font-black tracking-[-0.04em] text-[#1A1A1A] max-[330px]:text-2xl">
                     {qualityScore}/100
                   </h4>
                 </div>
                 <div className="min-w-[180px] flex-1">
-                  <div className="h-3 overflow-hidden rounded-full bg-white/70">
-                    <div className="h-full rounded-full bg-[#1A1A1A] transition-all duration-500" style={{ width: `${qualityScore}%` }} />
+                  <div className="fingen-flow-quality-bar">
+                    <div className="fingen-flow-quality-bar-fill" style={{ width: `${qualityScore}%` }} />
                   </div>
                   <p className="mt-2 text-xs font-bold text-[#1A1A1A]/80">
                     Seu anúncio pode ser publicado como básico. Depois, complete mais dados para aumentar a confiança.
@@ -1356,7 +1356,7 @@ export default function ListingForm() {
               ) : (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {recommendedItems.filter((item) => !item.complete).slice(0, 4).map((item) => (
-                    <span key={item.label} className="rounded-full bg-white/75 px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#1A1A1A]">
+                    <span key={item.label} className="fingen-flow-badge-outline-dark">
                       Completar {item.label.toLowerCase()}
                     </span>
                   ))}
@@ -1364,63 +1364,63 @@ export default function ListingForm() {
               )}
             </div>
             
-            <div className="surface p-5 max-[330px]:p-4">
-              <p className="label mb-4">Informações</p>
+            <div className="fingen-flow-substep-card p-5 max-[330px]:p-4">
+              <p className="fingen-flow-field-label mb-4">Informações</p>
               <div className="grid gap-4 text-sm sm:grid-cols-2 max-[330px]:grid-cols-1 max-[330px]:gap-3">
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Veículo</span><strong className="text-sm text-[#0A0A0A]">{form.brand} {form.model} {form.version}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Ano</span><strong className="text-sm text-[#0A0A0A]">{form.year}/{form.yearModel}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Preço</span><strong className="text-sm text-[#0A0A0A]">{form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado'}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Quilometragem</span><strong className="text-sm text-[#0A0A0A]">{form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Não informado'}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Cidade/UF</span><strong className="text-sm text-[#0A0A0A]">{form.city || '-'}{form.state ? `/${form.state}` : ''}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Fotos</span><strong className="text-sm text-[#0A0A0A]">{images.length} de {LISTING_MAX_IMAGES}</strong></div>
-                <div className="sm:col-span-2 flex flex-col gap-2 mt-1"><span className="text-xs text-[#767676]">Descrição</span><p className="text-sm text-[#0A0A0A] bg-[#FAFAF9] p-4 rounded-xl leading-relaxed">{form.description.trim() || 'Não informada'}</p></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Veículo</span><strong className="text-sm text-[#1A1A1A]">{form.brand} {form.model} {form.version}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Ano</span><strong className="text-sm text-[#1A1A1A]">{form.year}/{form.yearModel}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Preço</span><strong className="text-sm text-[#1A1A1A]">{form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado'}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Quilometragem</span><strong className="text-sm text-[#1A1A1A]">{form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Não informado'}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Cidade/UF</span><strong className="text-sm text-[#1A1A1A]">{form.city || '-'}{form.state ? `/${form.state}` : ''}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Fotos</span><strong className="text-sm text-[#1A1A1A]">{images.length} de {LISTING_MAX_IMAGES}</strong></div>
+                <div className="sm:col-span-2 flex flex-col gap-2 mt-1"><span className="text-xs text-[#767676]">Descrição</span><p className="text-sm text-[#1A1A1A] bg-[#FAFAF9] p-4 rounded-xl leading-relaxed">{form.description.trim() || 'Não informada'}</p></div>
               </div>
             </div>
 
-            <div className="surface p-5 max-[330px]:p-4">
+            <div className="fingen-flow-substep-card p-5 max-[330px]:p-4">
               <div className="flex items-center gap-2 mb-4">
-                <span className="w-7 h-7 rounded-full bg-[#D9F85F] flex items-center justify-center text-[#17170F] font-bold text-[10px]">AI</span>
-                <p className="label">Ficha técnica automática</p>
+                <span className="fingen-flow-tech-ai-badge">AI</span>
+                <p className="fingen-flow-field-label">Ficha técnica automática</p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 max-[330px]:grid-cols-1">
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5 max-[330px]:p-2.5">
-                  <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Motor</span>
+                <div className="fingen-flow-tech-item max-[330px]:p-2.5">
+                  <span className="fingen-flow-tech-label">Motor</span>
                   <input
-                    className="text-sm font-semibold text-[#0A0A0A] bg-transparent border border-[#EAEAE8] rounded-lg px-2 py-1 w-full outline-none focus:border-[#10B981]"
+                    className="fingen-flow-tech-input"
                     value={form.engine || (technical.engine !== 'Não informado' ? technical.engine : '')}
                     onChange={(e) => handleInput('engine', e.target.value)}
                     placeholder="Ex: 2.0 Turbo"
                   />
                 </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
-                  <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Potência</span>
-                  <strong className="text-sm font-semibold text-[#0A0A0A]">{technical.horsepower}</strong>
+                <div className="fingen-flow-tech-item">
+                  <span className="fingen-flow-tech-label">Potência</span>
+                  <strong className="text-sm font-semibold text-[#1A1A1A]">{technical.horsepower}</strong>
                 </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
-                  <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Torque</span>
-                  <strong className="text-sm font-semibold text-[#0A0A0A]">{technical.torque}</strong>
+                <div className="fingen-flow-tech-item">
+                  <span className="fingen-flow-tech-label">Torque</span>
+                  <strong className="text-sm font-semibold text-[#1A1A1A]">{technical.torque}</strong>
                 </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
-                  <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Combustível</span>
-                  <strong className="text-sm font-semibold text-[#0A0A0A]">{technical.fuel}</strong>
+                <div className="fingen-flow-tech-item">
+                  <span className="fingen-flow-tech-label">Combustível</span>
+                  <strong className="text-sm font-semibold text-[#1A1A1A]">{technical.fuel}</strong>
                 </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
-                  <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Câmbio</span>
-                  <strong className="text-sm font-bold text-[#0A0A0A]">{technical.transmission}</strong>
+                <div className="fingen-flow-tech-item">
+                  <span className="fingen-flow-tech-label">Câmbio</span>
+                  <strong className="text-sm font-bold text-[#1A1A1A]">{technical.transmission}</strong>
                 </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5 lg:col-span-2 max-[330px]:p-2.5">
-                  <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Consumo</span>
-                  <strong className="text-sm font-bold text-[#0A0A0A]">{technical.consumption}</strong>
+                <div className="fingen-flow-tech-item lg:col-span-2 max-[330px]:p-2.5">
+                  <span className="fingen-flow-tech-label">Consumo</span>
+                  <strong className="text-sm font-bold text-[#1A1A1A]">{technical.consumption}</strong>
                 </div>
-                <div className="bg-[#FAFAF9] rounded-xl p-3 flex flex-col gap-0.5">
-                  <span className="text-[10px] font-semibold text-[#767676] uppercase tracking-wider">Categoria</span>
-                  <strong className="text-sm font-bold text-[#0A0A0A]">{technical.category}</strong>
+                <div className="fingen-flow-tech-item">
+                  <span className="fingen-flow-tech-label">Categoria</span>
+                  <strong className="text-sm font-bold text-[#1A1A1A]">{technical.category}</strong>
                 </div>
               </div>
             </div>
 
-            <div className="bg-[#E9FFF2] border border-[#16855C]/20 rounded-2xl p-4 flex items-center justify-center text-center max-[330px]:p-3">
-              <p className="text-xs font-bold text-[#16855C] max-[330px]:text-[11px]">
+            <div className="fingen-flow-security-badge">
+              <p className="text-xs font-bold text-[#1A1A1A] max-[330px]:text-[11px]">
                 Seu contato direto não é exibido. Toda negociação acontece via chat seguro da plataforma.
               </p>
             </div>
@@ -1428,7 +1428,7 @@ export default function ListingForm() {
         )}
 
         {error ? (
-          <div className="bg-red-50 rounded-2xl border border-red-100 p-5">
+          <div className="fingen-flow-error-box rounded-2xl p-5">
             <p className="text-sm font-bold text-red-600">{error}</p>
             {validationDetails.length > 0 ? (
               <ul className="mt-3 space-y-1.5 text-xs font-bold text-red-600/80 bg-white/50 p-4 rounded-xl">
@@ -1441,8 +1441,8 @@ export default function ListingForm() {
         ) : null}
 
         {success ? (
-          <div className="bg-[#E9FFF2] rounded-2xl border border-[#16855C]/20 p-5 text-center">
-            <p className="text-base font-black text-[#16855C]">{success}</p>
+          <div className="fingen-flow-success-box rounded-2xl p-5 text-center">
+            <p className="text-base font-black text-[#1A1A1A]">{success}</p>
           </div>
         ) : null}
 
@@ -1451,7 +1451,7 @@ export default function ListingForm() {
             <button
               type="button"
               onClick={prevStep}
-              className="btn btn-secondary btn-sm"
+              className="fingen-flow-btn-secondary btn-sm"
               disabled={saving || fipeLoading}
             >
               <ArrowLeft className="h-4 w-4" />
@@ -1464,7 +1464,7 @@ export default function ListingForm() {
           <button
             type="button"
             onClick={currentStep === 3 ? handleSubmit : nextStep}
-              className="btn btn-primary max-[330px]:w-full"
+              className="fingen-flow-btn-primary max-[330px]:w-full"
               disabled={saving || fipeLoading}
             >
             {saving ? (
@@ -1489,7 +1489,7 @@ export default function ListingForm() {
               type="button"
               disabled={saving}
               onClick={handleSubmit}
-              className="btn btn-primary w-full shadow-lg max-[330px]:text-[13px]"
+              className="fingen-flow-btn-primary w-full shadow-lg max-[330px]:text-[13px]"
             >
               {saving ? 'Publicando...' : 'Publicar anúncio'}
             </button>
