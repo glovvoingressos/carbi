@@ -1168,13 +1168,13 @@ export default function ListingForm() {
                 <p className="text-sm font-medium text-[#D4F576] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8] flex items-center gap-2 max-[330px]:text-[13px] max-[330px]:p-3"><Loader2 className="w-4 h-4 animate-spin" /> Consultando valor atualizado...</p>
               ) : fipeResult ? (
                 <div className="grid gap-3 text-sm font-medium text-[#525252] max-[330px]:gap-2.5 max-[330px]:text-[13px]">
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Versão automática:</span> <strong className="text-[#1A1A1A]">{form.version || 'Não informada'}</strong></div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Preço FIPE:</span> <strong className="text-[#1A1A1A]">{fipeResult.price}</strong></div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Seu anúncio:</span> <strong className="text-[#1A1A1A]">{hasAskingPrice ? formatBRL(priceNumber) : 'Informe o preço na próxima etapa'}</strong></div>
+                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#6F6F6F]">Versão automática:</span> <strong className="text-[#1A1A1A]">{form.version || 'Não informada'}</strong></div>
+                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#6F6F6F]">Preço FIPE:</span> <strong className="text-[#1A1A1A]">{fipeResult.price}</strong></div>
+                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#6F6F6F]">Seu anúncio:</span> <strong className="text-[#1A1A1A]">{hasAskingPrice ? formatBRL(priceNumber) : 'Informe o preço na próxima etapa'}</strong></div>
                   {hasAskingPrice ? (
                     <>
-                      <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#767676]">Diferença:</span> <strong className="text-[#1A1A1A]">{comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</strong></div>
-                      <div className="flex justify-between items-center py-2"><span className="text-[#767676]">Percentual:</span> <strong className="text-[#1A1A1A]">{comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</strong></div>
+                      <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#6F6F6F]">Diferença:</span> <strong className="text-[#1A1A1A]">{comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</strong></div>
+                      <div className="flex justify-between items-center py-2"><span className="text-[#6F6F6F]">Percentual:</span> <strong className="text-[#1A1A1A]">{comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</strong></div>
                     </>
                   ) : null}
                 </div>
@@ -1324,22 +1324,22 @@ export default function ListingForm() {
               <span className="fingen-flow-badge-accent text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens</span>
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
             </label>
-            <p className="text-xs text-[#525252] text-center">Inclua pelo menos 1 foto para publicar.</p>
+            <p className="text-xs font-medium text-[#6F6F6F] text-center">Inclua pelo menos 1 foto para publicar.</p>
 
             {images.length > 0 && (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8 max-[330px]:grid-cols-1 max-[330px]:gap-4">
                 {images.map((image, index) => (
                   <div key={image.previewUrl} className="fingen-flow-substep-card p-3 hover:shadow-md transition-shadow max-[330px]:p-2.5">
                     <img src={image.previewUrl} alt={`Preview ${index + 1}`} width={1920} height={1080} className="aspect-video w-full rounded-xl object-cover" />
-                    <p className="mt-4 px-2 text-[10px] font-black uppercase tracking-widest text-[#525252] max-[330px]:mt-3">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
+                    <p className="mt-4 px-2 text-[10px] font-semibold uppercase tracking-wider text-[#6F6F6F] max-[330px]:mt-3">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
                     <div className="mt-3 flex items-center gap-2 px-2 pb-1 max-[330px]:gap-1.5">
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#D4F576] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, -1)} disabled={index === 0} aria-label="Mover imagem para a esquerda">
+                      <button type="button" className="w-10 h-10 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#6F6F6F] hover:text-[#1A1A1A] hover:bg-[#E5E5E5] transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, -1)} disabled={index === 0} aria-label="Mover imagem para a esquerda">
                         <MoveLeft className="h-4 w-4" />
                       </button>
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#D4F576] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1} aria-label="Mover imagem para a direita">
+                      <button type="button" className="w-10 h-10 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#6F6F6F] hover:text-[#1A1A1A] hover:bg-[#E5E5E5] transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1} aria-label="Mover imagem para a direita">
                         <MoveRight className="h-4 w-4" />
                       </button>
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors ml-auto max-[330px]:h-9 max-[330px]:w-9" onClick={() => removeImage(index)} aria-label="Remover imagem">
+                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FEF2F2] flex items-center justify-center text-[#DC2626] hover:bg-[#FEE2E2] hover:text-[#B91C1C] transition-colors ml-auto max-[330px]:h-9 max-[330px]:w-9" onClick={() => removeImage(index)} aria-label="Remover imagem">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -1371,7 +1371,7 @@ export default function ListingForm() {
                   <div className="fingen-flow-quality-bar">
                     <div className="fingen-flow-quality-bar-fill" style={{ width: `${qualityScore}%` }} />
                   </div>
-                  <p className="mt-2 text-xs font-bold text-[#1A1A1A]/80">
+                  <p className="mt-2 text-xs font-medium text-[#525252]">
                     Seu anúncio pode ser publicado como básico. Depois, complete mais dados para aumentar a confiança.
                   </p>
                 </div>
@@ -1394,13 +1394,13 @@ export default function ListingForm() {
             <div className="fingen-flow-substep-card p-5 max-[330px]:p-4">
               <p className="fingen-flow-field-label mb-4">Informações</p>
               <div className="grid gap-4 text-sm sm:grid-cols-2 max-[330px]:grid-cols-1 max-[330px]:gap-3">
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Veículo</span><strong className="text-sm text-[#1A1A1A]">{form.brand} {form.model} {form.version}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Ano</span><strong className="text-sm text-[#1A1A1A]">{form.year}/{form.yearModel}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Preço</span><strong className="text-sm text-[#1A1A1A]">{form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado'}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Quilometragem</span><strong className="text-sm text-[#1A1A1A]">{form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Não informado'}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Cidade/UF</span><strong className="text-sm text-[#1A1A1A]">{form.city || '-'}{form.state ? `/${form.state}` : ''}</strong></div>
-                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs text-[#767676]">Fotos</span><strong className="text-sm text-[#1A1A1A]">{images.length} de {LISTING_MAX_IMAGES}</strong></div>
-                <div className="sm:col-span-2 flex flex-col gap-2 mt-1"><span className="text-xs text-[#767676]">Descrição</span><p className="text-sm text-[#1A1A1A] bg-[#FAFAF9] p-4 rounded-xl leading-relaxed">{form.description.trim() || 'Não informada'}</p></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs font-medium text-[#6F6F6F]">Veículo</span><strong className="text-sm font-semibold text-[#1A1A1A]">{form.brand} {form.model} {form.version}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs font-medium text-[#6F6F6F]">Ano</span><strong className="text-sm font-semibold text-[#1A1A1A]">{form.year}/{form.yearModel}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs font-medium text-[#6F6F6F]">Preço</span><strong className="text-sm font-semibold text-[#1A1A1A]">{form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado'}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs font-medium text-[#6F6F6F]">Quilometragem</span><strong className="text-sm font-semibold text-[#1A1A1A]">{form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Não informado'}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs font-medium text-[#6F6F6F]">Cidade/UF</span><strong className="text-sm font-semibold text-[#1A1A1A]">{form.city || '-'}{form.state ? `/${form.state}` : ''}</strong></div>
+                <div className="flex flex-col gap-0.5 border-b border-[#EAEAE8] pb-2"><span className="text-xs font-medium text-[#6F6F6F]">Fotos</span><strong className="text-sm font-semibold text-[#1A1A1A]">{images.length} de {LISTING_MAX_IMAGES}</strong></div>
+                <div className="sm:col-span-2 flex flex-col gap-2 mt-1"><span className="text-xs font-medium text-[#6F6F6F]">Descrição</span><p className="text-sm font-medium text-[#1A1A1A] bg-[#F5F5F5] p-4 rounded-xl leading-relaxed">{form.description.trim() || 'Não informada'}</p></div>
               </div>
             </div>
 
@@ -1417,6 +1417,7 @@ export default function ListingForm() {
                     value={form.engine || (technical.engine !== 'Não informado' ? technical.engine : '')}
                     onChange={(e) => handleInput('engine', e.target.value)}
                     placeholder="Ex: 2.0 Turbo"
+                    aria-label="Motor"
                   />
                 </div>
                 <div className="fingen-flow-tech-item">
@@ -1433,21 +1434,21 @@ export default function ListingForm() {
                 </div>
                 <div className="fingen-flow-tech-item">
                   <span className="fingen-flow-tech-label">Câmbio</span>
-                  <strong className="text-sm font-bold text-[#1A1A1A]">{technical.transmission}</strong>
+                  <strong className="text-sm font-semibold text-[#1A1A1A]">{technical.transmission}</strong>
                 </div>
                 <div className="fingen-flow-tech-item lg:col-span-2 max-[330px]:p-2.5">
                   <span className="fingen-flow-tech-label">Consumo</span>
-                  <strong className="text-sm font-bold text-[#1A1A1A]">{technical.consumption}</strong>
+                  <strong className="text-sm font-semibold text-[#1A1A1A]">{technical.consumption}</strong>
                 </div>
                 <div className="fingen-flow-tech-item">
                   <span className="fingen-flow-tech-label">Categoria</span>
-                  <strong className="text-sm font-bold text-[#1A1A1A]">{technical.category}</strong>
+                  <strong className="text-sm font-semibold text-[#1A1A1A]">{technical.category}</strong>
                 </div>
               </div>
             </div>
 
             <div className="fingen-flow-security-badge">
-              <p className="text-xs font-bold text-[#1A1A1A] max-[330px]:text-[11px]">
+              <p className="text-xs font-medium text-[#525252] max-[330px]:text-[11px]">
                 Seu contato direto não é exibido. Toda negociação acontece via chat seguro da plataforma.
               </p>
             </div>
@@ -1455,12 +1456,15 @@ export default function ListingForm() {
         )}
 
         {error ? (
-          <div className="fingen-flow-error-box rounded-2xl p-5">
-            <p className="text-sm font-bold text-red-600">{error}</p>
+          <div className="rounded-2xl p-5 bg-[#FEF2F2] border border-[#FECACA]" role="alert">
+            <p className="text-sm font-bold text-[#DC2626]">{error}</p>
             {validationDetails.length > 0 ? (
-              <ul className="mt-3 space-y-1.5 text-xs font-bold text-red-600/80 bg-white/50 p-4 rounded-xl">
+              <ul className="mt-3 space-y-1.5 text-xs font-medium text-[#B91C1C] bg-white/60 p-4 rounded-xl">
                 {validationDetails.map((detail) => (
-                  <li key={detail}>• {detail}</li>
+                  <li key={detail} className="flex items-start gap-2">
+                    <span className="text-[#DC2626] mt-0.5">•</span>
+                    {detail}
+                  </li>
                 ))}
               </ul>
             ) : null}
@@ -1468,8 +1472,8 @@ export default function ListingForm() {
         ) : null}
 
         {success ? (
-          <div className="fingen-flow-success-box rounded-2xl p-5 text-center">
-            <p className="text-base font-black text-[#1A1A1A]">{success}</p>
+          <div className="rounded-2xl p-5 text-center bg-[#F0FDF4] border border-[#BBF7D0]" role="status">
+            <p className="text-base font-bold text-[#16A34A]">{success}</p>
           </div>
         ) : null}
 
@@ -1518,7 +1522,14 @@ export default function ListingForm() {
               onClick={handleSubmit}
               className="fingen-flow-btn-primary w-full shadow-lg max-[330px]:text-[13px]"
             >
-              {saving ? 'Publicando...' : 'Publicar anúncio'}
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Publicando...
+                </>
+              ) : (
+                'Publicar anúncio'
+              )}
             </button>
           </div>
         ) : null}
