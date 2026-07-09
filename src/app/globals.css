@@ -2,7 +2,7 @@
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    CARBI — DESIGN SYSTEM v6 "MARKETPLACE AO VIVO"
-   Referência visual: Outfit (headings) + Lora (body),
+   Referência visual: Poppins (Light/Medium/Bold),
                forest hero, chartreuse, lavender, marble,
                real marketplace data.
    Princípios: mobile-first, link blocks, bold type,
@@ -121,9 +121,9 @@
 }
 
 @theme {
-  --font-sans: "Lora", Georgia, "Times New Roman", serif;
-  --font-heading: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --font-mono: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-heading: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 
   --color-dark: var(--color-text-primary);
   --color-accent: var(--color-accent);
@@ -138,13 +138,13 @@
 
 .font-heading {
   font-family: var(--font-heading);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   font-feature-settings: "liga" 1, "kern" 1;
 }
 
 .font-display {
   font-family: var(--font-heading);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   font-weight: 700;
   font-feature-settings: "liga" 1, "kern" 1;
 }
@@ -152,6 +152,7 @@
 .font-mono {
   font-family: var(--font-heading);
   letter-spacing: 0.02em;
+  font-weight: 400;
 }
 
 /* ━━━━━━━━━━ BASE ━━━━━━━━━━ */
@@ -177,6 +178,7 @@ body {
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   font-size: 16px;
+  font-weight: 300;
   line-height: 1.6;
   overflow-x: hidden;
   min-height: 100vh;
@@ -244,13 +246,13 @@ button, a, input, select, textarea {
   }
 }
 
-/* ━━━━━━━━━━ TYPOGRAPHY (Outfit + Lora) ━━━━━━━━━━ */
+/* ━━━━━━━━━━ TYPOGRAPHY (Poppins) ━━━━━━━━━━ */
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   color: var(--color-text-primary);
 }
 
@@ -258,36 +260,37 @@ h1 {
   font-size: clamp(2rem, 6vw, 3.5rem);
   font-weight: 700;
   line-height: 1.05;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 h2 {
   font-size: clamp(1.5rem, 4vw, 2.5rem);
   font-weight: 600;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 h3 {
   font-size: clamp(1.25rem, 3vw, 1.75rem);
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 h4 {
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.3;
   letter-spacing: 0;
 }
 
 p {
   font-family: var(--font-sans);
+  font-weight: 300;
   color: var(--color-text-secondary);
   line-height: 1.6;
   font-size: 16px;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
 }
 
 .text-balance {
@@ -300,29 +303,32 @@ p {
 
 .body-large {
   font-family: var(--font-sans);
+  font-weight: 300;
   font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
   line-height: 1.55;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
 }
 
 .body-small {
   font-family: var(--font-sans);
+  font-weight: 300;
   font-size: 0.875rem;
   line-height: 1.5;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
 }
 
 .caption {
   font-family: var(--font-sans);
+  font-weight: 300;
   font-size: 0.75rem;
   line-height: 1.4;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
 }
 
 .eyebrow {
   font-family: var(--font-heading);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-text-tertiary);
@@ -331,7 +337,7 @@ p {
 .label {
   font-family: var(--font-heading);
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
@@ -453,8 +459,8 @@ p {
   gap: 8px;
   font-family: var(--font-heading);
   font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-weight: 500;
+  letter-spacing: 0;
   cursor: pointer;
   transition: var(--transition);
   border: none;
@@ -571,8 +577,9 @@ p {
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-full);
   font-family: var(--font-sans);
+  font-weight: 300;
   font-size: 15px;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
   color: var(--color-text-primary);
   transition: var(--transition);
   outline: none;
@@ -611,7 +618,7 @@ p {
   padding: 6px 12px;
   font-family: var(--font-heading);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.04em;
   border-radius: var(--radius-full);
   white-space: nowrap;
@@ -828,7 +835,7 @@ p {
   color: var(--color-text-primary);
   font-family: var(--font-heading);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }

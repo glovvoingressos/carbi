@@ -1,26 +1,26 @@
 import type { Metadata } from 'next'
-import { Outfit, Lora } from 'next/font/google'
+import { Poppins } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
 import { OrganizationSchema, WebSiteSchema } from '@/components/seo/JSONLD'
 
-const font = Lora({
+const font = Poppins({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700'],
   variable: '--font-sans',
   display: 'swap',
 })
 
-const fontHeading = Outfit({
+const fontHeading = Poppins({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700'],
   variable: '--font-heading',
   display: 'swap',
 })
 
-const fontMono = Lora({
+const fontMono = Poppins({
   subsets: ['latin'],
-  weight: ['400', '500'],
+  weight: ['300', '400', '500'],
   variable: '--font-mono',
   display: 'swap',
 })
