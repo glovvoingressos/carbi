@@ -593,12 +593,12 @@ export default function ListingForm() {
       : 'Sem referência'
   const fipeComparisonStatusClass =
     !fipeResult || !hasAskingPrice
-      ? 'bg-white/15 text-white/90 border border-white/20'
+      ? 'bg-white/10 text-white/80 border border-white/15'
       : comparison.status === 'below'
-      ? 'bg-[#D4F576] text-[#1A1A1A] border border-transparent'
+      ? 'bg-[#D4F576]/20 text-[#D4F576] border border-[#D4F576]/30'
       : comparison.status === 'above'
-      ? 'bg-[#FCD34D] text-[#1A1A1A] border border-transparent'
-      : 'bg-white/15 text-white/90 border border-white/20'
+      ? 'bg-[#FF6B52]/20 text-[#FF6B52] border border-[#FF6B52]/30'
+      : 'bg-[#39E09B]/20 text-[#39E09B] border border-[#39E09B]/30'
   const fipeProgressWidth =
     !fipeResult || !hasAskingPrice
       ? '50%'
@@ -1241,12 +1241,12 @@ export default function ListingForm() {
                       <p className="fingen-flow-fipe-dark-value max-[330px]:text-[30px]">
                         {fipeResult.price}
                       </p>
-                      <span className="text-[16px] font-medium text-white/80 max-[330px]:text-[13px]">
+                      <span className="text-[14px] font-medium text-white/60 max-[330px]:text-[12px]">
                         Tabela FIPE
                       </span>
                     </div>
                   </div>
-                  <span className={`rounded-full px-4 py-2 text-[12px] font-bold tracking-tight ${fipeComparisonStatusClass}`}>
+                  <span className={`rounded-full px-3 py-1.5 text-[11px] font-semibold tracking-wide ${fipeComparisonStatusClass}`}>
                     {fipeComparisonStatusLabel}
                   </span>
                 </div>
@@ -1254,7 +1254,7 @@ export default function ListingForm() {
                 <div className="mt-5 grid gap-3">
                   <div className="fingen-flow-fipe-dark-stat">
                     <p className="fingen-flow-fipe-dark-stat-label">Preço anunciado</p>
-                    <p className="fingen-flow-fipe-dark-stat-value max-[330px]:text-[23px]">
+                    <p className="fingen-flow-fipe-dark-stat-value max-[330px]:text-[20px]">
                       {hasAskingPrice ? formatBRL(priceNumber) : 'Informe abaixo'}
                     </p>
                   </div>
@@ -1262,20 +1262,20 @@ export default function ListingForm() {
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="fingen-flow-fipe-dark-stat">
                       <p className="fingen-flow-fipe-dark-stat-label">Diferença</p>
-                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[19px]">
+                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[17px]">
                         {fipeDiffValueLabel ?? 'Preencha o preço'}
                       </p>
                     </div>
                     <div className="fingen-flow-fipe-dark-stat">
                       <p className="fingen-flow-fipe-dark-stat-label">Percentual</p>
-                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[19px]">
+                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[17px]">
                         {fipeDiffPercentLabel ?? '—'}
                       </p>
                     </div>
                   </div>
 
                   <div className="fingen-flow-fipe-dark-track">
-                    <div className="flex items-center justify-between gap-4 text-[13px] font-medium text-white/80">
+                    <div className="flex items-center justify-between gap-4 text-[12px] font-medium text-white/60">
                       <span>Abaixo da FIPE</span>
                       <span>Acima da FIPE</span>
                     </div>
