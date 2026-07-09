@@ -1231,17 +1231,17 @@ export default function ListingForm() {
             </div>
 
             {fipeResult ? (
-              <div className="fingen-flow-fipe-comparison-dark rounded-[24px] p-5 text-white max-[330px]:p-4">
+              <div className="fingen-flow-fipe-comparison-dark rounded-[24px] p-5 max-[330px]:p-4" style={{ background: '#1A1A1A', color: '#FFFFFF' }}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-1">
-                    <p className="fingen-flow-fipe-dark-label max-[330px]:text-[11px]">
+                    <p className="fingen-flow-fipe-dark-label max-[330px]:text-[11px]" style={{ color: '#D4F576' }}>
                       Comparativo FIPE
                     </p>
                     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <p className="fingen-flow-fipe-dark-value max-[330px]:text-[30px]">
+                      <p className="fingen-flow-fipe-dark-value max-[330px]:text-[30px]" style={{ color: '#FFFFFF' }}>
                         {fipeResult.price}
                       </p>
-                      <span className="text-[14px] font-medium text-white/60 max-[330px]:text-[12px]">
+                      <span className="text-[14px] font-medium max-[330px]:text-[12px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
                         Tabela FIPE
                       </span>
                     </div>
@@ -1253,36 +1253,36 @@ export default function ListingForm() {
 
                 <div className="mt-5 grid gap-3">
                   <div className="fingen-flow-fipe-dark-stat">
-                    <p className="fingen-flow-fipe-dark-stat-label">Preço anunciado</p>
-                    <p className="fingen-flow-fipe-dark-stat-value max-[330px]:text-[20px]">
+                    <p className="fingen-flow-fipe-dark-stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>Preço anunciado</p>
+                    <p className="fingen-flow-fipe-dark-stat-value max-[330px]:text-[20px]" style={{ color: '#FFFFFF' }}>
                       {hasAskingPrice ? formatBRL(priceNumber) : 'Informe abaixo'}
                     </p>
                   </div>
 
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="fingen-flow-fipe-dark-stat">
-                      <p className="fingen-flow-fipe-dark-stat-label">Diferença</p>
-                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[17px]">
+                      <p className="fingen-flow-fipe-dark-stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>Diferença</p>
+                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[17px]" style={{ color: '#D4F576' }}>
                         {fipeDiffValueLabel ?? 'Preencha o preço'}
                       </p>
                     </div>
                     <div className="fingen-flow-fipe-dark-stat">
-                      <p className="fingen-flow-fipe-dark-stat-label">Percentual</p>
-                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[17px]">
+                      <p className="fingen-flow-fipe-dark-stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>Percentual</p>
+                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[17px]" style={{ color: '#D4F576' }}>
                         {fipeDiffPercentLabel ?? '—'}
                       </p>
                     </div>
                   </div>
 
                   <div className="fingen-flow-fipe-dark-track">
-                    <div className="flex items-center justify-between gap-4 text-[12px] font-medium text-white/60">
+                    <div className="flex items-center justify-between gap-4 text-[12px] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
                       <span>Abaixo da FIPE</span>
                       <span>Acima da FIPE</span>
                     </div>
                     <div className="mt-3 fingen-flow-fipe-progress-bar">
                       <div className="fingen-flow-fipe-progress-fill" style={{ width: fipeProgressWidth }} />
                     </div>
-                    <p className="mt-3 fingen-flow-fipe-dark-ref">
+                    <p className="mt-3 fingen-flow-fipe-dark-ref" style={{ color: 'rgba(255,255,255,0.5)' }}>
                       {fipeResult.referenceMonth
                         ? `Referência ${fipeResult.referenceMonth} • Atualizado pela FIPE.`
                         : 'Atualizado pela FIPE.'}

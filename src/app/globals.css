@@ -2753,8 +2753,8 @@ p {
 }
 
 .fingen-flow-fipe-comparison-dark {
-  background: #1A1A1A;
-  color: white;
+  background: #1A1A1A !important;
+  color: #FFFFFF !important;
 }
 
 .fingen-flow-fipe-dark-label {
@@ -2763,7 +2763,7 @@ p {
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: #D4F576;
+  color: #D4F576 !important;
 }
 
 .fingen-flow-fipe-dark-value {
@@ -2771,7 +2771,7 @@ p {
   font-weight: 900;
   line-height: 1;
   letter-spacing: -0.02em;
-  color: white;
+  color: #FFFFFF !important;
 }
 
 .fingen-flow-fipe-dark-stat {
@@ -2785,7 +2785,7 @@ p {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.6) !important;
 }
 
 .fingen-flow-fipe-dark-stat-value {
@@ -2794,7 +2794,7 @@ p {
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.02em;
-  color: white;
+  color: #FFFFFF !important;
 }
 
 .fingen-flow-fipe-dark-stat-diff {
@@ -2803,7 +2803,7 @@ p {
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.02em;
-  color: #D4F576;
+  color: #D4F576 !important;
 }
 
 .fingen-flow-fipe-dark-track {
@@ -2829,7 +2829,7 @@ p {
 .fingen-flow-fipe-dark-ref {
   font-size: 11px;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .fingen-flow-upload-area {
