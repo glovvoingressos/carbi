@@ -190,27 +190,7 @@ export default async function HomePage() {
             <div className="fingen-balance-sub">Compre, compare e anuncie seminovos com FIPE verificado</div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="fingen-actions-row">
-            <Link href="/carros-a-venda" className="fingen-action-btn">
-              <div className="fingen-action-icon">
-                <Search size={22} />
-              </div>
-              <span>Buscar</span>
-            </Link>
-            <Link href="/anunciar-carro" className="fingen-action-btn">
-              <div className="fingen-action-icon">
-                <Plus size={22} />
-              </div>
-              <span>Anunciar</span>
-            </Link>
-            <Link href="/qual-carro" className="fingen-action-btn">
-              <div className="fingen-action-icon">
-                <BarChart3 size={22} />
-              </div>
-              <span>Comparar</span>
-            </Link>
-          </div>
+          {/* Quick Actions - Removed */}
 
           {/* CTA Button - Fingen Style */}
           <div className="fingen-cta-wrapper">
