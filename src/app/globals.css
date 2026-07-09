@@ -2753,39 +2753,39 @@ p {
 }
 
 .fingen-flow-fipe-comparison-dark {
-  background: var(--color-bg-inverse);
-  color: var(--color-text-inverse);
+  background: #2D2D2D;
+  color: white;
 }
 
 .fingen-flow-fipe-dark-label {
   font-family: var(--font-heading);
   font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.18em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.95);
+  color: rgba(255,255,255,0.85);
 }
 
 .fingen-flow-fipe-dark-value {
   font-size: 40px;
   font-weight: 900;
   line-height: 1;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.03em;
   color: white;
 }
 
 .fingen-flow-fipe-dark-stat {
-  border-radius: 22px;
-  background: rgba(255,255,255,0.18);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.12);
   padding: 16px;
 }
 
 .fingen-flow-fipe-dark-stat-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: rgba(255,255,255,0.9);
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.7);
 }
 
 .fingen-flow-fipe-dark-stat-value {
@@ -2793,7 +2793,7 @@ p {
   font-size: 28px;
   font-weight: 900;
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   color: white;
 }
 
@@ -2802,20 +2802,20 @@ p {
   font-size: 22px;
   font-weight: 900;
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   color: var(--color-accent);
 }
 
 .fingen-flow-fipe-dark-track {
-  border-radius: 22px;
-  background: rgba(255,255,255,0.15);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.08);
   padding: 16px;
 }
 
 .fingen-flow-fipe-progress-bar {
   height: 8px;
   border-radius: 100px;
-  background: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.2);
   overflow: hidden;
 }
 
@@ -2829,7 +2829,7 @@ p {
 .fingen-flow-fipe-dark-ref {
   font-size: 12px;
   line-height: 1.6;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255,255,255,0.65);
 }
 
 .fingen-flow-upload-area {

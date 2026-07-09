@@ -31,27 +31,8 @@ export default function AnunciarFluxoPage() {
               <span className="fingen-hero-title-accent">poucos minutos.</span>
             </h1>
             <p>
-              Fluxo guiado com consulta FIPE, upload de fotos e revisão final — tudo com a identidade premium da Carbi.
+              Consulta FIPE, upload de fotos e revisão final — tudo rápido e seguro.
             </p>
-
-            {/* Banner de progresso — mesmo padrão fingen-banner */}
-            <div className="fingen-flow-progress-banner">
-              <div className="fingen-flow-progress-content">
-                <div className="fingen-flow-progress-icon">
-                  <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                    <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </div>
-                <div className="fingen-flow-progress-text">
-                  <strong>Fluxo guiado</strong>
-                  <span>3 etapas: veículo, dados e publicação</span>
-                </div>
-                <div className="fingen-flow-progress-bar">
-                  <div className="fingen-flow-progress-fill" style={{ width: '0%' }} />
-                </div>
-              </div>
-            </div>
           </div>
         </section>
 
