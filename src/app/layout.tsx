@@ -1,24 +1,24 @@
 import type { Metadata } from 'next'
-import { DM_Sans, Plus_Jakarta_Sans } from 'next/font/google'
+import { Outfit, Lora } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
 import { OrganizationSchema, WebSiteSchema } from '@/components/seo/JSONLD'
 
-const font = DM_Sans({
+const font = Lora({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
   display: 'swap',
 })
 
-const fontHeading = DM_Sans({
+const fontHeading = Outfit({
   subsets: ['latin'],
-  weight: ['500', '600', '700'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-heading',
   display: 'swap',
 })
 
-const fontMono = Plus_Jakarta_Sans({
+const fontMono = Lora({
   subsets: ['latin'],
   weight: ['400', '500'],
   variable: '--font-mono',
