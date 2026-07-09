@@ -2753,9 +2753,9 @@ p {
 }
 
 .fingen-flow-fipe-comparison-dark {
-  background: linear-gradient(135deg, #1A2F1E 0%, #0F1F12 100%);
+  background: linear-gradient(135deg, #2D5016 0%, #1A3A0A 100%);
   color: white;
-  border: 1px solid rgba(212, 245, 118, 0.2);
+  border: 1px solid rgba(163, 230, 53, 0.3);
 }
 
 .fingen-flow-fipe-dark-label {
@@ -2764,7 +2764,7 @@ p {
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: rgba(212, 245, 118, 0.9);
+  color: rgba(163, 230, 53, 0.95);
 }
 
 .fingen-flow-fipe-dark-value {
@@ -2777,9 +2777,9 @@ p {
 
 .fingen-flow-fipe-dark-stat {
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(163, 230, 53, 0.12);
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(163, 230, 53, 0.15);
 }
 
 .fingen-flow-fipe-dark-stat-label {
@@ -2787,7 +2787,7 @@ p {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(163, 230, 53, 0.7);
 }
 
 .fingen-flow-fipe-dark-stat-value {
@@ -2805,34 +2805,34 @@ p {
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.02em;
-  color: #D4F576;
+  color: #A3E635;
 }
 
 .fingen-flow-fipe-dark-track {
   border-radius: 16px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.25);
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(163, 230, 53, 0.1);
 }
 
 .fingen-flow-fipe-progress-bar {
   height: 6px;
   border-radius: 100px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(163, 230, 53, 0.2);
   overflow: hidden;
 }
 
 .fingen-flow-fipe-progress-fill {
   height: 100%;
   border-radius: 100px;
-  background: linear-gradient(90deg, #D4F576 0%, #39E09B 100%);
+  background: linear-gradient(90deg, #A3E635 0%, #84CC16 100%);
   transition: width 0.5s ease;
 }
 
 .fingen-flow-fipe-dark-ref {
   font-size: 11px;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(163, 230, 53, 0.6);
 }
 
 .fingen-flow-upload-area {

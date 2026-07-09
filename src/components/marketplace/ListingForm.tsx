@@ -593,12 +593,12 @@ export default function ListingForm() {
       : 'Sem referência'
   const fipeComparisonStatusClass =
     !fipeResult || !hasAskingPrice
-      ? 'bg-white/10 text-white/80 border border-white/15'
+      ? 'bg-white/10 text-white/70 border border-white/15'
       : comparison.status === 'below'
-      ? 'bg-[#D4F576]/20 text-[#D4F576] border border-[#D4F576]/30'
+      ? 'bg-[#A3E635]/20 text-[#A3E635] border border-[#A3E635]/30'
       : comparison.status === 'above'
-      ? 'bg-[#FF6B52]/20 text-[#FF6B52] border border-[#FF6B52]/30'
-      : 'bg-[#39E09B]/20 text-[#39E09B] border border-[#39E09B]/30'
+      ? 'bg-[#F97316]/20 text-[#F97316] border border-[#F97316]/30'
+      : 'bg-[#65A30D]/20 text-[#84CC16] border border-[#65A30D]/30'
   const fipeProgressWidth =
     !fipeResult || !hasAskingPrice
       ? '50%'
