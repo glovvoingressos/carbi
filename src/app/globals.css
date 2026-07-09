@@ -390,6 +390,16 @@ p {
   100% { transform: translateX(0); }
 }
 
+@keyframes checkmark {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 0.5; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.5s var(--ease-out) forwards;
 }
@@ -408,6 +418,76 @@ p {
 
 .animate-slide-up {
   animation: slideUp 0.5s var(--ease-out) forwards;
+}
+
+/* ━━━━━━━━━━ MICRO-INTERACTIONS ━━━━━━━━━━ */
+
+/* Button hover lift */
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Card hover lift */
+.card-elevated:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Input focus glow */
+.input:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px rgba(90, 71, 209, 0.15);
+}
+
+/* Smooth color transitions */
+.transition-colors {
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Success checkmark */
+.animate-checkmark {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: checkmark 0.4s ease-out forwards;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-fade-in-up,
+  .animate-scale-in,
+  .animate-slide-in-right,
+  .animate-slide-up,
+  .animate-spin,
+  .animate-checkmark {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .btn:hover,
+  .card-elevated:hover {
+    transform: none;
+  }
+
+  .btn:active,
+  .card-elevated:active {
+    transform: none;
+  }
 }
 
 /* ━━━━━━━━━━ CARDS (Fingen-style) ━━━━━━━━━━ */
