@@ -7886,26 +7886,32 @@ p {
 /* Desktop */
 @media (min-width: 768px) {
   .fingen-detail-layout {
-    flex-direction: row;
+    flex-direction: column;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 32px;
-    gap: 40px;
+    gap: 32px;
   }
 
   .fingen-detail-gallery {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
     margin-bottom: 0;
-    position: sticky;
-    top: 80px;
-    align-self: flex-start;
   }
 
   .fingen-detail-content {
-    flex: 1;
-    min-width: 0;
-    max-width: 500px;
+    width: 100%;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .fingen-detail-price-card {
+    grid-column: 1 / -1;
+  }
+
+  .fingen-detail-cta {
+    grid-column: 1 / -1;
   }
 
   .fingen-detail-mobile-bar {
