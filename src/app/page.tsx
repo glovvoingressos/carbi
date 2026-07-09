@@ -232,25 +232,6 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Free Traffic Banner */}
-        <section className="fingen-banner">
-          <div className="fingen-banner-content">
-            <div className="fingen-banner-icon">
-              <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor"/>
-                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <div className="fingen-banner-text">
-              <strong>Tráfego pago grátis</strong>
-              <span>Seus anúncios são divulgados no Google e Meta Ads sem custo</span>
-            </div>
-            <Link href="/anunciar-carro" className="fingen-banner-btn">
-              Saiba mais
-            </Link>
-          </div>
-        </section>
-
         {/* Recent Listings - Card Grid */}
         <section className="fingen-section">
           <div className="fingen-section-header">
@@ -272,6 +253,25 @@ export default async function HomePage() {
                 <p>{fetchError ? 'Carregando anúncios...' : 'Nenhum anúncio ainda'}</p>
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Free Traffic Banner */}
+        <section className="fingen-banner">
+          <div className="fingen-banner-content">
+            <div className="fingen-banner-icon">
+              <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor"/>
+                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div className="fingen-banner-text">
+              <strong>Tráfego pago grátis</strong>
+              <span>Seus anúncios são divulgados no Google e Meta Ads sem custo</span>
+            </div>
+            <Link href="/anunciar-carro" className="fingen-banner-btn">
+              Saiba mais
+            </Link>
           </div>
         </section>
 
