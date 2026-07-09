@@ -595,10 +595,10 @@ export default function ListingForm() {
     !fipeResult || !hasAskingPrice
       ? 'bg-white/10 text-white/70 border border-white/15'
       : comparison.status === 'below'
-      ? 'bg-[#A3E635]/20 text-[#A3E635] border border-[#A3E635]/30'
+      ? 'bg-[#D4F576]/20 text-[#D4F576] border border-[#D4F576]/30'
       : comparison.status === 'above'
-      ? 'bg-[#F97316]/20 text-[#F97316] border border-[#F97316]/30'
-      : 'bg-[#65A30D]/20 text-[#84CC16] border border-[#65A30D]/30'
+      ? 'bg-[#FF6B52]/20 text-[#FF6B52] border border-[#FF6B52]/30'
+      : 'bg-[#D4F576]/15 text-[#D4F576] border border-[#D4F576]/25'
   const fipeProgressWidth =
     !fipeResult || !hasAskingPrice
       ? '50%'
