@@ -593,12 +593,12 @@ export default function ListingForm() {
       : 'Sem referência'
   const fipeComparisonStatusClass =
     !fipeResult || !hasAskingPrice
-      ? 'bg-white/10 text-white/70 border-white/10'
+      ? 'bg-white/15 text-white/90 border-white/20'
       : comparison.status === 'below'
       ? 'bg-[#D9F85F] text-[#17170F] border-transparent'
       : comparison.status === 'above'
       ? 'bg-[#FFE08A] text-[#17170F] border-transparent'
-      : 'bg-white/10 text-white/90 border-white/10'
+      : 'bg-white/15 text-white/90 border-white/20'
   const fipeProgressWidth =
     !fipeResult || !hasAskingPrice
       ? '50%'
@@ -1241,12 +1241,12 @@ export default function ListingForm() {
                       <p className="fingen-flow-fipe-dark-value max-[330px]:text-[30px]">
                         {fipeResult.price}
                       </p>
-                      <span className="text-[16px] font-medium text-white/55 max-[330px]:text-[13px]">
+                      <span className="text-[16px] font-medium text-white/80 max-[330px]:text-[13px]">
                         Tabela FIPE
                       </span>
                     </div>
                   </div>
-                  <span className={`rounded-full border px-4 py-2 text-[12px] font-black tracking-[-0.01em] ${fipeComparisonStatusClass}`}>
+                  <span className={`rounded-full px-4 py-2 text-[12px] font-black tracking-[-0.01em] ${fipeComparisonStatusClass}`}>
                     {fipeComparisonStatusLabel}
                   </span>
                 </div>
@@ -1275,7 +1275,7 @@ export default function ListingForm() {
                   </div>
 
                   <div className="fingen-flow-fipe-dark-track">
-                    <div className="flex items-center justify-between gap-4 text-[13px] font-medium text-white/55">
+                    <div className="flex items-center justify-between gap-4 text-[13px] font-medium text-white/80">
                       <span>Abaixo da FIPE</span>
                       <span>Acima da FIPE</span>
                     </div>
