@@ -944,7 +944,14 @@ export default function ListingForm() {
   return (
     <div className="listing-form-ref fingen-flow-form space-y-8 pb-4 max-w-3xl mx-auto max-[330px]:space-y-6 max-[330px]:pb-20">
       <div className="space-y-3">
-        <div className="fingen-flow-progress-bar-track">
+        <div
+          className="fingen-flow-progress-bar-track"
+          role="progressbar"
+          aria-valuenow={currentStep}
+          aria-valuemin={1}
+          aria-valuemax={3}
+          aria-label={`Etapa ${currentStep} de 3`}
+        >
           <div
             className="fingen-flow-progress-bar-fill"
             style={{ width: `${(currentStep / 3) * 100}%` }}
@@ -1001,6 +1008,7 @@ export default function ListingForm() {
                   <span className="fingen-flow-badge-accent text-[10px]">Passo 1 de 4</span>
                 </div>
                 <select
+                  id="listing-brand"
                   className="fingen-flow-input text-[15px]"
                   value={selectedBrandCode}
                   onChange={(e) => {
@@ -1009,6 +1017,7 @@ export default function ListingForm() {
                     const selected = brands.find((item) => item.code === code)
                     handleInput('brand', selected?.name || '')
                   }}
+                  aria-label="Marca do veículo"
                 >
                   <option value="">Selecione a marca</option>
                   {brands.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
@@ -1030,6 +1039,7 @@ export default function ListingForm() {
                   <span className="fingen-flow-badge-accent text-[10px]">Passo 2 de 4</span>
                 </div>
                 <select
+                  id="listing-model"
                   className="fingen-flow-input text-[15px]"
                   value={selectedModelCode}
                   onChange={(e) => {
@@ -1040,6 +1050,7 @@ export default function ListingForm() {
                     handleInput('model', resolveCatalogModelName(form.brand, rawName))
                   }}
                   disabled={models.length === 0}
+                  aria-label="Modelo do veículo"
                 >
                   <option value="">Selecione o modelo</option>
                   {models.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
@@ -1061,6 +1072,7 @@ export default function ListingForm() {
                   <span className="fingen-flow-badge-accent text-[10px]">Passo 3 de 4</span>
                 </div>
                 <select
+                  id="listing-year"
                   className="fingen-flow-input text-[15px]"
                   value={selectedYear ?? ''}
                   onChange={(e) => {
@@ -1070,6 +1082,7 @@ export default function ListingForm() {
                     handleInput('year', code)
                     handleInput('yearModel', code)
                   }}
+                  aria-label="Ano do veículo"
                 >
                   <option value="">Selecione o ano</option>
                   {years.map((year) => <option key={year} value={year}>{year}</option>)}
@@ -1137,13 +1150,16 @@ export default function ListingForm() {
                   ) : (
                     <div className="text-center py-6 space-y-3">
                       <p className="text-sm text-[#525252]">Nenhuma versão encontrada para esta combinação.</p>
+                      <label htmlFor="listing-version-manual" className="sr-only">Versão do veículo</label>
                       <input
+                        id="listing-version-manual"
                         className="fingen-flow-input text-center"
                         placeholder="Informe a versão do veículo"
                         value={form.version}
                         onChange={(e) => handleInput('version', e.target.value)}
+                        aria-label="Versão do veículo"
                       />
-                      <button type="button" onClick={prevStep} className="text-sm text-[#D4F576] font-medium mt-2 hover:underline">
+                      <button type="button" onClick={prevStep} className="text-sm text-[#D4F576] font-medium mt-2 hover:underline min-h-[44px] px-4">
                         Voltar e escolher outro ano
                       </button>
                     </div>
@@ -1333,13 +1349,13 @@ export default function ListingForm() {
                     <img src={image.previewUrl} alt={`Preview ${index + 1}`} width={1920} height={1080} className="aspect-video w-full rounded-xl object-cover" />
                     <p className="mt-4 px-2 text-[10px] font-semibold uppercase tracking-wider text-[#6F6F6F] max-[330px]:mt-3">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
                     <div className="mt-3 flex items-center gap-2 px-2 pb-1 max-[330px]:gap-1.5">
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#6F6F6F] hover:text-[#1A1A1A] hover:bg-[#E5E5E5] transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, -1)} disabled={index === 0} aria-label="Mover imagem para a esquerda">
+                      <button type="button" className="w-11 h-11 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#6F6F6F] hover:text-[#1A1A1A] hover:bg-[#E5E5E5] transition-colors" onClick={() => moveImage(index, -1)} disabled={index === 0} aria-label="Mover imagem para a esquerda">
                         <MoveLeft className="h-4 w-4" />
                       </button>
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#6F6F6F] hover:text-[#1A1A1A] hover:bg-[#E5E5E5] transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1} aria-label="Mover imagem para a direita">
+                      <button type="button" className="w-11 h-11 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#6F6F6F] hover:text-[#1A1A1A] hover:bg-[#E5E5E5] transition-colors" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1} aria-label="Mover imagem para a direita">
                         <MoveRight className="h-4 w-4" />
                       </button>
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FEF2F2] flex items-center justify-center text-[#DC2626] hover:bg-[#FEE2E2] hover:text-[#B91C1C] transition-colors ml-auto max-[330px]:h-9 max-[330px]:w-9" onClick={() => removeImage(index)} aria-label="Remover imagem">
+                      <button type="button" className="w-11 h-11 rounded-xl bg-[#FEF2F2] flex items-center justify-center text-[#DC2626] hover:bg-[#FEE2E2] hover:text-[#B91C1C] transition-colors ml-auto" onClick={() => removeImage(index)} aria-label="Remover imagem">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>

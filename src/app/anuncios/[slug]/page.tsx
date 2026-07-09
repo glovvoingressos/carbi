@@ -69,13 +69,13 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             { name: listing.model, url: `/anuncios/${listing.slug}` },
           ]}
         />
-        <div className="fingen-breadcrumb" style={{ paddingTop: '24px' }}>
+        <nav className="fingen-breadcrumb" style={{ paddingTop: '24px' }} aria-label="Breadcrumb">
           <Link href="/">Home</Link>
-          <span>/</span>
+          <span aria-hidden="true">/</span>
           <Link href="/carros-a-venda">Carros à venda</Link>
-          <span>/</span>
-          <span>{listing.brand} {listing.model}</span>
-        </div>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{listing.brand} {listing.model}</span>
+        </nav>
 
         <VehicleDetailView
           listing={listing}

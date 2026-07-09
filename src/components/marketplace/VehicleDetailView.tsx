@@ -43,7 +43,37 @@ interface VehicleDetailViewProps {
     totalListings: number
   } | null
   relatedListings: ListingPublic[]
-  enrichment: any
+  enrichment?: {
+    powertrain?: {
+      engine?: string
+      horsepower?: string
+      torque?: string
+      fuel?: string
+      transmission?: string
+    }
+    dimensions?: {
+      length?: string
+      width?: string
+      height?: string
+      wheelbase?: string
+    }
+    performance?: {
+      topSpeed?: string
+      acceleration?: string
+    }
+    economy?: {
+      cityConsumption?: string
+      highwayConsumption?: string
+      fuelTankCapacity?: string
+    }
+    safety?: {
+      latinNcap?: number
+      airbags?: string
+      abs?: boolean
+      stabilityControl?: boolean
+    }
+    features?: string[]
+  }
   comparison: {
     status: 'below' | 'near' | 'above' | 'unknown'
     diffPercent: number | null
@@ -124,26 +154,34 @@ export default function VehicleDetailView({
   const publicPath = pageUrl ? pageUrl.replace(/^https?:\/\//, '') : `carbi.com.br/anuncios/${listing.slug}`
 
   const handleShare = async () => {
-    if (navigator.share) {
-      await navigator.share({ title: listing.title, url: window.location.href })
-      return
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: listing.title, url: window.location.href })
+        return
+      }
+      await navigator.clipboard?.writeText(window.location.href)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    } catch {
+      // Clipboard or share failed - silently ignore
     }
-    await navigator.clipboard?.writeText(window.location.href)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1800)
   }
 
   const handleCopy = async () => {
-    await navigator.clipboard?.writeText(window.location.href)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1800)
+    try {
+      await navigator.clipboard?.writeText(window.location.href)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    } catch {
+      // Clipboard write failed - silently ignore
+    }
   }
 
   return (
     <div className="fingen-detail-page">
       {/* Header */}
       <header className="fingen-detail-header">
-        <Link href="/carros-a-venda" className="fingen-detail-back">
+        <Link href="/carros-a-venda" className="fingen-detail-back" aria-label="Voltar para carros à venda">
           <ArrowLeft size={20} />
         </Link>
         <div className="fingen-detail-header-actions">

@@ -7209,8 +7209,8 @@ p {
 }
 
 .fingen-detail-back {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
@@ -7232,8 +7232,8 @@ p {
 }
 
 .fingen-detail-action-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
@@ -7473,6 +7473,65 @@ p {
   font-weight: 600;
   color: var(--color-text-primary);
   margin-bottom: 16px;
+}
+
+/* Share */
+.fingen-detail-share {
+  display: flex;
+  gap: 8px;
+}
+
+.fingen-detail-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 44px;
+}
+
+.fingen-detail-share-btn:hover {
+  background: var(--color-bg-muted);
+  border-color: var(--color-border-strong);
+}
+
+.fingen-detail-share-btn:active {
+  transform: scale(0.98);
+}
+
+/* Report */
+.fingen-detail-report {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 44px;
+}
+
+.fingen-detail-report:hover {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.fingen-detail-report:active {
+  transform: scale(0.98);
 }
 
 /* Specs Grid */
