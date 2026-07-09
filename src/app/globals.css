@@ -2763,7 +2763,7 @@ p {
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,0.95);
 }
 
 .fingen-flow-fipe-dark-value {
@@ -2776,7 +2776,7 @@ p {
 
 .fingen-flow-fipe-dark-stat {
   border-radius: 22px;
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.18);
   padding: 16px;
 }
 
@@ -2785,7 +2785,7 @@ p {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255,255,255,0.9);
 }
 
 .fingen-flow-fipe-dark-stat-value {
@@ -2808,14 +2808,14 @@ p {
 
 .fingen-flow-fipe-dark-track {
   border-radius: 22px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.15);
   padding: 16px;
 }
 
 .fingen-flow-fipe-progress-bar {
   height: 8px;
   border-radius: 100px;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.3);
   overflow: hidden;
 }
 
@@ -2829,7 +2829,7 @@ p {
 .fingen-flow-fipe-dark-ref {
   font-size: 12px;
   line-height: 1.6;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255,255,255,0.9);
 }
 
 .fingen-flow-upload-area {
