@@ -52,86 +52,82 @@ const cards = [
 
 export default function AnunciarCarroPage() {
   return (
-    <main className="fingen-shell">
-      {/* Hero */}
-      <section className="fingen-dark-hero text-center">
-        <div className="fingen-shell-content relative z-1">
-          <nav className="fingen-breadcrumb justify-center text-white/50" aria-label="Breadcrumb">
-            <Link href="/" className="text-white/50">Home</Link>
+    <main className="min-h-screen bg-[#F5F5F5]">
+      {/* Hero - Minimalista */}
+      <section className="bg-[#1A1A1A] py-20 px-6 text-center">
+        <div className="max-w-2xl mx-auto">
+          <nav className="flex items-center justify-center gap-2 mb-8 text-sm" aria-label="Breadcrumb">
+            <Link href="/" className="text-white/60 hover:text-white transition-colors">Home</Link>
             <span aria-hidden="true" className="text-white/30">/</span>
-            <span aria-current="page" className="text-white">Anunciar carro</span>
+            <span aria-current="page" className="text-white font-medium">Anunciar carro</span>
           </nav>
 
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[rgba(212,245,118,0.12)] border border-[rgba(212,245,118,0.2)] rounded-full text-xs font-semibold text-[var(--color-accent)] mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]" />
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#D4F576]/10 border border-[#D4F576]/20 rounded-full text-xs font-semibold text-[#D4F576] mb-6">
+            <span className="w-2 h-2 rounded-full bg-[#D4F576] animate-pulse" />
             100% grátis para anunciar
           </div>
 
-          <h1 className="text-balance">
-            Anuncie seu carro com visual de marketplace premium
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+            Anuncie seu carro
           </h1>
 
-          <p className="max-w-lg mx-auto text-white/70">
-            Publique seu veículo em poucos minutos com fotos, FIPE, dados estruturados e negociação segura pela Carbi.
+          <p className="text-lg text-white/70 mb-8 max-w-md mx-auto">
+            Marketplace premium com FIPE, fotos e chat seguro.
           </p>
 
-          <div className="flex justify-center gap-3 mt-7 flex-wrap">
-            <Link href="/anunciar-carro/fluxo" className="btn btn-primary">
-              Começar anúncio grátis <ArrowRight size={16} />
+          <div className="flex justify-center gap-3 flex-wrap">
+            <Link href="/anunciar-carro/fluxo" className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#D4F576] text-[#1A1A1A] font-semibold rounded-full hover:bg-[#C8E64E] transition-colors">
+              Começar agora <ArrowRight size={16} />
             </Link>
-            <Link href="/carros-a-venda" className="btn border border-white/20 text-white hover:bg-white/10">
-              Ver marketplace
+            <Link href="/carros-a-venda" className="inline-flex items-center gap-2 px-6 py-3.5 border border-white/20 text-white font-semibold rounded-full hover:bg-white/10 transition-colors">
+              Ver anúncios
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Steps */}
-      <section className="fingen-section">
-        <div className="fingen-shell-content">
-          <div className="fingen-section-header">
+      {/* Steps - Limpo */}
+      <section className="py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <div className="fingen-section-label">Fluxo simples</div>
-              <h2 className="fingen-section-title">Do veículo publicado sem atrito</h2>
+              <p className="text-xs font-semibold text-[#6F6F6F] uppercase tracking-wider mb-2">Fluxo simples</p>
+              <h2 className="text-2xl font-bold text-[#1A1A1A]">Do veículo publicado sem atrito</h2>
             </div>
-            <Link href="/anunciar-carro/fluxo" className="fingen-section-link">
+            <Link href="/anunciar-carro/fluxo" className="hidden md:flex items-center gap-1 text-sm font-medium text-[#1A1A1A] hover:text-[#5A47D1] transition-colors">
               Anunciar grátis <ArrowRight size={14} />
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {steps.map((step, index) => (
-              <div key={step} className="bg-white border border-[var(--color-border)] rounded-2xl p-6">
-                <div className="text-xs font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-3">
+              <div key={step} className="bg-white border border-[#E5E5E5] rounded-xl p-5">
+                <div className="text-xs font-bold text-[#D4F576] mb-3">
                   {String(index + 1).padStart(2, '0')}
                 </div>
-                <h3 className="text-base font-semibold text-[var(--color-text-primary)] leading-tight">{step}</h3>
+                <h3 className="text-sm font-semibold text-[#1A1A1A] leading-snug">{step}</h3>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="fingen-section">
-        <div className="fingen-shell-content">
-          <div className="fingen-section-header">
-            <div>
-              <div className="fingen-section-label">Recursos</div>
-              <h2 className="fingen-section-title">A mesma identidade visual em todo o fluxo</h2>
-            </div>
+      {/* Features - Minimalista */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-8">
+            <p className="text-xs font-semibold text-[#6F6F6F] uppercase tracking-wider mb-2">Recursos</p>
+            <h2 className="text-2xl font-bold text-[#1A1A1A]">Identidade visual em todo o fluxo</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             {cards.map((card) => {
               const Icon = card.icon
               return (
-                <Link href="/anunciar-carro/fluxo" key={card.title} className="bg-white border border-[var(--color-border)] rounded-2xl p-7 flex flex-col gap-5 no-underline hover:border-[var(--color-border-strong)] transition-colors">
-                  <div className="w-14 h-14 rounded-2xl bg-[var(--color-accent-soft)] flex items-center justify-center text-[var(--color-text-primary)]">
-                    <Icon size={28} strokeWidth={1.8} />
+                <Link href="/anunciar-carro/fluxo" key={card.title} className="p-6 rounded-xl border border-[#E5E5E5] no-underline hover:border-[#D4F576] transition-colors group">
+                  <div className="w-12 h-12 rounded-xl bg-[#D4F576]/10 flex items-center justify-center mb-4 group-hover:bg-[#D4F576]/20 transition-colors">
+                    <Icon size={24} className="text-[#1A1A1A]" strokeWidth={1.8} />
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{card.title}</h3>
-                    <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{card.text}</p>
-                  </div>
+                  <h3 className="text-base font-semibold text-[#1A1A1A] mb-2">{card.title}</h3>
+                  <p className="text-sm text-[#6F6F6F] leading-relaxed">{card.text}</p>
                 </Link>
               )
             })}
@@ -139,36 +135,36 @@ export default function AnunciarCarroPage() {
         </div>
       </section>
 
-      {/* Security */}
-      <section className="fingen-section">
-        <div className="fingen-shell-content">
-          <div className="bg-[var(--color-bg-inverse)] rounded-3xl p-10 grid md:grid-cols-2 gap-10">
+      {/* Security - Contraste Corrigido */}
+      <section className="py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-[#1A1A1A] rounded-2xl p-8 md:p-10 grid md:grid-cols-2 gap-8">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">Segurança</div>
-              <h2 className="text-3xl font-bold text-[var(--color-accent)] leading-tight mb-3">
+              <p className="text-xs font-semibold text-[#D4F576] uppercase tracking-wider mb-3">Segurança</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight mb-4">
                 Seu contato direto não fica exposto
               </h2>
-              <p className="text-[15px] text-white/70 leading-relaxed mb-6">
-                O comprador inicia conversa pelo chat interno. A experiência mantém a negociação organizada e protege dados sensíveis.
+              <p className="text-[15px] text-white/80 leading-relaxed mb-6">
+                O comprador inicia conversa pelo chat interno. Negociação organizada e dados protegidos.
               </p>
-              <Link href="/anunciar-carro/fluxo" className="btn btn-primary">
-                Publicar anúncio grátis <ArrowRight size={16} />
+              <Link href="/anunciar-carro/fluxo" className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#D4F576] text-[#1A1A1A] font-semibold rounded-full hover:bg-[#C8E64E] transition-colors">
+                Publicar grátis <ArrowRight size={16} />
               </Link>
             </div>
-            <div className="flex flex-col gap-4">
-              <div className="p-5 bg-white/[0.06] border border-white/[0.08] rounded-2xl">
-                <div className="flex items-center gap-2.5 mb-2">
-                  <ShieldCheck size={20} className="text-[var(--color-accent)]" />
+            <div className="flex flex-col gap-3">
+              <div className="p-5 bg-white/[0.08] border border-white/[0.1] rounded-xl">
+                <div className="flex items-center gap-3 mb-2">
+                  <ShieldCheck size={20} className="text-[#D4F576]" />
                   <h3 className="text-[15px] font-semibold text-white">Chat interno</h3>
                 </div>
-                <p className="text-[13px] text-white/60 leading-relaxed">Sem telefone público. Sem e-mail público. Conversa vinculada ao anúncio.</p>
+                <p className="text-[13px] text-white/70 leading-relaxed">Sem telefone público. Conversa vinculada ao anúncio.</p>
               </div>
-              <div className="p-5 bg-white/[0.06] border border-white/[0.08] rounded-2xl">
-                <div className="flex items-center gap-2.5 mb-2">
-                  <BadgeCheck size={20} className="text-[var(--color-accent)]" />
+              <div className="p-5 bg-white/[0.08] border border-white/[0.1] rounded-xl">
+                <div className="flex items-center gap-3 mb-2">
+                  <BadgeCheck size={20} className="text-[#D4F576]" />
                   <h3 className="text-[15px] font-semibold text-white">Permissões reais</h3>
                 </div>
-                <p className="text-[13px] text-white/60 leading-relaxed">Acesso controlado para anunciante e interessado autenticados.</p>
+                <p className="text-[13px] text-white/70 leading-relaxed">Acesso controlado para anunciante e interessado.</p>
               </div>
             </div>
           </div>
