@@ -893,11 +893,14 @@ export default function MyListingsDashboard() {
                   </div>
                   
                   <div className="space-y-1.5">
-                    <textarea 
+                    <label htmlFor="listing-description" className="sr-only">Descrição do veículo</label>
+                    <textarea
+                      id="listing-description"
                       className={`w-full min-h-[200px] p-6 rounded-2xl bg-[#FAFAF9] border-2 transition-all font-bold text-[#0A0A0A] focus:outline-none leading-relaxed ${errors.description ? 'border-red-500/20 text-red-600' : 'border-transparent focus:border-[#10B981]'}`}
                       value={formData.description || ''}
                       onChange={(e) => updateField('description', e.target.value)}
                       placeholder="Descreva o estado de conservação, revisões, pneus, opcionais e tudo que valoriza seu carro..."
+                      aria-label="Descrição do veículo"
                     />
                     <div className="flex justify-between items-center px-4 mt-2">
                       {errors.description ? (
@@ -1001,9 +1004,10 @@ export default function MyListingsDashboard() {
                               <div className="bg-white/90 p-1.5 rounded-lg shadow-sm">
                                 <GripVertical className="w-4 h-4 text-[#A3A3A3]" />
                               </div>
-                              <button 
+                              <button
                                 onClick={() => removeImage(img.id)}
                                 className="w-8 h-8 bg-danger text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg border border-danger/10"
+                                aria-label="Remover imagem"
                               >
                                 <X className="w-4 h-4" />
                               </button>
@@ -1052,7 +1056,7 @@ export default function MyListingsDashboard() {
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] bg-red-600 text-white px-8 py-4 rounded-full font-bold shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom-8">
           <AlertCircle className="w-5 h-5" />
           {globalError}
-          <button onClick={() => setGlobalError(null)} className="ml-4 opacity-60 hover:opacity-100">✕</button>
+          <button onClick={() => setGlobalError(null)} className="ml-4 opacity-60 hover:opacity-100" aria-label="Fechar mensagem de erro">✕</button>
         </div>
       )}
 

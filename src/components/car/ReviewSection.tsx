@@ -127,6 +127,15 @@ export default function ReviewSection({ carId: _carId }: { carId: string }) {
         <div
           className="bg-white border-2 border-dashed border-[#EAEAE8] rounded-2xl p-12 text-center cursor-pointer hover:bg-[#FAFAF9] transition-colors"
           onClick={() => setIsFormOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              setIsFormOpen(true)
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label="Abrir formulário de avaliação"
         >
           <div className="w-14 h-14 bg-[#FAFAF9] rounded-2xl flex items-center justify-center mx-auto mb-4">
             <MessageSquare className="w-6 h-6 text-[#A3A3A3]" strokeWidth={1.5} />
@@ -144,7 +153,7 @@ export default function ReviewSection({ carId: _carId }: { carId: string }) {
           <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden animate-scale-in max-h-[90vh] flex flex-col">
             <div className="p-6 border-b border-[#EAEAE8] flex items-center justify-between">
               <h3 className="text-[18px] font-semibold text-[#0A0A0A] tracking-tight">Sua opinião vale muito</h3>
-              <button onClick={() => setIsFormOpen(false)} className="btn-icon">
+              <button onClick={() => setIsFormOpen(false)} className="btn-icon" aria-label="Fechar formulário de avaliação">
                 <X className="w-5 h-5" strokeWidth={1.75} />
               </button>
             </div>
@@ -152,9 +161,16 @@ export default function ReviewSection({ carId: _carId }: { carId: string }) {
             <form onSubmit={handleSubmit} className="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-6">
               <div>
                 <label className="block text-[12px] font-medium text-[#525252] mb-2 tracking-tight">Nota geral</label>
-                <div className="flex gap-1.5">
+                <div className="flex gap-1.5" role="radiogroup" aria-label="Nota geral">
                   {[1, 2, 3, 4, 5].map(s => (
-                    <button type="button" key={s} onClick={() => setNewReview(prev => ({ ...prev, rating: s }))}>
+                    <button
+                      type="button"
+                      key={s}
+                      onClick={() => setNewReview(prev => ({ ...prev, rating: s }))}
+                      role="radio"
+                      aria-checked={s <= newReview.rating}
+                      aria-label={`${s} estrela${s > 1 ? 's' : ''}`}
+                    >
                       <Star className={`w-8 h-8 ${s <= newReview.rating ? 'fill-[#FACC15] text-[#FACC15]' : 'text-[#EAEAE8]'}`} strokeWidth={1.5} />
                     </button>
                   ))}
@@ -203,7 +219,7 @@ export default function ReviewSection({ carId: _carId }: { carId: string }) {
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-[12px] font-medium text-[#10B981] tracking-tight">O que você amou?</label>
-                    <button type="button" onClick={() => addField('pros')} className="btn-icon !w-7 !h-7 bg-[#FAFAF9]">
+                    <button type="button" onClick={() => addField('pros')} className="btn-icon !w-7 !h-7 bg-[#FAFAF9]" aria-label="Adicionar ponto positivo">
                       <Plus className="w-3.5 h-3.5" strokeWidth={1.75} />
                     </button>
                   </div>
@@ -223,7 +239,7 @@ export default function ReviewSection({ carId: _carId }: { carId: string }) {
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-[12px] font-medium text-[#525252] tracking-tight">O que te incomodou?</label>
-                    <button type="button" onClick={() => addField('cons')} className="btn-icon !w-7 !h-7 bg-[#FAFAF9]">
+                    <button type="button" onClick={() => addField('cons')} className="btn-icon !w-7 !h-7 bg-[#FAFAF9]" aria-label="Adicionar ponto negativo">
                       <Plus className="w-3.5 h-3.5" strokeWidth={1.75} />
                     </button>
                   </div>

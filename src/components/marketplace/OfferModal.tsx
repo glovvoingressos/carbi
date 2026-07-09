@@ -131,7 +131,7 @@ export default function OfferModal({ listingId, listingPrice, listingTitle, isOp
                   Fazer Oferta
                 </h3>
               </div>
-              <button onClick={handleClose} className="btn-icon bg-[#FAFAF9] hover:bg-[#EAEAE8] transition-colors">
+              <button onClick={handleClose} className="btn-icon bg-[#FAFAF9] hover:bg-[#EAEAE8] transition-colors" aria-label="Fechar modal de oferta">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -167,10 +167,11 @@ export default function OfferModal({ listingId, listingPrice, listingTitle, isOp
             {(step === 'form') && (
               <div className="p-6 space-y-5">
                 <div>
-                  <p className="label text-[#A3A3A3] mb-2">Valor da oferta</p>
+                  <label htmlFor="offer-amount" className="label text-[#A3A3A3] mb-2">Valor da oferta</label>
                   <div className="flex items-center gap-3 rounded-2xl border-2 border-[#17170F] bg-white px-4 py-3 shadow-sm focus-within:border-[#17170F]">
                     <span className="shrink-0 text-[15px] font-semibold text-[#525252]">R$</span>
                     <input
+                      id="offer-amount"
                       className="min-w-0 flex-1 border-0 bg-transparent p-0 text-[17px] font-semibold tracking-normal outline-none placeholder:text-[#A3A3A3] max-[330px]:text-[15px]"
                       inputMode="decimal"
                       placeholder="0,00"
@@ -182,6 +183,7 @@ export default function OfferModal({ listingId, listingPrice, listingTitle, isOp
                         if (parts.length === 2 && parts[1].length > 2) return
                         setAmount(raw)
                       }}
+                      aria-label="Valor da oferta em reais"
                     />
                   </div>
                   <p className="text-[11px] text-[#A3A3A3] mt-1.5">
@@ -214,12 +216,14 @@ export default function OfferModal({ listingId, listingPrice, listingTitle, isOp
                 </div>
 
                 <div>
-                  <p className="label text-[#A3A3A3] mb-2">Observação <span className="text-[#A3A3A3]/50">(opcional)</span></p>
+                  <label htmlFor="offer-message" className="label text-[#A3A3A3] mb-2">Observação <span className="text-[#A3A3A3]/50">(opcional)</span></label>
                   <textarea
+                    id="offer-message"
                     className="input min-h-[80px] resize-none py-3 text-[14px] leading-relaxed"
                     placeholder="Ex: Posso fechar esta semana. Pagamento à vista."
                     value={message}
                     onChange={(e) => setMessage(e.target.value.slice(0, 500))}
+                    aria-label="Observação sobre a oferta"
                   />
                   <p className="text-[11px] text-[#A3A3A3] mt-1 text-right">{message.length}/500</p>
                 </div>

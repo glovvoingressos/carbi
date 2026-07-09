@@ -311,20 +311,30 @@ export default function MarketplaceClient({
 
       <FilterSection title="Preço">
           <div className="grid grid-cols-2 gap-2">
-          <input
-            type="number"
-            value={priceRange[0] || ''}
-            onChange={e => setPriceRange([Number(e.target.value) || 0, priceRange[1]])}
-            placeholder="Mínimo"
-            className="w-full h-10 px-3 bg-white/80 border border-white/80 rounded-xl text-[13px] outline-none focus:border-[#17170F] transition-colors"
-          />
-          <input
-            type="number"
-            value={priceRange[1] === 1000000 ? '' : priceRange[1]}
-            onChange={e => setPriceRange([priceRange[0], Number(e.target.value) || 1000000])}
-            placeholder="Máximo"
-            className="w-full h-10 px-3 bg-white/80 border border-white/80 rounded-xl text-[13px] outline-none focus:border-[#17170F] transition-colors"
-          />
+          <div>
+            <label htmlFor="price-min" className="sr-only">Preço mínimo</label>
+            <input
+              id="price-min"
+              type="number"
+              value={priceRange[0] || ''}
+              onChange={e => setPriceRange([Number(e.target.value) || 0, priceRange[1]])}
+              placeholder="Mínimo"
+              className="w-full h-10 px-3 bg-white/80 border border-white/80 rounded-xl text-[13px] outline-none focus:border-[#17170F] transition-colors"
+              aria-label="Preço mínimo"
+            />
+          </div>
+          <div>
+            <label htmlFor="price-max" className="sr-only">Preço máximo</label>
+            <input
+              id="price-max"
+              type="number"
+              value={priceRange[1] === 1000000 ? '' : priceRange[1]}
+              onChange={e => setPriceRange([priceRange[0], Number(e.target.value) || 1000000])}
+              placeholder="Máximo"
+              className="w-full h-10 px-3 bg-white/80 border border-white/80 rounded-xl text-[13px] outline-none focus:border-[#17170F] transition-colors"
+              aria-label="Preço máximo"
+            />
+          </div>
         </div>
         <div className="flex flex-wrap gap-1.5 mt-3">
           {[50000, 80000, 120000, 200000].map(p => (
@@ -369,25 +379,37 @@ export default function MarketplaceClient({
 
       <FilterSection title="Ano">
         <div className="grid grid-cols-2 gap-2">
-          <input
-            type="number"
-            value={yearRange[0] === 1990 ? '' : yearRange[0]}
-            onChange={e => setYearRange([Number(e.target.value) || 1990, yearRange[1]])}
-            placeholder="De"
-            className="w-full h-10 px-3 bg-white border border-[#EAEAE8] rounded-lg text-[13px] outline-none focus:border-[#0A0A0A] transition-colors"
-          />
-          <input
-            type="number"
-            value={yearRange[1] === new Date().getFullYear() + 1 ? '' : yearRange[1]}
-            onChange={e => setYearRange([yearRange[0], Number(e.target.value) || new Date().getFullYear() + 1])}
-            placeholder="Até"
-            className="w-full h-10 px-3 bg-white border border-[#EAEAE8] rounded-lg text-[13px] outline-none focus:border-[#0A0A0A] transition-colors"
-          />
+          <div>
+            <label htmlFor="year-min" className="sr-only">Ano mínimo</label>
+            <input
+              id="year-min"
+              type="number"
+              value={yearRange[0] === 1990 ? '' : yearRange[0]}
+              onChange={e => setYearRange([Number(e.target.value) || 1990, yearRange[1]])}
+              placeholder="De"
+              className="w-full h-10 px-3 bg-white border border-[#EAEAE8] rounded-lg text-[13px] outline-none focus:border-[#0A0A0A] transition-colors"
+              aria-label="Ano mínimo"
+            />
+          </div>
+          <div>
+            <label htmlFor="year-max" className="sr-only">Ano máximo</label>
+            <input
+              id="year-max"
+              type="number"
+              value={yearRange[1] === new Date().getFullYear() + 1 ? '' : yearRange[1]}
+              onChange={e => setYearRange([yearRange[0], Number(e.target.value) || new Date().getFullYear() + 1])}
+              placeholder="Até"
+              className="w-full h-10 px-3 bg-white border border-[#EAEAE8] rounded-lg text-[13px] outline-none focus:border-[#0A0A0A] transition-colors"
+              aria-label="Ano máximo"
+            />
+          </div>
         </div>
       </FilterSection>
 
       <FilterSection title={`Quilometragem · até ${mileageMax.toLocaleString('pt-BR')} km`}>
+        <label htmlFor="mileage-slider" className="sr-only">Quilometragem máxima</label>
         <input
+          id="mileage-slider"
           type="range"
           min="0"
           max="300000"
@@ -395,6 +417,7 @@ export default function MarketplaceClient({
           value={mileageMax}
           onChange={e => setMileageMax(Number(e.target.value))}
           className="w-full h-1 bg-[#EAEAE8] rounded-full appearance-none cursor-pointer accent-[#0A0A0A]"
+          aria-label="Quilometragem máxima"
         />
           <div className="flex justify-between mt-2 text-[11px] text-[#8A95A8] tracking-tight">
             <span>0</span>
@@ -496,27 +519,34 @@ export default function MarketplaceClient({
         {/* Search + Sort */}
         <div className="flex gap-2 mb-5">
           <div className="relative flex-1">
+            <label htmlFor="marketplace-search" className="sr-only">Buscar anúncios</label>
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#17170F]" strokeWidth={1.75} />
             <input
+              id="marketplace-search"
               type="text"
               value={q}
               onChange={e => setQ(e.target.value)}
               placeholder="Buscar por marca, modelo ou versão..."
               className="w-full h-12 pl-11 pr-4 bg-white border-2 border-[#17170F]/12 rounded-full text-[14px] tracking-tight outline-none focus:border-[#17170F] transition-colors shadow-sm"
+              aria-label="Buscar anúncios por marca, modelo ou versão"
             />
           </div>
           <button
             onClick={() => setShowFilters(true)}
             className="lg:hidden h-12 px-4 bg-white border-2 border-[#17170F]/12 rounded-full flex items-center gap-2 text-[14px] font-bold tracking-tight shadow-sm"
+            aria-label="Abrir filtros"
           >
             <SlidersHorizontal className="w-4 h-4" strokeWidth={1.75} />
             Filtros
           </button>
           <div className="hidden lg:block relative">
+            <label htmlFor="marketplace-sort" className="sr-only">Ordenar por</label>
             <select
+              id="marketplace-sort"
               value={sort}
               onChange={e => setSort(e.target.value as ListingSort)}
               className="h-12 pl-4 pr-10 bg-white border-2 border-[#17170F]/12 rounded-full text-[14px] font-bold tracking-tight appearance-none outline-none cursor-pointer hover:border-[#17170F] focus:border-[#17170F] transition-colors shadow-sm"
+              aria-label="Ordenar anúncios"
             >
               {SORT_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -584,6 +614,7 @@ export default function MarketplaceClient({
               className={`flex h-11 w-11 items-center justify-center rounded-full border bg-white/84 shadow-sm backdrop-blur-xl transition-colors max-[330px]:h-9 max-[330px]:w-9 ${
                 currentPage <= 1 ? 'opacity-30 border-[#17170F]/10' : 'border-[#17170F]/12 hover:border-[#17170F]'
               }`}
+              aria-label="Página anterior"
             >
               <ChevronLeft className="w-4 h-4" strokeWidth={1.75} />
             </button>
@@ -599,6 +630,7 @@ export default function MarketplaceClient({
               className={`flex h-11 w-11 items-center justify-center rounded-full border bg-white/84 shadow-sm backdrop-blur-xl transition-colors max-[330px]:h-9 max-[330px]:w-9 ${
                 currentPage >= totalPages ? 'opacity-30 border-[#17170F]/10' : 'border-[#17170F]/12 hover:border-[#17170F]'
               }`}
+              aria-label="Próxima página"
             >
               <ChevronRight className="w-4 h-4" strokeWidth={1.75} />
             </button>

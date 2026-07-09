@@ -147,10 +147,10 @@ export default function VehicleDetailView({
           <ArrowLeft size={20} />
         </Link>
         <div className="fingen-detail-header-actions">
-          <button type="button" onClick={() => setIsFavorite(!isFavorite)} className="fingen-detail-action-btn">
+          <button type="button" onClick={() => setIsFavorite(!isFavorite)} className="fingen-detail-action-btn" aria-label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}>
             <Heart size={18} className={isFavorite ? 'fill-current' : ''} />
           </button>
-          <button type="button" onClick={handleShare} className="fingen-detail-action-btn">
+          <button type="button" onClick={handleShare} className="fingen-detail-action-btn" aria-label="Compartilhar anúncio">
             <Share2 size={18} />
           </button>
         </div>
@@ -319,7 +319,7 @@ export default function VehicleDetailView({
           <section className="fingen-detail-card">
             <h3 className="fingen-detail-card-title">Compartilhar</h3>
             <div className="fingen-detail-share">
-              <button type="button" onClick={handleCopy} className="fingen-detail-share-btn">
+              <button type="button" onClick={handleCopy} className="fingen-detail-share-btn" aria-label={copied ? 'Link copiado' : 'Copiar link do anúncio'}>
                 <Copy size={14} />
                 {copied ? 'Copiado!' : 'Copiar link'}
               </button>
@@ -327,7 +327,7 @@ export default function VehicleDetailView({
           </section>
 
           {/* Report */}
-          <button type="button" onClick={() => setShowReportModal(true)} className="fingen-detail-report">
+          <button type="button" onClick={() => setShowReportModal(true)} className="fingen-detail-report" aria-label="Denunciar este anúncio">
             Denunciar anúncio
           </button>
         </div>

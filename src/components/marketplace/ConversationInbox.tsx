@@ -380,7 +380,9 @@ export default function ConversationInbox() {
 
             <div className="conversation-composer-wrap">
               <div className="conversation-composer">
+                <label htmlFor="chat-message" className="sr-only">Mensagem</label>
                 <input
+                  id="chat-message"
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
                   onKeyDown={(e) => {
@@ -391,6 +393,7 @@ export default function ConversationInbox() {
                   }}
                   placeholder="Digite sua mensagem..."
                   className="conversation-composer-input"
+                  aria-label="Digite sua mensagem"
                 />
                 <button
                   type="button"

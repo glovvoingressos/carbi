@@ -1200,13 +1200,34 @@ export default function ListingForm() {
             </div>
             
             <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
-              <input className="fingen-flow-input" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} />
-              <input className="fingen-flow-input" placeholder="Quilometragem" value={formatBrazilianInt(form.mileage)} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} />
-              <input className="fingen-flow-input" placeholder="Combustível" value={form.fuel || resolvedFuelValue} onChange={(e) => handleInput('fuel', e.target.value)} />
-              <input className="fingen-flow-input" placeholder="Câmbio" value={form.transmission || resolvedTransmissionValue} onChange={(e) => handleInput('transmission', e.target.value)} />
-              <input className="fingen-flow-input" placeholder="Cor" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
-              <input className="fingen-flow-input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} />
-              <input className="fingen-flow-input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} />
+              <div>
+                <label htmlFor="listing-price" className="sr-only">Preço pedido</label>
+                <input id="listing-price" className="fingen-flow-input" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} aria-label="Preço pedido" />
+              </div>
+              <div>
+                <label htmlFor="listing-mileage" className="sr-only">Quilometragem</label>
+                <input id="listing-mileage" className="fingen-flow-input" placeholder="Quilometragem" value={formatBrazilianInt(form.mileage)} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} aria-label="Quilometragem" />
+              </div>
+              <div>
+                <label htmlFor="listing-fuel" className="sr-only">Combustível</label>
+                <input id="listing-fuel" className="fingen-flow-input" placeholder="Combustível" value={form.fuel || resolvedFuelValue} onChange={(e) => handleInput('fuel', e.target.value)} aria-label="Combustível" />
+              </div>
+              <div>
+                <label htmlFor="listing-transmission" className="sr-only">Câmbio</label>
+                <input id="listing-transmission" className="fingen-flow-input" placeholder="Câmbio" value={form.transmission || resolvedTransmissionValue} onChange={(e) => handleInput('transmission', e.target.value)} aria-label="Câmbio" />
+              </div>
+              <div>
+                <label htmlFor="listing-color" className="sr-only">Cor</label>
+                <input id="listing-color" className="fingen-flow-input" placeholder="Cor" value={form.color} onChange={(e) => handleInput('color', e.target.value)} aria-label="Cor" />
+              </div>
+              <div>
+                <label htmlFor="listing-city" className="sr-only">Cidade</label>
+                <input id="listing-city" className="fingen-flow-input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} aria-label="Cidade" />
+              </div>
+              <div>
+                <label htmlFor="listing-state" className="sr-only">Estado</label>
+                <input id="listing-state" className="fingen-flow-input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} aria-label="Estado" />
+              </div>
             </div>
 
             {fipeResult ? (
@@ -1276,8 +1297,14 @@ export default function ListingForm() {
                 <p className="fingen-flow-field-label">Recomendado, não obrigatório</p>
                 <span className="fingen-flow-badge-outline text-[10px]">Opcional</span>
               </div>
-              <textarea className="fingen-flow-input min-h-[120px] py-3 resize-none leading-relaxed max-[330px]:min-h-[100px]" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} />
-              <input className="fingen-flow-input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} />
+              <div>
+                <label htmlFor="listing-description" className="sr-only">Descrição do veículo</label>
+                <textarea id="listing-description" className="fingen-flow-input min-h-[120px] py-3 resize-none leading-relaxed max-[330px]:min-h-[100px]" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} aria-label="Descrição do veículo" />
+              </div>
+              <div>
+                <label htmlFor="listing-optionals" className="sr-only">Opcionais extras</label>
+                <input id="listing-optionals" className="fingen-flow-input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} aria-label="Opcionais extras" />
+              </div>
             </div>
 
 
@@ -1306,13 +1333,13 @@ export default function ListingForm() {
                     <img src={image.previewUrl} alt={`Preview ${index + 1}`} width={1920} height={1080} className="aspect-video w-full rounded-xl object-cover" />
                     <p className="mt-4 px-2 text-[10px] font-black uppercase tracking-widest text-[#525252] max-[330px]:mt-3">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
                     <div className="mt-3 flex items-center gap-2 px-2 pb-1 max-[330px]:gap-1.5">
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#D4F576] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, -1)} disabled={index === 0}>
+                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#D4F576] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, -1)} disabled={index === 0} aria-label="Mover imagem para a esquerda">
                         <MoveLeft className="h-4 w-4" />
                       </button>
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#D4F576] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1}>
+                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-[#525252] hover:text-[#D4F576] hover:bg-[#FAFAF9]/80 transition-colors max-[330px]:h-9 max-[330px]:w-9" onClick={() => moveImage(index, 1)} disabled={index === images.length - 1} aria-label="Mover imagem para a direita">
                         <MoveRight className="h-4 w-4" />
                       </button>
-                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors ml-auto max-[330px]:h-9 max-[330px]:w-9" onClick={() => removeImage(index)}>
+                      <button type="button" className="w-10 h-10 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors ml-auto max-[330px]:h-9 max-[330px]:w-9" onClick={() => removeImage(index)} aria-label="Remover imagem">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>

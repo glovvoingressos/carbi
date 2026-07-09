@@ -76,10 +76,11 @@ export default function SellerOfferActions({ offer, accessToken, onUpdate }: Sel
     return (
       <div className="space-y-4">
         <div>
-          <p className="label text-[#A3A3A3] mb-2">Sua contraproposta</p>
+          <label htmlFor="counter-amount" className="label text-[#A3A3A3] mb-2">Sua contraproposta</label>
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A3A3A3] font-medium">R$</span>
             <input
+              id="counter-amount"
               className="input pl-10 text-[15px] font-semibold"
               placeholder="0,00"
               value={counterAmount}
@@ -90,16 +91,19 @@ export default function SellerOfferActions({ offer, accessToken, onUpdate }: Sel
                 if (parts.length === 2 && parts[1].length > 2) return
                 setCounterAmount(raw)
               }}
+              aria-label="Valor da contraproposta em reais"
             />
           </div>
         </div>
         <div>
-          <p className="label text-[#A3A3A3] mb-2">Mensagem <span className="text-[#A3A3A3]/50">(opcional)</span></p>
+          <label htmlFor="seller-message" className="label text-[#A3A3A3] mb-2">Mensagem <span className="text-[#A3A3A3]/50">(opcional)</span></label>
           <textarea
+            id="seller-message"
             className="input min-h-[60px] resize-none py-3 text-[14px] leading-relaxed"
             placeholder="Ex: O valor mais baixo que posso fazer é este."
             value={sellerMessage}
             onChange={(e) => setSellerMessage(e.target.value.slice(0, 500))}
+            aria-label="Mensagem para o comprador"
           />
         </div>
         {error && <p className="text-[13px] text-[#DC2626]">{error}</p>}
@@ -154,6 +158,7 @@ export default function SellerOfferActions({ offer, accessToken, onUpdate }: Sel
           onClick={() => handleAction('reject')}
           disabled={loading || !canAct}
           className="btn-icon bg-[#FEF2F2] hover:bg-[#FEE2E2] border border-[#FECACA] text-[#DC2626]"
+          aria-label="Recusar oferta"
         >
           <X className="w-4 h-4" strokeWidth={2} />
         </button>

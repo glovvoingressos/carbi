@@ -53,6 +53,15 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
     <article
       className="surface-strong overflow-hidden transition-all duration-200 group cursor-pointer hover:-translate-y-1 hover:shadow-xl"
       onClick={() => router.push(detailUrl)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          router.push(detailUrl)
+        }
+      }}
+      tabIndex={0}
+      role="link"
+      aria-label={`${car.brand} ${car.model} ${car.year} - ${formatBRL(car.priceBrl)}`}
     >
       <div className="relative w-full aspect-square bg-[#FFF8DF] overflow-hidden">
         {badge && (
