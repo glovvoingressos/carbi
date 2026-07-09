@@ -54,28 +54,32 @@ export default function AnunciarCarroPage() {
   return (
     <main className="fingen-shell">
       {/* Hero */}
-      <section className="fingen-dark-hero" style={{ textAlign: 'center' }}>
-        <div className="fingen-shell-content" style={{ position: 'relative', zIndex: 1 }}>
-          <div className="fingen-breadcrumb" style={{ justifyContent: 'center', color: 'rgba(255,255,255,0.5)' }}>
-            <Link href="/" style={{ color: 'rgba(255,255,255,0.5)' }}>Home</Link>
-            <span style={{ color: 'rgba(255,255,255,0.3)' }}>/</span>
-            <span style={{ color: '#fff' }}>Anunciar carro</span>
-          </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: 'rgba(212,245,118,0.12)', border: '1px solid rgba(212,245,118,0.2)', borderRadius: 'var(--radius-full)', fontSize: '12px', fontWeight: 600, color: 'var(--color-accent)', marginBottom: '20px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-accent)' }} />
+      <section className="fingen-dark-hero text-center">
+        <div className="fingen-shell-content relative z-1">
+          <nav className="fingen-breadcrumb justify-center text-white/50" aria-label="Breadcrumb">
+            <Link href="/" className="text-white/50">Home</Link>
+            <span aria-hidden="true" className="text-white/30">/</span>
+            <span aria-current="page" className="text-white">Anunciar carro</span>
+          </nav>
+
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[rgba(212,245,118,0.12)] border border-[rgba(212,245,118,0.2)] rounded-full text-xs font-semibold text-[var(--color-accent)] mb-5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]" />
             100% grátis para anunciar
           </div>
+
           <h1 className="text-balance">
             Anuncie seu carro com visual de marketplace premium
           </h1>
-          <p style={{ maxWidth: '520px', margin: '0 auto' }}>
+
+          <p className="max-w-lg mx-auto text-white/70">
             Publique seu veículo em poucos minutos com fotos, FIPE, dados estruturados e negociação segura pela Carbi.
           </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '28px', flexWrap: 'wrap' }}>
-            <Link href="/anunciar-carro/fluxo" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', borderRadius: 'var(--radius-full)', background: 'var(--color-accent)', color: 'var(--color-text-primary)', fontWeight: 600, fontSize: '15px', textDecoration: 'none', transition: 'all 0.2s ease' }}>
+
+          <div className="flex justify-center gap-3 mt-7 flex-wrap">
+            <Link href="/anunciar-carro/fluxo" className="btn btn-primary">
               Começar anúncio grátis <ArrowRight size={16} />
             </Link>
-            <Link href="/carros-a-venda" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', borderRadius: 'var(--radius-full)', background: 'transparent', color: '#fff', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1.5px solid rgba(255,255,255,0.2)', transition: 'all 0.2s ease' }}>
+            <Link href="/carros-a-venda" className="btn border border-white/20 text-white hover:bg-white/10">
               Ver marketplace
             </Link>
           </div>
@@ -94,13 +98,13 @@ export default function AnunciarCarroPage() {
               Anunciar grátis <ArrowRight size={14} />
             </Link>
           </div>
-          <div className="fingen-grid-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {steps.map((step, index) => (
-              <div key={step} className="fingen-card-white" style={{ padding: '24px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
+              <div key={step} className="bg-white border border-[var(--color-border)] rounded-2xl p-6">
+                <div className="text-xs font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-3">
                   {String(index + 1).padStart(2, '0')}
                 </div>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)', lineHeight: 1.3 }}>{step}</h3>
+                <h3 className="text-base font-semibold text-[var(--color-text-primary)] leading-tight">{step}</h3>
               </div>
             ))}
           </div>
@@ -116,17 +120,17 @@ export default function AnunciarCarroPage() {
               <h2 className="fingen-section-title">A mesma identidade visual em todo o fluxo</h2>
             </div>
           </div>
-          <div className="fingen-grid-3">
+          <div className="grid md:grid-cols-3 gap-4">
             {cards.map((card) => {
               const Icon = card.icon
               return (
-                <Link href="/anunciar-carro/fluxo" key={card.title} className="fingen-card-white" style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '28px', textDecoration: 'none', transition: 'all 0.25s ease' }}>
-                  <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'var(--color-accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-primary)' }}>
+                <Link href="/anunciar-carro/fluxo" key={card.title} className="bg-white border border-[var(--color-border)] rounded-2xl p-7 flex flex-col gap-5 no-underline hover:border-[var(--color-border-strong)] transition-colors">
+                  <div className="w-14 h-14 rounded-2xl bg-[var(--color-accent-soft)] flex items-center justify-center text-[var(--color-text-primary)]">
                     <Icon size={28} strokeWidth={1.8} />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>{card.title}</h3>
-                    <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{card.text}</p>
+                    <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{card.title}</h3>
+                    <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{card.text}</p>
                   </div>
                 </Link>
               )
@@ -138,33 +142,33 @@ export default function AnunciarCarroPage() {
       {/* Security */}
       <section className="fingen-section">
         <div className="fingen-shell-content">
-          <div className="fingen-card-dark" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '40px', padding: '40px' }}>
+          <div className="bg-[var(--color-bg-inverse)] rounded-3xl p-10 grid md:grid-cols-2 gap-10">
             <div>
-              <div className="fingen-section-label" style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>Segurança</div>
-              <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 700, color: 'var(--color-accent)', lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: '12px' }}>
+              <div className="text-xs font-semibold uppercase tracking-wider text-white/50 mb-2">Segurança</div>
+              <h2 className="text-3xl font-bold text-[var(--color-accent)] leading-tight mb-3">
                 Seu contato direto não fica exposto
               </h2>
-              <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, marginBottom: '24px' }}>
+              <p className="text-[15px] text-white/70 leading-relaxed mb-6">
                 O comprador inicia conversa pelo chat interno. A experiência mantém a negociação organizada e protege dados sensíveis.
               </p>
-              <Link href="/anunciar-carro/fluxo" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', borderRadius: 'var(--radius-full)', background: 'var(--color-accent)', color: 'var(--color-text-primary)', fontWeight: 600, fontSize: '15px', textDecoration: 'none', transition: 'all 0.2s ease' }}>
+              <Link href="/anunciar-carro/fluxo" className="btn btn-primary">
                 Publicar anúncio grátis <ArrowRight size={16} />
               </Link>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ padding: '20px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                  <ShieldCheck size={20} style={{ color: 'var(--color-accent)' }} />
-                  <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff' }}>Chat interno</h3>
+            <div className="flex flex-col gap-4">
+              <div className="p-5 bg-white/[0.06] border border-white/[0.08] rounded-2xl">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <ShieldCheck size={20} className="text-[var(--color-accent)]" />
+                  <h3 className="text-[15px] font-semibold text-white">Chat interno</h3>
                 </div>
-                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>Sem telefone público. Sem e-mail público. Conversa vinculada ao anúncio.</p>
+                <p className="text-[13px] text-white/60 leading-relaxed">Sem telefone público. Sem e-mail público. Conversa vinculada ao anúncio.</p>
               </div>
-              <div style={{ padding: '20px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                  <BadgeCheck size={20} style={{ color: 'var(--color-accent)' }} />
-                  <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff' }}>Permissões reais</h3>
+              <div className="p-5 bg-white/[0.06] border border-white/[0.08] rounded-2xl">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <BadgeCheck size={20} className="text-[var(--color-accent)]" />
+                  <h3 className="text-[15px] font-semibold text-white">Permissões reais</h3>
                 </div>
-                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>Acesso controlado para anunciante e interessado autenticados.</p>
+                <p className="text-[13px] text-white/60 leading-relaxed">Acesso controlado para anunciante e interessado autenticados.</p>
               </div>
             </div>
           </div>
