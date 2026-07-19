@@ -6,6 +6,9 @@ import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
 import { TextRotate } from '@/components/ui/text-rotate'
 import KineticText from '@/components/ui/KineticText'
+import AnimatedStats from '@/components/ui/AnimatedStats'
+import AnimatedBarChart from '@/components/ui/AnimatedBarChart'
+import Logo from '@/components/ui/Logo'
 import { GridPattern } from '@/components/ui/grid-pattern'
 import { cn } from '@/lib/utils'
 import { GlareCard } from '@/components/ui/glare-card'
@@ -122,91 +125,91 @@ export default async function HomePage() {
   return (
     <div className="fingen-page">
       <main className="fingen-main">
-        {/* Hero Section */}
-        <section className="hero-collage">
-          <div className="hero-collage-inner">
-            {/* Left: Typography */}
-            <div className="hero-collage-content">
-              <h1 className="hero-collage-title">
-                Encontre o carro
-                <br />
-                <KineticText
-                  texts={["perfeito.", "ideal.", "dos sonhos.", "certo.", "novo."]}
-                  interval={3000}
-                  className="hero-collage-title-accent"
-                />
-              </h1>
+        {/* Hero Section - Fingen Style with Grid Pattern */}
+        <section className="fingen-hero">
+          {/* Grid Pattern Background */}
+          <div className="fingen-hero-grid-wrapper">
+            <GridPattern
+              width={30}
+              height={30}
+              x={-1}
+              y={-1}
+              squares={[
+                [4, 4],
+                [5, 1],
+                [8, 2],
+                [5, 3],
+                [5, 5],
+                [10, 10],
+                [12, 15],
+                [15, 10],
+                [10, 15],
+              ]}
+              className={cn(
+                "[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
+                "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12",
+                "fingen-hero-grid"
+              )}
+            />
+          </div>
 
-              <p className="hero-collage-sub">
-                Compre, compare e anuncie seminovos com dados reais da FIPE,
-                chat interno seguro e tráfego pago grátis.
-              </p>
-
-              <Link href="/carros-a-venda" className="hero-collage-btn">
-                Explorar anúncios
-                <ArrowRight size={18} />
-              </Link>
+          {/* Balance Card */}
+          <div className="fingen-balance-card">
+            <div className="fingen-balance-header">
+              <div className="fingen-balance-label">Seu próximo carro</div>
+              <div className="fingen-balance-actions">
+                <Link href="/anunciar-carro" className="fingen-balance-action-btn">
+                  <Plus size={16} />
+                </Link>
+                <Link href="/carros-a-venda" className="fingen-balance-action-btn">
+                  <BarChart3 size={16} />
+                </Link>
+              </div>
             </div>
 
-            {/* Right: Collage Composition */}
-            <div className="hero-collage-visual">
-              {/* Curved line SVG */}
-              <svg className="hero-collage-lines" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M80 120 C200 80, 350 150, 420 100" stroke="#E0E0E0" strokeWidth="2" strokeDasharray="6 4" />
-                <path d="M60 280 C180 320, 300 200, 450 260" stroke="#E0E0E0" strokeWidth="2" strokeDasharray="6 4" />
-                <circle cx="80" cy="120" r="4" fill="#D4F576" />
-                <circle cx="420" cy="100" r="4" fill="#D4F576" />
-                <circle cx="450" cy="260" r="4" fill="#D4F576" />
-              </svg>
+            {/* Title */}
+            <h1 className="fingen-hero-title">
+              Encontre o carro
+              <br />
+              <TextRotate
+                texts={[
+                  "perfeito.",
+                  "ideal.",
+                  "dos sonhos.",
+                  "certo.",
+                  "novo."
+                ]}
+                mainClassName="fingen-hero-title-accent"
+                staggerFrom="last"
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "-120%", opacity: 0 }}
+                staggerDuration={0.025}
+                splitLevelClassName="overflow-hidden pb-1"
+                transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                rotationInterval={3000}
+              />
+            </h1>
 
-              {/* Car image 1 */}
-              <div className="hero-collage-item hero-collage-item-1">
-                <img src="/categories/sedan.jpg" alt="Sedan" />
-              </div>
+            <div className="fingen-balance-sub">Compre, compare e anuncie seminovos com FIPE verificado</div>
+          </div>
 
-              {/* Car image 2 */}
-              <div className="hero-collage-item hero-collage-item-2">
-                <img src="/categories/suv.jpg" alt="SUV" />
-              </div>
-
-              {/* Car image 3 */}
-              <div className="hero-collage-item hero-collage-item-3">
-                <img src="/categories/esportivo.jpg" alt="Esportivo" />
-              </div>
-
-              {/* Dark pill - Brand Insights */}
-              <div className="hero-collage-pill">
-                <div className="hero-collage-pill-dot" />
-                <span>FIPE Verificado</span>
-                <div className="hero-collage-pill-badge">See</div>
-              </div>
-
-              {/* Data card - Price */}
-              <div className="hero-collage-data-card">
-                <div className="hero-collage-data-label">Preço médio</div>
-                <div className="hero-collage-data-value">R$ 67.5k</div>
-                <div className="hero-collage-data-change positive">
-                  <TrendingUp size={12} />
-                  -8.2% vs FIPE
-                </div>
-              </div>
-
-              {/* Chart card */}
-              <div className="hero-collage-chart-card">
-                <div className="hero-collage-chart-header">
-                  <span className="hero-collage-chart-title">Tendência</span>
-                  <span className="hero-collage-chart-badge">Q4</span>
-                </div>
-                <svg className="hero-collage-chart" viewBox="0 0 120 40" fill="none">
-                  <path d="M0 35 Q20 30, 30 25 T60 20 T90 15 T120 8" stroke="#D4F576" strokeWidth="2" fill="none" />
-                  <circle cx="120" cy="8" r="3" fill="#D4F576" />
+          {/* CTA Button - Fingen Style */}
+          <div className="fingen-cta-wrapper">
+            <Link href="/anunciar-carro" className="fingen-cta-main">
+              <div className="fingen-cta-icon">
+                <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
-                <div className="hero-collage-chart-value">1.2k</div>
-                <div className="hero-collage-chart-label">anúncios este mês</div>
               </div>
-
-              {/* Green dot accent */}
-              <div className="hero-collage-dot-accent" />
+              <span>Anunciar carro agora</span>
+              <ArrowRight size={18} />
+            </Link>
+            <div className="fingen-cta-dots">
+              <span className="fingen-cta-dot" />
+              <span className="fingen-cta-dot" />
+              <span className="fingen-cta-dot" />
             </div>
           </div>
         </section>
@@ -367,20 +370,7 @@ export default async function HomePage() {
             <div className="fingen-stats-title">Estatísticas</div>
             <Link href="/rankings" className="fingen-stats-link">Ver rankings</Link>
           </div>
-          <div className="fingen-stats-chart">
-            {statsData.map((stat, i) => (
-              <div key={stat.label} className="fingen-stats-col">
-                <div
-                  className="fingen-stats-bar"
-                  style={{
-                    height: `${(stat.value / maxValue) * 100}%`,
-                    background: i === statsData.length - 1 ? 'var(--color-accent)' : 'rgba(255,255,255,0.15)',
-                  }}
-                />
-                <div className="fingen-stats-label">{stat.label}</div>
-              </div>
-            ))}
-          </div>
+          <AnimatedBarChart data={statsData} maxValue={maxValue} />
         </section>
 
         {/* Brands */}

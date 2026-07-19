@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell } from 'lucide-react'
+import { Bell, Menu, X, ChevronRight } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import Logo from '@/components/ui/Logo'
 
@@ -17,7 +17,6 @@ const LINKS = [
 ]
 
 export default function Navbar() {
-  const [showBanner, setShowBanner] = useState(true)
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
@@ -25,7 +24,7 @@ export default function Navbar() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8)
+    const onScroll = () => setScrolled(window.scrollY > 20)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -35,7 +34,6 @@ export default function Navbar() {
     setOpen(false)
   }, [pathname])
 
-  // Check auth and fetch unread count
   useEffect(() => {
     if (!isSupabaseBrowserConfigured()) return
     const supabase = getSupabaseBrowserClient()
@@ -76,130 +74,102 @@ export default function Navbar() {
 
   return (
     <>
-      {showBanner && (
-        <div className="top-banner" id="topBanner">
-          <span>Anuncie seu carro <strong>grátis</strong> por tempo limitado —</span>
-          <Link href="/anunciar-carro">Criar anúncio agora</Link>
-          <button className="banner-close" onClick={() => setShowBanner(false)} aria-label="Fechar aviso">×</button>
-        </div>
-      )}
-
       <motion.nav
-        className={`fingen-nav ${scrolled ? 'scrolled' : ''}`}
+        className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}
         aria-label="Navegação principal"
-        initial={{ y: -24, opacity: 0 }}
+        initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
-        <Link href="/" className="fingen-nav-logo">
-          <Logo height={48} light />
-        </Link>
+        <div className="navbar-inner">
+          {/* Logo */}
+          <Link href="/" className="navbar-logo">
+            <Logo height={64} />
+          </Link>
 
-        <div className="fingen-nav-links">
-          {LINKS.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className={`fingen-nav-link ${isActive(l.href) ? 'active' : ''}`}
-            >
-              {l.label}
-              {isActive(l.href) && (
-                <motion.span
-                  layoutId="nav-pill"
-                  className="fingen-nav-pill"
-                  transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-                />
-              )}
-            </Link>
-          ))}
-        </div>
-
-        <div className="fingen-nav-actions">
-          {isAuth ? (
-            <Link href="/notificacoes" className="fingen-nav-icon-btn" aria-label="Notificações" style={{ position: 'relative' }}>
-              <Bell size={20} strokeWidth={1.75} />
-              {unreadCount > 0 && (
-                <span
-                  className="fingen-nav-badge"
-                  style={{
-                    position: 'absolute',
-                    top: -4,
-                    right: -4,
-                    minWidth: 18,
-                    height: 18,
-                    borderRadius: 9,
-                    background: '#DC2626',
-                    color: '#fff',
-                    fontSize: 10,
-                    fontWeight: 700,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '0 4px',
-                    lineHeight: 1,
-                  }}
-                >
-                  {unreadCount > 99 ? '99+' : unreadCount}
-                </span>
-              )}
-            </Link>
-          ) : (
-            <Link href="/entrar" className="fingen-nav-ghost">Entrar</Link>
-          )}
-          <Link href="/anunciar-carro" className="fingen-nav-cta">Anunciar grátis</Link>
-        </div>
-
-        <button
-          className={`fingen-nav-burger ${open ? 'open' : ''}`}
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Abrir menu"
-          aria-expanded={open}
-        >
-          <span /><span /><span />
-        </button>
-      </motion.nav>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="fingen-nav-mobile"
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          >
+          {/* Desktop Links */}
+          <div className="navbar-links">
             {LINKS.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
-                className={`fingen-nav-link ${isActive(l.href) ? 'active' : ''}`}
+                className={`navbar-link ${isActive(l.href) ? 'navbar-link--active' : ''}`}
               >
                 {l.label}
-                {isActive(l.href) && <span className="fingen-nav-pill fingen-nav-pill-m" />}
               </Link>
             ))}
-            {isAuth && (
-              <Link href="/notificacoes" className="fingen-nav-link">
-                Notificações
+          </div>
+
+          {/* Actions */}
+          <div className="navbar-actions">
+            {isAuth ? (
+              <Link href="/notificacoes" className="navbar-icon-btn" aria-label="Notificações">
+                <Bell size={18} strokeWidth={1.75} />
                 {unreadCount > 0 && (
-                  <span style={{
-                    marginLeft: 6,
-                    background: '#DC2626',
-                    color: '#fff',
-                    fontSize: 10,
-                    fontWeight: 700,
-                    borderRadius: 9,
-                    padding: '2px 6px',
-                    lineHeight: 1.2,
-                  }}>
-                    {unreadCount}
-                  </span>
+                  <span className="navbar-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
                 )}
               </Link>
+            ) : (
+              <Link href="/entrar" className="navbar-login">
+                Entrar
+              </Link>
             )}
-            <div className="fingen-nav-mobile-actions">
-              {isAuth ? null : <Link href="/entrar" className="fingen-nav-ghost">Entrar</Link>}
-              <Link href="/anunciar-carro" className="fingen-nav-cta">Anunciar grátis</Link>
+            <Link href="/anunciar-carro" className="navbar-cta">
+              Anunciar
+            </Link>
+          </div>
+
+          {/* Mobile Toggle */}
+          <button
+            className="navbar-toggle"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={open}
+          >
+            {open ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </motion.nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="navbar-mobile"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="navbar-mobile-inner">
+              {LINKS.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className={`navbar-mobile-link ${isActive(l.href) ? 'navbar-mobile-link--active' : ''}`}
+                >
+                  <span>{l.label}</span>
+                  <ChevronRight size={16} />
+                </Link>
+              ))}
+              {isAuth && (
+                <Link href="/notificacoes" className="navbar-mobile-link">
+                  <span>Notificações</span>
+                  {unreadCount > 0 && (
+                    <span className="navbar-mobile-badge">{unreadCount}</span>
+                  )}
+                </Link>
+              )}
+              <div className="navbar-mobile-actions">
+                {!isAuth && (
+                  <Link href="/entrar" className="navbar-mobile-login">
+                    Entrar
+                  </Link>
+                )}
+                <Link href="/anunciar-carro" className="navbar-mobile-cta">
+                  Anunciar grátis
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}

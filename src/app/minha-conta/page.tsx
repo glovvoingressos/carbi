@@ -16,7 +16,6 @@ export default function MinhaContaPage() {
     <main className="profile-page-shell">
       <div className="profile-page-grid">
         <section className="profile-hero surface-strong">
-          <span className="auth-hero-kicker">Minha conta</span>
           <h1 className="auth-hero-title">Organize anúncios, conversas e dados do perfil em um só lugar.</h1>
           <p className="auth-hero-copy">
             Uma área de conta consistente com a home e com a página do anúncio, focada em gestão rápida e leitura limpa.

@@ -19,10 +19,6 @@ export default function TrafegoPagoPage() {
         <section className="tfp-hero">
           <div className="tfp-hero-inner">
             <div className="tfp-hero-content">
-              <div className="tfp-badge">
-                <Zap size={14} />
-                Tráfego pago incluso
-              </div>
               <h1 className="tfp-hero-title">
                 Seu anúncio
                 <br />

@@ -32,7 +32,7 @@ export default function Footer() {
             <Link href="/marcas">Marcas</Link>
             <Link href="/qual-carro">Qual carro comprar</Link>
             <Link href="/rankings">Tabela FIPE</Link>
-            <Link href="/melhor-carro-aplicativo">Blog</Link>
+            <Link href="/blog">Blog</Link>
           </div>
           <div className="ref-footer-col">
             <h5>Empresa</h5>

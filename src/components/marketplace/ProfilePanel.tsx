@@ -158,7 +158,6 @@ export default function ProfilePanel() {
     <section className="profile-panel surface-strong p-8 md:p-10">
       <div className="profile-panel-head">
         <div>
-          <span className="auth-hero-kicker">Perfil do usuário</span>
           <h2>Configurações</h2>
           <p>Atualize seu nome e sua foto de perfil.</p>
         </div>

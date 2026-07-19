@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src/app/entrar/page.tsx src/app/cadastro/page.tsx src/app/minha-conta/page.tsx src/components/marketplace/AuthCard.tsx src/components/marketplace/ProfilePanel.tsx",

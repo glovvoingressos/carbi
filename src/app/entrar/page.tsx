@@ -9,12 +9,13 @@ export const metadata: Metadata = {
   },
 }
 
-export default function LoginPage() {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ redirect?: string }> }) {
+  const { redirect: redirectTo } = await searchParams
+
   return (
     <div className="auth-page-shell">
       <div className="auth-page-grid">
         <section className="auth-hero-card surface-strong">
-          <span className="auth-hero-kicker">Cadastro gratuito</span>
           <h1 className="auth-hero-title">Anuncie carros grátis em minutos.</h1>
           <p className="auth-hero-copy">
             Cadastro rápido com FIPE integrada, chat interno e tráfego pago grátis para seus anúncios.
@@ -36,7 +37,7 @@ export default function LoginPage() {
         </section>
 
         <section className="auth-form-card">
-          <AuthCard redirectTo="/minha-conta" defaultMode="signup" />
+          <AuthCard redirectTo={redirectTo || '/minha-conta'} defaultMode="signup" />
         </section>
       </div>
     </div>

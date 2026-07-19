@@ -24,7 +24,6 @@ export default function ConversationsPage() {
 
         <div className="conversation-hero-line">
           <div>
-            <span className="auth-hero-kicker">Chat interno</span>
             <h1 className="conversation-title">Conversas protegidas em um painel claro.</h1>
             <p className="conversation-copy">
               Negocie pelo chat da Carbi, acompanhe propostas e responda compradores sem expor telefone ou e-mail.
