@@ -3,6 +3,7 @@ import { getAuthContext } from '@/lib/auth-server'
 import { safeSanitizeMessage } from '@/lib/marketplace'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { sendNewMessageEmail } from '@/lib/email'
+import { notifyNewMessage } from '@/lib/notifications'
 
 export async function POST(
   req: NextRequest,
@@ -90,6 +91,14 @@ export async function POST(
                 vehicleTitle: title,
                 messageContent: firstMessage,
                 conversationId: conversation.id
+              })
+
+              // In-app notification
+              await notifyNewMessage({
+                recipientUserId: listing.user_id,
+                senderName: buyer?.full_name || 'Um interessado',
+                vehicleTitle: title,
+                conversationId: conversation.id,
               })
             }
           }

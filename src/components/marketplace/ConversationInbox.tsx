@@ -33,6 +33,7 @@ interface ConversationItem {
 interface MessageItem {
   id: string
   sender_user_id: string
+  sender_name: string
   message: string
   created_at: string
 }
@@ -359,14 +360,19 @@ export default function ConversationInbox() {
                 <p className="conversation-list-muted">Carregando mensagens...</p>
               ) : null}
               <div className="conversation-message-stack">
-                {messages.map((message) => {
+                {messages.map((message, index) => {
                   const isMine = message.sender_user_id === myUserId
+                  const prevMessage = messages[index - 1]
+                  const showSenderName = !isMine && (!prevMessage || prevMessage.sender_user_id !== message.sender_user_id)
                   return (
                     <div
                       key={message.id}
                       className={`conversation-message-row ${isMine ? 'is-mine' : ''}`}
                     >
                       <div className={`conversation-bubble ${isMine ? 'is-mine' : ''}`}>
+                        {showSenderName && (
+                          <div className="conversation-sender-name">{message.sender_name}</div>
+                        )}
                         <p>{message.message}</p>
                         <time>
                           {new Date(message.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}

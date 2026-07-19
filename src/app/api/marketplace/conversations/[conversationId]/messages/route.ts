@@ -3,6 +3,7 @@ import { getAuthContext } from '@/lib/auth-server'
 import { safeSanitizeMessage } from '@/lib/marketplace'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { sendNewMessageEmail } from '@/lib/email'
+import { notifyNewMessage } from '@/lib/notifications'
 
 async function canAccessConversation(accessToken: string, conversationId: string, userId: string) {
   const supabase = getSupabaseServerClient(accessToken)
@@ -47,7 +48,27 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json(data || [])
+    // Fetch sender names from users table
+    const senderIds = [...new Set((data || []).map(m => m.sender_user_id))]
+    let senderMap: Record<string, string> = {}
+    if (senderIds.length > 0) {
+      const { data: users } = await supabase
+        .from('users')
+        .select('id, full_name')
+        .in('id', senderIds)
+      if (users) {
+        for (const u of users) {
+          senderMap[u.id] = u.full_name || 'Usuário'
+        }
+      }
+    }
+
+    const enriched = (data || []).map(m => ({
+      ...m,
+      sender_name: senderMap[m.sender_user_id] || 'Usuário',
+    }))
+
+    return NextResponse.json(enriched)
   } catch (error) {
     console.error('GET /api/marketplace/conversations/[conversationId]/messages failed', error)
     return NextResponse.json({ error: 'Falha ao carregar mensagens.' }, { status: 500 })
@@ -97,6 +118,18 @@ export async function POST(
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    // Fetch sender name
+    const { data: senderProfile } = await supabase
+      .from('users')
+      .select('full_name')
+      .eq('id', auth.userId)
+      .maybeSingle()
+
+    const enriched = {
+      ...data,
+      sender_name: senderProfile?.full_name || 'Usuário',
+    }
+
     // Processamento assíncrono para enviar notificação por e-mail
     // Não utilizamos await aqui para não atrasar a resposta da API (fire-and-forget)
     ;(async () => {
@@ -123,11 +156,10 @@ export async function POST(
           if (users) {
             const recipient = users.find(u => u.id === recipientId)
             const sender = users.find(u => u.id === auth.userId)
+            const carInfo = Array.isArray(conv.vehicle_listings) ? conv.vehicle_listings[0] : conv.vehicle_listings
+            const title = carInfo?.title || `${carInfo?.brand} ${carInfo?.model}`
 
             if (recipient?.email) {
-              const carInfo = Array.isArray(conv.vehicle_listings) ? conv.vehicle_listings[0] : conv.vehicle_listings
-              const title = carInfo?.title || `${carInfo?.brand} ${carInfo?.model}`
-
               await sendNewMessageEmail({
                 recipientEmail: recipient.email,
                 recipientName: recipient.full_name || 'Cliente',
@@ -137,6 +169,14 @@ export async function POST(
                 conversationId: conversationId
               })
             }
+
+            // In-app notification
+            await notifyNewMessage({
+              recipientUserId: recipientId,
+              senderName: sender?.full_name || 'Um usuário',
+              vehicleTitle: title,
+              conversationId,
+            })
           }
         }
       } catch (emailErr) {
@@ -144,7 +184,7 @@ export async function POST(
       }
     })()
 
-    return NextResponse.json(data, { status: 201 })
+    return NextResponse.json(enriched, { status: 201 })
   } catch (error) {
     console.error('POST /api/marketplace/conversations/[conversationId]/messages failed', error)
     return NextResponse.json({ error: 'Falha ao enviar mensagem.' }, { status: 500 })

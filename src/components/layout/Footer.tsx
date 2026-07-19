@@ -1,11 +1,14 @@
 import Link from 'next/link'
+import Logo from '@/components/ui/Logo'
 
 export default function Footer() {
   return (
     <footer className="ref-footer">
       <div className="ref-footer-top">
         <div className="ref-footer-brand">
-          <Link href="/" className="logo">car<span>bi</span></Link>
+          <Link href="/" className="logo">
+            <Logo height={112} light />
+          </Link>
           <p>Um marketplace automotivo premium com busca rápida, leitura clara e dados de mercado que ajudam a decidir com confiança.</p>
           <div className="ref-footer-verified">✓ Dados verificados com FIPE</div>
         </div>

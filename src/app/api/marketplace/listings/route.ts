@@ -4,7 +4,8 @@ import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-se
 import { ListingFormPayload, validateListingPayload } from '@/lib/marketplace'
 import { queryPublicListings } from '@/lib/marketplace-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
-import { sendListingCreatedEmail } from '@/lib/email'
+import { sendListingCreatedEmail, sendAdminNewListingEmail } from '@/lib/email'
+import { notifyListingPublished } from '@/lib/notifications'
 
 export async function GET(req: NextRequest) {
   try {
@@ -170,6 +171,26 @@ export async function POST(req: NextRequest) {
             listingSlug: data.slug
           })
         }
+
+        await sendAdminNewListingEmail({
+          vehicleTitle: resolvedTitle,
+          brand: payload.brand,
+          model: payload.model,
+          year: payload.year,
+          yearModel: payload.year_model,
+          price: payload.price,
+          city: payload.city,
+          state: payload.state,
+          sellerName: userProfile?.full_name || 'Anunciante',
+          listingSlug: data.slug
+        })
+
+        // In-app notification
+        await notifyListingPublished({
+          userId: auth.userId,
+          vehicleTitle: resolvedTitle,
+          listingSlug: data.slug,
+        })
       } catch (emailErr) {
         console.error('Falha ao enviar e-mail de confirmação de anúncio ativo:', emailErr)
       }

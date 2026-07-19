@@ -303,7 +303,82 @@ export async function sendListingCreatedEmail(params: ListingCreatedEmailParams)
   }
 }
 
-// 5. Confirmação de Anúncio Excluído
+// 5. Notificação de Admin — Novo Anúncio Criado
+interface AdminNewListingEmailParams {
+  vehicleTitle: string
+  brand: string
+  model: string
+  year: number
+  yearModel: number
+  price: number
+  city: string
+  state: string
+  sellerName: string
+  listingSlug: string
+}
+
+export async function sendAdminNewListingEmail(params: AdminNewListingEmailParams) {
+  const adminEmail = process.env.ADMIN_NOTIFY_EMAIL
+
+  if (!adminEmail) {
+    console.warn('ADMIN_NOTIFY_EMAIL não configurada. Pulando notificação de novo anúncio para o admin.')
+    return { success: true, warning: 'ADMIN_NOTIFY_EMAIL not configured' }
+  }
+
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY não configurada. Simulando envio de e-mail de novo anúncio para o admin.')
+    return { success: true, warning: 'RESEND_API_KEY not configured' }
+  }
+
+  const { vehicleTitle, brand, model, year, yearModel, price, city, state, sellerName, listingSlug } = params
+
+  try {
+    const listingLink = `${SITE_URL}/anuncios/${listingSlug}`
+
+    const data = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: adminEmail,
+      subject: `Novo anúncio: ${vehicleTitle} — ${formatBRL(price)}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 20px;">
+          <h2 style="color: #7c3aed;">Novo anúncio no marketplace</h2>
+          <p>Um novo veículo foi anunciado na plataforma CarDecision.</p>
+
+          <div style="background-color: #f5f3ff; border-left: 4px solid #7c3aed; padding: 16px; border-radius: 4px; margin: 24px 0;">
+            <p style="margin: 0; font-size: 18px; font-weight: bold; color: #5b21b6;">
+              ${vehicleTitle}
+            </p>
+            <p style="margin: 8px 0 0 0; font-size: 14px; color: #4b5563;">
+              ${brand} ${model} · ${year}/${yearModel} · ${formatBRL(price)}
+            </p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #4b5563;">
+              Local: ${city || '—'}/${state || '—'} · Anunciante: ${sellerName || '—'}
+            </p>
+          </div>
+
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="${listingLink}" style="background-color: #7c3aed; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+              Ver Anúncio
+            </a>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
+          <p style="font-size: 12px; color: #6b7280; text-align: center;">
+            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Por favor, não responda a este e-mail.
+          </p>
+        </div>
+      `,
+    })
+
+    return { success: true, data }
+  } catch (error) {
+    console.error('Falha ao enviar e-mail de novo anúncio para o admin:', error)
+    return { success: false, error }
+  }
+}
+
+// 6. Confirmação de Anúncio Excluído
 interface ListingDeletedEmailParams {
   userEmail: string
   userName: string

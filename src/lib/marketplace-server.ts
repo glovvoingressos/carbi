@@ -626,11 +626,21 @@ export async function getSellerInfo(sellerUserId: string): Promise<{
       : null
 
   const userMeta = user?.user_metadata
-  const name = userMeta?.full_name as string | null 
-    || userMeta?.name as string | null 
-    || user?.email?.split('@')[0] 
+
+  // Try to get name/avatar from the users table first, then fallback to auth metadata
+  const { data: profileRow } = await serverClient
+    .from('users')
+    .select('full_name, avatar_url')
+    .eq('id', sellerUserId)
+    .maybeSingle()
+
+  const name = profileRow?.full_name
+    || userMeta?.full_name as string | null
+    || userMeta?.name as string | null
+    || user?.email?.split('@')[0]
     || null
-  const avatarUrl = userMeta?.avatar_url as string | null 
+  const avatarUrl = profileRow?.avatar_url
+    || userMeta?.avatar_url as string | null
     || userMeta?.picture as string | null
     || null
 

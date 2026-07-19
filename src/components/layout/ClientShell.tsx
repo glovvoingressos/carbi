@@ -4,7 +4,6 @@ import { useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import Navbar from './Navbar'
 import Footer from './Footer'
-import BottomNav from './BottomNav'
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -41,7 +40,6 @@ export default function ClientShell({ children }: { children: React.ReactNode })
       <Navbar />
       <main className="page-shell" style={{ minHeight: '100vh' }}>{children}</main>
       <Footer />
-      <BottomNav />
     </>
   )
 }

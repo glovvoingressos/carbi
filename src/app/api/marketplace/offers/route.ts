@@ -3,6 +3,7 @@ import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { CreateOfferPayload, validateOfferPayload } from '@/lib/offers'
 import { sendNewOfferEmail } from '@/lib/email'
+import { notifyOfferReceived } from '@/lib/notifications'
 
 export async function POST(req: NextRequest) {
   try {
@@ -119,6 +120,15 @@ export async function POST(req: NextRequest) {
               paymentMethod: body.payment_method,
               buyerMessage: body.message || undefined,
               offerId: offer.id
+            })
+
+            // In-app notification
+            await notifyOfferReceived({
+              sellerUserId: listing.user_id,
+              buyerName: buyer?.full_name || 'Um interessado',
+              vehicleTitle: title,
+              offerValue: body.amount,
+              listingSlug: body.listing_id,
             })
           }
         }

@@ -47,32 +47,10 @@ export async function generateMetadata({
     title: query ? `Carros à venda: ${query} | Carbi` : 'Carros à venda, seminovos e usados | Carbi',
     description: 'Encontre carros à venda, seminovos e usados com preços reais, comparação FIPE e chat interno seguro na Carbi.',
     keywords: ['carros à venda', 'seminovos à venda', 'carros usados', 'comprar carro', 'carro seminovo', 'anunciar carro grátis'],
-    alternates: {
-      canonical: '/carros-a-venda',
-    },
+    alternates: { canonical: '/carros-a-venda' },
     robots: hasFilters
-      ? {
-          index: false,
-          follow: true,
-          googleBot: {
-            index: false,
-            follow: true,
-            'max-image-preview': 'large',
-            'max-snippet': -1,
-            'max-video-preview': -1,
-          },
-        }
-      : {
-          index: true,
-          follow: true,
-          googleBot: {
-            index: true,
-            follow: true,
-            'max-image-preview': 'large',
-            'max-snippet': -1,
-            'max-video-preview': -1,
-          },
-        },
+      ? { index: false, follow: true, googleBot: { index: false, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } }
+      : { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } },
     openGraph: {
       title: 'Carros à venda, seminovos e usados | Carbi',
       description: 'Encontre carros à venda, seminovos e usados com preços reais, comparação FIPE e chat interno seguro na Carbi.',
@@ -132,25 +110,30 @@ export default async function CarrosAVendaPage({
   const totalPages = Math.max(1, Math.ceil(result.total / result.pageSize))
 
   return (
-    <main className="fingen-shell">
-      <LocalBusinessSchema />
-      <BreadcrumbSchema items={[
-        { name: 'Home', url: '/' },
-        { name: 'Carros à venda', url: '/carros-a-venda' },
-      ]} />
-      <div className="fingen-shell-content">
-        <div className="fingen-shell-hero">
-          <div className="fingen-breadcrumb">
-            <Link href="/">Home</Link>
-            <span>/</span>
-            <span>Carros à venda</span>
-          </div>
-          <h1 className="text-balance">Carros à venda</h1>
-          <p className="text-pretty">
-            Encontre o veículo perfeito entre os {result.total} anúncios ativos na plataforma. Compare com FIPE e negocie com segurança.
-          </p>
-        </div>
+    <div className="cbi-page">
+      <main className="cbi-main">
+        <LocalBusinessSchema />
+        <BreadcrumbSchema items={[
+          { name: 'Home', url: '/' },
+          { name: 'Carros à venda', url: '/carros-a-venda' },
+        ]} />
 
+        {/* Minimalist Hero */}
+        <section className="cbi-hero">
+          <div className="cbi-hero-eyebrow">Marketplace</div>
+          <h1 className="cbi-hero-title">
+            {query ? (
+              <>Resultados para <em>&ldquo;{query}&rdquo;</em></>
+            ) : (
+              <>Encontre o carro <em>perfeito</em></>
+            )}
+          </h1>
+          <p className="cbi-hero-sub">
+            {result.total} anúncios ativos na plataforma. Compare com a Tabela FIPE e negocie com segurança.
+          </p>
+        </section>
+
+        {/* Marketplace */}
         <MarketplaceClient 
           initialListings={listings}
           initialTotal={result.total}
@@ -159,39 +142,8 @@ export default async function CarrosAVendaPage({
           filterOptions={filterOptions}
         />
 
-        {/* Bottom SEO Content */}
-        <div className="mt-16 md:mt-24">
-          <section className="fingen-card-dark">
-            <h2 className="text-balance mb-6" style={{ color: '#fff' }}>Compre seu próximo carro com segurança</h2>
-            <div className="fingen-grid-2" style={{ gap: '32px' }}>
-              <div>
-                <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, marginBottom: '16px' }}>
-                  O marketplace da Carbi foi desenhado para eliminar o atrito na compra e venda de veículos. Aqui, cada detalhe importa: desde a precisão dos dados técnicos até a segurança do chat interno.
-                </p>
-                <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.7 }}>
-                  Utilizamos inteligência de dados para comparar preços com a Tabela FIPE em tempo real, garantindo que você faça sempre o melhor negócio.
-                </p>
-              </div>
-              <div>
-                <h3 style={{ color: '#fff', fontSize: '18px', fontWeight: 700, marginBottom: '16px' }}>Destaques da Plataforma</h3>
-                <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {[
-                    'Verificação de procedência via dados técnicos',
-                    'Comparação automática com preço de mercado',
-                    'Filtros avançados por categoria e opcionais',
-                    'Negociação direta sem intermediários',
-                    'Chat seguro com criptografia'
-                  ].map(item => (
-                    <li key={item} style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'rgba(255,255,255,0.8)', fontSize: '14px', fontWeight: 500 }}>
-                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0 }} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
-
+        {/* FAQ */}
+        <section className="cbi-section">
           <FAQSection
             items={[
               { q: 'Como comprar um carro com segurança na Carbi?', a: 'Sempre utilize nosso chat interno para negociação, verifique as fotos detalhadas e agende visitas em locais públicos e movimentados.' },
@@ -199,8 +151,27 @@ export default async function CarrosAVendaPage({
               { q: 'Como saber se o carro está com preço justo?', a: 'Cada anúncio exibe uma comparação automática com a Tabela FIPE do mês vigente, indicando se o valor está abaixo, na média ou acima do mercado.' }
             ]}
           />
-        </div>
-      </div>
-    </main>
+        </section>
+      </main>
+
+      {/* Bottom navigation */}
+      <nav className="cbi-nav">
+        <Link href="/"><span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Home</span></Link>
+        <Link href="/carros-a-venda" className="active"><span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+          Buscar</span></Link>
+        <Link href="/anunciar-carro"><span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+          Anunciar</span></Link>
+        <Link href="/minha-conta/conversas"><span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Chat</span></Link>
+        <Link href="/minha-conta"><span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2"/></svg>
+          Perfil</span></Link>
+      </nav>
+    </div>
   )
 }

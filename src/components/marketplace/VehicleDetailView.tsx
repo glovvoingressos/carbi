@@ -96,6 +96,12 @@ function initials(name: string | null | undefined) {
   return `${parts[0]?.[0] || 'P'}${parts[1]?.[0] || ''}`.toUpperCase()
 }
 
+function firstName(name: string | null | undefined) {
+  if (!name) return 'Vendedor particular'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  return parts[0] || 'Vendedor particular'
+}
+
 function getFipeLabel(status: VehicleDetailViewProps['comparison']['status']) {
   if (status === 'below') return 'Abaixo da FIPE'
   if (status === 'near') return 'Na média da FIPE'
@@ -150,6 +156,7 @@ export default function VehicleDetailView({
   ]
 
   const sellerName = sellerInfo?.name || 'Vendedor particular'
+  const sellerFirstName = firstName(sellerInfo?.name)
   const sellerYears = Math.max(0, new Date().getFullYear() - new Date(sellerInfo?.memberSince || Date.now()).getFullYear())
   const publicPath = pageUrl ? pageUrl.replace(/^https?:\/\//, '') : `carbi.com.br/anuncios/${listing.slug}`
 
@@ -194,20 +201,18 @@ export default function VehicleDetailView({
         </div>
       </header>
 
-      {/* Main Layout */}
+      {/* Top: Gallery + Summary side-by-side (desktop) */}
       <div className="fingen-detail-layout">
-        {/* Left Column - Gallery */}
+        {/* Gallery */}
         <div className="fingen-detail-gallery">
           <ListingImageGallery
             images={listingImages}
             title={listing.title}
-            badgeLabel={listing.badges?.[0]?.label || 'Anúncio Carbi'}
-            fipeBadgeLabel={fipePrice ? fipeStatus : undefined}
           />
         </div>
 
-        {/* Right Column - Content */}
-        <div className="fingen-detail-content">
+        {/* Ad Summary */}
+        <div className="fingen-detail-summary">
           {/* Price Card */}
           <section className="fingen-detail-price-card">
             <div className="fingen-detail-price-header">
@@ -253,122 +258,125 @@ export default function VehicleDetailView({
               <ChatStarter listingId={listing.id} label="Chat na Carbi" />
             </div>
           </section>
+        </div>
+      </div>
 
-          {/* FIPE Comparison */}
-          {fipePrice && (
-            <section className="fingen-detail-card-dark">
-              <div className="fingen-detail-dark-header">
-                <h3>Comparativo FIPE</h3>
-                <span className={`fingen-detail-dark-badge ${comparison.status === 'below' ? 'success' : ''}`}>
-                  {fipeStatus}
+      {/* Below: the rest of the listing, full width */}
+      <div className="fingen-detail-rest">
+        {/* FIPE Comparison */}
+        {fipePrice && (
+          <section className="fingen-detail-card-dark">
+            <div className="fingen-detail-dark-header">
+              <h3>Comparativo FIPE</h3>
+              <span className={`fingen-detail-dark-badge ${comparison.status === 'below' ? 'success' : ''}`}>
+                {fipeStatus}
+              </span>
+            </div>
+            <div className="fingen-detail-dark-value">{formatBRL(fipePrice)}</div>
+            <div className="fingen-detail-dark-label">Tabela FIPE referência</div>
+            {diffValue !== null && (
+              <div className="fingen-detail-dark-diff">
+                <span className={diffValue <= 0 ? 'positive' : 'negative'}>
+                  {diffValue <= 0 ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
+                  {diffValue > 0 ? '+' : ''}{formatBRL(diffValue)}
                 </span>
               </div>
-              <div className="fingen-detail-dark-value">{formatBRL(fipePrice)}</div>
-              <div className="fingen-detail-dark-label">Tabela FIPE referência</div>
-              {diffValue !== null && (
-                <div className="fingen-detail-dark-diff">
-                  <span className={diffValue <= 0 ? 'positive' : 'negative'}>
-                    {diffValue <= 0 ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
-                    {diffValue > 0 ? '+' : ''}{formatBRL(diffValue)}
-                  </span>
-                </div>
-              )}
-            </section>
-          )}
+            )}
+          </section>
+        )}
 
-          {/* Details */}
+        {/* Details */}
+        <section className="fingen-detail-card">
+          <h3 className="fingen-detail-card-title">Detalhes do veículo</h3>
+          <div className="fingen-detail-specs-grid">
+            {detailItems.map((item) => (
+              <div className="fingen-detail-spec-item" key={item.label}>
+                <div className="fingen-detail-spec-label">{item.label}</div>
+                <div className="fingen-detail-spec-value">{item.value}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Optionals */}
+        {listing.optional_items && listing.optional_items.length > 0 && (
           <section className="fingen-detail-card">
-            <h3 className="fingen-detail-card-title">Detalhes do veículo</h3>
-            <div className="fingen-detail-specs-grid">
-              {detailItems.map((item) => (
-                <div className="fingen-detail-spec-item" key={item.label}>
-                  <div className="fingen-detail-spec-label">{item.label}</div>
-                  <div className="fingen-detail-spec-value">{item.value}</div>
+            <h3 className="fingen-detail-card-title">Opcionais</h3>
+            <div className="fingen-detail-optionals-grid">
+              {listing.optional_items.map((item) => (
+                <div className="fingen-detail-optional-item" key={item}>
+                  <Check size={14} className="text-[var(--color-trust)]" />
+                  {item}
                 </div>
               ))}
             </div>
           </section>
+        )}
 
-          {/* Optionals */}
-          {listing.optional_items && listing.optional_items.length > 0 && (
-            <section className="fingen-detail-card">
-              <h3 className="fingen-detail-card-title">Opcionais</h3>
-              <div className="fingen-detail-optionals-grid">
-                {listing.optional_items.map((item) => (
-                  <div className="fingen-detail-optional-item" key={item}>
-                    <Check size={14} className="text-[var(--color-trust)]" />
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Description */}
-          {listing.description && (
-            <section className="fingen-detail-card">
-              <h3 className="fingen-detail-card-title">Descrição</h3>
-              <p className="fingen-detail-description">{listing.description}</p>
-            </section>
-          )}
-
-          {/* Safety */}
-          <section className="fingen-detail-card">
-            <h3 className="fingen-detail-card-title">Segurança na compra</h3>
-            <div className="fingen-detail-safety-list">
-              <div className="fingen-detail-safety-item">
-                <ShieldCheck size={16} className="text-[var(--color-trust)]" />
-                <span>Negocie pelo chat interno. Evite compartilhar telefone antes de verificar o veículo.</span>
-              </div>
-              <div className="fingen-detail-safety-item">
-                <Calendar size={16} className="text-[var(--color-trust)]" />
-                <span>Faça test drive e vistoria antes de fechar negócio.</span>
-              </div>
-              <div className="fingen-detail-safety-item">
-                <BadgeCheck size={16} className="text-[var(--color-trust)]" />
-                <span>Confira documentação, chassi e histórico antes de transferir.</span>
-              </div>
-            </div>
+        {/* Description */}
+        {listing.description && (
+          <section className="fingen-detail-card fingen-detail-card--full">
+            <h3 className="fingen-detail-card-title">Descrição</h3>
+            <p className="fingen-detail-description">{listing.description}</p>
           </section>
+        )}
 
-          {/* Seller */}
-          <section className="fingen-detail-card">
-            <h3 className="fingen-detail-card-title">Vendedor</h3>
-            <div className="fingen-detail-seller">
-              <div className="fingen-detail-seller-avatar">
-                {sellerInfo?.avatarUrl ? (
-                  <img src={sellerInfo.avatarUrl} alt={sellerName} />
-                ) : (
-                  initials(sellerName)
-                )}
-              </div>
-              <div className="fingen-detail-seller-info">
-                <div className="fingen-detail-seller-name">{sellerName}</div>
-                <div className="fingen-detail-seller-type">Vendedor particular</div>
-              </div>
+        {/* Safety */}
+        <section className="fingen-detail-card">
+          <h3 className="fingen-detail-card-title">Segurança na compra</h3>
+          <div className="fingen-detail-safety-list">
+            <div className="fingen-detail-safety-item">
+              <ShieldCheck size={16} className="text-[var(--color-trust)]" />
+              <span>Negocie pelo chat interno. Evite compartilhar telefone antes de verificar o veículo.</span>
             </div>
-            <div className="fingen-detail-seller-stats">
-              <div><strong>{sellerInfo?.activeListings ?? 1}</strong><span>anúncios</span></div>
-              <div><strong>{sellerYears || 1}</strong><span>no Carbi</span></div>
+            <div className="fingen-detail-safety-item">
+              <Calendar size={16} className="text-[var(--color-trust)]" />
+              <span>Faça test drive e vistoria antes de fechar negócio.</span>
             </div>
-          </section>
+            <div className="fingen-detail-safety-item">
+              <BadgeCheck size={16} className="text-[var(--color-trust)]" />
+              <span>Confira documentação, chassi e histórico antes de transferir.</span>
+            </div>
+          </div>
+        </section>
 
-          {/* Share */}
-          <section className="fingen-detail-card">
-            <h3 className="fingen-detail-card-title">Compartilhar</h3>
-            <div className="fingen-detail-share">
-              <button type="button" onClick={handleCopy} className="fingen-detail-share-btn" aria-label={copied ? 'Link copiado' : 'Copiar link do anúncio'}>
-                <Copy size={14} />
-                {copied ? 'Copiado!' : 'Copiar link'}
-              </button>
+        {/* Seller */}
+        <section className="fingen-detail-card">
+          <h3 className="fingen-detail-card-title">Vendedor</h3>
+          <div className="fingen-detail-seller">
+            <div className="fingen-detail-seller-avatar">
+              {sellerInfo?.avatarUrl ? (
+                <img src={sellerInfo.avatarUrl} alt={sellerFirstName} />
+              ) : (
+                initials(sellerName)
+              )}
             </div>
-          </section>
+            <div className="fingen-detail-seller-info">
+              <div className="fingen-detail-seller-name">{sellerFirstName}</div>
+              <div className="fingen-detail-seller-type">Vendedor particular</div>
+            </div>
+          </div>
+          <div className="fingen-detail-seller-stats">
+            <div><strong>{sellerInfo?.activeListings ?? 1}</strong><span>anúncios</span></div>
+            <div><strong>{sellerYears || 1}</strong><span>no Carbi</span></div>
+          </div>
+        </section>
 
-          {/* Report */}
-          <button type="button" onClick={() => setShowReportModal(true)} className="fingen-detail-report" aria-label="Denunciar este anúncio">
-            Denunciar anúncio
-          </button>
-        </div>
+        {/* Share */}
+        <section className="fingen-detail-card">
+          <h3 className="fingen-detail-card-title">Compartilhar</h3>
+          <div className="fingen-detail-share">
+            <button type="button" onClick={handleCopy} className="fingen-detail-share-btn" aria-label={copied ? 'Link copiado' : 'Copiar link do anúncio'}>
+              <Copy size={14} />
+              {copied ? 'Copiado!' : 'Copiar link'}
+            </button>
+          </div>
+        </section>
+
+        {/* Report */}
+        <button type="button" onClick={() => setShowReportModal(true)} className="fingen-detail-report fingen-detail-report--full" aria-label="Denunciar este anúncio">
+          Denunciar anúncio
+        </button>
       </div>
 
       {/* Similar Cars */}

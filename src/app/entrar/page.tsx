@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import AuthCard from '@/components/marketplace/AuthCard'
 
 export const metadata: Metadata = {
-  title: 'Entrar | Carbi',
+  title: 'Criar conta ou Entrar | Carbi',
   robots: {
     index: false,
     follow: false,
@@ -14,29 +14,29 @@ export default function LoginPage() {
     <div className="auth-page-shell">
       <div className="auth-page-grid">
         <section className="auth-hero-card surface-strong">
-          <span className="auth-hero-kicker">Acesso rápido</span>
-          <h1 className="auth-hero-title">Entre para gerenciar seus anúncios e conversar com compradores.</h1>
+          <span className="auth-hero-kicker">Cadastro gratuito</span>
+          <h1 className="auth-hero-title">Anuncie carros grátis em minutos.</h1>
           <p className="auth-hero-copy">
-            A mesma identidade visual da home e do anúncio, com foco em conversão, clareza e acesso rápido ao seu painel.
+            Cadastro rápido com FIPE integrada, chat interno e tráfego pago grátis para seus anúncios.
           </p>
           <div className="auth-hero-points">
             <div className="auth-hero-point">
-              <strong>Anúncios e chat</strong>
-              <span>Veja seus veículos publicados e conversas em um só lugar.</span>
+              <strong>Publicação rápida</strong>
+              <span>Anuncie em menos de 2 minutos.</span>
             </div>
             <div className="auth-hero-point">
-              <strong>Dados protegidos</strong>
-              <span>O contato direto continua protegido pelo chat interno.</span>
+              <strong>FIPE integrada</strong>
+              <span>Preço de referência verificado.</span>
             </div>
             <div className="auth-hero-point">
-              <strong>Visual consistente</strong>
-              <span>Mesmo padrão da home, do anúncio e do perfil do usuário.</span>
+              <strong>Tráfego grátis</strong>
+              <span>Seus anúncios no Google e Meta Ads sem custo.</span>
             </div>
           </div>
         </section>
 
         <section className="auth-form-card">
-          <AuthCard redirectTo="/minha-conta" />
+          <AuthCard redirectTo="/minha-conta" defaultMode="signup" />
         </section>
       </div>
     </div>
