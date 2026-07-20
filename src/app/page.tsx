@@ -204,9 +204,6 @@ export default async function HomePage() {
         {/* Free Promo Banner */}
         <section className="fingen-banner fingen-promo-banner">
           <div className="fingen-banner-content fingen-promo-content">
-            <div className="fingen-banner-icon fingen-promo-icon">
-              <Tag size={20} />
-            </div>
             <div className="fingen-banner-text">
               <strong>Anuncie grátis por tempo limitado</strong>
               <span>Publique seu carro sem custo e alcance milhares de compradores.</span>
