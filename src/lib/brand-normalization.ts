@@ -10,60 +10,108 @@
  */
 
 const BRAND_CANONICAL_MAP: Record<string, string> = {
-  // Citroen
+  // Citroën
   'citroen': 'Citroën',
   'citroën': 'Citroën',
-  
+
   // RAM
   'ram': 'RAM',
   'ram trucks': 'RAM',
-  
+
   // CAOA Chery
   'caoa chery': 'CAOA Chery',
   'chery': 'CAOA Chery',
   'caoachery': 'CAOA Chery',
-  
+
   // Omoda / Jaecoo
   'omoda': 'Omoda',
   'omoda jaecoo': 'Omoda Jaecoo',
   'jaecoo': 'Jaecoo',
-  
+
   // GWM / Haval
   'gwm': 'GWM',
   'haval': 'GWM',
   'great wall': 'GWM',
-  
+  'great wall motors': 'GWM',
+
   // BYD
   'byd': 'BYD',
-  
+  'build your dreams': 'BYD',
+
   // Volkswagen
   'volkswagen': 'Volkswagen',
   'vw': 'Volkswagen',
   'v.w.': 'Volkswagen',
-  
+  'volks': 'Volkswagen',
+
   // Chevrolet
   'chevrolet': 'Chevrolet',
   'chevy': 'Chevrolet',
   'gm': 'Chevrolet',
-  
-  // Mercedes
+  'general motors': 'Chevrolet',
+
+  // Mercedes-Benz
   'mercedes-benz': 'Mercedes-Benz',
   'mercedes benz': 'Mercedes-Benz',
   'mercedes': 'Mercedes-Benz',
-  
+
   // Land Rover
   'land rover': 'Land Rover',
   'landrover': 'Land Rover',
-  
+  'land-rover': 'Land Rover',
+
   // Alfa Romeo
   'alfa romeo': 'Alfa Romeo',
   'alfaromeo': 'Alfa Romeo',
-  
-  // Others that might have variations
-  'land-rover': 'Land Rover',
   'alfa-romeo': 'Alfa Romeo',
+  'alfa': 'Alfa Romeo',
+
+  // Aston Martin
   'aston martin': 'Aston Martin',
   'aston-martin': 'Aston Martin',
+
+  // Rolls-Royce
+  'rolls-royce': 'Rolls-Royce',
+  'rolls royce': 'Rolls-Royce',
+
+  // BMW
+  'bmw': 'BMW',
+  'bayerische': 'BMW',
+
+  // Hyundai
+  'hyundai': 'Hyundai',
+  'hundai': 'Hyundai',
+
+  // Peugeot
+  'peugeot': 'Peugeot',
+  'peugeout': 'Peugeot',
+
+  // Mitsubishi
+  'mitsubishi': 'Mitsubishi',
+  'mitsubish': 'Mitsubishi',
+
+  // JAC
+  'jac': 'JAC',
+  'jac motors': 'JAC',
+
+  // Changan
+  'changan': 'Changan',
+
+  // Dongfeng
+  'dongfeng': 'Dongfeng',
+
+  // Foton
+  'foton': 'Foton',
+
+  // Exeed
+  'exeed': 'Exeed',
+
+  // Genesis
+  'genesis': 'Genesis',
+
+  // Stellantis
+  'stellantis': 'Fiat',
+  'fiat chrysler': 'Fiat',
 }
 
 /**
