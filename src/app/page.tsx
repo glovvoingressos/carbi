@@ -134,8 +134,31 @@ export default async function HomePage() {
       <main className="fingen-main">
         {/* Hero Section - Creative Agency Style */}
         <section className="hero-creative">
-          {/* Dot Grid Background */}
-          <div className="hero-creative-bg" />
+          {/* Grid Pattern Background */}
+          <div className="hero-creative-grid-wrapper">
+            <GridPattern
+              width={30}
+              height={30}
+              x={-1}
+              y={-1}
+              squares={[
+                [4, 4],
+                [5, 1],
+                [8, 2],
+                [5, 3],
+                [5, 5],
+                [10, 10],
+                [12, 15],
+                [15, 10],
+                [10, 15],
+              ]}
+              className={cn(
+                "[mask-image:radial-gradient(80%_50%_at_center,white,transparent)]",
+                "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12",
+                "hero-creative-grid"
+              )}
+            />
+          </div>
 
           {/* Subtitle */}
           <div className="hero-creative-eyebrow">Compre, compare e anuncie carros</div>
