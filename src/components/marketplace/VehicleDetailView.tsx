@@ -9,7 +9,6 @@ import {
   Check,
   Copy,
   Fuel,
-  HandCoins,
   Heart,
   MapPin,
   MessageCircle,
@@ -26,7 +25,6 @@ import { formatBRL } from '@/data/cars'
 import { trackEvent } from '@/lib/analytics'
 import ListingImageGallery from './ListingImageGallery'
 import ChatStarter from './ChatStarter'
-import OfferModal from './OfferModal'
 import OfferHistory from './OfferHistory'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import MarketplaceListingImage from './MarketplaceListingImage'
@@ -89,7 +87,6 @@ export default function VehicleDetailView({
   comparison,
 }: VehicleDetailViewProps) {
   const [isFavorite, setIsFavorite] = useState(false)
-  const [showOfferModal, setShowOfferModal] = useState(false)
   const [sessionUserId, setSessionUserId] = useState<string | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [pageUrl, setPageUrl] = useState('')
@@ -247,10 +244,6 @@ export default function VehicleDetailView({
 
           {/* CTA Buttons */}
           <section className="fingen-detail-cta">
-            <button type="button" className="fingen-detail-cta-primary" onClick={() => setShowOfferModal(true)}>
-              <HandCoins size={18} />
-              Fazer oferta
-            </button>
             <div className="fingen-detail-cta-chat">
               <ChatStarter listingId={listing.id} label="Chat na Carbi" />
             </div>
@@ -414,9 +407,6 @@ export default function VehicleDetailView({
           <strong>{formatBRL(price)}</strong>
           {fipePrice && <span>FIPE {formatBRL(fipePrice)}</span>}
         </div>
-        <button type="button" className="fingen-detail-mobile-offer" onClick={() => setShowOfferModal(true)}>
-          <HandCoins size={16} /> Oferta
-        </button>
         <div className="fingen-detail-mobile-chat">
           <ChatStarter listingId={listing.id} label="Chat" />
         </div>
@@ -424,14 +414,6 @@ export default function VehicleDetailView({
 
       {/* Modals */}
       <OfferHistory listingId={listing.id} isSeller={isSeller} accessToken={accessToken} />
-
-      <OfferModal
-        listingId={listing.id}
-        listingPrice={price}
-        listingTitle={`${listing.brand} ${listing.model} ${listing.year_model}`}
-        isOpen={showOfferModal}
-        onClose={() => setShowOfferModal(false)}
-      />
 
       <ConfirmModal
         isOpen={showReportModal}
