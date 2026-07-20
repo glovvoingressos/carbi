@@ -832,6 +832,7 @@ p {
 
 .page-shell {
   position: relative;
+  padding-top: 72px;
 }
 
 .page-shell::before {
@@ -10184,8 +10185,10 @@ p {
 
 /* ╁━━ Navbar Modern ╁━━ */
 .navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   width: 100%;
   background: rgba(255, 255, 255, 0.95);

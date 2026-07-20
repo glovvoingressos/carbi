@@ -102,18 +102,17 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="navbar-actions">
-            {isAuth ? (
+            {isAuth && (
               <Link href="/notificacoes" className="navbar-icon-btn" aria-label="Notificações">
                 <Bell size={18} strokeWidth={1.75} />
                 {unreadCount > 0 && (
                   <span className="navbar-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
                 )}
               </Link>
-            ) : (
-              <Link href="/entrar" className="navbar-login">
-                Entrar
-              </Link>
             )}
+            <Link href="/entrar" className="navbar-login">
+              Entrar
+            </Link>
             <Link href="/anunciar-carro" className="navbar-cta">
               Anunciar
             </Link>
