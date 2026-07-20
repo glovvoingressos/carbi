@@ -66,7 +66,7 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
       <div className="comparison-grid">
         {selected.map((car, i) => (
           <motion.div
-            key={`${car.slug}-${i}`}
+            key={`col-${i}-${car.slug}`}
             className="comparison-col"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -95,9 +95,9 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                     transition={{ duration: 0.15 }}
                   >
                     <div className="comparison-dropdown-scroll">
-                      {getAvailableCars(i).map((opt) => (
+                      {getAvailableCars(i).map((opt, j) => (
                         <button
-                          key={opt.slug}
+                          key={`${opt.slug}-${j}`}
                           className={`comparison-dropdown-item ${opt.slug === car.slug ? 'active' : ''}`}
                           onClick={() => handleSelect(i, opt)}
                         >
