@@ -118,6 +118,16 @@ export default function Navbar() {
             </Link>
           </div>
 
+          {/* Mobile Notification Icon */}
+          {isAuth && (
+            <Link href="/notificacoes" className="navbar-icon-btn navbar-icon-btn--mobile" aria-label="Notificações">
+              <Bell size={18} strokeWidth={1.75} />
+              {unreadCount > 0 && (
+                <span className="navbar-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
+              )}
+            </Link>
+          )}
+
           {/* Mobile Toggle */}
           <button
             className="navbar-toggle"

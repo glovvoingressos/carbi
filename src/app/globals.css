@@ -10452,6 +10452,10 @@ p {
     display: none;
   }
 
+  .navbar-icon-btn--mobile {
+    display: flex;
+  }
+
   .navbar-toggle {
     display: flex;
   }
@@ -10463,6 +10467,11 @@ p {
   .navbar-mobile {
     top: 56px;
   }
+}
+
+/* Hide mobile notification icon on desktop */
+.navbar-icon-btn--mobile {
+  display: none;
 }
 
 /* ╁━━ Hero Clean Centered ╁━━ */
