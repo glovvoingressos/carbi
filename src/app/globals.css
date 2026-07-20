@@ -7503,13 +7503,14 @@ p {
 /* Header */
 .fingen-detail-header {
   position: sticky;
-  top: 72px;
+  top: 0;
   z-index: 90;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
   background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .fingen-detail-back {
@@ -10183,7 +10184,7 @@ p {
   }
 }
 
-/* ╁━━ Navbar Modern ╁━━ */
+/* ╁━━ Navbar ╁━━ */
 .navbar {
   position: fixed;
   top: 0;
@@ -10195,7 +10196,18 @@ p {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--color-border);
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(0);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.3s ease;
+}
+
+.navbar--hidden {
+  transform: translateY(-100%);
+  box-shadow: none;
+}
+
+.navbar:not(.navbar--hidden) {
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
 }
 
 .navbar-inner {
@@ -10205,10 +10217,6 @@ p {
   max-width: 1200px;
   margin: 0 auto;
   padding: 8px 24px;
-}
-
-.navbar--scrolled {
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
 }
 
 .navbar-logo {
@@ -10343,17 +10351,25 @@ p {
 }
 
 /* Mobile Menu */
+.navbar-mobile-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+  background: rgba(0, 0, 0, 0.3);
+}
+
 .navbar-mobile {
   position: fixed;
-  top: 56px;
+  top: 0;
   left: 0;
   right: 0;
   z-index: 99;
+  padding-top: 64px;
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--color-border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 .navbar-mobile-inner {
@@ -10445,6 +10461,11 @@ p {
   background: #C8E64E;
 }
 
+/* Hide mobile-only elements on desktop */
+.navbar-icon-btn--mobile {
+  display: none;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .navbar-links,
@@ -10463,15 +10484,6 @@ p {
   .navbar-inner {
     padding: 12px 16px;
   }
-
-  .navbar-mobile {
-    top: 56px;
-  }
-}
-
-/* Hide mobile notification icon on desktop */
-.navbar-icon-btn--mobile {
-  display: none;
 }
 
 /* ╁━━ Hero Clean Centered ╁━━ */
