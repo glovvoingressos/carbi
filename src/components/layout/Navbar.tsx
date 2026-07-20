@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Bell, Menu, X, ChevronRight } from 'lucide-react'
@@ -17,15 +17,29 @@ const LINKS = [
 ]
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const [open, setOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
   const [isAuth, setIsAuth] = useState(false)
   const pathname = usePathname()
+  const lastScrollY = useRef(0)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    onScroll()
+    const onScroll = () => {
+      const currentY = window.scrollY
+      // Always show at top
+      if (currentY < 60) {
+        setHidden(false)
+      } else if (currentY > lastScrollY.current + 5) {
+        // Scrolling down — hide
+        setHidden(true)
+        setOpen(false)
+      } else if (currentY < lastScrollY.current - 5) {
+        // Scrolling up — show
+        setHidden(false)
+      }
+      lastScrollY.current = currentY
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -75,11 +89,11 @@ export default function Navbar() {
   return (
     <>
       <motion.nav
-        className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}
+        className="navbar"
         aria-label="Navegação principal"
         initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        animate={{ y: hidden ? -100 : 0, opacity: hidden ? 0 : 1 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="navbar-inner">
           {/* Logo */}
