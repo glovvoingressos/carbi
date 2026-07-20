@@ -6950,6 +6950,13 @@ p {
   transition: all 0.25s ease;
 }
 
+@media (min-width: 768px) {
+  .fingen-category-img {
+    width: 220px;
+    height: 160px;
+  }
+}
+
 .fingen-category-label {
   font-size: 14px;
   font-weight: 600;
