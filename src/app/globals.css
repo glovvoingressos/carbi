@@ -5941,133 +5941,166 @@ p {
 }
 
 /* Hero Section - Fingen Style Balance Card */
-.fingen-hero {
+/* ═══════════════════════════════════════════════════════════════════
+   HERO CREATIVE - Agency Style
+   ═══════════════════════════════════════════════════════════════════ */
+
+.hero-creative {
   position: relative;
-  padding: 64px 0 88px;
-  min-height: 520px;
+  min-height: 85vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  animation: fingen-fade-in 0.6s ease;
+  padding: 80px 24px 60px;
   overflow: hidden;
+  text-align: center;
 }
 
-/* Grid Pattern Background */
-.fingen-hero-grid-wrapper {
+/* Dot Grid Background */
+.hero-creative-bg {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
   pointer-events: none;
 }
 
-.fingen-hero-grid {
-  color: rgba(212, 245, 118, 0.15);
-  opacity: 0.6;
-}
-
-/* Balance Card */
-.fingen-balance-card {
-  padding: 0;
-  margin-bottom: 40px;
-}
-
-.fingen-balance-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
-.fingen-balance-label {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-}
-
-.fingen-balance-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.fingen-balance-action-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-primary);
-  text-decoration: none;
-  transition: all 0.15s ease;
-}
-
-.fingen-balance-action-btn:active {
-  transform: scale(0.92);
-  background: var(--color-bg-muted);
-}
-
-.fingen-balance-amount {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-  font-family: var(--font-heading);
-  font-size: clamp(48px, 12vw, 72px);
-  font-weight: 700;
-  color: var(--color-text-primary);
-  letter-spacing: -3px;
-  line-height: 1;
-}
-
-.fingen-balance-suffix {
-  font-size: 16px;
+/* Eyebrow */
+.hero-creative-eyebrow {
+  font-size: 14px;
   font-weight: 500;
   color: var(--color-text-tertiary);
-  letter-spacing: 0;
-  margin-left: 4px;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
 }
 
-.fingen-balance-change {
+/* Main Title */
+.hero-creative-title {
+  font-family: var(--font-heading);
+  font-size: clamp(40px, 11vw, 80px);
+  font-weight: 800;
+  color: #0A0A0A;
+  line-height: 1.05;
+  letter-spacing: -3px;
+  margin: 0 0 24px;
+  max-width: 800px;
+}
+
+/* Highlighted Word */
+.hero-creative-highlight {
+  display: inline-block;
+  background: #C8F169;
+  border-radius: 12px;
+  padding: 0 16px;
+  position: relative;
+}
+.hero-creative-highlight-text {
+  color: #0A0A0A;
+  display: inline-block;
+}
+
+/* Description */
+.hero-creative-desc {
+  font-size: 17px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto 36px;
+}
+
+/* CTA Buttons */
+.hero-creative-cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+.hero-creative-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  background: var(--color-accent);
-  color: var(--color-text-primary);
-  border-radius: var(--radius-full);
-  font-size: 13px;
-  font-weight: 600;
-  animation: fingen-scale-in 0.5s ease 0.2s both;
-}
-
-/* Hero Title */
-.fingen-hero-title {
-  font-family: var(--font-heading);
-  font-size: clamp(36px, 10vw, 52px);
-  font-weight: 700;
-  color: var(--color-text-primary);
-  line-height: 1.1;
-  letter-spacing: -2px;
-  margin: 24px 0;
-  text-align: center;
-}
-
-.fingen-hero-title-accent {
-  color: #5D9400;
-  display: inline-block;
-  padding: 0 8px;
-  text-shadow: 0 0 20px rgba(93, 148, 0, 0.2);
-}
-
-.fingen-balance-sub {
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 50px;
   font-size: 15px;
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-  margin-top: 8px;
-  text-align: center;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: #0A0A0A;
+  color: #fff;
+}
+.hero-creative-btn:active {
+  transform: scale(0.97);
+}
+.hero-creative-btn:hover {
+  background: #1a1a1a;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.hero-creative-btn-outline {
+  background: transparent;
+  color: #0A0A0A;
+  border: 2px solid #E5E5E5;
+}
+.hero-creative-btn-outline:hover {
+  border-color: #0A0A0A;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Scroll Indicator */
+.hero-creative-scroll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.hero-creative-scroll span {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.hero-creative-scroll-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #0A0A0A;
+  animation: hero-scroll-bounce 1.5s ease-in-out infinite;
+}
+@keyframes hero-scroll-bounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(8px); opacity: 0.5; }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .hero-creative {
+    min-height: 90vh;
+    padding: 60px 20px 60px;
+  }
+  .hero-creative-title {
+    font-size: clamp(36px, 12vw, 56px);
+    letter-spacing: -2px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .hero-creative {
+    min-height: 80vh;
+    padding: 80px 48px 60px;
+  }
+  .hero-creative-title {
+    font-size: clamp(56px, 8vw, 88px);
+    letter-spacing: -4px;
+  }
 }
 
 /* Quick Actions Row */
@@ -7421,21 +7454,6 @@ p {
 
   .fingen-shell-content {
     padding: 0 16px;
-  }
-
-  /* Hero Desktop */
-  .fingen-hero {
-    padding: 48px 0;
-  }
-
-  .fingen-hero-title {
-    font-size: clamp(36px, 5vw, 60px);
-    letter-spacing: -2px;
-  }
-
-  .fingen-balance-amount {
-    font-size: 80px;
-    letter-spacing: -4px;
   }
 
   .fingen-actions-row {

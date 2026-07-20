@@ -132,61 +132,21 @@ export default async function HomePage() {
   return (
     <div className="fingen-page">
       <main className="fingen-main">
-        {/* Hero Section - Fingen Style with Grid Pattern */}
-        <section className="fingen-hero">
-          {/* Grid Pattern Background */}
-          <div className="fingen-hero-grid-wrapper">
-            <GridPattern
-              width={30}
-              height={30}
-              x={-1}
-              y={-1}
-              squares={[
-                [4, 4],
-                [5, 1],
-                [8, 2],
-                [5, 3],
-                [5, 5],
-                [10, 10],
-                [12, 15],
-                [15, 10],
-                [10, 15],
-              ]}
-              className={cn(
-                "[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
-                "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12",
-                "fingen-hero-grid"
-              )}
-            />
-          </div>
+        {/* Hero Section - Creative Agency Style */}
+        <section className="hero-creative">
+          {/* Dot Grid Background */}
+          <div className="hero-creative-bg" />
 
-          {/* Balance Card */}
-          <div className="fingen-balance-card">
-            <div className="fingen-balance-header">
-              <div className="fingen-balance-label">Seu próximo carro</div>
-              <div className="fingen-balance-actions">
-                <Link href="/anunciar-carro" className="fingen-balance-action-btn">
-                  <Plus size={16} />
-                </Link>
-                <Link href="/carros-a-venda" className="fingen-balance-action-btn">
-                  <BarChart3 size={16} />
-                </Link>
-              </div>
-            </div>
+          {/* Subtitle */}
+          <div className="hero-creative-eyebrow">Compre, compare e anuncie carros</div>
 
-            {/* Title */}
-            <h1 className="fingen-hero-title">
-              Encontre o carro
-              <br />
+          {/* Main Title */}
+          <h1 className="hero-creative-title">
+            Encontre o carro{' '}
+            <span className="hero-creative-highlight">
               <TextRotate
-                texts={[
-                  "perfeito.",
-                  "ideal.",
-                  "dos sonhos.",
-                  "certo.",
-                  "novo."
-                ]}
-                mainClassName="fingen-hero-title-accent"
+                texts={["perfeito", "ideal", "dos sonhos", "certo", "novo"]}
+                mainClassName="hero-creative-highlight-text"
                 staggerFrom="last"
                 initial={{ y: "100%", opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -196,28 +156,30 @@ export default async function HomePage() {
                 transition={{ type: "spring", damping: 30, stiffness: 400 }}
                 rotationInterval={3000}
               />
-            </h1>
+            </span>
+          </h1>
 
-            <div className="fingen-balance-sub">Compre, compare e anuncie seminovos com FIPE verificado</div>
+          {/* Description */}
+          <p className="hero-creative-desc">
+            Seminovos com FIPE verificado, dados detalhados e as melhores ofertas do mercado.
+          </p>
+
+          {/* CTA */}
+          <div className="hero-creative-cta">
+            <Link href="/carros-a-venda" className="hero-creative-btn">
+              <Search size={18} />
+              <span>Explorar carros</span>
+            </Link>
+            <Link href="/anunciar-carro" className="hero-creative-btn hero-creative-btn-outline">
+              <Plus size={18} />
+              <span>Anunciar grátis</span>
+            </Link>
           </div>
 
-          {/* CTA Button - Fingen Style */}
-          <div className="fingen-cta-wrapper">
-            <Link href="/anunciar-carro" className="fingen-cta-main">
-              <div className="fingen-cta-icon">
-                <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <span>Anunciar carro agora</span>
-              <ArrowRight size={18} />
-            </Link>
-            <div className="fingen-cta-dots">
-              <span className="fingen-cta-dot" />
-              <span className="fingen-cta-dot" />
-              <span className="fingen-cta-dot" />
-            </div>
+          {/* Scroll Indicator */}
+          <div className="hero-creative-scroll">
+            <span>Scroll down</span>
+            <div className="hero-creative-scroll-dot" />
           </div>
         </section>
 
