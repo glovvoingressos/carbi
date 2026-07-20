@@ -204,6 +204,9 @@ export default function VehicleDetailView({
               <div className="fingen-detail-price-make">{listing.brand}</div>
               <h1 className="fingen-detail-price-title">{listing.model} {listing.version || ''}</h1>
               <div className="fingen-detail-price-sub">{listing.year}/{listing.year_model} · {listing.color}</div>
+              <div className="fingen-detail-seller-inline">
+                <span>Anunciado por <strong>{sellerFirstName}</strong></span>
+              </div>
             </div>
 
             <div className="fingen-detail-price-row">

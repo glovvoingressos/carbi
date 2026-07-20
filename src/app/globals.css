@@ -8039,6 +8039,20 @@ p {
   margin-top: 4px;
 }
 
+.fingen-detail-seller-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.fingen-detail-seller-inline strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
 .fingen-detail-price-row {
   margin-bottom: 16px;
 }
