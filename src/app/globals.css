@@ -10536,11 +10536,23 @@ p {
   display: none;
 }
 
+/* Mobile Actions Row */
+.navbar-mobile-actions-row {
+  display: none;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .navbar-links,
   .navbar-actions {
     display: none;
+  }
+
+  .navbar-mobile-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
   }
 
   .navbar-icon-btn--mobile {
@@ -10553,6 +10565,11 @@ p {
 
   .navbar-inner {
     padding: 12px 16px;
+    gap: 0;
+  }
+
+  .navbar-logo {
+    margin-right: auto;
   }
 }
 

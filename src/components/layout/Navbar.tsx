@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, Menu, X, ChevronRight } from 'lucide-react'
+import { Bell, Menu, X, ChevronRight, User } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import Logo from '@/components/ui/Logo'
 
@@ -105,16 +105,18 @@ export default function Navbar() {
             <Link href="/anunciar-carro" className="navbar-cta">Anunciar</Link>
           </div>
 
-          {isAuth && (
+          <div className="navbar-mobile-actions-row">
             <Link href="/notificacoes" className="navbar-icon-btn navbar-icon-btn--mobile" aria-label="Notificações">
               <Bell size={18} strokeWidth={1.75} />
               {unreadCount > 0 && <span className="navbar-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
             </Link>
-          )}
-
-          <button className="navbar-toggle" onClick={() => setOpen((v) => !v)} aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open}>
-            {open ? <X size={20} /> : <Menu size={20} />}
-          </button>
+            <Link href={isAuth ? '/minha-conta' : '/entrar'} className="navbar-icon-btn navbar-icon-btn--mobile" aria-label={isAuth ? 'Minha conta' : 'Entrar'}>
+              <User size={18} strokeWidth={1.75} />
+            </Link>
+            <button className="navbar-toggle" onClick={() => setOpen((v) => !v)} aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open}>
+              {open ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
       </nav>
 
