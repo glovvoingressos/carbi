@@ -6916,21 +6916,29 @@ p {
   color: var(--color-text-primary);
 }
 
-/* ━━━ Testimonials Section ━━━ */
-.fingen-testimonials-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+/* ━━━ Testimonials Slider ━━━ */
+.fingen-testimonials-track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 0 20px;
+  margin: 0 -24px;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
-@media (max-width: 640px) {
-  .fingen-testimonials-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+.fingen-testimonials-track::-webkit-scrollbar {
+  display: none;
 }
 
 .fingen-testimonial-card {
+  min-width: 320px;
+  max-width: 360px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
   padding: 24px;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
@@ -6975,6 +6983,12 @@ p {
 .fingen-testimonial-author span {
   font-size: 12px;
   color: var(--color-text-tertiary);
+}
+
+@media (max-width: 640px) {
+  .fingen-testimonial-card {
+    min-width: 280px;
+  }
 }
 
 /* Statistics Card */
@@ -7653,6 +7667,18 @@ p {
   gap: 6px;
   font-size: 13px;
   color: var(--color-text-tertiary);
+}
+
+.fingen-detail-view-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  padding: 6px 10px;
+  background: var(--color-bg-muted);
+  border-radius: 8px;
+  margin-top: 8px;
 }
 
 /* CTA Buttons */
@@ -10176,8 +10202,6 @@ p {
   max-width: 1200px;
   margin: 0 auto;
   padding: 8px 24px;
-  max-height: 56px;
-  overflow: hidden;
 }
 
 .navbar--scrolled {

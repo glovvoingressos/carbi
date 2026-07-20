@@ -119,7 +119,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
           return
         }
 
-        if (data.session) {
+        if (data.session && data.user) {
           // Also save to users table
           await supabase.from('users').upsert({
             id: data.user.id,

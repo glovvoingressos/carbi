@@ -177,14 +177,14 @@ export default function NotificationsPage() {
             {notifications.map((notification) => {
               const icon = getIcon(notification.type)
               const colors = getColor(notification.type)
-              const Wrapper = notification.link ? Link : 'div'
-              const wrapperProps = notification.link ? { href: notification.link } : {}
 
               return (
-                <Wrapper
+                <div
                   key={notification.id}
-                  {...wrapperProps}
-                  onClick={() => { if (!notification.read) markRead(notification.id) }}
+                  onClick={() => {
+                    if (!notification.read) markRead(notification.id)
+                    if (notification.link) window.location.href = notification.link
+                  }}
                   className="flex items-start gap-3 p-4 rounded-2xl transition-all cursor-pointer"
                   style={{
                     background: notification.read ? 'var(--color-bg-elevated)' : 'rgba(90,71,209,0.04)',
@@ -220,7 +220,7 @@ export default function NotificationsPage() {
                       {timeAgo(notification.created_at)}
                     </p>
                   </div>
-                </Wrapper>
+                </div>
               )
             })}
           </div>

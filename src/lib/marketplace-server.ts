@@ -322,6 +322,7 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
       negotiable,
       accepts_counter,
       accepts_trade,
+      view_count,
       images:vehicle_listing_images(
         id,
         public_url,

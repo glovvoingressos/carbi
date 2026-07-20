@@ -81,7 +81,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
           listing={listing}
           sellerInfo={sellerInfo}
           relatedListings={related}
-          enrichment={enrichment}
+          enrichment={enrichment || undefined}
           comparison={comparison}
         />
       </div>

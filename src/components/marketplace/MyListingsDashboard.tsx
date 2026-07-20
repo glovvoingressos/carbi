@@ -58,6 +58,7 @@ interface DashboardListing {
   doors: number | null
   plate_final: string | null
   images: DashboardImage[] | null
+  view_count?: number
 }
 
 interface UploadImageItem {
@@ -626,6 +627,13 @@ export default function MyListingsDashboard() {
                     </p>
                     <p className={`text-[10px] lg:text-xs font-bold mt-0.5 lg:mt-1 ${selectedId === l.id ? 'text-white/60' : 'text-[#0A0A0A]'}`}>
                       {formatBRL(l.price)}
+                    </p>
+                    <p className={`text-[10px] lg:text-xs mt-0.5 flex items-center gap-1 ${selectedId === l.id ? 'text-white/40' : 'text-[#8A95A8]'}`}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      {(l.view_count || 0).toLocaleString('pt-BR')} views
                     </p>
                   </div>
                 </div>

@@ -43,37 +43,8 @@ interface VehicleDetailViewProps {
     totalListings: number
   } | null
   relatedListings: ListingPublic[]
-  enrichment?: {
-    powertrain?: {
-      engine?: string
-      horsepower?: string
-      torque?: string
-      fuel?: string
-      transmission?: string
-    }
-    dimensions?: {
-      length?: string
-      width?: string
-      height?: string
-      wheelbase?: string
-    }
-    performance?: {
-      topSpeed?: string
-      acceleration?: string
-    }
-    economy?: {
-      cityConsumption?: string
-      highwayConsumption?: string
-      fuelTankCapacity?: string
-    }
-    safety?: {
-      latinNcap?: number
-      airbags?: string
-      abs?: boolean
-      stabilityControl?: boolean
-    }
-    features?: string[]
-  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  enrichment?: any
   comparison: {
     status: 'below' | 'near' | 'above' | 'unknown'
     diffPercent: number | null
@@ -123,6 +94,7 @@ export default function VehicleDetailView({
   const [pageUrl, setPageUrl] = useState('')
   const [copied, setCopied] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
+  const [viewCount, setViewCount] = useState(listing.view_count || 0)
   const isSeller = sessionUserId === listing.user_id
 
   useEffect(() => {
@@ -135,7 +107,12 @@ export default function VehicleDetailView({
         setAccessToken(session.access_token)
       }
     })
-  }, [])
+
+    // Track view (non-blocking)
+    fetch(`/api/marketplace/listings/${listing.id}/views`, { method: 'POST' })
+      .then(() => setViewCount((v) => v + 1))
+      .catch(() => {})
+  }, [listing.id])
 
   const listingImages = useMemo(() => listing.images?.map((img) => img.url).filter(Boolean) || [], [listing.images])
   const fipePrice = listing.fipe_price ? Number(listing.fipe_price) : null
@@ -246,6 +223,17 @@ export default function VehicleDetailView({
               <MapPin size={14} />
               {listing.city} / {listing.state}
             </div>
+
+            {/* View count - only for seller */}
+            {isSeller && (
+              <div className="fingen-detail-view-count">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                {viewCount.toLocaleString('pt-BR')} visualizações
+              </div>
+            )}
           </section>
 
           {/* CTA Buttons */}

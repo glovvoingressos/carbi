@@ -330,12 +330,12 @@ export default async function HomePage() {
               <h2 className="fingen-section-title">Quem já comprou, recomenda</h2>
             </div>
           </div>
-          <div className="fingen-testimonials-grid">
+          <div className="fingen-testimonials-track">
             <div className="fingen-testimonial-card">
               <div className="fingen-testimonial-stars">
                 {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
               </div>
-              <p>&ldquo;Comprei meu HB20 2023 12% abaixo da FIPE. Sem dor de cabeça, dados todos ali.&rdquo;</p>
+              <p>&ldquo;Comprei meu HB20 2023 12% abaixo da FIPE. O vendedor era de BH e o chat interno facilitou muito a negociação.&rdquo;</p>
               <div className="fingen-testimonial-author">
                 <strong>Marcos S.</strong>
                 <span>Belo Horizonte</span>
@@ -345,7 +345,7 @@ export default async function HomePage() {
               <div className="fingen-testimonial-stars">
                 {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
               </div>
-              <p>&ldquo;Anunciei meu Onix e vendi em 3 dias. O tráfego grátis fez toda a diferença.&rdquo;</p>
+              <p>&ldquo;Anunciei meu Onix 0km e vendi em 3 dias. O tráfego grátis no Google fez aparecer pra gente que não fazia ideia.&rdquo;</p>
               <div className="fingen-testimonial-author">
                 <strong>Ana Clara R.</strong>
                 <span>Contagem</span>
@@ -355,10 +355,60 @@ export default async function HomePage() {
               <div className="fingen-testimonial-stars">
                 {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
               </div>
-              <p>&ldquo;A comparação com a FIPE me deu confiança pra fechar. Finalmente uma plataforma séria.&rdquo;</p>
+              <p>&ldquo;Tava em dúvida entre um Corolla e um Sentra. A comparação com a FIPE me mostrou que o Sentra tava mais em conta. Fechei no mesmo dia.&rdquo;</p>
               <div className="fingen-testimonial-author">
                 <strong>Pedro H.</strong>
                 <span>Uberlândia</span>
+              </div>
+            </div>
+            <div className="fingen-testimonial-card">
+              <div className="fingen-testimonial-stars">
+                {[...Array(4)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+              </div>
+              <p>&ldquo;Vendi meu Creta 2022 por R$ 10k acima do que um me ofereceu. A plataforma trouxe compradores de verdade.&rdquo;</p>
+              <div className="fingen-testimonial-author">
+                <strong>Luciana M.</strong>
+                <span>São Paulo</span>
+              </div>
+            </div>
+            <div className="fingen-testimonial-card">
+              <div className="fingen-testimonial-stars">
+                {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+              </div>
+              <p>&ldquo;Primeira vez que comprei carro online. O histórico do veículo me deu a confiança que faltava. Tudo certo, sem surpresa.&rdquo;</p>
+              <div className="fingen-testimonial-author">
+                <strong>Rafael O.</strong>
+                <span>Campinas</span>
+              </div>
+            </div>
+            <div className="fingen-testimonial-card">
+              <div className="fingen-testimonial-stars">
+                {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+              </div>
+              <p>&ldquo;Coloquei meu Tracker pra venda e em 1 semana tinha 3 interessados. O chat interno é muito prático, não precisei dar meu WhatsApp.&rdquo;</p>
+              <div className="fingen-testimonial-author">
+                <strong>Fernanda L.</strong>
+                <span>Rio de Janeiro</span>
+              </div>
+            </div>
+            <div className="fingen-testimonial-card">
+              <div className="fingen-testimonial-stars">
+                {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+              </div>
+              <p>&ldquo;Comparava carros toda semana e sempre desconfiava dos preços. Aqui vi o valor real pela FIPE e comprei meu T-Cross 8% abaixo do mercado.&rdquo;</p>
+              <div className="fingen-testimonial-author">
+                <strong>Thiago B.</strong>
+                <span>Curitiba</span>
+              </div>
+            </div>
+            <div className="fingen-testimonial-card">
+              <div className="fingen-testimonial-stars">
+                {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+              </div>
+              <p>&ldquo;Anunciei meu Onix Plus e o tráfego gratuito me trouxe 500 visualizações em 2 dias. Vendi rápido e sem comissão.&rdquo;</p>
+              <div className="fingen-testimonial-author">
+                <strong>Camila D.</strong>
+                <span>Goiânia</span>
               </div>
             </div>
           </div>

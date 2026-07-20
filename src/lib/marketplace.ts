@@ -113,6 +113,8 @@ export interface ListingPublic {
   negotiable?: 'open' | 'low' | 'firm'
   accepts_counter?: boolean
   accepts_trade?: boolean
+  // View tracking
+  view_count?: number
 }
 
 export function parseMoneyInputToNumber(value: string): number {

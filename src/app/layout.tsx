@@ -3,6 +3,7 @@ import { Poppins } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
 import { OrganizationSchema, WebSiteSchema } from '@/components/seo/JSONLD'
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics'
 
 const font = Poppins({
   subsets: ['latin'],
@@ -74,6 +75,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${font.variable} ${fontHeading.variable} ${fontMono.variable}`}>
       <body className={font.className}>
+        <GoogleAnalytics />
         <WebSiteSchema />
         <OrganizationSchema />
         <ClientShell>{children}</ClientShell>
