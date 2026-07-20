@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Search, TrendingUp, Plus, BarChart3, ChevronRight, ArrowRight, Heart, MapPin, Fuel, Gauge, Calendar, MessageCircle, Car, CheckCircle2, Star } from 'lucide-react'
 import { getLatestPublicListings, getMonthlyViews } from '@/lib/marketplace-server'
-import { formatBRL } from '@/data/cars'
+import { formatBRL, cars } from '@/data/cars'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
 import { TextRotate } from '@/components/ui/text-rotate'
 import KineticText from '@/components/ui/KineticText'
 import AnimatedStats from '@/components/ui/AnimatedStats'
 import AnimatedBarChart from '@/components/ui/AnimatedBarChart'
+import ModelComparison from '@/components/home/ModelComparison'
 import TestimonialsCarousel from '@/components/ui/TestimonialsCarousel'
 import Logo from '@/components/ui/Logo'
 import { GridPattern } from '@/components/ui/grid-pattern'
@@ -112,22 +113,23 @@ export default async function HomePage() {
   const recentListings = listings.slice(0, 8)
   const topBrands = [...new Set(listings.map((l) => l.brand))].slice(0, 6)
 
-  // Stats data — real monthly views from Supabase
-  const rawMonthlyViews = await getMonthlyViews()
-  const statsData = rawMonthlyViews.length > 0
-    ? rawMonthlyViews.map((m) => ({
-        label: m.label.charAt(0).toUpperCase() + m.label.slice(1, 3),
-        value: m.value,
-      }))
-    : [
-        { label: 'Jan', value: 0 },
-        { label: 'Fev', value: 0 },
-        { label: 'Mar', value: 0 },
-        { label: 'Abr', value: 0 },
-        { label: 'Mai', value: 0 },
-        { label: 'Jun', value: 0 },
-      ]
-  const maxValue = Math.max(...statsData.map((s) => s.value), 1)
+  // Comparison cars — pick popular models from catalog
+  const comparisonCars = cars
+    .filter((c) => c.isPopular)
+    .slice(0, 3)
+    .map((c) => ({
+      brand: c.brand,
+      model: c.model,
+      version: c.version,
+      segment: c.segment,
+      priceBrl: c.priceBrl,
+      horsepower: c.horsepower,
+      fuelEconomyCityGas: c.fuelEconomyCityGas,
+      airbagsCount: c.airbagsCount,
+      slug: c.slug,
+      image: c.image,
+      idealFor: c.idealFor,
+    }))
 
   return (
     <div className="fingen-page">
@@ -325,14 +327,8 @@ export default async function HomePage() {
           <TestimonialsCarousel />
         </section>
 
-        {/* Statistics */}
-        <section className="fingen-stats">
-          <div className="fingen-stats-header">
-            <div className="fingen-stats-title">Estatísticas</div>
-            <Link href="/rankings" className="fingen-stats-link">Ver rankings</Link>
-          </div>
-          <AnimatedBarChart data={statsData} maxValue={maxValue} />
-        </section>
+        {/* Model Comparison */}
+        <ModelComparison cars={comparisonCars} />
 
         {/* Brands */}
         <section className="fingen-section">
