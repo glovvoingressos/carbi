@@ -608,6 +608,24 @@ export async function getSellerInfo(sellerUserId: string): Promise<{
     }
   }
 
+  // Fallback: get user info from users table if admin client failed
+  if (!user) {
+    const { data: fallbackUser } = await serverClient
+      .from('users')
+      .select('id, email, created_at, full_name')
+      .eq('id', sellerUserId)
+      .maybeSingle()
+
+    if (fallbackUser) {
+      user = {
+        id: fallbackUser.id,
+        email: fallbackUser.email || '',
+        created_at: fallbackUser.created_at,
+        user_metadata: { full_name: fallbackUser.full_name },
+      }
+    }
+  }
+
   const listingsResult = await serverClient
     .from('vehicle_listings')
     .select('id, status, created_at')
