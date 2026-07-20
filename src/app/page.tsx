@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Search, TrendingUp, Plus, BarChart3, ChevronRight, ArrowRight, Heart, MapPin, Fuel, Gauge, Calendar, MessageCircle, Car, CheckCircle2, Star } from 'lucide-react'
+import { Search, TrendingUp, Plus, BarChart3, ChevronRight, ArrowRight, Heart, MapPin, Fuel, Gauge, Calendar, MessageCircle, Car, CheckCircle2, Star, Tag } from 'lucide-react'
 import { getLatestPublicListings, getMonthlyViews } from '@/lib/marketplace-server'
 import { formatBRL, cars } from '@/data/cars'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
@@ -205,10 +205,7 @@ export default async function HomePage() {
         <section className="fingen-banner fingen-promo-banner">
           <div className="fingen-banner-content fingen-promo-content">
             <div className="fingen-banner-icon fingen-promo-icon">
-              <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor"/>
-                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <Tag size={20} />
             </div>
             <div className="fingen-banner-text">
               <strong>Anuncie grátis por tempo limitado</strong>
