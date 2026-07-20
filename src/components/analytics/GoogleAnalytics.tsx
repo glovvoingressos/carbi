@@ -3,6 +3,7 @@
 import Script from 'next/script'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
+import { trackPageView } from '@/lib/analytics'
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 
@@ -10,10 +11,7 @@ export function GoogleAnalytics() {
   const pathname = usePathname()
 
   useEffect(() => {
-    if (!GA_MEASUREMENT_ID || !window.gtag) return
-    window.gtag('config', GA_MEASUREMENT_ID, {
-      page_path: pathname,
-    })
+    trackPageView(pathname)
   }, [pathname])
 
   if (!GA_MEASUREMENT_ID) return null

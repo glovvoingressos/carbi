@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { ListingPublic } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
+import { trackEvent } from '@/lib/analytics'
 import ListingImageGallery from './ListingImageGallery'
 import ChatStarter from './ChatStarter'
 import OfferModal from './OfferModal'
@@ -112,6 +113,16 @@ export default function VehicleDetailView({
     fetch(`/api/marketplace/listings/${listing.id}/views`, { method: 'POST' })
       .then(() => setViewCount((v) => v + 1))
       .catch(() => {})
+
+    // GA event: view_item
+    trackEvent('view_item', {
+      item_id: listing.id,
+      item_name: listing.title,
+      item_brand: listing.brand,
+      item_category: listing.body_type || 'vehicle',
+      price: Number(listing.price),
+      currency: 'BRL',
+    })
   }, [listing.id])
 
   const listingImages = useMemo(() => listing.images?.map((img) => img.url).filter(Boolean) || [], [listing.images])

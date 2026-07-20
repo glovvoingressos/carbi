@@ -6,6 +6,7 @@ import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2,
 import Link from 'next/link'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
+import { trackEvent } from '@/lib/analytics'
 import AuthCard from '@/components/marketplace/AuthCard'
 import {
   LISTING_ALLOWED_TYPES,
@@ -914,6 +915,13 @@ export default function ListingForm() {
 
       localStorage.removeItem(DRAFT_KEY)
       setSuccess('Carro anunciado com sucesso')
+
+      trackEvent('create_listing', {
+        item_brand: form.brand || '',
+        item_model: form.model || '',
+        price: form.price ? Number(form.price) : 0,
+        currency: 'BRL',
+      })
       setTimeout(() => {
         router.push(`/anuncios/${created.slug}`)
       }, 800)
