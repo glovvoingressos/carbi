@@ -5,6 +5,8 @@ import { getSupabaseServerClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import RevendaKPICard from '@/components/revenda/RevendaKPICard'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Dashboard da Revenda | Carbi',
   robots: { index: false, follow: false },
