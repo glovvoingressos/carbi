@@ -7349,6 +7349,146 @@ p {
   color: #D4F576;
 }
 
+/* Car Selector */
+.comparison-selector {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.comparison-selector-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(212, 245, 118, 0.08);
+  border: 1px solid rgba(212, 245, 118, 0.15);
+  border-radius: 10px;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.comparison-selector-btn:hover {
+  background: rgba(212, 245, 118, 0.12);
+  border-color: rgba(212, 245, 118, 0.25);
+}
+
+.comparison-selector-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comparison-selector-icon {
+  flex-shrink: 0;
+  color: rgba(212, 245, 118, 0.6);
+  transition: transform 0.2s ease;
+}
+
+.comparison-selector-icon.open {
+  transform: rotate(180deg);
+}
+
+.comparison-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #1A1A1A;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.comparison-dropdown-scroll {
+  max-height: 240px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.comparison-dropdown-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.comparison-dropdown-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.comparison-dropdown-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.comparison-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.comparison-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.comparison-dropdown-item.active {
+  background: rgba(212, 245, 118, 0.1);
+  color: #D4F576;
+}
+
+.comparison-dropdown-brand {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  min-width: 50px;
+}
+
+.comparison-dropdown-model {
+  flex: 1;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comparison-dropdown-price {
+  font-size: 11px;
+  font-weight: 600;
+  color: #D4F576;
+  white-space: nowrap;
+}
+
+/* Comparison Hint */
+.comparison-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 20px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  position: relative;
+}
+
+.comparison-hint svg {
+  color: rgba(212, 245, 118, 0.5);
+}
+
 /* Brands Scroll */
 .fingen-brands-scroll {
   display: flex;

@@ -114,22 +114,21 @@ export default async function HomePage() {
   const topBrands = [...new Set(listings.map((l) => l.brand))].slice(0, 6)
 
   // Comparison cars — pick popular models from catalog
-  const comparisonCars = cars
-    .filter((c) => c.isPopular)
-    .slice(0, 3)
-    .map((c) => ({
-      brand: c.brand,
-      model: c.model,
-      version: c.version,
-      segment: c.segment,
-      priceBrl: c.priceBrl,
-      horsepower: c.horsepower,
-      fuelEconomyCityGas: c.fuelEconomyCityGas,
-      airbagsCount: c.airbagsCount,
-      slug: c.slug,
-      image: c.image,
-      idealFor: c.idealFor,
-    }))
+  const mapCar = (c: typeof cars[0]) => ({
+    brand: c.brand,
+    model: c.model,
+    version: c.version,
+    segment: c.segment,
+    priceBrl: c.priceBrl,
+    horsepower: c.horsepower,
+    fuelEconomyCityGas: c.fuelEconomyCityGas,
+    airbagsCount: c.airbagsCount,
+    slug: c.slug,
+    image: c.image,
+    idealFor: c.idealFor,
+  })
+  const comparisonCars = cars.filter((c) => c.isPopular).slice(0, 3).map(mapCar)
+  const allComparisonCars = cars.map(mapCar)
 
   return (
     <div className="fingen-page">
@@ -328,7 +327,7 @@ export default async function HomePage() {
         </section>
 
         {/* Model Comparison */}
-        <ModelComparison cars={comparisonCars} />
+        <ModelComparison cars={comparisonCars} allCars={allComparisonCars} />
 
         {/* Brands */}
         <section className="fingen-section">
