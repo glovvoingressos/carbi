@@ -202,13 +202,20 @@ export default async function HomePage() {
         </section>
 
         {/* Free Promo Banner */}
-        <section className="fingen-promo-banner">
-          <div className="fingen-promo-content">
-            <div className="fingen-promo-badge">Tempo limitado</div>
-            <h2 className="fingen-promo-title">Anuncie grátis por tempo limitado</h2>
-            <p className="fingen-promo-desc">Publique seu carro sem custo e alcance milhares de compradores. Depois, planos a partir de R$ 29/mês.</p>
-            <Link href="/anunciar-carro" className="fingen-promo-btn">
-              Começar agora <ArrowRight size={16} />
+        <section className="fingen-banner fingen-promo-banner">
+          <div className="fingen-banner-content fingen-promo-content">
+            <div className="fingen-banner-icon fingen-promo-icon">
+              <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor"/>
+                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div className="fingen-banner-text">
+              <strong>Anuncie grátis por tempo limitado</strong>
+              <span>Publique seu carro sem custo e alcance milhares de compradores.</span>
+            </div>
+            <Link href="/anunciar-carro" className="fingen-banner-btn fingen-promo-btn">
+              Começar agora
             </Link>
           </div>
         </section>
