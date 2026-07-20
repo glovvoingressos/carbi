@@ -2,7 +2,14 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { motion, useInView } from 'motion/react'
-import { TrendingUp, Users, Car, MessageCircle } from 'lucide-react'
+import { TrendingUp, Users, Car, Eye } from 'lucide-react'
+
+interface PlatformStats {
+  active_listings: number
+  total_views: number
+  new_listings_this_month: number
+  new_listings_last_month: number
+}
 
 interface StatItem {
   icon: React.ReactNode
@@ -12,11 +19,11 @@ interface StatItem {
   color: string
 }
 
-const stats: StatItem[] = [
-  { icon: <Car size={20} />, value: 5247, suffix: '+', label: 'Anúncios ativos', color: '#D4F576' },
-  { icon: <Users size={20} />, value: 12400, suffix: '+', label: 'Usuários ativos', color: '#93C5FD' },
-  { icon: <MessageCircle size={20} />, value: 8920, suffix: '+', label: 'Conversas no chat', color: '#C9B8FF' },
-  { icon: <TrendingUp size={20} />, value: 340, suffix: '%', label: 'Crescimento mensal', color: '#39E09B' },
+const fallbackStats: StatItem[] = [
+  { icon: <Car size={20} />, value: 0, suffix: '+', label: 'Anúncios ativos', color: '#D4F576' },
+  { icon: <Eye size={20} />, value: 0, suffix: '+', label: 'Visualizações totais', color: '#93C5FD' },
+  { icon: <TrendingUp size={20} />, value: 0, suffix: '+', label: 'Novos este mês', color: '#C9B8FF' },
+  { icon: <Users size={20} />, value: 0, suffix: '%', label: 'Crescimento mensal', color: '#39E09B' },
 ]
 
 function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
@@ -25,7 +32,7 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
   const isInView = useInView(ref, { once: true })
 
   useEffect(() => {
-    if (!isInView) return
+    if (!isInView || value === 0) return
 
     let start = 0
     const duration = 2000
@@ -54,6 +61,28 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
 }
 
 export default function AnimatedStats() {
+  const [stats, setStats] = useState<StatItem[]>(fallbackStats)
+
+  useEffect(() => {
+    fetch('/api/analytics/stats')
+      .then((r) => r.json())
+      .then((data: PlatformStats) => {
+        const growth = data.new_listings_last_month > 0
+          ? Math.round(((data.new_listings_this_month - data.new_listings_last_month) / data.new_listings_last_month) * 100)
+          : 0
+
+        setStats([
+          { icon: <Car size={20} />, value: data.active_listings, suffix: '+', label: 'Anúncios ativos', color: '#D4F576' },
+          { icon: <Eye size={20} />, value: data.total_views, suffix: '+', label: 'Visualizações totais', color: '#93C5FD' },
+          { icon: <TrendingUp size={20} />, value: data.new_listings_this_month, suffix: '+', label: 'Novos este mês', color: '#C9B8FF' },
+          { icon: <Users size={20} />, value: Math.max(0, growth), suffix: '%', label: 'Crescimento mensal', color: '#39E09B' },
+        ])
+      })
+      .catch(() => {})
+  }, [])
+
+  const maxVal = Math.max(...stats.map((s) => s.value), 1)
+
   return (
     <section className="animated-stats">
       <div className="animated-stats-header">
@@ -90,7 +119,7 @@ export default function AnimatedStats() {
                 className="animated-stat-bar-fill"
                 style={{ background: stat.color }}
                 initial={{ width: 0 }}
-                whileInView={{ width: `${(stat.value / 12400) * 100}%` }}
+                whileInView={{ width: `${(stat.value / maxVal) * 100}%` }}
                 viewport={{ once: true }}
                 transition={{ duration: 1, delay: 0.5 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
               />
@@ -99,7 +128,6 @@ export default function AnimatedStats() {
         ))}
       </div>
 
-      {/* Animated background elements */}
       <div className="animated-stats-bg">
         <motion.div
           className="animated-stats-bg-circle"
