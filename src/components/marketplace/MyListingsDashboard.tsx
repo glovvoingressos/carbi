@@ -694,6 +694,31 @@ export default function MyListingsDashboard() {
                 </div>
               </div>
 
+              {/* View Stats Card */}
+              <div className="flex items-center gap-6 surface-strong p-6 rounded-3xl">
+                <div className="w-14 h-14 rounded-2xl bg-[#D4F576]/15 flex items-center justify-center">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#17170F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-3xl font-black tracking-tight">{(selectedListing.view_count || 0).toLocaleString('pt-BR')}</div>
+                  <div className="text-xs font-bold text-[#8A95A8] uppercase tracking-wider">visualizações no anúncio</div>
+                </div>
+                <div className="ml-auto text-right">
+                  <div className="text-xs font-bold text-[#8A95A8]">Link público</div>
+                  <a
+                    href={`/anuncios/${selectedListing.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-black text-[#17170F] underline underline-offset-2 hover:text-[#10B981] transition-colors"
+                  >
+                    Ver anúncio
+                  </a>
+                </div>
+              </div>
+
               {/* Sections Container */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 
