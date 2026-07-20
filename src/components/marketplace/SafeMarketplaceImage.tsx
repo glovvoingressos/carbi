@@ -109,7 +109,7 @@ export default function SafeMarketplaceImage({
         <img
           src={resolvedSrc}
           alt={alt}
-          className={`${className} transition-opacity duration-300 ${status === 'ready' ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${status === 'ready' ? 'opacity-100' : 'opacity-0'}`}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
         />
