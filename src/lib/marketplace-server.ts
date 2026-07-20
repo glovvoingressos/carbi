@@ -690,3 +690,14 @@ export async function getFilterOptions() {
     optionalItems: distinctOptionals
   }
 }
+
+export async function getMonthlyViews(): Promise<{ label: string; value: number }[]> {
+  if (!isSupabaseConfigured()) return []
+
+  const supabase = getSupabaseServerClient()
+  const { data, error } = await supabase.rpc('get_monthly_views')
+
+  if (error || !data) return []
+
+  return Array.isArray(data) ? data : []
+}

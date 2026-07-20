@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Search, TrendingUp, Plus, BarChart3, ChevronRight, ArrowRight, Heart, MapPin, Fuel, Gauge, Calendar, MessageCircle, Car, CheckCircle2, Star } from 'lucide-react'
-import { getLatestPublicListings } from '@/lib/marketplace-server'
+import { getLatestPublicListings, getMonthlyViews } from '@/lib/marketplace-server'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
 import { TextRotate } from '@/components/ui/text-rotate'
@@ -111,16 +111,22 @@ export default async function HomePage() {
   const recentListings = listings.slice(0, 8)
   const topBrands = [...new Set(listings.map((l) => l.brand))].slice(0, 6)
 
-  // Stats data
-  const statsData = [
-    { label: 'Jan', value: 30 },
-    { label: 'Fev', value: 45 },
-    { label: 'Mar', value: 25 },
-    { label: 'Abr', value: 60 },
-    { label: 'Mai', value: 40 },
-    { label: 'Jun', value: 55 },
-  ]
-  const maxValue = Math.max(...statsData.map((s) => s.value))
+  // Stats data — real monthly views from Supabase
+  const rawMonthlyViews = await getMonthlyViews()
+  const statsData = rawMonthlyViews.length > 0
+    ? rawMonthlyViews.map((m) => ({
+        label: m.label.charAt(0).toUpperCase() + m.label.slice(1, 3),
+        value: m.value,
+      }))
+    : [
+        { label: 'Jan', value: 0 },
+        { label: 'Fev', value: 0 },
+        { label: 'Mar', value: 0 },
+        { label: 'Abr', value: 0 },
+        { label: 'Mai', value: 0 },
+        { label: 'Jun', value: 0 },
+      ]
+  const maxValue = Math.max(...statsData.map((s) => s.value), 1)
 
   return (
     <div className="fingen-page">
