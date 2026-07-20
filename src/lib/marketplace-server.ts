@@ -609,19 +609,14 @@ export async function getSellerInfo(sellerUserId: string): Promise<{
     }
   }
 
-  // Always try to get profile from users table via admin client (bypasses RLS)
-  let profileFullName: string | null = null
-  let profileAvatarUrl: string | null = null
-
-  if (adminClient) {
-    const { data: profileRow } = await adminClient
-      .from('users')
-      .select('full_name, avatar_url')
-      .eq('id', sellerUserId)
-      .maybeSingle()
-    profileFullName = profileRow?.full_name || null
-    profileAvatarUrl = profileRow?.avatar_url || null
-  }
+  // Get profile from users table (public read policy allows this)
+  const { data: profileRow } = await serverClient
+    .from('users')
+    .select('full_name, avatar_url')
+    .eq('id', sellerUserId)
+    .maybeSingle()
+  const profileFullName = profileRow?.full_name || null
+  const profileAvatarUrl = profileRow?.avatar_url || null
 
   const listingsResult = await serverClient
     .from('vehicle_listings')
