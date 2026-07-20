@@ -235,16 +235,14 @@ export default function VehicleDetailView({
               {listing.city} / {listing.state}
             </div>
 
-            {/* View count - only for seller */}
-            {isSeller && (
-              <div className="fingen-detail-view-count">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-                {viewCount.toLocaleString('pt-BR')} visualizações
-              </div>
-            )}
+            {/* View count */}
+            <div className="fingen-detail-view-count">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              {viewCount.toLocaleString('pt-BR')} visualizações
+            </div>
           </section>
 
           {/* CTA Buttons */}
