@@ -56,7 +56,7 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
       <div className="comparison-header">
         <div>
           <div className="comparison-label">Comparativo</div>
-          <h3 className="comparison-title">Encontre o carro ideal</h3>
+          <h3 className="comparison-title">Qual carro combina com você?</h3>
         </div>
         <Link href="/qual-carro" className="comparison-link">
           Ver todos <ArrowRight size={14} />
