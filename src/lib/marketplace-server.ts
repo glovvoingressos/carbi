@@ -596,6 +596,7 @@ export async function getSellerInfo(sellerUserId: string): Promise<{
 
   let user: { id: string; email: string; created_at: string; user_metadata: Record<string, unknown> | null } | null = null
 
+  // Try admin client for auth user data
   if (adminClient) {
     const authResult = await adminClient.auth.admin.getUserById(sellerUserId)
     if (authResult.data?.user) {
@@ -608,22 +609,18 @@ export async function getSellerInfo(sellerUserId: string): Promise<{
     }
   }
 
-  // Fallback: get user info from users table if admin client failed
-  if (!user) {
-    const { data: fallbackUser } = await serverClient
+  // Always try to get profile from users table via admin client (bypasses RLS)
+  let profileFullName: string | null = null
+  let profileAvatarUrl: string | null = null
+
+  if (adminClient) {
+    const { data: profileRow } = await adminClient
       .from('users')
-      .select('id, email, created_at, full_name')
+      .select('full_name, avatar_url')
       .eq('id', sellerUserId)
       .maybeSingle()
-
-    if (fallbackUser) {
-      user = {
-        id: fallbackUser.id,
-        email: fallbackUser.email || '',
-        created_at: fallbackUser.created_at,
-        user_metadata: { full_name: fallbackUser.full_name },
-      }
-    }
+    profileFullName = profileRow?.full_name || null
+    profileAvatarUrl = profileRow?.avatar_url || null
   }
 
   const listingsResult = await serverClient
@@ -646,19 +643,13 @@ export async function getSellerInfo(sellerUserId: string): Promise<{
 
   const userMeta = user?.user_metadata
 
-  // Try to get name/avatar from the users table first, then fallback to auth metadata
-  const { data: profileRow } = await serverClient
-    .from('users')
-    .select('full_name, avatar_url')
-    .eq('id', sellerUserId)
-    .maybeSingle()
-
-  const name = profileRow?.full_name
+  // Priority: users table (admin) > auth metadata > email prefix
+  const name = profileFullName
     || userMeta?.full_name as string | null
     || userMeta?.name as string | null
     || user?.email?.split('@')[0]
     || null
-  const avatarUrl = profileRow?.avatar_url
+  const avatarUrl = profileAvatarUrl
     || userMeta?.avatar_url as string | null
     || userMeta?.picture as string | null
     || null
