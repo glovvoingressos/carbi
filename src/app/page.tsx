@@ -194,16 +194,10 @@ export default async function HomePage() {
               <Search size={18} />
               <span>Explorar carros</span>
             </Link>
-            <Link href="/anunciar-carro" className="hero-creative-btn hero-creative-btn-outline">
+            <Link href="/anunciar-carro" className="hero-creative-btn hero-creative-btn-white">
               <Plus size={18} />
               <span>Anunciar grátis</span>
             </Link>
-          </div>
-
-          {/* Scroll Indicator */}
-          <div className="hero-creative-scroll">
-            <span>Scroll down</span>
-            <div className="hero-creative-scroll-dot" />
           </div>
         </section>
 
