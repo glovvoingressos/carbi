@@ -60,12 +60,15 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [accountType, setAccountType] = useState<'pf' | 'revenda'>('pf')
+  const [storeName, setStoreName] = useState('')
+  const [cnpj, setCnpj] = useState('')
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const canNextStep = mode === 'signup' && step === 1 && name.trim().length >= 2 && validateCPF(cpf)
+  const canNextStep = mode === 'signup' && step === 1 && name.trim().length >= 2 && validateCPF(cpf) && (accountType === 'pf' || storeName.trim().length >= 2)
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -105,6 +108,9 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
               full_name: name.trim(),
               cpf: cleanCpf,
               phone: cleanPhone,
+              account_type: accountType,
+              store_name: storeName.trim() || undefined,
+              cnpj: cnpj.replace(/\D/g, '') || undefined,
             },
             emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/anunciar-carro` : undefined,
           },
@@ -125,6 +131,9 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
             id: data.user.id,
             email,
             full_name: name.trim(),
+            account_type: accountType,
+            store_name: storeName.trim() || null,
+            cnpj: cnpj.replace(/\D/g, '') || null,
           }, { onConflict: 'id' })
           onAuthenticated?.()
           if (redirectTo) router.push(redirectTo)
@@ -144,6 +153,9 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
     setPhone('')
     setEmail('')
     setPassword('')
+    setAccountType('pf')
+    setStoreName('')
+    setCnpj('')
     setError(null)
     setMessage(null)
   }
@@ -336,6 +348,78 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
                 <p className="mt-1 text-[12px] text-[#DC2626]">CPF inválido</p>
               )}
             </div>
+
+            {/* Account Type Toggle */}
+            <div>
+              <label className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
+                Tipo de conta
+              </label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAccountType('pf')}
+                  className={`flex-1 py-2.5 px-4 rounded-xl text-[13px] font-semibold border transition-all ${
+                    accountType === 'pf'
+                      ? 'bg-[#0A0A0A] text-white border-[#0A0A0A]'
+                      : 'bg-white text-[#525252] border-[#E0E0E0] hover:border-[#A3A3A3]'
+                  }`}
+                >
+                  Pessoa Física
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAccountType('revenda')}
+                  className={`flex-1 py-2.5 px-4 rounded-xl text-[13px] font-semibold border transition-all ${
+                    accountType === 'revenda'
+                      ? 'bg-[#0A0A0A] text-white border-[#0A0A0A]'
+                      : 'bg-white text-[#525252] border-[#E0E0E0] hover:border-[#A3A3A3]'
+                  }`}
+                >
+                  Revenda
+                </button>
+              </div>
+            </div>
+
+            {/* Revenda Fields */}
+            {accountType === 'revenda' && (
+              <div className="space-y-4" style={{ animation: 'fadeIn 0.2s ease' }}>
+                <div>
+                  <label htmlFor="signup-store-name" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
+                    Nome da loja
+                  </label>
+                  <input
+                    id="signup-store-name"
+                    type="text"
+                    value={storeName}
+                    onChange={(e) => setStoreName(e.target.value)}
+                    placeholder="Ex: Auto Carros"
+                    className="input h-12 pr-4 rounded-2xl"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="signup-cnpj" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
+                    CNPJ <span className="text-[#A3A3A3]">(opcional)</span>
+                  </label>
+                  <input
+                    id="signup-cnpj"
+                    type="text"
+                    inputMode="numeric"
+                    value={cnpj}
+                    onChange={(e) => {
+                      let v = e.target.value.replace(/\D/g, '').slice(0, 14)
+                      if (v.length > 12) v = v.slice(0,2) + '.' + v.slice(2,5) + '.' + v.slice(5,8) + '/' + v.slice(8,12) + '-' + v.slice(12)
+                      else if (v.length > 8) v = v.slice(0,2) + '.' + v.slice(2,5) + '.' + v.slice(5,8) + '/' + v.slice(8)
+                      else if (v.length > 5) v = v.slice(0,2) + '.' + v.slice(2,5) + '.' + v.slice(5)
+                      else if (v.length > 2) v = v.slice(0,2) + '.' + v.slice(2)
+                      setCnpj(v)
+                    }}
+                    placeholder="00.000.000/0000-00"
+                    className="input h-12 pr-4 rounded-2xl"
+                    maxLength={18}
+                  />
+                </div>
+              </div>
+            )}
 
             {error && (
               <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-2xl">

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { LayoutDashboard, MessageCircle, CarFront, UserRound } from 'lucide-react'
+import { LayoutDashboard, MessageCircle, CarFront, UserRound, Store } from 'lucide-react'
 import ProfilePanel from '@/components/marketplace/ProfilePanel'
 
 export const metadata: Metadata = {
@@ -52,6 +52,14 @@ export default function MinhaContaPage() {
                 <span>Login / Segurança</span>
               </div>
               <p>Entrar ou trocar de conta com segurança.</p>
+            </Link>
+
+            <Link href="/minha-conta/revenda" className="profile-action-card" style={{ border: '1px solid #D4F576' }}>
+              <div className="profile-action-top">
+                <Store className="h-5 w-5" style={{ color: '#5D9400' }} />
+                <span>Área da Revenda</span>
+              </div>
+              <p>Dashboard, importação em massa e gestão de veículos.</p>
             </Link>
           </div>
         </section>
