@@ -33,15 +33,16 @@ export async function getSupabaseServerClientWithCookies(): Promise<SupabaseClie
   }
 
   const cookieStore = await cookies()
+
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        return cookieStore.getAll()
+        return cookieStore.getAll().map(c => ({ name: c.name, value: c.value }))
       },
       setAll(cookiesToSet) {
         try {
           cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
+            cookieStore.set(name, value, options as any)
           )
         } catch {
           // Server component - ignore
