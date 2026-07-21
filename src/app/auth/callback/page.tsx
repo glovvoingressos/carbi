@@ -25,9 +25,6 @@ export default function AuthCallbackPage() {
               await supabase.from('users').upsert({
                 id: user.id, email: user.email,
                 full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
-                account_type: user.user_metadata?.account_type || 'pf',
-                store_name: user.user_metadata?.store_name || null,
-                cnpj: user.user_metadata?.cnpj || null,
               }, { onConflict: 'id' })
             }
             return router.replace('/anunciar-carro')

@@ -4,13 +4,13 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   User, Mail, Phone, Lock, Camera, Save, Loader2,
-  Building2, CreditCard, ChevronRight, AlertTriangle,
+  ChevronRight, AlertTriangle,
 } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 type ProfileRow = {
   id: string; email: string | null; full_name: string | null; avatar_url: string | null
-  phone: string | null; account_type: string | null; store_name: string | null; cnpj: string | null
+  phone: string | null
 }
 
 const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -12 }, transition: { duration: 0.2 } }
@@ -20,15 +20,6 @@ const formatPhone = (v: string) => {
     ? d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2')
     : d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2')
 }
-const formatCnpj = (v: string) => {
-  let d = v.replace(/\D/g, '').slice(0, 14)
-  if (d.length > 12) d = d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5,8)+'/'+d.slice(8,12)+'-'+d.slice(12)
-  else if (d.length > 8) d = d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5,8)+'/'+d.slice(8)
-  else if (d.length > 5) d = d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5)
-  else if (d.length > 2) d = d.slice(0,2)+'.'+d.slice(2)
-  return d
-}
-
 export default function ProfilePanel() {
   const supabaseReady = isSupabaseBrowserConfigured()
   const [loading, setLoading] = useState(true)
@@ -37,9 +28,6 @@ export default function ProfilePanel() {
   const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
-  const [accountType, setAccountType] = useState<'pf' | 'revenda'>('pf')
-  const [storeName, setStoreName] = useState('')
-  const [cnpj, setCnpj] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
@@ -67,12 +55,11 @@ export default function ProfilePanel() {
     if (!userId || !supabaseReady) return
     const load = async () => {
       const { data } = await getSupabaseBrowserClient()
-        .from('users').select('id,email,full_name,avatar_url,phone,account_type,store_name,cnpj')
+        .from('users').select('id,email,full_name,avatar_url,phone')
         .eq('id', userId).maybeSingle()
       if (data) {
         setFullName(data.full_name || ''); setAvatarUrl(data.avatar_url || '')
-        setPhone(data.phone || ''); setAccountType((data.account_type as 'pf' | 'revenda') || 'pf')
-        setStoreName(data.store_name || ''); setCnpj(data.cnpj || '')
+        setPhone(data.phone || '')
       }
     }
     void load()
@@ -84,7 +71,6 @@ export default function ProfilePanel() {
     try {
       const { error } = await getSupabaseBrowserClient().from('users').update({
         full_name: fullName.trim() || null, phone: phone.replace(/\D/g, '') || null,
-        account_type: accountType, store_name: storeName.trim() || null, cnpj: cnpj.replace(/\D/g, '') || null,
       }).eq('id', userId)
       if (error) throw error
       toast_('success', 'Perfil atualizado com sucesso.')
@@ -188,40 +174,6 @@ export default function ProfilePanel() {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="h-px bg-gray-100" />
-      {/* Account Type */}
-      <div>
-        <h3 className="text-sm font-semibold text-[#0A0A0A] mb-4">Tipo de conta</h3>
-        <div className="flex gap-2 mb-4">
-          {([['pf','Pessoa Física'],['revenda','Revenda']] as const).map(([v,l]) => (
-            <button key={v} type="button" onClick={() => setAccountType(v)}
-              className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold border transition-all ${accountType === v ? 'bg-[#0A0A0A] text-white border-[#0A0A0A]' : 'bg-white text-[#525252] border-gray-200 hover:border-gray-400'}`}>
-              {l}
-            </button>
-          ))}
-        </div>
-        <AnimatePresence>
-          {accountType === 'revenda' && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-4 overflow-hidden">
-              <div>
-                <label className="block text-xs font-medium text-[#525252] mb-1.5">Nome da loja</label>
-                <div className="relative">
-                  <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" strokeWidth={1.75} />
-                  <input value={storeName} onChange={(e) => setStoreName(e.target.value)} placeholder="Ex: Auto Carros" className="input pl-10" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#525252] mb-1.5">CNPJ</label>
-                <div className="relative">
-                  <CreditCard className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" strokeWidth={1.75} />
-                  <input value={cnpj} onChange={(e) => setCnpj(formatCnpj(e.target.value))} placeholder="00.000.000/0000-00" maxLength={18} className="input pl-10" />
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       <div className="h-px bg-gray-100" />

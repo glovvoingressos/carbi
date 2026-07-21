@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight,
-  Loader2, Check, AlertCircle, Building2, CreditCard,
+  Loader2, Check, AlertCircle, CreditCard,
 } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
@@ -110,9 +110,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [accountType, setAccountType] = useState<'pf' | 'revenda'>('pf')
-  const [storeName, setStoreName] = useState('')
-  const [cnpj, setCnpj] = useState('')
+  const [accountType] = useState<'pf'>('pf')
   const [remember, setRemember] = useState(false)
 
   const [loading, setLoading] = useState(false)
@@ -120,13 +118,13 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
   const [error, setError] = useState<string | null>(null)
 
   const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
-  const step1Valid = firstName.trim().length >= 2 && lastName.trim().length >= 2 && validateCPF(cpf) && (accountType === 'pf' || storeName.trim().length >= 2)
+  const step1Valid = firstName.trim().length >= 2 && lastName.trim().length >= 2 && validateCPF(cpf)
   const passwordValid = password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password) && /[^A-Za-z0-9]/.test(password)
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0
 
   const reset = () => {
     setStep(1); setFirstName(''); setLastName(''); setCpf(''); setPhone(''); setEmail('')
-    setPassword(''); setConfirmPassword(''); setAccountType('pf'); setStoreName(''); setCnpj('')
+    setPassword(''); setConfirmPassword('')
     setRemember(false); setError(null); setMessage(null)
   }
 
@@ -142,20 +140,20 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
       if (mode === 'login') {
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
         if (signInError) { setError('E-mail ou senha incorretos.'); return }
-        await supabase.from('users').upsert({ id: (await supabase.auth.getUser()).data.user!.id, email, full_name: fullName || null, account_type: accountType }, { onConflict: 'id' })
+        await supabase.from('users').upsert({ id: (await supabase.auth.getUser()).data.user!.id, email, full_name: fullName || null }, { onConflict: 'id' })
         onAuthenticated?.()
         if (redirectTo) router.push(redirectTo)
       } else if (mode === 'signup') {
         const { data, error: signUpError } = await supabase.auth.signUp({
           email, password,
           options: {
-            data: { full_name: fullName, cpf: cpf.replace(/\D/g, ''), phone: phone.replace(/\D/g, ''), account_type: accountType, store_name: storeName.trim() || undefined, cnpj: cnpj.replace(/\D/g, '') || undefined },
+            data: { full_name: fullName, cpf: cpf.replace(/\D/g, ''), phone: phone.replace(/\D/g, '') },
             emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
           },
         })
         if (signUpError) { setError(signUpError.message.includes('already') ? 'Este e-mail já está cadastrado.' : signUpError.message); return }
         if (data.session && data.user) {
-          await supabase.from('users').upsert({ id: data.user.id, email, full_name: fullName, account_type: accountType, store_name: storeName.trim() || null, cnpj: cnpj.replace(/\D/g, '') || null }, { onConflict: 'id' })
+          await supabase.from('users').upsert({ id: data.user.id, email, full_name: fullName }, { onConflict: 'id' })
           onAuthenticated?.()
           if (redirectTo) router.push(redirectTo)
         } else {
@@ -167,15 +165,6 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         setMessage('Link de redefinição enviado! Verifique sua caixa de entrada.')
       }
     } finally { setLoading(false) }
-  }
-
-  const formatCnpj = (v: string) => {
-    let d = v.replace(/\D/g, '').slice(0, 14)
-    if (d.length > 12) d = d.slice(0,2) + '.' + d.slice(2,5) + '.' + d.slice(5,8) + '/' + d.slice(8,12) + '-' + d.slice(12)
-    else if (d.length > 8) d = d.slice(0,2) + '.' + d.slice(2,5) + '.' + d.slice(5,8) + '/' + d.slice(8)
-    else if (d.length > 5) d = d.slice(0,2) + '.' + d.slice(2,5) + '.' + d.slice(5)
-    else if (d.length > 2) d = d.slice(0,2) + '.' + d.slice(2)
-    return d
   }
 
   const ErrorBanner = () => error ? (
@@ -269,27 +258,6 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
                     <InputField icon={User} id="signup-last" label="Sobrenome" value={lastName} onChange={setLastName} placeholder="Sobrenome" required />
                   </div>
                   <InputField icon={CreditCard} id="signup-cpf" label="CPF" value={cpf} onChange={(v) => setCpf(formatCPF(v))} placeholder="000.000.000-00" maxLength={14} required />
-
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1.5">Tipo de conta</label>
-                    <div className="flex gap-2">
-                      {([['pf', 'Pessoa Física'], ['revenda', 'Revenda']] as const).map(([val, lbl]) => (
-                        <button key={val} type="button" onClick={() => setAccountType(val)}
-                          className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-all ${accountType === val ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'}`}>
-                          {lbl}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <AnimatePresence>
-                    {accountType === 'revenda' && (
-                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-4 overflow-hidden">
-                        <InputField icon={Building2} id="signup-store" label="Nome da loja" value={storeName} onChange={setStoreName} placeholder="Ex: Auto Carros" required />
-                        <InputField icon={CreditCard} id="signup-cnpj" label="CNPJ (opcional)" value={cnpj} onChange={(v) => setCnpj(formatCnpj(v))} placeholder="00.000.000/0000-00" maxLength={18} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </motion.div>
               )}
 
