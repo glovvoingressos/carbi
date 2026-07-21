@@ -1,14 +1,14 @@
 'use client'
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 
-let cachedClient: SupabaseClient | null = null
+let cachedClient: ReturnType<typeof createBrowserClient> | null = null
 
 export function isSupabaseBrowserConfigured(): boolean {
   return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 }
 
-export function getSupabaseBrowserClient(): SupabaseClient {
+export function getSupabaseBrowserClient() {
   if (cachedClient) return cachedClient
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -18,6 +18,6 @@ export function getSupabaseBrowserClient(): SupabaseClient {
     throw new Error('Supabase não configurado. Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY.')
   }
 
-  cachedClient = createClient(supabaseUrl, supabaseAnonKey)
+  cachedClient = createBrowserClient(supabaseUrl, supabaseAnonKey)
   return cachedClient
 }
