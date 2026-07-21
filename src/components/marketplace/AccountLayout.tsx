@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   LayoutDashboard, Car, Heart, MessageCircle, Bell, Settings, LogOut, User,
 } from 'lucide-react'
+import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
 import ProfilePanel from '@/components/marketplace/ProfilePanel'
 
 const navItems = [
@@ -26,7 +27,19 @@ const fade = {
 
 export default function AccountLayout({ user }: { user: { email: string; fullName: string; avatarUrl: string } }) {
   const pathname = usePathname()
-  const [mobileTab, setMobileTab] = useState<'nav' | 'content'>('content')
+  const router = useRouter()
+  const [loggingOut, setLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    setLoggingOut(true)
+    try {
+      const supabase = getSupabaseBrowserClient()
+      await supabase.auth.signOut()
+      router.replace('/')
+    } catch {
+      setLoggingOut(false)
+    }
+  }
 
   return (
     <div className="min-h-screen pb-16 pt-28 px-4 md:px-8">
@@ -95,9 +108,14 @@ export default function AccountLayout({ user }: { user: { email: string; fullNam
 
               {/* Logout */}
               <div className="mt-5 pt-4 border-t border-gray-100">
-                <button type="button" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors w-full">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors w-full disabled:opacity-50"
+                >
                   <LogOut className="w-4 h-4" strokeWidth={1.75} />
-                  Sair da conta
+                  {loggingOut ? 'Saindo...' : 'Sair da conta'}
                 </button>
               </div>
             </div>

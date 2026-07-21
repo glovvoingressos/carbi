@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import AccountLayout from '@/components/marketplace/AccountLayout'
 
 export const metadata: Metadata = {
@@ -28,14 +29,16 @@ async function getUser() {
     }
   )
   const { data: { session } } = await supabase.auth.getSession()
-  if (!session) return { email: '', fullName: '', avatarUrl: '' }
+  if (!session) {
+    redirect('/entrar?redirect=/minha-conta')
+  }
   const { data: profile } = await supabase
     .from('users')
     .select('full_name,avatar_url')
-    .eq('id', session.user.id)
+    .eq('id', session!.user.id)
     .maybeSingle()
   return {
-    email: session.user.email || '',
+    email: session!.user.email || '',
     fullName: profile?.full_name || '',
     avatarUrl: profile?.avatar_url || '',
   }

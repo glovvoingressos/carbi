@@ -65,8 +65,9 @@ function InputField({ icon: Icon, id, label, type = 'text', value, onChange, pla
           className={`w-full h-11 pl-10 pr-10 rounded-xl border bg-white text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[#D4F576] focus:border-[#D4F576] ${error ? 'border-red-400' : 'border-gray-200'}`}
         />
         {isPassword && (
-          <button type="button" tabIndex={-1} onClick={() => setShow(!show)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+          <button type="button" onClick={() => setShow(!show)}
+            aria-label={show ? 'Ocultar senha' : 'Mostrar senha'}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-[#D4F576]">
             {show ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         )}
@@ -110,8 +111,6 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [accountType] = useState<'pf'>('pf')
-  const [remember, setRemember] = useState(false)
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -125,7 +124,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
   const reset = () => {
     setStep(1); setFirstName(''); setLastName(''); setCpf(''); setPhone(''); setEmail('')
     setPassword(''); setConfirmPassword('')
-    setRemember(false); setError(null); setMessage(null)
+    setError(null); setMessage(null)
   }
 
   const switchMode = (m: Mode) => { reset(); setMode(m); setError(null); setMessage(null) }
@@ -201,12 +200,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
               <InputField icon={Lock} id="login-password" label="Senha" type="password" value={password} onChange={setPassword} placeholder="Sua senha" required />
             </div>
 
-            <div className="flex items-center justify-between mt-3">
-              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
-                <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-[#0A0A0A] focus:ring-[#D4F576]" />
-                Lembrar
-              </label>
+            <div className="flex items-center justify-end mt-3">
               <button type="button" onClick={() => switchMode('forgot')} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
                 Esqueceu a senha?
               </button>
