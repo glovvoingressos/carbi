@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Car, Eye, MessageCircle, TrendingUp, Plus, Upload, AlertTriangle } from 'lucide-react'
-import { getSupabaseServerClientWithCookies } from '@/lib/supabase-server'
+import { getSupabaseServerClient } from '@/lib/supabase-server'
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import RevendaKPICard from '@/components/revenda/RevendaKPICard'
 
@@ -13,7 +14,12 @@ export const metadata: Metadata = {
 }
 
 export default async function RevendaDashboardPage() {
-  const client = await getSupabaseServerClientWithCookies()
+  const cookieStore = await cookies()
+  const token = cookieStore.get('sb-access-token')?.value || cookieStore.get('sb-ygrnbudqtfuadkpbgttw-auth-token')?.value
+
+  if (!token) redirect('/entrar?redirect=/minha-conta/revenda')
+
+  const client = getSupabaseServerClient(token)
   const { data: { user } } = await client.auth.getUser()
   if (!user) redirect('/entrar?redirect=/minha-conta/revenda')
 
@@ -30,10 +36,14 @@ export default async function RevendaDashboardPage() {
   const soldVehicles = listings?.filter((l: any) => l.status === 'sold').length || 0
   const totalViews = listings?.reduce((sum: number, l: any) => sum + (l.view_count || 0), 0) || 0
 
-  const { count: leadsCount } = await client
-    .from('conversations')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
+  let leadsCount = 0
+  try {
+    const { count } = await client
+      .from('conversations')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+    leadsCount = count || 0
+  } catch {}
 
   return (
     <div className="fingen-page">
@@ -59,7 +69,7 @@ export default async function RevendaDashboardPage() {
             <RevendaKPICard label="Ativos" value={activeVehicles} icon={TrendingUp} delay={0.05} />
             <RevendaKPICard label="Vendidos" value={soldVehicles} icon={Car} delay={0.1} />
             <RevendaKPICard label="Visualizações" value={totalViews} icon={Eye} delay={0.15} />
-            <RevendaKPICard label="Leads" value={leadsCount || 0} icon={MessageCircle} delay={0.2} />
+            <RevendaKPICard label="Leads" value={leadsCount} icon={MessageCircle} delay={0.2} />
           </div>
 
           <div style={{ background: 'linear-gradient(135deg, #1A1A1A 0%, #0D1F12 50%, #1A2F1E 100%)', borderRadius: '24px', padding: '32px', color: '#fff' }}>

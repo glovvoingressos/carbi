@@ -1,10 +1,18 @@
 import { redirect } from 'next/navigation'
-import { getSupabaseServerClientWithCookies } from '@/lib/supabase-server'
+import { getSupabaseServerClient } from '@/lib/supabase-server'
+import { cookies } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AnunciarCarroPage() {
-  const supabase = await getSupabaseServerClientWithCookies()
+  const cookieStore = await cookies()
+  const token = cookieStore.get('sb-access-token')?.value || cookieStore.get('sb-ygrnbudqtfuadkpbgttw-auth-token')?.value
+
+  if (!token) {
+    redirect('/entrar?redirect=/anunciar-carro/fluxo')
+  }
+
+  const supabase = getSupabaseServerClient(token)
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
