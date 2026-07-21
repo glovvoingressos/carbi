@@ -11,7 +11,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
 import ProfilePanel from '@/components/marketplace/ProfilePanel'
 
 const navItems = [
-  { href: '/minha-conta', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/minha-conta', label: 'Painel', icon: LayoutDashboard },
   { href: '/minha-conta/anuncios', label: 'Meus anúncios', icon: Car },
   { href: '/minha-conta/favoritos', label: 'Favoritos', icon: Heart },
   { href: '/minha-conta/conversas', label: 'Mensagens', icon: MessageCircle },
@@ -79,7 +79,7 @@ export default function AccountLayout({ user }: { user: { email: string; fullNam
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[var(--color-text-primary)] truncate">{user.fullName || 'Sua conta'}</p>
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)] truncate">{user.fullName || 'Usuário'}</p>
                   <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.email}</p>
                 </div>
               </div>

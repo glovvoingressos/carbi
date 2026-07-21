@@ -18,7 +18,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <section className="auth-hero-card surface-strong">
           <h1 className="auth-hero-title">Anuncie carros grátis em minutos.</h1>
           <p className="auth-hero-copy">
-            Cadastro rápido com FIPE integrada, chat interno e tráfego pago grátis para seus anúncios.
+            Cadastro rápido com FIPE integrada, chat interno e divulgação gratuita para seus anúncios.
           </p>
           <div className="auth-hero-points">
             <div className="auth-hero-point">
@@ -30,8 +30,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
               <span>Preço de referência verificado.</span>
             </div>
             <div className="auth-hero-point">
-              <strong>Tráfego grátis</strong>
-              <span>Seus anúncios no Google e Meta Ads sem custo.</span>
+              <strong>Divulgação gratuita</strong>
+              <span>Seus anúncios divulgados sem custo adicional.</span>
             </div>
           </div>
         </section>

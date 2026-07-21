@@ -74,7 +74,7 @@ export default function ProfilePanel() {
       }).eq('id', userId)
       if (error) throw error
       toast_('success', 'Perfil atualizado com sucesso.')
-    } catch (e) { toast_('error', e instanceof Error ? e.message : 'Falha ao salvar.') }
+    } catch (e) { toast_('error', e instanceof Error ? e.message : 'Não foi possível salvar. Tente novamente.') }
     finally { setSaving(false) }
   }
 
@@ -92,7 +92,7 @@ export default function ProfilePanel() {
       setAvatarUrl(u.publicUrl)
       await sb.from('users').update({ avatar_url: u.publicUrl }).eq('id', userId)
       toast_('success', 'Foto de perfil atualizada.')
-    } catch (e) { toast_('error', e instanceof Error ? e.message : 'Falha no upload.') }
+    } catch (e) { toast_('error', e instanceof Error ? e.message : 'Não foi possível atualizar a foto. Tente novamente.') }
     finally { setUploading(false); e.target.value = '' }
   }
 
@@ -104,7 +104,7 @@ export default function ProfilePanel() {
       if (error) throw error
       toast_('success', 'Senha alterada com sucesso.')
       setShowPw(false); setNewPw(''); setConfirmPw('')
-    } catch (e) { toast_('error', e instanceof Error ? e.message : 'Falha ao alterar senha.') }
+    } catch (e) { toast_('error', e instanceof Error ? e.message : 'Não foi possível alterar a senha. Verifique os requisitos.') }
     finally { setPwSaving(false) }
   }
 
@@ -114,7 +114,7 @@ export default function ProfilePanel() {
       await getSupabaseBrowserClient().from('users').delete().eq('id', userId)
       await getSupabaseBrowserClient().auth.signOut()
       window.location.href = '/'
-    } catch (e) { toast_('error', e instanceof Error ? e.message : 'Falha ao excluir.') }
+    } catch (e) { toast_('error', e instanceof Error ? e.message : 'Não foi possível excluir a conta. Tente novamente.') }
   }
   if (loading) return <div className="surface-strong p-12 text-center"><Loader2 className="mx-auto h-5 w-5 animate-spin text-[var(--color-text-primary)]" /><p className="mt-3 text-sm text-[var(--color-text-secondary)]">Carregando perfil...</p></div>
 
@@ -157,7 +157,7 @@ export default function ProfilePanel() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">Nome completo</label>
-            <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Seu nome completo" className="input" />
+            <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ex: João Silva" className="input" />
           </div>
           <div>
             <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">E-mail</label>
@@ -223,8 +223,8 @@ export default function ProfilePanel() {
 
       {/* Danger Zone */}
       <div>
-        <h3 className="text-sm font-semibold text-[var(--color-danger)] mb-4">Zona de perigo</h3>
-        <p className="text-sm text-[var(--color-text-secondary)] mb-4">Excluir sua conta é irreversível.</p>
+        <h3 className="text-sm font-semibold text-[var(--color-danger)] mb-4">Excluir conta</h3>
+        <p className="text-sm text-[var(--color-text-secondary)] mb-4">Essa ação é permanente e não pode ser desfeita.</p>
         {!showDel ? (
           <button type="button" onClick={() => setShowDel(true)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-danger)]/30 text-sm font-medium text-[var(--color-danger)] hover:bg-[var(--color-danger)]/5 transition-colors">

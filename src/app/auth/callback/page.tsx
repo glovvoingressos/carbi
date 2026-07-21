@@ -33,7 +33,7 @@ export default function AuthCallbackPage() {
         const { data: { session } } = await supabase.auth.getSession()
         router.replace(session ? '/minha-conta' : '/entrar')
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erro ao confirmar e-mail.')
+        setError(err instanceof Error ? err.message : 'Não foi possível confirmar seu e-mail. Tente fazer login novamente.')
       }
     })()
   }, [router])

@@ -79,10 +79,10 @@ function InputField({ icon: Icon, id, label, type = 'text', value, onChange, pla
 
 function PasswordChecklist({ password }: { password: string }) {
   const rules = [
-    { label: '8+ caracteres', met: password.length >= 8 },
+    { label: 'Pelo menos 8 caracteres', met: password.length >= 8 },
     { label: 'Letra maiúscula', met: /[A-Z]/.test(password) },
-    { label: 'Número', met: /\d/.test(password) },
-    { label: 'Caractere especial', met: /[^A-Za-z0-9]/.test(password) },
+    { label: 'Pelo menos 1 número', met: /\d/.test(password) },
+    { label: 'Pelo menos 1 caractere especial', met: /[^A-Za-z0-9]/.test(password) },
   ]
   return (
     <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-2">
@@ -131,7 +131,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!supabaseReady) { setError('Autenticação indisponível.'); return }
+    if (!supabaseReady) { setError('Serviço de login temporariamente indisponível. Tente novamente mais tarde.'); return }
     setLoading(true); setError(null); setMessage(null)
     try {
       const supabase = getSupabaseBrowserClient()
@@ -150,18 +150,18 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
             emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
           },
         })
-        if (signUpError) { setError(signUpError.message.includes('already') ? 'Este e-mail já está cadastrado.' : signUpError.message); return }
+        if (signUpError) { setError(signUpError.message.includes('already') ? 'Este e-mail já está cadastrado.' : 'Não foi possível criar a conta. Verifique os dados e tente novamente.'); return }
         if (data.session && data.user) {
           await supabase.from('users').upsert({ id: data.user.id, email, full_name: fullName }, { onConflict: 'id' })
           onAuthenticated?.()
           if (redirectTo) router.push(redirectTo)
         } else {
-          setMessage('Conta criada! Confirme seu e-mail para continuar.')
+          setMessage('Conta criada! Confirme seu e-mail para continuar. Verifique também a pasta de spam.')
         }
       } else if (mode === 'forgot') {
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/reset-password` : undefined })
         if (resetError) { setError(resetError.message); return }
-        setMessage('Link de redefinição enviado! Verifique sua caixa de entrada.')
+        setMessage('Link enviado! Verifique sua caixa de entrada e a pasta de spam.')
       }
     } finally { setLoading(false) }
   }
@@ -191,13 +191,13 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
 
             {!supabaseReady && (
               <div className="mt-5 p-3 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-sm text-[var(--color-danger)]">Ambiente sem Supabase configurado.</p>
+                <p className="text-sm text-[var(--color-danger)]">Serviço de login indisponível no momento.</p>
               </div>
             )}
 
             <div className="mt-6 space-y-4">
-              <InputField icon={Mail} id="login-email" label="E-mail" type="email" value={email} onChange={setEmail} placeholder="voce@email.com" required />
-              <InputField icon={Lock} id="login-password" label="Senha" type="password" value={password} onChange={setPassword} placeholder="Sua senha" required />
+              <InputField icon={Mail} id="login-email" label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" required />
+              <InputField icon={Lock} id="login-password" label="Senha" type="password" value={password} onChange={setPassword} placeholder="Digite sua senha" required />
             </div>
 
             <div className="flex items-center justify-end mt-3">
@@ -248,8 +248,8 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
               {step === 1 && (
                 <motion.div key="step1" {...fade} className="space-y-4">
                   <div className="grid grid-cols-2 gap-3">
-                    <InputField icon={User} id="signup-first" label="Nome" value={firstName} onChange={setFirstName} placeholder="Nome" required />
-                    <InputField icon={User} id="signup-last" label="Sobrenome" value={lastName} onChange={setLastName} placeholder="Sobrenome" required />
+                    <InputField icon={User} id="signup-first" label="Nome" value={firstName} onChange={setFirstName} placeholder="Ex: João" required />
+                    <InputField icon={User} id="signup-last" label="Sobrenome" value={lastName} onChange={setLastName} placeholder="Ex: Silva" required />
                   </div>
                   <InputField icon={CreditCard} id="signup-cpf" label="CPF" value={cpf} onChange={(v) => setCpf(formatCPF(v))} placeholder="000.000.000-00" maxLength={14} required />
                 </motion.div>
@@ -263,14 +263,14 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
                       <ArrowRight size={14} className="text-gray-600 rotate-180" />
                     </button>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">Contato e acesso</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">Dados de contato e acesso</h3>
                     </div>
                   </div>
                   <InputField icon={Phone} id="signup-phone" label="Telefone" type="tel" value={phone} onChange={(v) => setPhone(formatPhone(v))} placeholder="(00) 00000-0000" maxLength={15} required />
                   <InputField icon={Mail} id="signup-email" label="E-mail" type="email" value={email} onChange={setEmail} placeholder="voce@email.com" required />
-                  <InputField icon={Lock} id="signup-password" label="Senha" type="password" value={password} onChange={setPassword} placeholder="Sua senha" required />
+                  <InputField icon={Lock} id="signup-password" label="Senha" type="password" value={password} onChange={setPassword} placeholder="Crie uma senha" required />
                   <PasswordChecklist password={password} />
-                  <InputField icon={Lock} id="signup-confirm" label="Confirmar senha" type="password" value={confirmPassword} onChange={setConfirmPassword} placeholder="Repita a senha" required error={confirmPassword && !passwordsMatch ? 'Senhas não coincidem' : undefined} />
+                  <InputField icon={Lock} id="signup-confirm" label="Confirmar senha" type="password" value={confirmPassword} onChange={setConfirmPassword} placeholder="Repita a senha" required error={confirmPassword && !passwordsMatch ? 'As senhas não coincidem' : undefined} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -311,7 +311,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         {mode === 'forgot' && (
           <motion.form key="forgot" {...fade} onSubmit={handleSubmit}>
             <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Redefinir senha</h2>
-            <p className="mt-1.5 text-sm text-gray-500">Enviaremos um link para redefinir sua senha.</p>
+            <p className="mt-1.5 text-sm text-gray-500">Informe seu e-mail para receber um link de redefinição.</p>
 
             <div className="mt-6">
               <InputField icon={Mail} id="forgot-email" label="E-mail" type="email" value={email} onChange={setEmail} placeholder="voce@email.com" required />
@@ -322,7 +322,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
 
             <button type="submit" disabled={loading || !supabaseReady}
               className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-              {loading ? <Loader2 size={16} className="animate-spin" /> : <>Enviar link <ArrowRight size={16} /></>}
+              {loading ? <Loader2 size={16} className="animate-spin" /> : <>Enviar link por e-mail <ArrowRight size={16} /></>}
             </button>
 
             <div className="mt-6 pt-5 border-t border-gray-100 text-center">
