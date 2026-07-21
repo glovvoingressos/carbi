@@ -3686,10 +3686,10 @@ p {
 .auth-hero-title {
   margin-top: 18px;
   color: var(--ink);
-  font-size: clamp(38px, 4.8vw, 62px);
+  font-size: clamp(20px, 3vw, 32px);
   font-weight: 700;
-  letter-spacing: -2px;
-  line-height: .98;
+  letter-spacing: -1px;
+  line-height: 1.2;
   text-wrap: balance;
 }
 .auth-hero-copy {
