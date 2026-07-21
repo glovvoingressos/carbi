@@ -101,7 +101,9 @@ export default function Navbar() {
                 {unreadCount > 0 && <span className="navbar-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
               </Link>
             )}
-            <Link href="/entrar" className="navbar-login">Entrar</Link>
+            <Link href={isAuth ? '/minha-conta' : '/entrar'} className="navbar-login">
+              {isAuth ? 'Minha conta' : 'Entrar'}
+            </Link>
             <Link href="/anunciar-carro" className="navbar-cta">Anunciar</Link>
           </div>
 
@@ -158,7 +160,9 @@ export default function Navbar() {
                 </Link>
               )}
               <div className="navbar-mobile-actions">
-                <Link href="/entrar" className="navbar-mobile-login">Entrar</Link>
+                <Link href={isAuth ? '/minha-conta' : '/entrar'} className="navbar-mobile-login">
+                  {isAuth ? 'Minha conta' : 'Entrar'}
+                </Link>
                 <Link href="/anunciar-carro" className="navbar-mobile-cta">Anunciar grátis</Link>
               </div>
             </div>
