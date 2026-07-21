@@ -40,10 +40,10 @@ export default function ProfilePanel() {
       setEmail(session?.user.email || '')
       setSessionReady(true)
 
-      const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      const { data } = supabase.auth.onAuthStateChange((_event: string, nextSession: { access_token?: string; user?: { id?: string; email?: string } } | null) => {
         setIsAuthenticated(!!nextSession)
-        setUserId(nextSession?.user.id || null)
-        setEmail(nextSession?.user.email || '')
+        setUserId(nextSession?.user?.id || null)
+        setEmail(nextSession?.user?.email || '')
       })
       unsubscribe = () => data.subscription.unsubscribe()
     }
@@ -61,7 +61,7 @@ export default function ProfilePanel() {
         .from('users')
         .select('id,email,full_name,avatar_url')
         .eq('id', userId)
-        .maybeSingle<ProfileRow>()
+        .maybeSingle()
 
       if (!existing) {
         await supabase.from('users').upsert({ id: userId, email: email || null })
@@ -71,7 +71,7 @@ export default function ProfilePanel() {
         .from('users')
         .select('id,email,full_name,avatar_url')
         .eq('id', userId)
-        .single<ProfileRow>()
+        .single()
 
       if (profile) {
         setFullName(profile.full_name || '')

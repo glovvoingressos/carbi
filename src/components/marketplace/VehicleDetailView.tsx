@@ -99,9 +99,9 @@ export default function VehicleDetailView({
     setPageUrl(window.location.href)
     if (!isSupabaseBrowserConfigured()) return
     const supabase = getSupabaseBrowserClient()
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: { data: { session: { access_token?: string; user?: { id?: string } } | null } }) => {
       if (session?.access_token) {
-        setSessionUserId(session.user.id)
+        setSessionUserId(session.user?.id || null)
         setAccessToken(session.access_token)
       }
     })

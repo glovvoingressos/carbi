@@ -57,7 +57,7 @@ export default function NotificationsPage() {
   useEffect(() => {
     if (!supabaseReady) { setReady(true); return }
     const supabase = getSupabaseBrowserClient()
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: { data: { session: { access_token?: string; user?: { id?: string } } | null } }) => {
       setAuthenticated(!!session)
       setToken(session?.access_token || null)
       setReady(true)

@@ -277,7 +277,7 @@ export default function ListingForm() {
       setIsAuthenticated(!!data.session)
       setSessionReady(true)
 
-      const { data: authData } = supabase.auth.onAuthStateChange((_event, session) => {
+      const { data: authData } = supabase.auth.onAuthStateChange((_event: string, session: { access_token?: string; user?: { id?: string } } | null) => {
         setIsAuthenticated(!!session)
       })
       unsubscribe = () => authData.subscription.unsubscribe()

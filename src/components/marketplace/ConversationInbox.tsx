@@ -100,10 +100,10 @@ export default function ConversationInbox() {
       setMyUserId(session?.user.id || null)
       setReady(true)
 
-      const { data } = supabase.auth.onAuthStateChange((_event, updated) => {
+      const { data } = supabase.auth.onAuthStateChange((_event: string, updated: { access_token?: string; user?: { id?: string } } | null) => {
         setAuthenticated(!!updated)
         setToken(updated?.access_token || null)
-        setMyUserId(updated?.user.id || null)
+        setMyUserId(updated?.user?.id || null)
       })
       unsubscribe = () => data.subscription.unsubscribe()
     }
