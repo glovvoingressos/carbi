@@ -1,23 +1,35 @@
-import { redirect } from 'next/navigation'
-import { getSupabaseServerClient } from '@/lib/supabase-server'
-import { cookies } from 'next/headers'
+'use client'
 
-export const dynamic = 'force-dynamic'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
-export default async function AnunciarCarroPage() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('sb-access-token')?.value || cookieStore.get('sb-ygrnbudqtfuadkpbgttw-auth-token')?.value
+export default function AnunciarCarroPage() {
+  const router = useRouter()
 
-  if (!token) {
-    redirect('/entrar?redirect=/anunciar-carro/fluxo')
-  }
+  useEffect(() => {
+    if (!isSupabaseBrowserConfigured()) {
+      router.replace('/entrar?redirect=/anunciar-carro/fluxo')
+      return
+    }
 
-  const supabase = getSupabaseServerClient(token)
-  const { data: { user } } = await supabase.auth.getUser()
+    const supabase = getSupabaseBrowserClient()
 
-  if (!user) {
-    redirect('/entrar?redirect=/anunciar-carro/fluxo')
-  }
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        router.replace('/anunciar-carro/fluxo')
+      } else {
+        router.replace('/entrar?redirect=/anunciar-carro/fluxo')
+      }
+    }
 
-  redirect('/anunciar-carro/fluxo')
+    checkAuth()
+  }, [router])
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+      <p style={{ color: 'var(--color-text-secondary)' }}>Verificando autenticação...</p>
+    </div>
+  )
 }
