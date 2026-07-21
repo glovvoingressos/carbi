@@ -671,10 +671,6 @@ p {
   outline: none;
 }
 
-.auth-icon-input {
-  padding-left: 44px !important;
-}
-
 .input::placeholder {
   color: var(--color-text-tertiary);
 }

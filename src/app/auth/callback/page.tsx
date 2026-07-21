@@ -27,11 +27,11 @@ export default function AuthCallbackPage() {
                 full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
               }, { onConflict: 'id' })
             }
-            return router.replace('/anunciar-carro')
+            return router.replace('/minha-conta')
           }
         }
         const { data: { session } } = await supabase.auth.getSession()
-        router.replace(session ? '/anunciar-carro' : '/entrar')
+        router.replace(session ? '/minha-conta' : '/entrar')
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro ao confirmar e-mail.')
       }
