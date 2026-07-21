@@ -10,6 +10,9 @@ type ProfileRow = {
   email: string | null
   full_name: string | null
   avatar_url: string | null
+  account_type: string | null
+  store_name: string | null
+  cnpj: string | null
 }
 
 export default function ProfilePanel() {
@@ -20,6 +23,8 @@ export default function ProfilePanel() {
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
+  const [accountType, setAccountType] = useState<'pf' | 'revenda'>('pf')
+  const [storeName, setStoreName] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -59,7 +64,7 @@ export default function ProfilePanel() {
       setError(null)
       const { data: existing } = await supabase
         .from('users')
-        .select('id,email,full_name,avatar_url')
+        .select('id,email,full_name,avatar_url,account_type,store_name')
         .eq('id', userId)
         .maybeSingle()
 
@@ -69,13 +74,15 @@ export default function ProfilePanel() {
 
       const { data: profile } = await supabase
         .from('users')
-        .select('id,email,full_name,avatar_url')
+        .select('id,email,full_name,avatar_url,account_type,store_name')
         .eq('id', userId)
         .single()
 
       if (profile) {
         setFullName(profile.full_name || '')
         setAvatarUrl(profile.avatar_url || '')
+        setAccountType((profile.account_type as 'pf' | 'revenda') || 'pf')
+        setStoreName(profile.store_name || '')
       }
     }
     void loadProfile()
@@ -94,6 +101,8 @@ export default function ProfilePanel() {
           full_name: fullName.trim() || null,
           avatar_url: avatarUrl || null,
           email: email || null,
+          account_type: accountType,
+          store_name: storeName.trim() || null,
         })
         .eq('id', userId)
       if (updateError) throw updateError
@@ -215,6 +224,46 @@ export default function ProfilePanel() {
             className="input opacity-60 cursor-not-allowed bg-white/60"
           />
         </div>
+      </div>
+
+      {/* Account Type */}
+      <div className="mt-6 p-4 rounded-xl border border-[#E0E0E0] bg-[#FAFAF9]">
+        <p className="text-[12px] font-medium text-[#525252] mb-3 tracking-tight">Tipo de conta</p>
+        <div className="flex gap-2 mb-3">
+          <button
+            type="button"
+            onClick={() => setAccountType('pf')}
+            className={`flex-1 py-2.5 px-4 rounded-xl text-[13px] font-semibold border transition-all ${
+              accountType === 'pf'
+                ? 'bg-[#0A0A0A] text-white border-[#0A0A0A]'
+                : 'bg-white text-[#525252] border-[#E0E0E0] hover:border-[#A3A3A3]'
+            }`}
+          >
+            Pessoa Física
+          </button>
+          <button
+            type="button"
+            onClick={() => setAccountType('revenda')}
+            className={`flex-1 py-2.5 px-4 rounded-xl text-[13px] font-semibold border transition-all ${
+              accountType === 'revenda'
+                ? 'bg-[#0A0A0A] text-white border-[#0A0A0A]'
+                : 'bg-white text-[#525252] border-[#E0E0E0] hover:border-[#A3A3A3]'
+            }`}
+          >
+            Revenda
+          </button>
+        </div>
+        {accountType === 'revenda' && (
+          <div style={{ animation: 'fadeIn 0.2s ease' }}>
+            <label className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">Nome da loja</label>
+            <input
+              value={storeName}
+              onChange={(e) => setStoreName(e.target.value)}
+              placeholder="Ex: Auto Carros"
+              className="input"
+            />
+          </div>
+        )}
       </div>
 
       <div className="mt-8 flex flex-wrap items-center gap-3">

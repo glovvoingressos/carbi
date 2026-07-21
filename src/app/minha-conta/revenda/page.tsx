@@ -33,13 +33,7 @@ export default async function RevendaDashboardPage() {
   const { count: leadsCount } = await client
     .from('conversations')
     .select('*', { count: 'exact', head: true })
-    .eq('seller_id', user.id)
-
-  const { count: unreadMessages } = await client
-    .from('conversation_messages')
-    .select('*', { count: 'exact', head: true })
-    .eq('sender_id', 'seller_id')
-    .eq('read', false)
+    .eq('user_id', user.id)
 
   return (
     <div className="fingen-page">
