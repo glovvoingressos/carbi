@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createServerClient, type CookieOptionsWithName } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export function isSupabaseConfigured(): boolean {
@@ -34,15 +35,15 @@ export async function getSupabaseServerClientWithCookies(): Promise<SupabaseClie
 
   const cookieStore = await cookies()
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        return cookieStore.getAll().map(c => ({ name: c.name, value: c.value }))
+        return cookieStore.getAll()
       },
       setAll(cookiesToSet) {
         try {
           cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options as any)
+            cookieStore.set(name, value, options)
           )
         } catch {
           // Server component - ignore
@@ -50,8 +51,6 @@ export async function getSupabaseServerClientWithCookies(): Promise<SupabaseClie
       },
     },
   })
-
-  return supabase
 }
 
 export function getSupabaseAdminClient(): SupabaseClient | null {
