@@ -61,7 +61,7 @@ export default function ChatStarter({
   }
 
   if (showAuth) {
-    return <AuthCard compact onAuthenticated={() => setShowAuth(false)} />
+    return <AuthCard onAuthenticated={() => setShowAuth(false)} />
   }
 
   return (

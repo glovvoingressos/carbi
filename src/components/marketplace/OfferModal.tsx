@@ -139,7 +139,7 @@ export default function OfferModal({ listingId, listingPrice, listingTitle, isOp
             {step === 'auth' && (
               <div className="p-6">
                 <p className="text-sm text-[#525252] mb-4">Faça login para enviar uma oferta.</p>
-                <AuthCard compact onAuthenticated={() => setStep('form')} />
+                <AuthCard onAuthenticated={() => setStep('form')} />
               </div>
             )}
 

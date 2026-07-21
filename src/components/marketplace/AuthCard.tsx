@@ -3,56 +3,104 @@
 import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowRight, ArrowLeft, User, CreditCard, Phone, Mail, Lock, Check, Loader2 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight,
+  Loader2, Check, AlertCircle, Building2, CreditCard,
+} from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 interface Props {
   onAuthenticated?: () => void
-  compact?: boolean
   redirectTo?: string
   defaultMode?: 'login' | 'signup'
 }
 
-function formatCPF(value: string) {
-  const digits = value.replace(/\D/g, '').slice(0, 11)
-  return digits
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+function formatCPF(v: string) {
+  const d = v.replace(/\D/g, '').slice(0, 11)
+  return d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
 }
 
-function formatPhone(value: string) {
-  const digits = value.replace(/\D/g, '').slice(0, 11)
-  if (digits.length <= 10) {
-    return digits
-      .replace(/(\d{2})(\d)/, '($1) $2')
-      .replace(/(\d{4})(\d)/, '$1-$2')
-  }
-  return digits
-    .replace(/(\d{2})(\d)/, '($1) $2')
-    .replace(/(\d{5})(\d)/, '$1-$2')
+function formatPhone(v: string) {
+  const d = v.replace(/\D/g, '').slice(0, 11)
+  return d.length <= 10
+    ? d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2')
+    : d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2')
 }
 
 function validateCPF(cpf: string) {
-  const digits = cpf.replace(/\D/g, '')
-  if (digits.length !== 11) return false
-  if (/^(\d)\1{10}$/.test(digits)) return false
-  let sum = 0
-  for (let i = 0; i < 9; i++) sum += parseInt(digits[i]) * (10 - i)
-  let rest = (sum * 10) % 11
-  if (rest === 10) rest = 0
-  if (rest !== parseInt(digits[9])) return false
-  sum = 0
-  for (let i = 0; i < 10; i++) sum += parseInt(digits[i]) * (11 - i)
-  rest = (sum * 10) % 11
-  if (rest === 10) rest = 0
-  return rest === parseInt(digits[10])
+  const d = cpf.replace(/\D/g, '')
+  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false
+  let s = 0
+  for (let i = 0; i < 9; i++) s += parseInt(d[i]) * (10 - i)
+  let r = (s * 10) % 11
+  if (r === 10) r = 0
+  if (r !== parseInt(d[9])) return false
+  s = 0
+  for (let i = 0; i < 10; i++) s += parseInt(d[i]) * (11 - i)
+  r = (s * 10) % 11
+  if (r === 10) r = 0
+  return r === parseInt(d[10])
 }
 
-export default function AuthCard({ onAuthenticated, compact = false, redirectTo, defaultMode = 'login' }: Props) {
+type Mode = 'login' | 'signup' | 'forgot'
+
+const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -12 }, transition: { duration: 0.2 } }
+
+function InputField({ icon: Icon, id, label, type = 'text', value, onChange, placeholder, maxLength, inputMode, required, error }: {
+  icon: React.ElementType; id: string; label: string; type?: string; value: string; onChange: (v: string) => void
+  placeholder?: string; maxLength?: number; inputMode?: string; required?: boolean; error?: string
+}) {
+  const [show, setShow] = useState(false)
+  const isPassword = type === 'password'
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-medium text-gray-500 mb-1.5">{label}</label>
+      <div className="relative">
+        <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" strokeWidth={1.75} />
+        <input
+          id={id} type={isPassword && show ? 'text' : type} value={value} required={required}
+          onChange={(e) => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength}
+          inputMode={inputMode as any}
+          className={`w-full h-11 pl-10 pr-10 rounded-xl border bg-white text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[#D4F576] focus:border-[#D4F576] ${error ? 'border-red-400' : 'border-gray-200'}`}
+        />
+        {isPassword && (
+          <button type="button" tabIndex={-1} onClick={() => setShow(!show)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+            {show ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        )}
+      </div>
+      {error && <p className="mt-1 text-xs text-red-500 flex items-center gap-1"><AlertCircle size={12} />{error}</p>}
+    </div>
+  )
+}
+
+function PasswordChecklist({ password }: { password: string }) {
+  const rules = [
+    { label: '8+ caracteres', met: password.length >= 8 },
+    { label: 'Letra maiúscula', met: /[A-Z]/.test(password) },
+    { label: 'Número', met: /\d/.test(password) },
+    { label: 'Caractere especial', met: /[^A-Za-z0-9]/.test(password) },
+  ]
+  return (
+    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-2">
+      {rules.map((r) => (
+        <div key={r.label} className={`flex items-center gap-1.5 text-xs ${r.met ? 'text-emerald-600' : 'text-gray-400'}`}>
+          <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${r.met ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100'}`}>
+            {r.met ? <Check size={10} strokeWidth={3} /> : '○'}
+          </div>
+          {r.label}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'login' }: Props) {
   const router = useRouter()
   const supabaseReady = isSupabaseBrowserConfigured()
-  const [mode, setMode] = useState<'login' | 'signup'>(defaultMode)
+  const [mode, setMode] = useState<Mode>(defaultMode)
   const [step, setStep] = useState<1 | 2>(1)
 
   const [firstName, setFirstName] = useState('')
@@ -61,514 +109,268 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [accountType, setAccountType] = useState<'pf' | 'revenda'>('pf')
   const [storeName, setStoreName] = useState('')
   const [cnpj, setCnpj] = useState('')
+  const [remember, setRemember] = useState(false)
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
-  const canNextStep = mode === 'signup' && step === 1 && firstName.trim().length >= 2 && lastName.trim().length >= 2 && validateCPF(cpf) && (accountType === 'pf' || storeName.trim().length >= 2)
+  const step1Valid = firstName.trim().length >= 2 && lastName.trim().length >= 2 && validateCPF(cpf) && (accountType === 'pf' || storeName.trim().length >= 2)
+  const passwordValid = password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password) && /[^A-Za-z0-9]/.test(password)
+  const passwordsMatch = password === confirmPassword && confirmPassword.length > 0
+
+  const reset = () => {
+    setStep(1); setFirstName(''); setLastName(''); setCpf(''); setPhone(''); setEmail('')
+    setPassword(''); setConfirmPassword(''); setAccountType('pf'); setStoreName(''); setCnpj('')
+    setRemember(false); setError(null); setMessage(null)
+  }
+
+  const switchMode = (m: Mode) => { reset(); setMode(m); setError(null); setMessage(null) }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!supabaseReady) {
-      setError('Autenticação indisponível.')
-      return
-    }
-    setLoading(true)
-    setError(null)
-    setMessage(null)
-
+    if (!supabaseReady) { setError('Autenticação indisponível.'); return }
+    setLoading(true); setError(null); setMessage(null)
     try {
       const supabase = getSupabaseBrowserClient()
 
       if (mode === 'login') {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-
-        if (signInError) {
-          setError('E-mail ou senha incorretos.')
-          return
-        }
-
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+        if (signInError) { setError('E-mail ou senha incorretos.'); return }
+        await supabase.from('users').upsert({ id: (await supabase.auth.getUser()).data.user!.id, email, full_name: fullName || null, account_type: accountType }, { onConflict: 'id' })
         onAuthenticated?.()
         if (redirectTo) router.push(redirectTo)
-      } else {
-        const cleanCpf = cpf.replace(/\D/g, '')
-        const cleanPhone = phone.replace(/\D/g, '')
-
+      } else if (mode === 'signup') {
         const { data, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
+          email, password,
           options: {
-            data: {
-              full_name: fullName,
-              cpf: cleanCpf,
-              phone: cleanPhone,
-              account_type: accountType,
-              store_name: storeName.trim() || undefined,
-              cnpj: cnpj.replace(/\D/g, '') || undefined,
-            },
+            data: { full_name: fullName, cpf: cpf.replace(/\D/g, ''), phone: phone.replace(/\D/g, ''), account_type: accountType, store_name: storeName.trim() || undefined, cnpj: cnpj.replace(/\D/g, '') || undefined },
             emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
           },
         })
-
-        if (signUpError) {
-          if (signUpError.message.includes('already')) {
-            setError('Este e-mail já está cadastrado.')
-          } else {
-            setError(signUpError.message)
-          }
-          return
-        }
-
+        if (signUpError) { setError(signUpError.message.includes('already') ? 'Este e-mail já está cadastrado.' : signUpError.message); return }
         if (data.session && data.user) {
-          // Also save to users table
-          await supabase.from('users').upsert({
-            id: data.user.id,
-            email,
-            full_name: fullName,
-            account_type: accountType,
-            store_name: storeName.trim() || null,
-            cnpj: cnpj.replace(/\D/g, '') || null,
-          }, { onConflict: 'id' })
+          await supabase.from('users').upsert({ id: data.user.id, email, full_name: fullName, account_type: accountType, store_name: storeName.trim() || null, cnpj: cnpj.replace(/\D/g, '') || null }, { onConflict: 'id' })
           onAuthenticated?.()
           if (redirectTo) router.push(redirectTo)
         } else {
           setMessage('Conta criada! Confirme seu e-mail para continuar.')
         }
+      } else if (mode === 'forgot') {
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/reset-password` : undefined })
+        if (resetError) { setError(resetError.message); return }
+        setMessage('Link de redefinição enviado! Verifique sua caixa de entrada.')
       }
-    } finally {
-      setLoading(false)
-    }
+    } finally { setLoading(false) }
   }
 
-  const resetSignup = () => {
-    setStep(1)
-    setFirstName('')
-    setLastName('')
-    setCpf('')
-    setPhone('')
-    setEmail('')
-    setPassword('')
-    setAccountType('pf')
-    setStoreName('')
-    setCnpj('')
-    setError(null)
-    setMessage(null)
+  const formatCnpj = (v: string) => {
+    let d = v.replace(/\D/g, '').slice(0, 14)
+    if (d.length > 12) d = d.slice(0,2) + '.' + d.slice(2,5) + '.' + d.slice(5,8) + '/' + d.slice(8,12) + '-' + d.slice(12)
+    else if (d.length > 8) d = d.slice(0,2) + '.' + d.slice(2,5) + '.' + d.slice(5,8) + '/' + d.slice(8)
+    else if (d.length > 5) d = d.slice(0,2) + '.' + d.slice(2,5) + '.' + d.slice(5)
+    else if (d.length > 2) d = d.slice(0,2) + '.' + d.slice(2)
+    return d
   }
 
-  const switchMode = () => {
-    if (mode === 'signup') {
-      setMode('login')
-      resetSignup()
-    } else {
-      setMode('signup')
-      setStep(1)
-      setError(null)
-      setMessage(null)
-    }
-  }
+  const ErrorBanner = () => error ? (
+    <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
+      <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
+      <p className="text-sm text-red-600">{error}</p>
+    </div>
+  ) : null
 
-  // ── LOGIN ──
-  if (mode === 'login') {
-    return (
-      <div className={`surface-strong auth-card-shell ${compact ? 'p-6' : 'p-8 md:p-10'}`}>
-        <div className="auth-card-topline">
-          <span>Acesso rápido</span>
-          <span>FIPE integrada</span>
-        </div>
-        <h2 className="text-[24px] md:text-[28px] font-semibold tracking-tight text-[#0A0A0A] text-balance">
-          Entre na sua conta
-        </h2>
-        <p className="mt-2 text-[15px] text-[#52607A] tracking-tight text-pretty">
-          Acesse para gerenciar seus anúncios e conversas.
-        </p>
+  const SuccessBanner = () => message ? (
+    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2">
+      <Check size={16} className="text-emerald-500 mt-0.5 shrink-0" />
+      <p className="text-sm text-emerald-600">{message}</p>
+    </div>
+  ) : null
 
-        {!supabaseReady && (
-          <div className="mt-6 p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-2xl">
-            <p className="text-[13px] text-[#DC2626] tracking-tight">
-              Ambiente sem Supabase configurado. Login indisponível.
-            </p>
-          </div>
-        )}
-
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="login-email" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-              E-mail
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" strokeWidth={1.75} />
-              <input
-                id="login-email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="voce@email.com"
-                className="input auth-icon-input h-12 pr-4 rounded-2xl"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="login-password" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-              Senha
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" strokeWidth={1.75} />
-              <input
-                id="login-password"
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Sua senha"
-                className="input auth-icon-input h-12 pr-4 rounded-2xl"
-              />
-            </div>
-          </div>
-
-          {error && (
-            <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-2xl">
-              <p className="text-[13px] text-[#DC2626] tracking-tight">{error}</p>
-            </div>
-          )}
-
-          <button type="submit" disabled={loading} className="btn btn-primary btn-lg w-full">
-            {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <>Entrar <ArrowRight className="w-4 h-4" strokeWidth={2} /></>
-            )}
-          </button>
-        </form>
-
-        <div className="mt-6 pt-6 border-t border-[#EAEAE8] text-center">
-          <button type="button" onClick={switchMode} className="text-[14px] text-[#52607A] hover:text-[#0A0A0A] transition-colors">
-            Não tem conta? <span className="text-[#0A0A0A] font-medium">Criar conta</span>
-          </button>
-        </div>
-
-        <p className="mt-6 text-[11px] text-[#A3A3A3] tracking-tight text-center">
-          Ao continuar, você concorda com nossos{' '}
-          <Link href="#" className="underline underline-offset-2 hover:text-[#0A0A0A]">Termos</Link>
-          {' '}e{' '}
-          <Link href="#" className="underline underline-offset-2 hover:text-[#0A0A0A]">Privacidade</Link>.
-        </p>
-      </div>
-    )
-  }
-
-  // ── SIGNUP ──
   return (
-    <div className={`surface-strong auth-card-shell ${compact ? 'p-6' : 'p-8 md:p-10'}`}>
-      {/* Top bar */}
-      <div className="auth-card-topline">
-        <span>Cadastro grátis</span>
-        <span>2 passos</span>
-      </div>
+    <div className="w-full max-w-md mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-8 md:p-10">
+      <AnimatePresence mode="wait">
+        {/* ─── LOGIN ─── */}
+        {mode === 'login' && (
+          <motion.form key="login" {...fade} onSubmit={handleSubmit}>
+            <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Entrar</h2>
+            <p className="mt-1.5 text-sm text-gray-500">Acesse para gerenciar seus anúncios e conversas.</p>
 
-      {/* Progress */}
-      <div className="flex items-center gap-3 mt-4 mb-6">
-        <div className={`flex items-center justify-center w-8 h-8 rounded-full text-[13px] font-semibold transition-all duration-200 ${
-          step === 1 ? 'bg-[var(--color-bg-inverse)] text-white' : 'bg-[#16855C] text-white'
-        }`}>
-          {step === 2 ? <Check size={16} strokeWidth={2.5} /> : '1'}
-        </div>
-        <div className={`h-[2px] flex-1 rounded-full transition-all duration-300 ${step === 2 ? 'bg-[#16855C]' : 'bg-[#E0E0E0]'}`} />
-        <div className={`flex items-center justify-center w-8 h-8 rounded-full text-[13px] font-semibold transition-all duration-200 ${
-          step === 2 ? 'bg-[var(--color-bg-inverse)] text-white' : 'bg-[#E8E8E8] text-[#A3A3A3]'
-        }`}>
-          2
-        </div>
-      </div>
-
-      {!supabaseReady && (
-        <div className="mb-6 p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-2xl">
-          <p className="text-[13px] text-[#DC2626] tracking-tight">
-            Ambiente sem Supabase configurado. Cadastro indisponível.
-          </p>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit}>
-        {/* Step 1: Name + CPF */}
-        {step === 1 && (
-          <div className="space-y-4" style={{ animation: 'fadeIn 0.25s ease' }}>
-            <h2 className="text-[22px] md:text-[26px] font-semibold tracking-tight text-[#0A0A0A] text-balance">
-              Seus dados
-            </h2>
-            <p className="text-[14px] text-[#52607A] tracking-tight mb-2">
-              Comece pelo seu nome e CPF.
-            </p>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label htmlFor="signup-firstname" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-                  Nome
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" strokeWidth={1.75} />
-                  <input
-                    id="signup-firstname"
-                    type="text"
-                    required
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Nome"
-                    className="input auth-icon-input h-12 pr-4 rounded-2xl"
-                    autoFocus
-                  />
-                </div>
-              </div>
-              <div>
-                <label htmlFor="signup-lastname" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-                  Sobrenome
-                </label>
-                <input
-                  id="signup-lastname"
-                  type="text"
-                  required
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Sobrenome"
-                  className="input h-12 px-4 rounded-2xl"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="signup-cpf" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-                CPF
-              </label>
-              <div className="relative">
-                <CreditCard className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" strokeWidth={1.75} />
-                <input
-                  id="signup-cpf"
-                  type="text"
-                  inputMode="numeric"
-                  required
-                  value={cpf}
-                  onChange={(e) => setCpf(formatCPF(e.target.value))}
-                  placeholder="000.000.000-00"
-                  className="input auth-icon-input h-12 pr-4 rounded-2xl"
-                  maxLength={14}
-                />
-              </div>
-              {cpf.length === 14 && !validateCPF(cpf) && (
-                <p className="mt-1 text-[12px] text-[#DC2626]">CPF inválido</p>
-              )}
-            </div>
-
-            {/* Account Type Toggle */}
-            <div>
-              <label className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-                Tipo de conta
-              </label>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setAccountType('pf')}
-                  className={`flex-1 py-2.5 px-4 rounded-xl text-[13px] font-semibold border transition-all ${
-                    accountType === 'pf'
-                      ? 'bg-[#0A0A0A] text-white border-[#0A0A0A]'
-                      : 'bg-white text-[#525252] border-[#E0E0E0] hover:border-[#A3A3A3]'
-                  }`}
-                >
-                  Pessoa Física
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAccountType('revenda')}
-                  className={`flex-1 py-2.5 px-4 rounded-xl text-[13px] font-semibold border transition-all ${
-                    accountType === 'revenda'
-                      ? 'bg-[#0A0A0A] text-white border-[#0A0A0A]'
-                      : 'bg-white text-[#525252] border-[#E0E0E0] hover:border-[#A3A3A3]'
-                  }`}
-                >
-                  Revenda
-                </button>
-              </div>
-            </div>
-
-            {/* Revenda Fields */}
-            {accountType === 'revenda' && (
-              <div className="space-y-4" style={{ animation: 'fadeIn 0.2s ease' }}>
-                <div>
-                  <label htmlFor="signup-store-name" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-                    Nome da loja
-                  </label>
-                  <input
-                    id="signup-store-name"
-                    type="text"
-                    value={storeName}
-                    onChange={(e) => setStoreName(e.target.value)}
-                    placeholder="Ex: Auto Carros"
-                    className="input h-12 pr-4 rounded-2xl"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="signup-cnpj" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-                    CNPJ <span className="text-[#A3A3A3]">(opcional)</span>
-                  </label>
-                  <input
-                    id="signup-cnpj"
-                    type="text"
-                    inputMode="numeric"
-                    value={cnpj}
-                    onChange={(e) => {
-                      let v = e.target.value.replace(/\D/g, '').slice(0, 14)
-                      if (v.length > 12) v = v.slice(0,2) + '.' + v.slice(2,5) + '.' + v.slice(5,8) + '/' + v.slice(8,12) + '-' + v.slice(12)
-                      else if (v.length > 8) v = v.slice(0,2) + '.' + v.slice(2,5) + '.' + v.slice(5,8) + '/' + v.slice(8)
-                      else if (v.length > 5) v = v.slice(0,2) + '.' + v.slice(2,5) + '.' + v.slice(5)
-                      else if (v.length > 2) v = v.slice(0,2) + '.' + v.slice(2)
-                      setCnpj(v)
-                    }}
-                    placeholder="00.000.000/0000-00"
-                    className="input h-12 pr-4 rounded-2xl"
-                    maxLength={18}
-                  />
-                </div>
+            {!supabaseReady && (
+              <div className="mt-5 p-3 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-sm text-red-500">Ambiente sem Supabase configurado.</p>
               </div>
             )}
 
-            {error && (
-              <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-2xl">
-                <p className="text-[13px] text-[#DC2626] tracking-tight">{error}</p>
-              </div>
-            )}
+            <div className="mt-6 space-y-4">
+              <InputField icon={Mail} id="login-email" label="E-mail" type="email" value={email} onChange={setEmail} placeholder="voce@email.com" required />
+              <InputField icon={Lock} id="login-password" label="Senha" type="password" value={password} onChange={setPassword} placeholder="Sua senha" required />
+            </div>
 
-            <button
-              type="button"
-              disabled={!canNextStep}
-              onClick={() => { setError(null); setStep(2) }}
-              className="btn btn-primary btn-lg w-full mt-2"
-            >
-              Continuar <ArrowRight className="w-4 h-4" strokeWidth={2} />
-            </button>
-          </div>
-        )}
-
-        {/* Step 2: Phone + Email + Password */}
-        {step === 2 && (
-          <div className="space-y-4" style={{ animation: 'fadeIn 0.25s ease' }}>
-            <div className="flex items-center gap-3 mb-1">
-              <button type="button" onClick={() => setStep(1)} className="w-9 h-9 flex items-center justify-center rounded-full bg-[#F0F0F0] hover:bg-[#E4E4E4] transition-colors">
-                <ArrowLeft size={16} strokeWidth={2} className="text-[#525252]" />
+            <div className="flex items-center justify-between mt-3">
+              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+                <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-[#0A0A0A] focus:ring-[#D4F576]" />
+                Lembrar
+              </label>
+              <button type="button" onClick={() => switchMode('forgot')} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+                Esqueceu a senha?
               </button>
-              <div>
-                <h2 className="text-[22px] md:text-[26px] font-semibold tracking-tight text-[#0A0A0A]">
-                  Contato e acesso
-                </h2>
-              </div>
-            </div>
-            <p className="text-[14px] text-[#52607A] tracking-tight">
-              Como podemos falar com você e qual e-mail para login?
-            </p>
-
-            <div>
-              <label htmlFor="signup-phone" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-                Telefone
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" strokeWidth={1.75} />
-                <input
-                  id="signup-phone"
-                  type="tel"
-                  inputMode="tel"
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(formatPhone(e.target.value))}
-                  placeholder="(00) 00000-0000"
-                  className="input auth-icon-input h-12 pr-4 rounded-2xl"
-                  maxLength={15}
-                />
-              </div>
             </div>
 
-            <div>
-              <label htmlFor="signup-email" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-                E-mail
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" strokeWidth={1.75} />
-                <input
-                  id="signup-email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="voce@email.com"
-                  className="input auth-icon-input h-12 pr-4 rounded-2xl"
-                />
-              </div>
-            </div>
+            <ErrorBanner />
+            <SuccessBanner />
 
-            <div>
-              <label htmlFor="signup-password" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-                Senha
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" strokeWidth={1.75} />
-                <input
-                  id="signup-password"
-                  type="password"
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Mínimo 6 caracteres"
-                  className="input auth-icon-input h-12 pr-4 rounded-2xl"
-                />
-              </div>
-            </div>
-
-            {error && (
-              <div className="p-3 bg-[#FEF2F2] border border-[#FECACA] rounded-2xl">
-                <p className="text-[13px] text-[#DC2626] tracking-tight">{error}</p>
-              </div>
-            )}
-            {message && (
-              <div className="p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-2xl">
-                <p className="text-[13px] text-[#10B981] tracking-tight">{message}</p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading || !email || !password || password.length < 6}
-              className="btn btn-primary btn-lg w-full mt-2"
-            >
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <>Criar conta <ArrowRight className="w-4 h-4" strokeWidth={2} /></>
-              )}
+            <button type="submit" disabled={loading || !supabaseReady}
+              className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 active:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+              {loading ? <Loader2 size={16} className="animate-spin" /> : <>Entrar <ArrowRight size={16} /></>}
             </button>
-          </div>
+
+            <div className="mt-6 pt-5 border-t border-gray-100 text-center">
+              <button type="button" onClick={() => switchMode('signup')} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                Não tem conta? <span className="font-medium text-gray-900">Criar conta</span>
+              </button>
+            </div>
+
+            <p className="mt-5 text-[11px] text-gray-400 text-center">
+              Ao continuar, você concorda com nossos{' '}
+              <Link href="#" className="underline underline-offset-2 hover:text-gray-900 transition-colors">Termos</Link> e{' '}
+              <Link href="#" className="underline underline-offset-2 hover:text-gray-900 transition-colors">Privacidade</Link>.
+            </p>
+          </motion.form>
         )}
-      </form>
 
-      <div className="mt-6 pt-6 border-t border-[#EAEAE8] text-center">
-        <button type="button" onClick={switchMode} className="text-[14px] text-[#52607A] hover:text-[#0A0A0A] transition-colors">
-          Já tem conta? <span className="text-[#0A0A0A] font-medium">Entrar</span>
-        </button>
-      </div>
+        {/* ─── SIGNUP ─── */}
+        {mode === 'signup' && (
+          <motion.form key="signup" {...fade} onSubmit={handleSubmit}>
+            <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Criar conta</h2>
+            <p className="mt-1.5 text-sm text-gray-500">Cadastro gratuito em dois passos.</p>
 
-      <p className="mt-6 text-[11px] text-[#A3A3A3] tracking-tight text-center">
-        Ao continuar, você concorda com nossos{' '}
-        <Link href="#" className="underline underline-offset-2 hover:text-[#0A0A0A]">Termos</Link>
-        {' '}e{' '}
-        <Link href="#" className="underline underline-offset-2 hover:text-[#0A0A0A]">Privacidade</Link>.
-      </p>
+            {/* Step indicator */}
+            <div className="flex items-center gap-3 mt-5 mb-6">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${step === 2 ? 'bg-emerald-500 text-white' : 'bg-gray-900 text-white'}`}>
+                {step === 2 ? <Check size={14} strokeWidth={2.5} /> : '1'}
+              </div>
+              <div className={`h-0.5 flex-1 rounded-full transition-all duration-300 ${step === 2 ? 'bg-emerald-500' : 'bg-gray-200'}`} />
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${step === 2 ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-400'}`}>2</div>
+            </div>
+
+            <AnimatePresence mode="wait">
+              {/* Step 1 */}
+              {step === 1 && (
+                <motion.div key="step1" {...fade} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <InputField icon={User} id="signup-first" label="Nome" value={firstName} onChange={setFirstName} placeholder="Nome" required />
+                    <InputField icon={User} id="signup-last" label="Sobrenome" value={lastName} onChange={setLastName} placeholder="Sobrenome" required />
+                  </div>
+                  <InputField icon={CreditCard} id="signup-cpf" label="CPF" value={cpf} onChange={(v) => setCpf(formatCPF(v))} placeholder="000.000.000-00" maxLength={14} required />
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1.5">Tipo de conta</label>
+                    <div className="flex gap-2">
+                      {([['pf', 'Pessoa Física'], ['revenda', 'Revenda']] as const).map(([val, lbl]) => (
+                        <button key={val} type="button" onClick={() => setAccountType(val)}
+                          className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-all ${accountType === val ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'}`}>
+                          {lbl}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <AnimatePresence>
+                    {accountType === 'revenda' && (
+                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-4 overflow-hidden">
+                        <InputField icon={Building2} id="signup-store" label="Nome da loja" value={storeName} onChange={setStoreName} placeholder="Ex: Auto Carros" required />
+                        <InputField icon={CreditCard} id="signup-cnpj" label="CNPJ (opcional)" value={cnpj} onChange={(v) => setCnpj(formatCnpj(v))} placeholder="00.000.000/0000-00" maxLength={18} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+
+              {/* Step 2 */}
+              {step === 2 && (
+                <motion.div key="step2" {...fade} className="space-y-4">
+                  <div className="flex items-center gap-3 mb-1">
+                    <button type="button" onClick={() => setStep(1)} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+                      <ArrowRight size={14} className="text-gray-600 rotate-180" />
+                    </button>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">Contato e acesso</h3>
+                    </div>
+                  </div>
+                  <InputField icon={Phone} id="signup-phone" label="Telefone" type="tel" value={phone} onChange={(v) => setPhone(formatPhone(v))} placeholder="(00) 00000-0000" maxLength={15} required />
+                  <InputField icon={Mail} id="signup-email" label="E-mail" type="email" value={email} onChange={setEmail} placeholder="voce@email.com" required />
+                  <InputField icon={Lock} id="signup-password" label="Senha" type="password" value={password} onChange={setPassword} placeholder="Sua senha" required />
+                  <PasswordChecklist password={password} />
+                  <InputField icon={Lock} id="signup-confirm" label="Confirmar senha" type="password" value={confirmPassword} onChange={setConfirmPassword} placeholder="Repita a senha" required error={confirmPassword && !passwordsMatch ? 'Senhas não coincidem' : undefined} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <ErrorBanner />
+            <SuccessBanner />
+
+            {mode === 'signup' && (
+              step === 1 ? (
+                <button type="button" disabled={!step1Valid}
+                  onClick={() => { setError(null); setStep(2) }}
+                  className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  Continuar <ArrowRight size={16} />
+                </button>
+              ) : (
+                <button type="submit" disabled={loading || !email || !passwordValid || !passwordsMatch}
+                  className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  {loading ? <Loader2 size={16} className="animate-spin" /> : <>Criar conta <ArrowRight size={16} /></>}
+                </button>
+              )
+            )}
+
+            <div className="mt-6 pt-5 border-t border-gray-100 text-center">
+              <button type="button" onClick={() => switchMode('login')} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                Já tem conta? <span className="font-medium text-gray-900">Entrar</span>
+              </button>
+            </div>
+
+            <p className="mt-5 text-[11px] text-gray-400 text-center">
+              Ao continuar, você concorda com nossos{' '}
+              <Link href="#" className="underline underline-offset-2 hover:text-gray-900 transition-colors">Termos</Link> e{' '}
+              <Link href="#" className="underline underline-offset-2 hover:text-gray-900 transition-colors">Privacidade</Link>.
+            </p>
+          </motion.form>
+        )}
+
+        {/* ─── FORGOT PASSWORD ─── */}
+        {mode === 'forgot' && (
+          <motion.form key="forgot" {...fade} onSubmit={handleSubmit}>
+            <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Redefinir senha</h2>
+            <p className="mt-1.5 text-sm text-gray-500">Enviaremos um link para redefinir sua senha.</p>
+
+            <div className="mt-6">
+              <InputField icon={Mail} id="forgot-email" label="E-mail" type="email" value={email} onChange={setEmail} placeholder="voce@email.com" required />
+            </div>
+
+            <ErrorBanner />
+            <SuccessBanner />
+
+            <button type="submit" disabled={loading || !supabaseReady}
+              className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+              {loading ? <Loader2 size={16} className="animate-spin" /> : <>Enviar link <ArrowRight size={16} /></>}
+            </button>
+
+            <div className="mt-6 pt-5 border-t border-gray-100 text-center">
+              <button type="button" onClick={() => switchMode('login')} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                Voltar ao <span className="font-medium text-gray-900">login</span>
+              </button>
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
