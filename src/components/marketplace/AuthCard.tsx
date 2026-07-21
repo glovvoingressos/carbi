@@ -62,17 +62,17 @@ function InputField({ icon: Icon, id, label, type = 'text', value, onChange, pla
           id={id} type={isPassword && show ? 'text' : type} value={value} required={required}
           onChange={(e) => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength}
           inputMode={inputMode as any}
-          className={`w-full h-11 pl-10 pr-10 rounded-xl border bg-white text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[#D4F576] focus:border-[#D4F576] ${error ? 'border-red-400' : 'border-gray-200'}`}
+          className={`w-full h-11 pl-10 pr-10 rounded-xl border bg-white text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] ${error ? 'border-red-400' : 'border-gray-200'}`}
         />
         {isPassword && (
           <button type="button" onClick={() => setShow(!show)}
             aria-label={show ? 'Ocultar senha' : 'Mostrar senha'}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-[#D4F576]">
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
             {show ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         )}
       </div>
-      {error && <p className="mt-1 text-xs text-red-500 flex items-center gap-1"><AlertCircle size={12} />{error}</p>}
+      {error && <p className="mt-1 text-xs text-[var(--color-danger)] flex items-center gap-1"><AlertCircle size={12} />{error}</p>}
     </div>
   )
 }
@@ -168,8 +168,8 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
 
   const ErrorBanner = () => error ? (
     <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
-      <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
-      <p className="text-sm text-red-600">{error}</p>
+      <AlertCircle size={16} className="text-[var(--color-danger)] mt-0.5 shrink-0" />
+      <p className="text-sm text-[var(--color-danger)]">{error}</p>
     </div>
   ) : null
 
@@ -191,7 +191,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
 
             {!supabaseReady && (
               <div className="mt-5 p-3 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-sm text-red-500">Ambiente sem Supabase configurado.</p>
+                <p className="text-sm text-[var(--color-danger)]">Ambiente sem Supabase configurado.</p>
               </div>
             )}
 

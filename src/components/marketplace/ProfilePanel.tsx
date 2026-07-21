@@ -116,14 +116,14 @@ export default function ProfilePanel() {
       window.location.href = '/'
     } catch (e) { toast_('error', e instanceof Error ? e.message : 'Falha ao excluir.') }
   }
-  if (loading) return <div className="surface-strong p-12 text-center"><Loader2 className="mx-auto h-5 w-5 animate-spin text-[#0A0A0A]" /><p className="mt-3 text-sm text-[#525252]">Carregando perfil...</p></div>
+  if (loading) return <div className="surface-strong p-12 text-center"><Loader2 className="mx-auto h-5 w-5 animate-spin text-[var(--color-text-primary)]" /><p className="mt-3 text-sm text-[var(--color-text-secondary)]">Carregando perfil...</p></div>
 
   return (
     <motion.section {...fade} className="surface-strong p-8 md:p-10 space-y-8">
       <AnimatePresence>
         {toast && (
           <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
-            className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-2xl text-sm font-medium shadow-lg ${toast.type === 'success' ? 'bg-[#16855C] text-white' : 'bg-[#DC2626] text-white'}`}>
+            className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-2xl text-sm font-medium shadow-lg ${toast.type === 'success' ? 'bg-[var(--color-success)] text-white' : 'bg-[var(--color-danger)] text-white'}`}>
             {toast.message}
           </motion.div>
         )}
@@ -144,8 +144,8 @@ export default function ProfilePanel() {
           {uploading && <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center"><Loader2 className="w-5 h-5 text-white animate-spin" /></div>}
         </div>
         <div>
-          <p className="text-base font-semibold text-[#0A0A0A]">{fullName || 'Seu nome'}</p>
-          <p className="text-sm text-[#525252]">{email}</p>
+          <p className="text-base font-semibold text-[var(--color-text-primary)]">{fullName || 'Seu nome'}</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{email}</p>
         </div>
       </div>
 
@@ -153,21 +153,21 @@ export default function ProfilePanel() {
 
       {/* Personal Info */}
       <div>
-        <h3 className="text-sm font-semibold text-[#0A0A0A] mb-4">Informações pessoais</h3>
+        <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Informações pessoais</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-[#525252] mb-1.5">Nome completo</label>
+            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">Nome completo</label>
             <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Seu nome completo" className="input" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-[#525252] mb-1.5">E-mail</label>
+            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">E-mail</label>
             <div className="relative">
               <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" strokeWidth={1.75} />
               <input value={email} disabled className="input pl-10 opacity-60 cursor-not-allowed bg-gray-50" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-[#525252] mb-1.5">Telefone</label>
+            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">Telefone</label>
             <div className="relative">
               <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" strokeWidth={1.75} />
               <input value={phone} onChange={(e) => setPhone(formatPhone(e.target.value))} placeholder="(00) 00000-0000" maxLength={15} className="input pl-10" />
@@ -179,30 +179,30 @@ export default function ProfilePanel() {
       <div className="h-px bg-gray-100" />
       {/* Security */}
       <div>
-        <h3 className="text-sm font-semibold text-[#0A0A0A] mb-4">Segurança</h3>
+        <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Segurança</h3>
         {!showPw ? (
           <button type="button" onClick={() => setShowPw(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-[#0A0A0A] hover:bg-gray-50 transition-colors">
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-[var(--color-text-primary)] hover:bg-gray-50 transition-colors">
             <Lock className="w-4 h-4" strokeWidth={1.75} /> Alterar senha <ChevronRight className="w-4 h-4 ml-auto text-gray-400" />
           </button>
         ) : (
           <motion.div {...fade} className="space-y-3 p-4 rounded-xl border border-gray-200 bg-gray-50/50">
             <div>
-              <label className="block text-xs font-medium text-[#525252] mb-1.5">Nova senha</label>
+              <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">Nova senha</label>
               <input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="Mínimo 8 caracteres" className="input" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#525252] mb-1.5">Confirmar senha</label>
+              <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">Confirmar senha</label>
               <input type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="Repita a senha" className="input" />
             </div>
-            {newPw && confirmPw && newPw !== confirmPw && <p className="text-xs text-[#DC2626]">As senhas não coincidem.</p>}
+            {newPw && confirmPw && newPw !== confirmPw && <p className="text-xs text-[var(--color-danger)]">As senhas não coincidem.</p>}
             <div className="flex gap-2">
               <button type="button" onClick={changePw} disabled={pwSaving || newPw.length < 8 || newPw !== confirmPw}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0A0A0A] text-white text-sm font-medium hover:bg-[#2D2D2D] disabled:opacity-50 transition-all">
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--color-text-primary)] text-white text-sm font-medium hover:bg-[#2D2D2D] disabled:opacity-50 transition-all">
                 {pwSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar
               </button>
               <button type="button" onClick={() => { setShowPw(false); setNewPw(''); setConfirmPw('') }}
-                className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-[#525252] hover:bg-gray-50 transition-colors">
+                className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-[var(--color-text-secondary)] hover:bg-gray-50 transition-colors">
                 Cancelar
               </button>
             </div>
@@ -214,7 +214,7 @@ export default function ProfilePanel() {
 
       {/* Save */}
       <button type="button" onClick={saveProfile} disabled={saving || uploading}
-        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#0A0A0A] text-white text-sm font-semibold hover:bg-[#2D2D2D] disabled:opacity-50 transition-all">
+        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[var(--color-text-primary)] text-white text-sm font-semibold hover:bg-[#2D2D2D] disabled:opacity-50 transition-all">
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
         {saving ? 'Salvando...' : 'Salvar alterações'}
       </button>
@@ -223,24 +223,24 @@ export default function ProfilePanel() {
 
       {/* Danger Zone */}
       <div>
-        <h3 className="text-sm font-semibold text-[#DC2626] mb-4">Zona de perigo</h3>
-        <p className="text-sm text-[#525252] mb-4">Excluir sua conta é irreversível.</p>
+        <h3 className="text-sm font-semibold text-[var(--color-danger)] mb-4">Zona de perigo</h3>
+        <p className="text-sm text-[var(--color-text-secondary)] mb-4">Excluir sua conta é irreversível.</p>
         {!showDel ? (
           <button type="button" onClick={() => setShowDel(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#DC2626]/30 text-sm font-medium text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors">
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-danger)]/30 text-sm font-medium text-[var(--color-danger)] hover:bg-[var(--color-danger)]/5 transition-colors">
             <AlertTriangle className="w-4 h-4" /> Excluir conta
           </button>
         ) : (
-          <motion.div {...fade} className="p-4 rounded-xl border border-[#DC2626]/30 bg-[#FEF2F2]">
-            <p className="text-sm text-[#DC2626] font-medium mb-3">Digite &quot;EXCLUIR&quot; para confirmar:</p>
+          <motion.div {...fade} className="p-4 rounded-xl border border-[var(--color-danger)]/30 bg-[#FEF2F2]">
+            <p className="text-sm text-[var(--color-danger)] font-medium mb-3">Digite &quot;EXCLUIR&quot; para confirmar:</p>
             <input value={delText} onChange={(e) => setDelText(e.target.value)} placeholder="EXCLUIR" className="input mb-3" />
             <div className="flex gap-2">
               <button type="button" onClick={deleteAccount} disabled={delText !== 'EXCLUIR'}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#DC2626] text-white text-sm font-medium hover:bg-[#B91C1C] disabled:opacity-50 transition-all">
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--color-danger)] text-white text-sm font-medium hover:bg-[#B91C1C] disabled:opacity-50 transition-all">
                 <AlertTriangle className="w-4 h-4" /> Confirmar exclusão
               </button>
               <button type="button" onClick={() => { setShowDel(false); setDelText('') }}
-                className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-[#525252] hover:bg-gray-50 transition-colors">
+                className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-[var(--color-text-secondary)] hover:bg-gray-50 transition-colors">
                 Cancelar
               </button>
             </div>

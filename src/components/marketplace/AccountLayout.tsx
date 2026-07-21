@@ -54,8 +54,8 @@ export default function AccountLayout({ user }: { user: { email: string; fullNam
                 <Link key={item.href} href={item.href}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                     active
-                      ? 'bg-[#D4F576] text-[#0A0A0A] font-semibold'
-                      : 'bg-white border border-gray-200 text-[#525252] hover:border-gray-300'
+                      ? 'bg-[var(--color-accent)] text-[var(--color-text-primary)] font-semibold'
+                      : 'bg-white border border-gray-200 text-[var(--color-text-secondary)] hover:border-gray-300'
                   }`}>
                   <item.icon className="w-4 h-4" strokeWidth={1.75} />
                   {item.label}
@@ -79,8 +79,8 @@ export default function AccountLayout({ user }: { user: { email: string; fullNam
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#0A0A0A] truncate">{user.fullName || 'Sua conta'}</p>
-                  <p className="text-xs text-[#525252] truncate">{user.email}</p>
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)] truncate">{user.fullName || 'Sua conta'}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.email}</p>
                 </div>
               </div>
 
@@ -92,14 +92,14 @@ export default function AccountLayout({ user }: { user: { email: string; fullNam
                     <Link key={item.href} href={item.href}
                       className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all ${
                         active
-                          ? 'bg-[#D4F576]/30 text-[#0A0A0A] font-semibold'
-                          : 'text-[#525252] hover:bg-gray-50 hover:text-[#0A0A0A]'
+                          ? 'bg-[var(--color-accent)]/30 text-[var(--color-text-primary)] font-semibold'
+                          : 'text-[var(--color-text-secondary)] hover:bg-gray-50 hover:text-[var(--color-text-primary)]'
                       }`}>
                       <item.icon className="w-4 h-4 shrink-0" strokeWidth={1.75} />
                       {item.label}
                       {active && (
                         <motion.div layoutId="sidebar-indicator"
-                          className="ml-auto w-1.5 h-1.5 rounded-full bg-[#0A0A0A]" />
+                          className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--color-text-primary)]" />
                       )}
                     </Link>
                   )
@@ -112,7 +112,7 @@ export default function AccountLayout({ user }: { user: { email: string; fullNam
                   type="button"
                   onClick={handleLogout}
                   disabled={loggingOut}
-                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors w-full disabled:opacity-50"
+                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-[var(--color-danger)] hover:bg-[var(--color-danger)]/5 transition-colors w-full disabled:opacity-50"
                 >
                   <LogOut className="w-4 h-4" strokeWidth={1.75} />
                   {loggingOut ? 'Saindo...' : 'Sair da conta'}
