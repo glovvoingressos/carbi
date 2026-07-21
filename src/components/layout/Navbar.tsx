@@ -59,7 +59,7 @@ export default function Navbar() {
     }
     checkAuth()
 
-    const { data } = supabase.auth.onAuthStateChange((_event, updated) => {
+    const { data } = supabase.auth.onAuthStateChange((_event: string, updated: { access_token?: string } | null) => {
       setIsAuth(!!updated)
       if (updated?.access_token) fetchUnreadCount(updated.access_token)
       else setUnreadCount(0)
