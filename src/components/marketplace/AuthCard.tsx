@@ -55,7 +55,8 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
   const [mode, setMode] = useState<'login' | 'signup'>(defaultMode)
   const [step, setStep] = useState<1 | 2>(1)
 
-  const [name, setName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [cpf, setCpf] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
@@ -68,7 +69,8 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const canNextStep = mode === 'signup' && step === 1 && name.trim().length >= 2 && validateCPF(cpf) && (accountType === 'pf' || storeName.trim().length >= 2)
+  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
+  const canNextStep = mode === 'signup' && step === 1 && firstName.trim().length >= 2 && lastName.trim().length >= 2 && validateCPF(cpf) && (accountType === 'pf' || storeName.trim().length >= 2)
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -105,14 +107,14 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
           password,
           options: {
             data: {
-              full_name: name.trim(),
+              full_name: fullName,
               cpf: cleanCpf,
               phone: cleanPhone,
               account_type: accountType,
               store_name: storeName.trim() || undefined,
               cnpj: cnpj.replace(/\D/g, '') || undefined,
             },
-            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/anunciar-carro` : undefined,
+            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
           },
         })
 
@@ -130,7 +132,7 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
           await supabase.from('users').upsert({
             id: data.user.id,
             email,
-            full_name: name.trim(),
+            full_name: fullName,
             account_type: accountType,
             store_name: storeName.trim() || null,
             cnpj: cnpj.replace(/\D/g, '') || null,
@@ -148,7 +150,8 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
 
   const resetSignup = () => {
     setStep(1)
-    setName('')
+    setFirstName('')
+    setLastName('')
     setCpf('')
     setPhone('')
     setEmail('')
@@ -307,21 +310,37 @@ export default function AuthCard({ onAuthenticated, compact = false, redirectTo,
               Comece pelo seu nome e CPF.
             </p>
 
-            <div>
-              <label htmlFor="signup-name" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
-                Nome completo
-              </label>
-              <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" strokeWidth={1.75} />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="signup-firstname" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
+                  Nome
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" strokeWidth={1.75} />
+                  <input
+                    id="signup-firstname"
+                    type="text"
+                    required
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Nome"
+                    className="input auth-icon-input h-12 pr-4 rounded-2xl"
+                    autoFocus
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="signup-lastname" className="block text-[12px] font-medium text-[#525252] mb-1.5 tracking-tight">
+                  Sobrenome
+                </label>
                 <input
-                  id="signup-name"
+                  id="signup-lastname"
                   type="text"
                   required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Seu nome"
-                  className="input auth-icon-input h-12 pr-4 rounded-2xl"
-                  autoFocus
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Sobrenome"
+                  className="input h-12 px-4 rounded-2xl"
                 />
               </div>
             </div>

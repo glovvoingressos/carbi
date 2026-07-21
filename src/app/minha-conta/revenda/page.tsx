@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Car, Eye, MessageCircle, TrendingUp, Plus, Upload, AlertTriangle } from 'lucide-react'
-import { getSupabaseServerClient } from '@/lib/supabase-server'
+import { getSupabaseServerClientWithCookies } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import RevendaKPICard from '@/components/revenda/RevendaKPICard'
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 }
 
 export default async function RevendaDashboardPage() {
-  const client = getSupabaseServerClient()
+  const client = await getSupabaseServerClientWithCookies()
   const { data: { user } } = await client.auth.getUser()
   if (!user) redirect('/entrar?redirect=/minha-conta/revenda')
 
