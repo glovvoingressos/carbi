@@ -54,7 +54,7 @@ function NotificationHeader({ unreadCount, onMarkAllRead, markingAll }: { unread
         </div>
       </div>
       {unreadCount > 0 && (
-        <button onClick={onMarkAllRead} disabled={markingAll} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-white border border-gray-200 text-[var(--color-text-secondary)] hover:bg-gray-50 transition-colors">
+        <button onClick={onMarkAllRead} disabled={markingAll} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-white border border-gray-200 text-[var(--color-text-secondary)] hover:bg-gray-50 transition-colors">
           {markingAll ? <Loader2 size={14} className="animate-spin" /> : <CheckCheck size={14} />}
           Marcar todas como lidas
         </button>

@@ -46,7 +46,7 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
       {(isUploading || pendingUploads > 0) && <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--color-info-bg)] text-xs text-[var(--color-text-primary)] mb-3"><Loader2 className="w-3 h-3 animate-spin text-[var(--color-info)]" />{isUploading ? 'Enviando fotos…' : `${pendingUploads} foto(s) prontas`}</div>}
       {imageError && <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[var(--color-danger-bg)] text-xs text-[var(--color-danger)] mb-3"><AlertCircle className="w-3 h-3 mt-0.5 shrink-0" /> {imageError}</div>}
       {images.length === 0 ? (
-        <label className="block cursor-pointer rounded-xl border-2 border-dashed border-[var(--color-border-strong)] bg-[var(--color-bg)] p-10 text-center transition-colors hover:border-[var(--color-accent)]">
+        <label className="block cursor-pointer rounded-xl border-2 border-dashed border-[var(--color-border-strong)] bg-[var(--color-bg)] p-6 text-center transition-colors hover:border-[var(--color-accent)]">
           <ImageIcon className="mx-auto mb-3 h-10 w-10 text-[var(--color-text-disabled)]" />
           <p className="text-sm font-bold text-[var(--color-text-primary)]">Arraste fotos ou clique para selecionar</p>
           <p className="text-xs text-[var(--color-text-tertiary)] mt-1">JPG, PNG ou WEBP · até {LISTING_MAX_IMAGES} · máx {LISTING_MAX_IMAGE_SIZE_MB}MB</p>
@@ -60,7 +60,7 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
                 <div className="flex justify-between">
                   <div className="bg-white/90 p-1 rounded-md"><GripVertical className="w-3 h-3 text-[var(--color-text-tertiary)]" /></div>
-                  <button onClick={() => onRemove(img.id)} className="w-6 h-6 bg-[var(--color-danger)] text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform"><X className="w-3 h-3" /></button>
+                  <button onClick={() => onRemove(img.id)} className="w-8 h-8 bg-[var(--color-danger)] text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform"><X className="w-3 h-3" /></button>
                 </div>
                 <button onClick={() => onSetPrimary(img.id)} className={`w-full py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${img.is_primary ? 'bg-[var(--color-success)] text-white' : 'bg-white text-[var(--color-text-primary)]'}`}>
                   {img.is_primary ? 'Capa' : 'Definir Capa'}
@@ -156,7 +156,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
         </div>
         <div className="flex items-center gap-2">
           <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="h-9 px-5 rounded-full bg-[var(--color-text-primary)] text-white text-xs font-bold flex items-center gap-1.5 disabled:opacity-40"><Save className="w-3.5 h-3.5" /> Salvar</button>
-          <button onClick={onDelete} disabled={isDeleting} className="h-9 w-9 rounded-full border border-[var(--color-danger)] flex items-center justify-center text-[var(--color-danger)] hover:bg-[var(--color-danger-bg)] transition-colors" title="Excluir">
+          <button onClick={onDelete} disabled={isDeleting} className="h-10 w-10 rounded-full border border-[var(--color-danger)] flex items-center justify-center text-[var(--color-danger)] hover:bg-[var(--color-danger-bg)] transition-colors" title="Excluir">
             {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
           </button>
         </div>
@@ -217,7 +217,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
         </div>
         <div><label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">VIN (Opcional)</label>
           <div className="relative">
-            <input className={`${ic('vin')} pr-28 font-mono text-xs`} value={formData.vin || ''} maxLength={17} placeholder="17 caracteres" onChange={(e) => update('vin', e.target.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, ''))} />
+            <input className={`${ic('vin')} pr-20 md:pr-28 font-mono text-xs`} value={formData.vin || ''} maxLength={17} placeholder="17 caracteres" onChange={(e) => update('vin', e.target.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, ''))} />
             <button onClick={onBlurPlates} disabled={isBlurring} className="absolute right-1.5 top-1.5 bottom-1.5 px-3 bg-white rounded-lg text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] flex items-center gap-1 border border-[var(--color-border)]">
               {isBlurring ? <Loader2 className="w-3 h-3 animate-spin" /> : <ScanSearch className="w-3 h-3" />} Borrar Placas
             </button>
@@ -348,7 +348,7 @@ export default function MyListingsDashboard() {
     catch (err) { setGlobalError(err instanceof Error ? err.message : 'Erro ao borrar placas') } finally { setIsBlurring(false) }
   }, [selected, loadListings])
 
-  if (!sessionReady) return <div className="flex flex-col items-center justify-center p-20 text-center"><Loader2 className="h-8 w-8 animate-spin text-[var(--color-text-primary)]" /><p className="mt-4 font-heading font-bold text-[var(--color-text-primary)]">Carregando…</p></div>
+  if (!sessionReady) return <div className="flex flex-col items-center justify-center p-12 text-center"><Loader2 className="h-8 w-8 animate-spin text-[var(--color-text-primary)]" /><p className="mt-4 font-heading font-bold text-[var(--color-text-primary)]">Carregando…</p></div>
   if (!isAuthenticated) return <AuthCard onAuthenticated={() => setIsAuthenticated(true)} />
 
   return (
@@ -361,7 +361,7 @@ export default function MyListingsDashboard() {
               <ListingEditor listing={selected} formData={formData} setFormData={setFormData} errors={errors} setErrors={setErrors} isDirty={isDirty} setIsDirty={setIsDirty} saveStatus={saveStatus} onSave={() => void saveListing(false)} onDelete={handleDelete} isDeleting={isDeleting} isBlurring={isBlurring} onBlurPlates={handleBlurPlates} localImages={localImages} onImageRemove={removeImage} onImageSetPrimary={setPrimary} onImageReorder={(next) => { setLocalImages(next); localImgRef.current = next; setIsDirty(true); schedSync(next) }} onImageAdd={handleImageSelect} onImageSync={() => void syncImages()} isUploading={isUploading} pendingUploads={pendingUploads} imageError={imageError} isDraggingPhotos={isDraggingPhotos} onDragEnter={(e) => handlePhotosDrag(e, true)} onDragLeave={(e) => handlePhotosDrag(e, false)} onDragOver={(e) => { e.preventDefault(); e.stopPropagation() }} onDrop={handlePhotosDrop} />
             </motion.div>
           ) : (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center rounded-2xl border border-[var(--color-border-strong)] bg-white p-16 text-center">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center rounded-2xl border border-[var(--color-border-strong)] bg-white p-8 md:p-16 text-center">
               <Car className="h-12 w-12 text-[var(--color-text-disabled)] mb-4" />
               <h2 className="font-heading font-bold text-xl text-[var(--color-text-primary)]">Selecione um anúncio</h2>
               <p className="mt-2 text-sm text-[var(--color-text-tertiary)] max-w-xs">Escolha um dos seus veículos para editar detalhes, fotos e preço.</p>

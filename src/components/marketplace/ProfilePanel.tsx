@@ -243,11 +243,11 @@ export default function ProfilePanel() {
     finally { setSaving(false) }
   }
 
-  if (loading) return <div className="surface-strong p-12 text-center"><Loader2 className="mx-auto h-5 w-5 animate-spin text-[var(--color-text-primary)]" /><p className="mt-3 text-sm text-[var(--color-text-secondary)]">Carregando perfil...</p></div>
+  if (loading) return <div className="surface-strong p-8 text-center"><Loader2 className="mx-auto h-5 w-5 animate-spin text-[var(--color-text-primary)]" /><p className="mt-3 text-sm text-[var(--color-text-secondary)]">Carregando perfil...</p></div>
   if (!userId) return null
 
   return (
-    <motion.section {...fade} className="surface-strong p-8 md:p-10 space-y-8">
+    <motion.section {...fade} className="surface-strong p-5 md:p-8 space-y-8">
       <AnimatePresence>
         {toast && (
           <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
