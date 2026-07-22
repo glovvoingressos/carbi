@@ -8,6 +8,7 @@ import { LISTING_ALLOWED_TYPES, LISTING_MAX_IMAGES, LISTING_MAX_IMAGE_SIZE_MB, p
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from './MarketplaceListingImage'
+import PlateInput from './PlateInput'
 
 interface DashboardImage { id: string; public_url: string; storage_path: string; sort_order: number; is_primary: boolean }
 interface DashboardListing { id: string; slug: string; title: string; description: string; brand: string; model: string; version: string | null; year: number; year_model: number; vin?: string | null; mileage: number; price: number; city: string; state: string; status: string; transmission: string; fuel: string; color: string; body_type: string; optional_items: string[]; engine: string | null; horsepower: number | null; doors: number | null; plate_final: string | null; images: DashboardImage[] | null; view_count?: number }
@@ -167,6 +168,24 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
         <div><div className="text-sm md:text-sm font-heading font-bold text-[var(--color-text-primary)]">{(listing.view_count || 0).toLocaleString('pt-BR')}</div><div className="text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider">visualizações</div></div>
         <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-[var(--color-text-primary)] underline underline-offset-2 hover:text-[var(--color-success)]">Ver anúncio →</a>
       </div>
+
+      {/* Plate Lookup */}
+      <PlateInput onPlateFound={(data) => {
+        setFormData(prev => ({
+          ...prev,
+          brand: data.brand,
+          model: data.model,
+          year: data.year,
+          yearModel: data.yearModel,
+          color: data.color,
+          fuel: data.fuel,
+          engine: data.engine,
+          transmission: data.transmission,
+          bodyType: data.bodyType,
+          plate: data.plate,
+        }))
+        setIsDirty(true)
+      }} />
 
       {/* Basic Info */}
       <div className="bg-white border border-[var(--color-border-strong)] rounded-xl p-5 space-y-3">
