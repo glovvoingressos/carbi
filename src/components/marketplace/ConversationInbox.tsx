@@ -254,7 +254,7 @@ export default function ConversationInbox() {
   const listPanel = (
     <div className="flex flex-col h-full bg-white border border-gray-200 rounded-2xl overflow-hidden">
       <div className="px-5 pt-5 pb-3">
-        <h2 className="text-base md:text-lg font-extrabold text-[var(--color-text-primary)] font-[var(--font-heading)]">Minhas conversas</h2>
+        <h2 className="text-xs md:text-sm font-extrabold text-[var(--color-text-primary)] font-[var(--font-heading)]">Minhas conversas</h2>
         <div className="relative mt-3">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input type="text" placeholder="Buscar conversas..." value={search} onChange={(e) => setSearch(e.target.value)}
@@ -357,7 +357,7 @@ export default function ConversationInbox() {
       <div className="w-16 h-16 rounded-full bg-[var(--color-accent)] flex items-center justify-center mb-4">
         <MessageSquare className="w-7 h-7 text-[var(--color-text-primary)]" strokeWidth={1.5} />
       </div>
-      <h2 className="text-base md:text-lg font-extrabold text-[var(--color-text-primary)]">Selecione uma conversa</h2>
+      <h2 className="text-xs md:text-sm font-extrabold text-[var(--color-text-primary)]">Selecione uma conversa</h2>
       <p className="text-sm text-[var(--color-text-secondary)] mt-2 max-w-[300px]">O histórico e as novas mensagens aparecem em tempo real.</p>
     </div>
   )

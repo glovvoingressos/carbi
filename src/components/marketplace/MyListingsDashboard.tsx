@@ -164,7 +164,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
 
       {/* Stats */}
       <div className="bg-white border border-[var(--color-border-strong)] rounded-xl px-5 py-4 flex items-center justify-between">
-        <div><div className="text-xl md:text-2xl font-heading font-bold text-[var(--color-text-primary)]">{(listing.view_count || 0).toLocaleString('pt-BR')}</div><div className="text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider">visualizações</div></div>
+        <div><div className="text-sm md:text-sm font-heading font-bold text-[var(--color-text-primary)]">{(listing.view_count || 0).toLocaleString('pt-BR')}</div><div className="text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider">visualizações</div></div>
         <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-[var(--color-text-primary)] underline underline-offset-2 hover:text-[var(--color-success)]">Ver anúncio →</a>
       </div>
 
@@ -191,7 +191,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       <div className="bg-white border border-[var(--color-border-strong)] rounded-xl p-5 space-y-3">
         <h3 className="font-heading font-bold text-sm text-[var(--color-text-primary)]">Preço e Localização</h3>
         <div><label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Valor (R$)</label>
-          <input className={`${ic('price')} text-lg md:text-xl`} value={formData.price || ''} onChange={(e) => update('price', e.target.value)} />
+          <input className={`${ic('price')} text-xs md:text-sm`} value={formData.price || ''} onChange={(e) => update('price', e.target.value)} />
           {errors.price && <p className="text-[10px] font-bold text-[var(--color-danger)] mt-1 ml-1">{errors.price}</p>}
         </div>
         <div className="grid grid-cols-[1fr_70px] gap-3">
@@ -363,7 +363,7 @@ export default function MyListingsDashboard() {
           ) : (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center rounded-2xl border border-[var(--color-border-strong)] bg-white p-8 md:p-16 text-center">
               <Car className="h-12 w-12 text-[var(--color-text-disabled)] mb-4" />
-              <h2 className="font-heading font-bold text-lg md:text-xl text-[var(--color-text-primary)]">Selecione um anúncio</h2>
+              <h2 className="font-heading font-bold text-xs md:text-sm text-[var(--color-text-primary)]">Selecione um anúncio</h2>
               <p className="mt-2 text-sm text-[var(--color-text-tertiary)] max-w-xs">Escolha um dos seus veículos para editar detalhes, fotos e preço.</p>
             </motion.div>
           )}

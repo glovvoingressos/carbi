@@ -37,7 +37,7 @@ export default function FavoritosPage() {
           <div className="w-16 h-16 rounded-full bg-[var(--color-accent)]/15 flex items-center justify-center mx-auto mb-5">
             <Heart className="w-7 h-7 text-[var(--color-text-secondary)]" strokeWidth={1.5} />
           </div>
-          <h2 className="text-base md:text-lg font-semibold text-[var(--color-text-primary)] mb-2">Nenhum favorito ainda</h2>
+          <h2 className="text-xs md:text-sm font-semibold text-[var(--color-text-primary)] mb-2">Nenhum favorito ainda</h2>
           <p className="text-sm text-[var(--color-text-secondary)] mb-6 max-w-sm mx-auto">Salve seus carros favoritos para comparar preços e specs depois.</p>
           <Link href="/carros-a-venda" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-dark)] text-white rounded-full text-sm font-semibold hover:bg-[var(--color-dark-hover)] transition-colors">
             <Search className="w-4 h-4" strokeWidth={2} /> Buscar carros
