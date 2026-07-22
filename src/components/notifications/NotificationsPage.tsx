@@ -1,48 +1,99 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { Bell, Check, CheckCheck, Car, MessageCircle, Trash2, Loader2, Inbox } from 'lucide-react'
+import { useEffect, useState, useCallback } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
+import { Bell, CheckCheck, MessageCircle, Tag, Car, Settings, Loader2 } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
 
 interface Notification {
-  id: string
-  type: string
-  title: string
-  body: string | null
-  link: string | null
-  read: boolean
-  created_at: string
+  id: string; type: string; title: string; body: string | null
+  link: string | null; read: boolean; created_at: string
 }
 
-function timeAgo(dateStr: string) {
-  const now = Date.now()
-  const then = new Date(dateStr).getTime()
-  const diff = Math.floor((now - then) / 1000)
+const TYPE_CONFIG: Record<string, { icon: React.ReactNode; colorClass: string; bgClass: string }> = {
+  message:           { icon: <MessageCircle size={16} />, colorClass: 'text-blue-600',   bgClass: 'bg-blue-50' },
+  offer:             { icon: <Tag size={16} />,           colorClass: 'text-green-600',  bgClass: 'bg-green-50' },
+  listing_published: { icon: <Car size={16} />,           colorClass: 'text-orange-600', bgClass: 'bg-orange-50' },
+  listing_removed:   { icon: <Car size={16} />,           colorClass: 'text-red-600',    bgClass: 'bg-red-50' },
+}
+const DEFAULT_TYPE = { icon: <Settings size={16} />, colorClass: 'text-gray-500', bgClass: 'bg-gray-100' } as const
+
+function relativeTime(dateStr: string) {
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
   if (diff < 60) return 'agora'
-  if (diff < 3600) return `${Math.floor(diff / 60)}min`
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h`
-  if (diff < 604800) return `${Math.floor(diff / 86400)}d`
+  if (diff < 3600) return `há ${Math.floor(diff / 60)} min`
+  if (diff < 86400) return `há ${Math.floor(diff / 3600)}h`
+  if (diff < 604800) return `há ${Math.floor(diff / 86400)} dia${Math.floor(diff / 86400) > 1 ? 's' : ''}`
   return new Date(dateStr).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
 }
 
-function getIcon(type: string) {
-  switch (type) {
-    case 'message': return <MessageCircle size={18} />
-    case 'listing_published': return <Car size={18} />
-    case 'listing_removed': return <Trash2 size={18} />
-    default: return <Bell size={18} />
-  }
+function NotificationSkeleton() {
+  return (
+    <div className="flex items-start gap-3 p-4 rounded-xl bg-white border border-gray-100 animate-pulse">
+      <div className="w-10 h-10 rounded-lg bg-gray-100" />
+      <div className="flex-1 space-y-2">
+        <div className="h-4 bg-gray-100 rounded w-3/4" />
+        <div className="h-3 bg-gray-100 rounded w-full" />
+        <div className="h-3 bg-gray-100 rounded w-1/4" />
+      </div>
+    </div>
+  )
 }
 
-function getColor(type: string) {
-  switch (type) {
-    case 'message': return { bg: 'rgba(90,71,209,0.1)', color: '#5A47D1' }
-    case 'listing_published': return { bg: 'rgba(22,133,92,0.1)', color: '#16855C' }
-    case 'listing_removed': return { bg: 'rgba(220,38,38,0.1)', color: '#DC2626' }
-    default: return { bg: 'rgba(0,0,0,0.06)', color: '#6F6F6F' }
-  }
+function NotificationHeader({ unreadCount, onMarkAllRead, markingAll }: { unreadCount: number; onMarkAllRead: () => void; markingAll: boolean }) {
+  return (
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-[var(--color-accent)] flex items-center justify-center">
+          <Bell size={18} className="text-white" />
+        </div>
+        <div>
+          <h1 className="text-xl font-bold text-[var(--color-text-primary)] tracking-tight">Notificações</h1>
+          {unreadCount > 0 && <p className="text-sm text-[var(--color-text-secondary)]">{unreadCount} não lida{unreadCount > 1 ? 's' : ''}</p>}
+        </div>
+      </div>
+      {unreadCount > 0 && (
+        <button onClick={onMarkAllRead} disabled={markingAll} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-white border border-gray-200 text-[var(--color-text-secondary)] hover:bg-gray-50 transition-colors">
+          {markingAll ? <Loader2 size={14} className="animate-spin" /> : <CheckCheck size={14} />}
+          Marcar todas como lidas
+        </button>
+      )}
+    </div>
+  )
+}
+
+function NotificationItem({ notification, onRead }: { notification: Notification; onRead: (id: string) => void }) {
+  const cfg = TYPE_CONFIG[notification.type] ?? DEFAULT_TYPE
+  const read = notification.read
+  return (
+    <motion.button layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+      onClick={() => { if (!read) onRead(notification.id); if (notification.link) window.location.href = notification.link }}
+      className={`w-full text-left flex items-start gap-3 p-4 rounded-xl border transition-all cursor-pointer ${
+        read ? 'bg-white border-gray-100 hover:bg-gray-50' : 'bg-[var(--color-accent)]/[0.04] border-l-[3px] border-l-[var(--color-accent)] border-t-gray-100 border-r-gray-100 border-b-gray-100 hover:bg-[var(--color-accent)]/[0.07]'
+      }`}
+    >
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${cfg.bgClass} ${cfg.colorClass}`}>{cfg.icon}</div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <p className={`text-sm leading-snug ${read ? 'font-medium' : 'font-semibold'} text-[var(--color-text-primary)]`}>{notification.title}</p>
+          {!read && <span className="w-2 h-2 rounded-full bg-[var(--color-accent)] shrink-0 mt-1.5" />}
+        </div>
+        {notification.body && <p className="text-sm text-[var(--color-text-secondary)] mt-1 leading-snug line-clamp-2">{notification.body}</p>}
+        <p className="text-xs text-[var(--color-text-secondary)] mt-1.5 opacity-60">{relativeTime(notification.created_at)}</p>
+      </div>
+    </motion.button>
+  )
+}
+
+function EmptyState() {
+  return (
+    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4"><Bell size={28} className="text-gray-400" /></div>
+      <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-1">Nenhuma notificação ainda</h3>
+      <p className="text-sm text-[var(--color-text-secondary)] max-w-xs leading-relaxed">Quando alguém interagir com seus anúncios, você será notificado aqui.</p>
+    </motion.div>
+  )
 }
 
 export default function NotificationsPage() {
@@ -56,10 +107,9 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (!supabaseReady) { setReady(true); return }
-    const supabase = getSupabaseBrowserClient()
-    supabase.auth.getSession().then(({ data: { session } }: { data: { session: { access_token?: string; user?: { id?: string } } | null } }) => {
+    getSupabaseBrowserClient().auth.getSession().then(({ data: { session } }: { data: { session: { access_token?: string } | null } }) => {
       setAuthenticated(!!session)
-      setToken(session?.access_token || null)
+      setToken(session?.access_token ?? null)
       setReady(true)
     })
   }, [supabaseReady])
@@ -69,12 +119,12 @@ export default function NotificationsPage() {
     setLoading(true)
     fetch('/api/notifications', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
-      .then(data => { setNotifications(data.notifications || []) })
+      .then(d => setNotifications(d.notifications ?? []))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [token])
 
-  const markAllRead = async () => {
+  const markAllRead = useCallback(async () => {
     if (!token) return
     setMarkingAll(true)
     try {
@@ -86,9 +136,9 @@ export default function NotificationsPage() {
       setNotifications(prev => prev.map(n => ({ ...n, read: true })))
     } catch {}
     setMarkingAll(false)
-  }
+  }, [token])
 
-  const markRead = async (id: string) => {
+  const markRead = useCallback(async (id: string) => {
     if (!token) return
     try {
       await fetch('/api/notifications/read', {
@@ -98,131 +148,24 @@ export default function NotificationsPage() {
       })
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
     } catch {}
-  }
+  }, [token])
 
-  if (!ready) {
-    return (
-      <main className="fingen-shell">
-        <div className="fingen-shell-content" style={{ paddingTop: 24, paddingBottom: 96 }}>
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-6 w-6 animate-spin text-[#8A95A8]" />
-          </div>
-        </div>
-      </main>
-    )
-  }
-
-  if (!authenticated) {
-    return (
-      <main className="fingen-shell">
-        <div className="fingen-shell-content" style={{ paddingTop: 24, paddingBottom: 96, maxWidth: 480, margin: '0 auto' }}>
-          <AuthCard redirectTo="/notificacoes" />
-        </div>
-      </main>
-    )
-  }
+  if (!ready) return <main className="fingen-shell"><div className="fingen-shell-content pt-6 pb-24 max-w-2xl mx-auto flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-gray-400" /></div></main>
+  if (!authenticated) return <main className="fingen-shell"><div className="fingen-shell-content pt-6 pb-24 max-w-md mx-auto"><AuthCard redirectTo="/notificacoes" /></div></main>
 
   const unreadCount = notifications.filter(n => !n.read).length
 
   return (
     <main className="fingen-shell">
-      <div className="fingen-shell-content" style={{ paddingTop: 24, paddingBottom: 96, maxWidth: 720, margin: '0 auto' }}>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[var(--color-bg-inverse)] flex items-center justify-center">
-              <Bell size={18} className="text-white" />
-            </div>
-            <div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-0.5px' }}>
-                Notificações
-              </h1>
-              {unreadCount > 0 && (
-                <p style={{ fontSize: 13, color: 'var(--color-text-tertiary)' }}>
-                  {unreadCount} não lida{unreadCount > 1 ? 's' : ''}
-                </p>
-              )}
-            </div>
-          </div>
-          {unreadCount > 0 && (
-            <button
-              onClick={markAllRead}
-              disabled={markingAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors"
-              style={{ background: 'var(--color-bg-elevated)', border: '1.5px solid var(--color-border-strong)', color: 'var(--color-text-secondary)' }}
-            >
-              {markingAll ? <Loader2 size={14} className="animate-spin" /> : <CheckCheck size={14} />}
-              Marcar todas como lidas
-            </button>
-          )}
-        </div>
-
+      <div className="fingen-shell-content pt-6 pb-24 max-w-2xl mx-auto px-4">
+        <NotificationHeader unreadCount={unreadCount} onMarkAllRead={markAllRead} markingAll={markingAll} />
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-6 w-6 animate-spin text-[#8A95A8]" />
-          </div>
-        ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'var(--color-bg-muted)' }}>
-              <Inbox size={28} className="text-[#A3A3A3]" />
-            </div>
-            <h3 style={{ fontSize: 18, fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: 6 }}>
-              Nenhuma notificação
-            </h3>
-            <p style={{ fontSize: 14, color: 'var(--color-text-tertiary)', maxWidth: 320 }}>
-              Quando você receber mensagens, seus anúncios forem publicados ou outras atualizações, elas aparecerão aqui.
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {notifications.map((notification) => {
-              const icon = getIcon(notification.type)
-              const colors = getColor(notification.type)
-
-              return (
-                <div
-                  key={notification.id}
-                  onClick={() => {
-                    if (!notification.read) markRead(notification.id)
-                    if (notification.link) window.location.href = notification.link
-                  }}
-                  className="flex items-start gap-3 p-4 rounded-2xl transition-all cursor-pointer"
-                  style={{
-                    background: notification.read ? 'var(--color-bg-elevated)' : 'rgba(90,71,209,0.04)',
-                    border: `1.5px solid ${notification.read ? 'var(--color-border)' : 'rgba(90,71,209,0.12)'}`,
-                  }}
-                >
-                  <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                    style={{ background: colors.bg, color: colors.color }}
-                  >
-                    {icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <p style={{
-                        fontSize: 14,
-                        fontWeight: notification.read ? 500 : 600,
-                        color: 'var(--color-text-primary)',
-                        lineHeight: 1.4,
-                      }}>
-                        {notification.title}
-                      </p>
-                      {!notification.read && (
-                        <span className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5" style={{ background: 'var(--iris)' }} />
-                      )}
-                    </div>
-                    {notification.body && (
-                      <p style={{ fontSize: 13, color: 'var(--color-text-tertiary)', marginTop: 2, lineHeight: 1.4 }}>
-                        {notification.body}
-                      </p>
-                    )}
-                    <p style={{ fontSize: 11, color: 'var(--color-text-disabled)', marginTop: 4 }}>
-                      {timeAgo(notification.created_at)}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
+          <div className="space-y-2">{Array.from({ length: 5 }).map((_, i) => <NotificationSkeleton key={i} />)}</div>
+        ) : notifications.length === 0 ? <EmptyState /> : (
+          <div className="space-y-2">
+            <AnimatePresence mode="popLayout">
+              {notifications.map(n => <NotificationItem key={n.id} notification={n} onRead={markRead} />)}
+            </AnimatePresence>
           </div>
         )}
       </div>

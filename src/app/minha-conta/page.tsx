@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import AccountLayout from '@/components/marketplace/AccountLayout'
+import ProfilePanel from '@/components/marketplace/ProfilePanel'
 
 export const metadata: Metadata = {
   title: 'Minha conta | Carbi',
@@ -46,5 +47,9 @@ async function getUser() {
 
 export default async function MinhaContaPage() {
   const user = await getUser()
-  return <AccountLayout user={user} />
+  return (
+    <AccountLayout user={user}>
+      <ProfilePanel />
+    </AccountLayout>
+  )
 }
