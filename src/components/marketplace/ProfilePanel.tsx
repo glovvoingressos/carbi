@@ -1,14 +1,13 @@
 'use client'
 
-import { ChangeEvent, useEffect, useState, useCallback, useRef } from 'react'
+import { ChangeEvent, useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import {
-  User, Mail, Phone, Lock, Camera, Save, Loader2,
-  ChevronRight, AlertTriangle,
-} from 'lucide-react'
+import { User, Mail, Phone, Lock, Camera, Save, Loader2, ChevronDown, AlertTriangle } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -12 }, transition: { duration: 0.2 } }
+const INPUT = 'w-full px-5 py-3.5 rounded-[20px] border border-[#ECECEC] bg-white text-[15px] text-[#111111] placeholder:text-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent,#111111)]/10 focus:border-[var(--color-accent,#111111)] transition-all duration-200'
+const LABEL = 'block text-[13px] font-semibold text-[#7A7A7A] mb-2'
 const formatPhone = (v: string) => {
   const d = v.replace(/\D/g, '').slice(0, 11)
   return d.length <= 10
@@ -36,25 +35,30 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
     await sb.from('users').update({ avatar_url: data.publicUrl }).eq('id', userId)
     e.target.value = ''
   }
+
   return (
-    <div className="flex items-center gap-5">
-      <div className="relative group">
-        <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
+    <motion.div {...fade} className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] p-7 flex items-center gap-6">
+      <div className="relative group shrink-0">
+        <div className="w-24 h-24 rounded-full overflow-hidden bg-[var(--color-bg,#F7F7F7)] border-2 border-[var(--color-border,#ECECEC)]">
           {avatarUrl
             ? <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-            : <div className="w-full h-full flex items-center justify-center"><User className="w-8 h-8 text-gray-300" strokeWidth={1.5} /></div>}
+            : <div className="w-full h-full flex items-center justify-center"><User className="w-10 h-10 text-[#C8C8C8]" strokeWidth={1.25} /></div>}
         </div>
-        <label className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
+        <label className="absolute inset-0 rounded-full bg-black/30 backdrop-blur-sm opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity duration-200">
           <Camera className="w-5 h-5 text-white" strokeWidth={1.75} />
           <input type="file" className="hidden" accept="image/png,image/jpeg,image/webp" onChange={upload} />
         </label>
-        {uploading && <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center"><Loader2 className="w-5 h-5 text-white animate-spin" /></div>}
+        {uploading && (
+          <div className="absolute inset-0 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+            <Loader2 className="w-5 h-5 text-white animate-spin" />
+          </div>
+        )}
       </div>
-      <div>
-        <p className="text-xs md:text-sm font-semibold text-[var(--color-text-primary)]">{fullName || 'Seu nome'}</p>
-        <p className="text-sm text-[var(--color-text-secondary)]">{email}</p>
+      <div className="min-w-0">
+        <p className="text-base font-bold text-[#111111] truncate">{fullName || 'Seu nome'}</p>
+        <p className="text-sm text-[#7A7A7A] mt-0.5 truncate">{email}</p>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -64,35 +68,35 @@ function PersonalInfo({ fullName, email, phone, onNameChange, onPhoneChange }: {
   onNameChange: (v: string) => void; onPhoneChange: (v: string) => void
 }) {
   return (
-    <div>
-      <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Informações pessoais</h3>
-      <div className="grid gap-4 sm:grid-cols-2">
+    <motion.div {...fade} className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] p-7">
+      <h3 className="text-[20px] font-bold text-[#111111] mb-6">Informações pessoais</h3>
+      <div className="space-y-5">
         <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">Nome completo</label>
-          <input value={fullName} onChange={(e) => onNameChange(e.target.value)} placeholder="Ex: João Silva" className="input" />
+          <label className={LABEL}>Nome completo</label>
+          <input value={fullName} onChange={(e) => onNameChange(e.target.value)} placeholder="Ex: João Silva" className={INPUT} />
         </div>
         <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">E-mail</label>
+          <label className={LABEL}>E-mail</label>
           <div className="relative">
-            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" strokeWidth={1.75} />
-            <input value={email} disabled className="input pl-10 opacity-60 cursor-not-allowed bg-gray-50" />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#C0C0C0] pointer-events-none" strokeWidth={1.5} />
+            <input value={email} disabled className={`${INPUT} pl-11 bg-[#F7F7F7] opacity-60 cursor-not-allowed`} />
           </div>
         </div>
         <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">Telefone</label>
+          <label className={LABEL}>Telefone</label>
           <div className="relative">
-            <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" strokeWidth={1.75} />
-            <input value={phone} onChange={(e) => onPhoneChange(formatPhone(e.target.value))} placeholder="(00) 00000-0000" maxLength={15} className="input pl-10" />
+            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#C0C0C0] pointer-events-none" strokeWidth={1.5} />
+            <input value={phone} onChange={(e) => onPhoneChange(formatPhone(e.target.value))} placeholder="(00) 00000-0000" maxLength={15} className={`${INPUT} pl-11`} />
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
 /* ─── Security ─── */
 function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) {
-  const [show, setShow] = useState(false)
+  const [open, setOpen] = useState(false)
   const [newPw, setNewPw] = useState('')
   const [confirmPw, setConfirmPw] = useState('')
   const [saving, setSaving] = useState(false)
@@ -104,43 +108,47 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
       const { error } = await getSupabaseBrowserClient().auth.updateUser({ password: newPw })
       if (error) throw error
       toast('success', 'Senha alterada com sucesso.')
-      setShow(false); setNewPw(''); setConfirmPw('')
+      setOpen(false); setNewPw(''); setConfirmPw('')
     } catch (e) { toast('error', e instanceof Error ? e.message : 'Não foi possível alterar a senha.') }
     finally { setSaving(false) }
   }
 
   return (
-    <div>
-      <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Segurança</h3>
-      {!show ? (
-        <button type="button" onClick={() => setShow(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-[var(--color-text-primary)] hover:bg-gray-50 transition-colors">
-          <Lock className="w-4 h-4" strokeWidth={1.75} /> Alterar senha <ChevronRight className="w-4 h-4 ml-auto text-gray-400" />
-        </button>
-      ) : (
-        <motion.div {...fade} className="space-y-3 p-4 rounded-xl border border-gray-200 bg-gray-50/50">
-          <div>
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">Nova senha</label>
-            <input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="Mínimo 8 caracteres" className="input" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">Confirmar senha</label>
-            <input type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="Repita a senha" className="input" />
-          </div>
-          {newPw && confirmPw && newPw !== confirmPw && <p className="text-xs text-[var(--color-danger)]">As senhas não coincidem.</p>}
-          <div className="flex gap-2">
-            <button type="button" onClick={changePw} disabled={saving || newPw.length < 8 || newPw !== confirmPw}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--color-text-primary)] text-white text-sm font-medium hover:bg-[#2D2D2D] disabled:opacity-50 transition-all">
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar
-            </button>
-            <button type="button" onClick={() => { setShow(false); setNewPw(''); setConfirmPw('') }}
-              className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-[var(--color-text-secondary)] hover:bg-gray-50 transition-colors">
-              Cancelar
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </div>
+    <motion.div {...fade} className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] p-7">
+      <h3 className="text-[20px] font-bold text-[#111111] mb-6">Segurança</h3>
+      <button type="button" onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-5 py-4 rounded-[20px] border border-[#ECECEC] text-[15px] font-medium text-[#111111] hover:bg-[#F7F7F7] transition-colors duration-200">
+        <span className="flex items-center gap-3"><Lock className="w-[18px] h-[18px] text-[#7A7A7A]" strokeWidth={1.5} /> Alterar senha</span>
+        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}><ChevronDown className="w-[18px] h-[18px] text-[#7A7A7A]" strokeWidth={1.5} /></motion.span>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className="overflow-hidden">
+            <div className="pt-5 space-y-4">
+              <div>
+                <label className={LABEL}>Nova senha</label>
+                <input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="Mínimo 8 caracteres" className={INPUT} />
+              </div>
+              <div>
+                <label className={LABEL}>Confirmar senha</label>
+                <input type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="Repita a senha" className={INPUT} />
+              </div>
+              {newPw && confirmPw && newPw !== confirmPw && <p className="text-[13px] font-medium text-[var(--color-danger,#DC2626)]">As senhas não coincidem.</p>}
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={changePw} disabled={saving || newPw.length < 8 || newPw !== confirmPw}
+                  className="flex items-center gap-2 px-5 py-3 rounded-full bg-[#111111] text-white text-[14px] font-semibold hover:bg-[#2D2D2D] disabled:opacity-40 transition-all duration-200">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar
+                </button>
+                <button type="button" onClick={() => { setOpen(false); setNewPw(''); setConfirmPw('') }}
+                  className="px-5 py-3 rounded-full border border-[#ECECEC] text-[14px] font-medium text-[#7A7A7A] hover:bg-[#F7F7F7] transition-colors duration-200">
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   )
 }
 
@@ -159,31 +167,32 @@ function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
   }
 
   return (
-    <div>
-      <h3 className="text-sm font-semibold text-[var(--color-danger)] mb-4">Excluir conta</h3>
-      <p className="text-sm text-[var(--color-text-secondary)] mb-4">Essa ação é permanente e não pode ser desfeita.</p>
+    <motion.div {...fade} className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] p-7">
+      <h3 className="text-[20px] font-bold text-[var(--color-danger,#DC2626)] mb-3">Excluir conta</h3>
+      <p className="text-[14px] text-[#7A7A7A] mb-5 leading-relaxed">Essa ação é permanente e não pode ser desfeita.</p>
       {!show ? (
         <button type="button" onClick={() => setShow(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-danger)]/30 text-sm font-medium text-[var(--color-danger)] hover:bg-[var(--color-danger)]/5 transition-colors">
+          className="flex items-center gap-2.5 px-5 py-3.5 rounded-full border border-[var(--color-danger,#DC2626)]/25 text-[14px] font-semibold text-[var(--color-danger,#DC2626)] hover:bg-[var(--color-danger,#DC2626)]/5 transition-colors duration-200">
           <AlertTriangle className="w-4 h-4" /> Excluir conta
         </button>
       ) : (
-        <motion.div {...fade} className="p-4 rounded-xl border border-[var(--color-danger)]/30 bg-[#FEF2F2]">
-          <p className="text-sm text-[var(--color-danger)] font-medium mb-3">Digite &quot;EXCLUIR&quot; para confirmar:</p>
-          <input value={delText} onChange={(e) => setDelText(e.target.value)} placeholder="EXCLUIR" className="input mb-3" />
-          <div className="flex gap-2">
+        <motion.div {...fade} className="p-5 rounded-[20px] border border-[var(--color-danger,#DC2626)]/20 bg-[var(--color-danger,#DC2626)]/5">
+          <p className="text-[14px] font-semibold text-[var(--color-danger,#DC2626)] mb-3">Digite &quot;EXCLUIR&quot; para confirmar:</p>
+          <input value={delText} onChange={(e) => setDelText(e.target.value)} placeholder="EXCLUIR"
+            className={`${INPUT} border-[var(--color-danger,#DC2626)]/25 focus:ring-[var(--color-danger,#DC2626)]/10 mb-4`} />
+          <div className="flex gap-3">
             <button type="button" onClick={deleteAccount} disabled={delText !== 'EXCLUIR'}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--color-danger)] text-white text-sm font-medium hover:bg-[#B91C1C] disabled:opacity-50 transition-all">
+              className="flex items-center gap-2 px-5 py-3 rounded-full bg-[var(--color-danger,#DC2626)] text-white text-[14px] font-semibold hover:bg-[#B91C1C] disabled:opacity-40 transition-all duration-200">
               <AlertTriangle className="w-4 h-4" /> Confirmar exclusão
             </button>
             <button type="button" onClick={() => { setShow(false); setDelText('') }}
-              className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-[var(--color-text-secondary)] hover:bg-gray-50 transition-colors">
+              className="px-5 py-3 rounded-full border border-[#ECECEC] text-[14px] font-medium text-[#7A7A7A] hover:bg-[#F7F7F7] transition-colors duration-200">
               Cancelar
             </button>
           </div>
         </motion.div>
       )}
-    </div>
+    </motion.div>
   )
 }
 
@@ -243,33 +252,36 @@ export default function ProfilePanel() {
     finally { setSaving(false) }
   }
 
-  if (loading) return <div className="surface-strong p-8 text-center"><Loader2 className="mx-auto h-5 w-5 animate-spin text-[var(--color-text-primary)]" /><p className="mt-3 text-sm text-[var(--color-text-secondary)]">Carregando perfil...</p></div>
+  if (loading) return (
+    <div className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] p-8 flex flex-col items-center gap-3">
+      <Loader2 className="h-5 w-5 animate-spin text-[#7A7A7A]" />
+      <p className="text-sm text-[#7A7A7A]">Carregando perfil...</p>
+    </div>
+  )
   if (!userId) return null
 
   return (
-    <motion.section {...fade} className="surface-strong p-5 md:p-8 space-y-8">
+    <section className="space-y-5 max-w-[520px]">
       <AnimatePresence>
         {toast && (
           <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
-            className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-2xl text-sm font-medium shadow-lg ${toast.type === 'success' ? 'bg-[var(--color-success)] text-white' : 'bg-[var(--color-danger)] text-white'}`}>
+            className={`fixed top-6 right-6 z-50 px-6 py-3.5 rounded-full text-[14px] font-semibold shadow-[0_18px_50px_rgba(0,0,0,.12)] ${toast.type === 'success' ? 'bg-[var(--color-success,#16A34A)] text-white' : 'bg-[var(--color-danger,#DC2626)] text-white'}`}>
             {toast.message}
           </motion.div>
         )}
       </AnimatePresence>
 
       <AvatarSection avatarUrl={avatarUrl} fullName={fullName} email={email} userId={userId} onAvatarChange={setAvatarUrl} uploading={uploading} />
-      <div className="h-px bg-gray-100" />
       <PersonalInfo fullName={fullName} email={email} phone={phone} onNameChange={setFullName} onPhoneChange={setPhone} />
-      <div className="h-px bg-gray-100" />
       <SecuritySection userId={userId} toast={showToast} />
-      <div className="h-px bg-gray-100" />
-      <button type="button" onClick={saveProfile} disabled={saving || uploading}
-        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[var(--color-text-primary)] text-white text-sm font-semibold hover:bg-[#2D2D2D] disabled:opacity-50 transition-all">
-        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+
+      <motion.button {...fade} type="button" onClick={saveProfile} disabled={saving || uploading}
+        className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-full bg-[#111111] text-white text-[15px] font-semibold hover:bg-[#2D2D2D] disabled:opacity-40 transition-all duration-200 shadow-[0_8px_24px_rgba(0,0,0,.12)]">
+        {saving ? <Loader2 className="w-[18px] h-[18px] animate-spin" /> : <Save className="w-[18px] h-[18px]" />}
         {saving ? 'Salvando...' : 'Salvar alterações'}
-      </button>
-      <div className="h-px bg-gray-100" />
+      </motion.button>
+
       <DangerZone userId={userId} toast={showToast} />
-    </motion.section>
+    </section>
   )
 }
