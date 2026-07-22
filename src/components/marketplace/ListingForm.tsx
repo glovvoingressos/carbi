@@ -1382,26 +1382,30 @@ export default function ListingForm() {
             <div />
           )}
 
-          <button
-            type="button"
-            onClick={currentStep === 3 ? handleSubmit : nextStep}
+          {currentStep === 1 && listingSubStep === 1 ? (
+            <div />
+          ) : (
+            <button
+              type="button"
+              onClick={currentStep === 3 ? handleSubmit : nextStep}
               className="fingen-flow-btn-primary max-[330px]:w-full"
               disabled={saving || fipeLoading}
             >
-            {saving ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Publicando...
-              </>
-            ) : currentStep === 3 ? (
-              'Publicar anúncio'
-            ) : (
-              <>
-                Próxima etapa
-                <ArrowRight className="h-4 w-4" />
-              </>
-            )}
-          </button>
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Publicando...
+                </>
+              ) : currentStep === 3 ? (
+                'Publicar anúncio'
+              ) : (
+                <>
+                  Próxima etapa
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         {currentStep === 3 ? (

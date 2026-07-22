@@ -15,7 +15,7 @@ export async function lookupPlate(plate: string): Promise<PlacaLookupResult> {
     const data = await response.json()
 
     if (data.message) {
-      return { success: false, error: data.message }
+      return { success: false, error: 'Placa não encontrada ou formato inválido. Verifique e tente novamente.' }
     }
 
     const vehicleData = data as PlacaApiResponse
