@@ -27,19 +27,19 @@ export default function FavoritosPage() {
     load()
   }, [router])
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="w-6 h-6 animate-spin text-[var(--color-text-secondary)]" /></div>
+  if (loading) return <div className="flex items-center justify-center min-h-dvh bg-[#F7F7F7]"><Loader2 className="w-5 h-5 animate-spin text-[#999]" /></div>
   if (!user) return null
 
   return (
     <AccountLayout user={user}>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-        <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-[28px] p-8 sm:p-12 text-center shadow-[0_18px_50px_rgba(0,0,0,.05)]">
           <div className="w-16 h-16 rounded-full bg-[var(--color-accent)]/15 flex items-center justify-center mx-auto mb-5">
             <Heart className="w-7 h-7 text-[var(--color-text-secondary)]" strokeWidth={1.5} />
           </div>
-          <h2 className="text-xs md:text-sm font-semibold text-[var(--color-text-primary)] mb-2">Nenhum favorito ainda</h2>
+          <h2 className="text-sm font-semibold text-[var(--color-text-primary)] mb-2 font-[family-name:var(--font-heading)]">Nenhum favorito ainda</h2>
           <p className="text-sm text-[var(--color-text-secondary)] mb-6 max-w-sm mx-auto">Salve seus carros favoritos para comparar preços e specs depois.</p>
-          <Link href="/carros-a-venda" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-dark)] text-white rounded-full text-sm font-semibold hover:bg-[var(--color-dark-hover)] transition-colors">
+          <Link href="/carros-a-venda" className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-dark)] text-white rounded-full text-sm font-semibold hover:bg-[var(--color-dark-hover)] transition-colors min-h-[44px]">
             <Search className="w-4 h-4" strokeWidth={2} /> Buscar carros
           </Link>
         </div>

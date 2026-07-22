@@ -49,7 +49,7 @@ function NotificationHeader({ unreadCount, onMarkAllRead, markingAll }: { unread
           <Bell size={18} className="text-white" />
         </div>
         <div>
-          <h1 className="text-xs md:text-sm font-bold text-[var(--color-text-primary)] tracking-tight">Notificações</h1>
+          <h1 className="text-sm font-bold text-[var(--color-text-primary)] tracking-tight font-[family-name:var(--font-heading)]">Notificações</h1>
           {unreadCount > 0 && <p className="text-sm text-[var(--color-text-secondary)]">{unreadCount} não lida{unreadCount > 1 ? 's' : ''}</p>}
         </div>
       </div>
@@ -90,7 +90,7 @@ function EmptyState() {
   return (
     <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-20 text-center">
       <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4"><Bell size={28} className="text-gray-400" /></div>
-      <h3 className="text-xs md:text-sm font-semibold text-[var(--color-text-primary)] mb-1">Nenhuma notificação ainda</h3>
+      <h3 className="text-xs font-semibold text-[var(--color-text-primary)] mb-1 font-[family-name:var(--font-heading)]">Nenhuma notificação ainda</h3>
       <p className="text-sm text-[var(--color-text-secondary)] max-w-xs leading-relaxed">Quando alguém interagir com seus anúncios, você será notificado aqui.</p>
     </motion.div>
   )
@@ -150,7 +150,7 @@ export default function NotificationsPage() {
     } catch {}
   }, [token])
 
-  if (!ready) return <main className="fingen-shell"><div className="fingen-shell-content pt-6 pb-24 max-w-2xl mx-auto flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-gray-400" /></div></main>
+  if (!ready) return <main className="fingen-shell"><div className="fingen-shell-content pt-6 pb-24 max-w-2xl mx-auto flex items-center justify-center py-20"><Loader2 className="h-5 w-5 animate-spin text-[var(--color-text-tertiary)]" /></div></main>
   if (!authenticated) return <main className="fingen-shell"><div className="fingen-shell-content pt-6 pb-24 max-w-md mx-auto"><AuthCard redirectTo="/notificacoes" /></div></main>
 
   const unreadCount = notifications.filter(n => !n.read).length

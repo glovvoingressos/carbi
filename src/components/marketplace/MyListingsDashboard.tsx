@@ -33,13 +33,13 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
     <div className={`bg-white p-5 rounded-2xl border transition-colors ${isDragging ? 'border-[var(--color-accent)] bg-[var(--color-accent-soft)]/20' : 'border-[var(--color-border-strong)]'}`}
       onDragEnter={onDragEnter} onDragLeave={onDragLeave} onDragOver={onDragOver} onDrop={onDrop}>
       <div className="flex items-center justify-between mb-4">
-        <div><h3 className="font-heading font-bold text-[var(--color-text-primary)]">Fotos</h3><p className="text-xs text-[var(--color-text-tertiary)]">Arraste para reordenar. A primeira é capa.</p></div>
+        <div><h3 className="font-heading font-bold text-xs text-[var(--color-text-primary)]">Fotos</h3><p className="text-xs text-[var(--color-text-tertiary)]">Arraste para reordenar. A primeira é capa.</p></div>
         <div className="flex gap-2">
-          <label className="h-8 px-3 rounded-full bg-[var(--color-bg)] hover:bg-[var(--color-bg-muted)] text-[var(--color-text-primary)] text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-colors border border-[var(--color-border)]">
+          <label className="h-8 px-3 rounded-full bg-[var(--color-bg)] hover:bg-[var(--color-bg-muted)] text-[var(--color-text-primary)] text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors border border-[var(--color-border)]">
             <Upload className="w-3 h-3" /> Adicionar
             <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { onAdd(e.target.files); e.target.value = '' }} />
           </label>
-          <button onClick={onSync} disabled={!isDirty || isUploading} className="h-8 px-4 rounded-full bg-[var(--color-text-primary)] text-white text-[11px] font-bold flex items-center gap-1 disabled:opacity-40">
+          <button onClick={onSync} disabled={!isDirty || isUploading} className="h-8 px-4 rounded-full bg-[var(--color-text-primary)] text-white text-xs font-bold flex items-center gap-1 disabled:opacity-40">
             {isUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} Salvar
           </button>
         </div>
@@ -89,14 +89,14 @@ function ListingSidebar({ listings, selectedId, onSelect, loading, searchQuery, 
 
   return (
     <aside className="space-y-3 lg:sticky lg:top-24">
-      <h3 className="font-heading font-bold text-xs uppercase tracking-widest text-[var(--color-text-tertiary)] px-1">Anúncios ({filtered.length})</h3>
+      <h3 className="font-heading font-bold text-[10px] uppercase tracking-widest text-[var(--color-text-tertiary)] px-1">Anúncios ({filtered.length})</h3>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-disabled)]" />
         <input className="w-full h-10 pl-9 pr-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] placeholder:text-[var(--color-text-disabled)] focus:outline-none focus:border-[var(--color-accent)] transition-colors" placeholder="Buscar anúncio…" value={searchQuery} onChange={(e) => onSearchChange(e.target.value)} />
       </div>
       <div className="flex gap-1.5 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
         {(['all', 'active', 'paused', 'sold'] as const).map((s) => (
-          <button key={s} onClick={() => onStatusFilterChange(s)} className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors border ${statusFilter === s ? 'bg-[var(--color-text-primary)] text-white border-[var(--color-text-primary)]' : 'bg-white text-[var(--color-text-tertiary)] border-[var(--color-border)] hover:border-[var(--color-border-strong)]'}`}>
+          <button key={s} onClick={() => onStatusFilterChange(s)} className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors border ${statusFilter === s ? 'bg-[var(--color-text-primary)] text-white border-[var(--color-text-primary)]' : 'bg-white text-[var(--color-text-tertiary)] border-[var(--color-border)] hover:border-[var(--color-border-strong)]'}`}>
             {s === 'all' ? 'Todos' : s === 'active' ? 'Ativos' : s === 'paused' ? 'Pausados' : 'Vendidos'}
           </button>
         ))}
@@ -151,7 +151,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-3 bg-white border border-[var(--color-border-strong)] rounded-xl px-4 py-3">
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${saveStatus === 'saving' ? 'bg-[var(--color-info-bg)] text-[var(--color-info)]' : saveStatus === 'saved' ? 'bg-emerald-50 text-emerald-600' : saveStatus === 'error' ? 'bg-[var(--color-danger-bg)] text-[var(--color-danger)]' : 'bg-[var(--color-bg)] text-[var(--color-text-tertiary)]'}`}>
+        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${saveStatus === 'saving' ? 'bg-[var(--color-info-bg)] text-[var(--color-info)]' : saveStatus === 'saved' ? 'bg-emerald-50 text-emerald-600' : saveStatus === 'error' ? 'bg-[var(--color-danger-bg)] text-[var(--color-danger)]' : 'bg-[var(--color-bg)] text-[var(--color-text-tertiary)]'}`}>
           {saveStatus === 'saving' ? <Loader2 className="w-3 h-3 animate-spin" /> : saveStatus === 'saved' ? <Check className="w-3 h-3" /> : saveStatus === 'error' ? <AlertCircle className="w-3 h-3" /> : <div className="w-2 h-2 rounded-full bg-current opacity-30" />}
           {saveStatus === 'saving' ? 'Salvando…' : saveStatus === 'saved' ? 'Salvo' : saveStatus === 'error' ? 'Erro' : 'Tudo salvo'}
         </div>
@@ -165,7 +165,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
 
       {/* Stats */}
       <div className="bg-white border border-[var(--color-border-strong)] rounded-xl px-5 py-4 flex items-center justify-between">
-        <div><div className="text-sm md:text-sm font-heading font-bold text-[var(--color-text-primary)]">{(listing.view_count || 0).toLocaleString('pt-BR')}</div><div className="text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider">visualizações</div></div>
+        <div><div className="text-sm font-heading font-bold text-[var(--color-text-primary)]">{(listing.view_count || 0).toLocaleString('pt-BR')}</div><div className="text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider">visualizações</div></div>
         <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-[var(--color-text-primary)] underline underline-offset-2 hover:text-[var(--color-success)]">Ver anúncio →</a>
       </div>
 
@@ -189,17 +189,17 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
 
       {/* Basic Info */}
       <div className="bg-white border border-[var(--color-border-strong)] rounded-xl p-5 space-y-3">
-        <h3 className="font-heading font-bold text-sm text-[var(--color-text-primary)]">Informações Básicas</h3>
+        <h3 className="font-heading font-bold text-xs text-[var(--color-text-primary)]">Informações Básicas</h3>
         <div>
-          <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Título</label>
+          <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Título</label>
           <input autoFocus className={ic('title')} value={formData.title || ''} onChange={(e) => update('title', e.target.value)} placeholder="Ex: Toyota Corolla 2.0 XEi 2024" />
-          {errors.title && <p className="text-[10px] font-bold text-[var(--color-danger)] mt-1 ml-1">{errors.title}</p>}
+          {errors.title && <p className="text-xs font-bold text-[var(--color-danger)] mt-1 ml-1">{errors.title}</p>}
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <div><label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Ano Fab.</label><input type="number" className={ic('year')} value={formData.year || ''} onChange={(e) => update('year', parseBrazilianInt(e.target.value))} /></div>
-          <div><label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Ano Mod.</label><input type="number" className={ic('year_model')} value={formData.year_model || ''} onChange={(e) => update('year_model', parseBrazilianInt(e.target.value))} /></div>
+          <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Ano Fab.</label><input type="number" className={ic('year')} value={formData.year || ''} onChange={(e) => update('year', parseBrazilianInt(e.target.value))} /></div>
+          <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Ano Mod.</label><input type="number" className={ic('year_model')} value={formData.year_model || ''} onChange={(e) => update('year_model', parseBrazilianInt(e.target.value))} /></div>
         </div>
-        <div><label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Status</label>
+        <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Status</label>
           <select className={`${ic('status')} appearance-none cursor-pointer`} value={formData.status || 'active'} onChange={(e) => update('status', e.target.value)}>
             <option value="active">🟢 Ativo</option><option value="paused">🟠 Pausado</option><option value="sold">✅ Vendido</option><option value="archived">⚪ Arquivado</option>
           </select>
@@ -208,33 +208,33 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
 
       {/* Price & Location */}
       <div className="bg-white border border-[var(--color-border-strong)] rounded-xl p-5 space-y-3">
-        <h3 className="font-heading font-bold text-sm text-[var(--color-text-primary)]">Preço e Localização</h3>
-        <div><label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Valor (R$)</label>
-          <input className={`${ic('price')} text-xs md:text-sm`} value={formData.price || ''} onChange={(e) => update('price', e.target.value)} />
-          {errors.price && <p className="text-[10px] font-bold text-[var(--color-danger)] mt-1 ml-1">{errors.price}</p>}
+        <h3 className="font-heading font-bold text-xs text-[var(--color-text-primary)]">Preço e Localização</h3>
+        <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Valor (R$)</label>
+          <input className={`${ic('price')}`} value={formData.price || ''} onChange={(e) => update('price', e.target.value)} />
+          {errors.price && <p className="text-xs font-bold text-[var(--color-danger)] mt-1 ml-1">{errors.price}</p>}
         </div>
         <div className="grid grid-cols-[1fr_70px] gap-3">
-          <div><label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Cidade</label><input className={ic('city')} value={formData.city || ''} onChange={(e) => update('city', e.target.value)} /></div>
-          <div><label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">UF</label><input className={`${ic('state')} text-center`} value={formData.state || ''} maxLength={2} onChange={(e) => update('state', e.target.value.toUpperCase())} /></div>
+          <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Cidade</label><input className={ic('city')} value={formData.city || ''} onChange={(e) => update('city', e.target.value)} /></div>
+          <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">UF</label><input className={`${ic('state')} text-center`} value={formData.state || ''} maxLength={2} onChange={(e) => update('state', e.target.value.toUpperCase())} /></div>
         </div>
-        <div><label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">KM Atual</label>
+        <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">KM Atual</label>
           <input type="number" className={ic('mileage')} value={formatBrazilianInt(formData.mileage)} onChange={(e) => update('mileage', parseBrazilianInt(e.target.value))} />
-          {errors.mileage && <p className="text-[10px] font-bold text-[var(--color-danger)] mt-1 ml-1">{errors.mileage}</p>}
+          {errors.mileage && <p className="text-xs font-bold text-[var(--color-danger)] mt-1 ml-1">{errors.mileage}</p>}
         </div>
       </div>
 
       {/* Specs */}
       <div className="bg-white border border-[var(--color-border-strong)] rounded-xl p-5 space-y-3">
-        <h3 className="font-heading font-bold text-sm text-[var(--color-text-primary)]">Especificações</h3>
+        <h3 className="font-heading font-bold text-xs text-[var(--color-text-primary)]">Especificações</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {([['transmission', 'Câmbio', ['Manual', 'Automático', 'CVT', 'DCT']], ['fuel', 'Combustível', ['Flex', 'Gasolina', 'Etanol', 'Diesel', 'Híbrido', 'Elétrico']], ['engine', 'Motor', null], ['color', 'Cor', null], ['plate_final', 'Placa', null]] as const).map(([f, lbl, opts]) => (
-            <div key={f}><label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">{lbl}</label>
+            <div key={f}><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">{lbl}</label>
               {opts ? <select className={`${ic(f)} appearance-none cursor-pointer text-xs`} value={(formData as any)[f] || ''} onChange={(e) => update(f as any, e.target.value)}>{opts.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                : <input className={ic(f)} value={(formData as any)[f] || ''} maxLength={f === 'plate_final' ? 1 : undefined} onChange={(e) => update(f as any, e.target.value)} />}
             </div>
           ))}
         </div>
-        <div><label className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">VIN (Opcional)</label>
+        <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">VIN (Opcional)</label>
           <div className="relative">
             <input className={`${ic('vin')} pr-20 md:pr-28 font-mono text-xs`} value={formData.vin || ''} maxLength={17} placeholder="17 caracteres" onChange={(e) => update('vin', e.target.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, ''))} />
             <button onClick={onBlurPlates} disabled={isBlurring} className="absolute right-1.5 top-1.5 bottom-1.5 px-3 bg-white rounded-lg text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] flex items-center gap-1 border border-[var(--color-border)]">
@@ -246,11 +246,11 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
 
       {/* Description */}
       <div className="bg-white border border-[var(--color-border-strong)] rounded-xl p-5 space-y-3">
-        <h3 className="font-heading font-bold text-sm text-[var(--color-text-primary)]">Descrição</h3>
+        <h3 className="font-heading font-bold text-xs text-[var(--color-text-primary)]">Descrição</h3>
         <textarea className={`w-full min-h-[120px] p-4 rounded-xl bg-[var(--color-bg)] border-2 border-transparent text-sm font-medium text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)] transition-colors leading-relaxed resize-y ${errors.description ? '!border-[var(--color-danger)]/20 text-[var(--color-danger)]' : ''}`} value={formData.description || ''} onChange={(e) => update('description', e.target.value)} placeholder="Descreva conservação, revisões, opcionais…" />
         <div className="flex justify-between px-1">
-          {errors.description ? <p className="text-[10px] font-bold text-[var(--color-danger)]">{errors.description}</p> : <p className="text-[10px] text-[var(--color-text-disabled)]">Seja transparente.</p>}
-          <p className="text-[10px] text-[var(--color-text-disabled)] font-bold">{(formData.description || '').length} chars</p>
+          {errors.description ? <p className="text-xs font-bold text-[var(--color-danger)]">{errors.description}</p> : <p className="text-xs text-[var(--color-text-disabled)]">Seja transparente.</p>}
+          <p className="text-xs text-[var(--color-text-disabled)] font-bold">{(formData.description || '').length} chars</p>
         </div>
       </div>
 
@@ -367,7 +367,7 @@ export default function MyListingsDashboard() {
     catch (err) { setGlobalError(err instanceof Error ? err.message : 'Erro ao borrar placas') } finally { setIsBlurring(false) }
   }, [selected, loadListings])
 
-  if (!sessionReady) return <div className="flex flex-col items-center justify-center p-12 text-center"><Loader2 className="h-8 w-8 animate-spin text-[var(--color-text-primary)]" /><p className="mt-4 font-heading font-bold text-[var(--color-text-primary)]">Carregando…</p></div>
+  if (!sessionReady) return <div className="flex flex-col items-center justify-center p-12 text-center"><Loader2 className="h-6 w-6 animate-spin text-[var(--color-text-tertiary)]" /><p className="mt-4 text-sm font-medium text-[var(--color-text-tertiary)]">Carregando…</p></div>
   if (!isAuthenticated) return <AuthCard onAuthenticated={() => setIsAuthenticated(true)} />
 
   return (
@@ -382,7 +382,7 @@ export default function MyListingsDashboard() {
           ) : (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center rounded-2xl border border-[var(--color-border-strong)] bg-white p-8 md:p-16 text-center">
               <Car className="h-12 w-12 text-[var(--color-text-disabled)] mb-4" />
-              <h2 className="font-heading font-bold text-xs md:text-sm text-[var(--color-text-primary)]">Selecione um anúncio</h2>
+              <h2 className="font-heading font-bold text-sm text-[var(--color-text-primary)]">Selecione um anúncio</h2>
               <p className="mt-2 text-sm text-[var(--color-text-tertiary)] max-w-xs">Escolha um dos seus veículos para editar detalhes, fotos e preço.</p>
             </motion.div>
           )}

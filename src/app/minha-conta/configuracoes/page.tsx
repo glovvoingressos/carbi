@@ -27,22 +27,22 @@ export default function ConfiguracoesPage() {
     load()
   }, [router])
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="w-6 h-6 animate-spin text-[var(--color-text-secondary)]" /></div>
+  if (loading) return <div className="flex items-center justify-center min-h-dvh bg-[#F7F7F7]"><Loader2 className="w-5 h-5 animate-spin text-[#999]" /></div>
   if (!user) return null
 
   return (
     <AccountLayout user={user}>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="space-y-4">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-full bg-[var(--color-accent)]/15 flex items-center justify-center">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-full bg-[var(--color-accent)]/15 flex items-center justify-center shrink-0">
             <Settings className="w-5 h-5 text-[var(--color-text-secondary)]" strokeWidth={1.5} />
           </div>
           <div>
-            <h1 className="text-xs md:text-sm font-semibold text-[var(--color-text-primary)]">Configurações</h1>
+            <h2 className="text-sm font-semibold text-[var(--color-text-primary)] font-[family-name:var(--font-heading)]">Configurações</h2>
             <p className="text-sm text-[var(--color-text-secondary)]">Preferências da sua conta</p>
           </div>
         </div>
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:border-gray-300 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-[28px] p-5 shadow-[0_18px_50px_rgba(0,0,0,.05)] hover:border-gray-300 transition-colors">
           <div className="flex items-start gap-4">
             <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
               <Shield className="w-5 h-5 text-[var(--color-text-secondary)]" strokeWidth={1.5} />
@@ -53,7 +53,7 @@ export default function ConfiguracoesPage() {
             </div>
           </div>
         </div>
-        <Link href="/minha-conta/notificacoes" className="block bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:border-gray-300 transition-colors">
+        <Link href="/minha-conta/notificacoes" className="block bg-white border border-gray-200 rounded-[28px] p-5 shadow-[0_18px_50px_rgba(0,0,0,.05)] hover:border-gray-300 transition-colors">
           <div className="flex items-start gap-4">
             <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
               <Bell className="w-5 h-5 text-[var(--color-text-secondary)]" strokeWidth={1.5} />

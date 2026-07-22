@@ -256,26 +256,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-text-primary);
 }
 
-h1 {
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-}
-
-h2 {
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-}
-
-h3 {
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: 0;
-}
+/* Font sizes removed — use Tailwind text-* classes per component */
 
 h4 {
   font-size: 1.125rem;
@@ -1082,16 +1063,16 @@ p {
     letter-spacing: 0;
   }
 
-  h1 {
+  :not(.fingen-flow-page):not(.fingen-shell) h1 {
     font-size: clamp(2.1rem, 13vw, 3rem);
     line-height: 0.95;
   }
 
-  h2 {
+  :not(.fingen-flow-page):not(.fingen-shell) h2 {
     font-size: clamp(1.6rem, 9vw, 2.2rem);
   }
 
-  h3 {
+  :not(.fingen-flow-page):not(.fingen-shell) h3 {
     font-size: 1.05rem;
   }
 }
@@ -3427,7 +3408,7 @@ p {
 .ref-ad-right-col { position: sticky; top: 88px; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 .ref-ad-gallery { background: var(--ref-white); border-radius: 24px; overflow: hidden; }
 .ref-ad-gallery-main {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
   width: 100%;
   background: linear-gradient(145deg, #e8eef8, #d0dcf0);
   display: flex;
@@ -7218,6 +7199,8 @@ p {
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
+  color: #FFFFFF;
+  padding: 4px 0;
 }
 
 .comparison-link {
@@ -8880,7 +8863,7 @@ p {
   opacity: 0;
 }
 .cbi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(26,26,26,0.07); border-color: #E0E0DC; }
-.cbi-card-media { position: relative; aspect-ratio: 4/3; overflow: hidden; background: #F4F4F1; }
+.cbi-card-media { position: relative; aspect-ratio: 16/9; overflow: hidden; background: #F4F4F1; }
 .cbi-card-media img, .cbi-card-media > div { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
 .cbi-card:hover .cbi-card-media img, .cbi-card:hover .cbi-card-media > div { transform: scale(1.04); }
 .cbi-card-badge {

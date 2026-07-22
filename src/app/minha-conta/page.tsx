@@ -50,10 +50,10 @@ export default function MinhaContaPage() {
   }, [router])
 
   if (loading) return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-dvh bg-[#F7F7F7]">
       <div className="flex flex-col items-center gap-3">
-        <Loader2 className="w-6 h-6 animate-spin text-[var(--color-text-secondary)]" />
-        <p className="text-sm text-[var(--color-text-secondary)]">Carregando...</p>
+        <Loader2 className="w-5 h-5 animate-spin text-[#999]" />
+        <p className="text-sm text-[#999]">Carregando...</p>
       </div>
     </div>
   )

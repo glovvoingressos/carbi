@@ -2,12 +2,17 @@
 
 import { ChangeEvent, useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { User, Mail, Phone, Lock, Camera, Save, Loader2, ChevronDown, AlertTriangle } from 'lucide-react'
+import { User, Mail, Phone, Lock, Camera, Save, Loader2, ChevronDown, AlertTriangle, Eye, EyeOff } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -12 }, transition: { duration: 0.2 } }
-const INPUT = 'w-full px-5 py-3.5 rounded-[20px] border border-[#ECECEC] bg-white text-[15px] text-[#111111] placeholder:text-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent,#111111)]/10 focus:border-[var(--color-accent,#111111)] transition-all duration-200'
-const LABEL = 'block text-[13px] font-semibold text-[#7A7A7A] mb-2'
+
+/* ── Consistent design tokens ── */
+const CARD = 'bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] p-5 sm:p-7'
+const INPUT = 'w-full px-4 py-3 rounded-2xl border border-[#ECECEC] bg-white text-sm text-[#111] placeholder:text-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/30 focus:border-[var(--color-accent)] transition-all duration-200 min-h-[44px]'
+const LABEL = 'block text-xs font-semibold text-[#7A7A7A] mb-1.5'
+const ICON_BTN = 'absolute right-3 top-1/2 -translate-y-1/2 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-[#7A7A7A] hover:text-[#111] transition-colors rounded-full'
+
 const formatPhone = (v: string) => {
   const d = v.replace(/\D/g, '').slice(0, 11)
   return d.length <= 10
@@ -37,16 +42,17 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
   }
 
   return (
-    <motion.div {...fade} className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] p-7 flex items-center gap-6">
+    <motion.div {...fade} className={`${CARD} flex items-center gap-4 sm:gap-6`}>
       <div className="relative group shrink-0">
-        <div className="w-24 h-24 rounded-full overflow-hidden bg-[var(--color-bg,#F7F7F7)] border-2 border-[var(--color-border,#ECECEC)]">
+        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-[var(--color-bg,#F7F7F7)] border-2 border-[var(--color-border,#ECECEC)]">
           {avatarUrl
             ? <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-            : <div className="w-full h-full flex items-center justify-center"><User className="w-10 h-10 text-[#C8C8C8]" strokeWidth={1.25} /></div>}
+            : <div className="w-full h-full flex items-center justify-center"><User className="w-8 h-8 sm:w-10 sm:h-10 text-[#C8C8C8]" strokeWidth={1.25} /></div>}
         </div>
-        <label className="absolute inset-0 rounded-full bg-black/30 backdrop-blur-sm opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity duration-200">
+        <label htmlFor="avatar-upload" className="absolute inset-0 rounded-full bg-black/30 backdrop-blur-sm opacity-0 group-hover:opacity-100 focus-within:opacity-100 flex items-center justify-center cursor-pointer transition-opacity duration-200">
           <Camera className="w-5 h-5 text-white" strokeWidth={1.75} />
-          <input type="file" className="hidden" accept="image/png,image/jpeg,image/webp" onChange={upload} />
+          <span className="sr-only">Alterar foto do perfil</span>
+          <input id="avatar-upload" type="file" className="hidden" accept="image/png,image/jpeg,image/webp" onChange={upload} />
         </label>
         {uploading && (
           <div className="absolute inset-0 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
@@ -55,7 +61,7 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
         )}
       </div>
       <div className="min-w-0">
-        <p className="text-base font-bold text-[#111111] truncate">{fullName || 'Seu nome'}</p>
+        <p className="text-base font-bold text-[#111] truncate">{fullName || 'Seu nome'}</p>
         <p className="text-sm text-[#7A7A7A] mt-0.5 truncate">{email}</p>
       </div>
     </motion.div>
@@ -68,9 +74,9 @@ function PersonalInfo({ fullName, email, phone, onNameChange, onPhoneChange }: {
   onNameChange: (v: string) => void; onPhoneChange: (v: string) => void
 }) {
   return (
-    <motion.div {...fade} className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] p-7">
-      <h3 className="text-[20px] font-bold text-[#111111] mb-6">Informações pessoais</h3>
-      <div className="space-y-5">
+    <motion.div {...fade} className={CARD}>
+      <h2 className="text-sm font-bold text-[#111] mb-5 font-[family-name:var(--font-heading)]">Informações pessoais</h2>
+      <div className="space-y-4">
         <div>
           <label className={LABEL}>Nome completo</label>
           <input value={fullName} onChange={(e) => onNameChange(e.target.value)} placeholder="Ex: João Silva" className={INPUT} />
@@ -78,15 +84,15 @@ function PersonalInfo({ fullName, email, phone, onNameChange, onPhoneChange }: {
         <div>
           <label className={LABEL}>E-mail</label>
           <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#C0C0C0] pointer-events-none" strokeWidth={1.5} />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C0C0C0] pointer-events-none" strokeWidth={1.5} />
             <input value={email} disabled className={`${INPUT} pl-11 bg-[#F7F7F7] opacity-60 cursor-not-allowed`} />
           </div>
         </div>
         <div>
           <label className={LABEL}>Telefone</label>
           <div className="relative">
-            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#C0C0C0] pointer-events-none" strokeWidth={1.5} />
-            <input value={phone} onChange={(e) => onPhoneChange(formatPhone(e.target.value))} placeholder="(00) 00000-0000" maxLength={15} className={`${INPUT} pl-11`} />
+            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C0C0C0] pointer-events-none" strokeWidth={1.5} />
+            <input value={phone} onChange={(e) => onPhoneChange(formatPhone(e.target.value))} placeholder="(00) 00000-0000" inputMode="tel" maxLength={15} className={`${INPUT} pl-11`} />
           </div>
         </div>
       </div>
@@ -100,6 +106,8 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
   const [newPw, setNewPw] = useState('')
   const [confirmPw, setConfirmPw] = useState('')
   const [saving, setSaving] = useState(false)
+  const [showNewPw, setShowNewPw] = useState(false)
+  const [showConfirmPw, setShowConfirmPw] = useState(false)
 
   const changePw = async () => {
     if (newPw !== confirmPw || newPw.length < 8) return
@@ -114,33 +122,45 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
   }
 
   return (
-    <motion.div {...fade} className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] p-7">
-      <h3 className="text-[20px] font-bold text-[#111111] mb-6">Segurança</h3>
+    <motion.div {...fade} className={CARD}>
+      <h2 className="text-sm font-bold text-[#111] mb-5 font-[family-name:var(--font-heading)]">Segurança</h2>
       <button type="button" onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-5 py-4 rounded-[20px] border border-[#ECECEC] text-[15px] font-medium text-[#111111] hover:bg-[#F7F7F7] transition-colors duration-200">
-        <span className="flex items-center gap-3"><Lock className="w-[18px] h-[18px] text-[#7A7A7A]" strokeWidth={1.5} /> Alterar senha</span>
-        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}><ChevronDown className="w-[18px] h-[18px] text-[#7A7A7A]" strokeWidth={1.5} /></motion.span>
+        className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border border-[#ECECEC] text-sm font-medium text-[#111] hover:bg-[#F7F7F7] transition-colors duration-200 min-h-[44px]">
+        <span className="flex items-center gap-3"><Lock className="w-4 h-4 text-[#7A7A7A]" strokeWidth={1.5} /> Alterar senha</span>
+        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}><ChevronDown className="w-4 h-4 text-[#7A7A7A]" strokeWidth={1.5} /></motion.span>
       </button>
       <AnimatePresence>
         {open && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className="overflow-hidden">
-            <div className="pt-5 space-y-4">
+            <div className="pt-4 space-y-4">
               <div>
                 <label className={LABEL}>Nova senha</label>
-                <input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="Mínimo 8 caracteres" className={INPUT} />
+                <div className="relative">
+                  <input type={showNewPw ? 'text' : 'password'} value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="Mínimo 8 caracteres" className={`${INPUT} pr-14`} />
+                  <button type="button" onClick={() => setShowNewPw(!showNewPw)} className={ICON_BTN} aria-label={showNewPw ? 'Ocultar senha' : 'Mostrar senha'}>
+                    {showNewPw ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
+                  </button>
+                </div>
               </div>
               <div>
                 <label className={LABEL}>Confirmar senha</label>
-                <input type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="Repita a senha" className={INPUT} />
+                <div className="relative">
+                  <input type={showConfirmPw ? 'text' : 'password'} value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="Repita a senha" className={`${INPUT} pr-14`} />
+                  <button type="button" onClick={() => setShowConfirmPw(!showConfirmPw)} className={ICON_BTN} aria-label={showConfirmPw ? 'Ocultar senha' : 'Mostrar senha'}>
+                    {showConfirmPw ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
+                  </button>
+                </div>
               </div>
-              {newPw && confirmPw && newPw !== confirmPw && <p className="text-[13px] font-medium text-[var(--color-danger,#DC2626)]">As senhas não coincidem.</p>}
+              {newPw && confirmPw && newPw !== confirmPw && (
+                <p className="text-xs font-medium text-[var(--color-danger,#DC2626)]">As senhas não coincidem.</p>
+              )}
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={changePw} disabled={saving || newPw.length < 8 || newPw !== confirmPw}
-                  className="flex items-center gap-2 px-5 py-3 rounded-full bg-[#111111] text-white text-[14px] font-semibold hover:bg-[#2D2D2D] disabled:opacity-40 transition-all duration-200">
+                  className="flex items-center gap-2 px-5 py-3 rounded-full bg-[#111] text-white text-sm font-semibold hover:bg-[#2D2D2D] disabled:opacity-40 transition-all duration-200 min-h-[44px]">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar
                 </button>
                 <button type="button" onClick={() => { setOpen(false); setNewPw(''); setConfirmPw('') }}
-                  className="px-5 py-3 rounded-full border border-[#ECECEC] text-[14px] font-medium text-[#7A7A7A] hover:bg-[#F7F7F7] transition-colors duration-200">
+                  className="px-5 py-3 rounded-full border border-[#ECECEC] text-sm font-medium text-[#7A7A7A] hover:bg-[#F7F7F7] transition-colors duration-200 min-h-[44px]">
                   Cancelar
                 </button>
               </div>
@@ -156,37 +176,39 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
 function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
   const [show, setShow] = useState(false)
   const [delText, setDelText] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   const deleteAccount = async () => {
+    setDeleting(true)
     try {
       const sb = getSupabaseBrowserClient()
       await sb.from('users').delete().eq('id', userId)
       await sb.auth.signOut()
       window.location.href = '/'
-    } catch (e) { toast('error', e instanceof Error ? e.message : 'Não foi possível excluir a conta.') }
+    } catch (e) { toast('error', e instanceof Error ? e.message : 'Não foi possível excluir a conta.'); setDeleting(false) }
   }
 
   return (
-    <motion.div {...fade} className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] p-7">
-      <h3 className="text-[20px] font-bold text-[var(--color-danger,#DC2626)] mb-3">Excluir conta</h3>
-      <p className="text-[14px] text-[#7A7A7A] mb-5 leading-relaxed">Essa ação é permanente e não pode ser desfeita.</p>
+    <motion.div {...fade} className={CARD}>
+      <h2 className="text-sm font-bold text-[var(--color-danger,#DC2626)] mb-2 font-[family-name:var(--font-heading)]">Excluir conta</h2>
+      <p className="text-sm text-[#7A7A7A] mb-4 leading-relaxed">Essa ação é permanente e não pode ser desfeita.</p>
       {!show ? (
         <button type="button" onClick={() => setShow(true)}
-          className="flex items-center gap-2.5 px-5 py-3.5 rounded-full border border-[var(--color-danger,#DC2626)]/25 text-[14px] font-semibold text-[var(--color-danger,#DC2626)] hover:bg-[var(--color-danger,#DC2626)]/5 transition-colors duration-200">
+          className="flex items-center gap-2.5 px-5 py-3 rounded-full border border-[var(--color-danger,#DC2626)]/25 text-sm font-semibold text-[var(--color-danger,#DC2626)] hover:bg-[var(--color-danger,#DC2626)]/5 transition-colors duration-200 min-h-[44px]">
           <AlertTriangle className="w-4 h-4" /> Excluir conta
         </button>
       ) : (
-        <motion.div {...fade} className="p-5 rounded-[20px] border border-[var(--color-danger,#DC2626)]/20 bg-[var(--color-danger,#DC2626)]/5">
-          <p className="text-[14px] font-semibold text-[var(--color-danger,#DC2626)] mb-3">Digite &quot;EXCLUIR&quot; para confirmar:</p>
-          <input value={delText} onChange={(e) => setDelText(e.target.value)} placeholder="EXCLUIR"
-            className={`${INPUT} border-[var(--color-danger,#DC2626)]/25 focus:ring-[var(--color-danger,#DC2626)]/10 mb-4`} />
-          <div className="flex gap-3">
-            <button type="button" onClick={deleteAccount} disabled={delText !== 'EXCLUIR'}
-              className="flex items-center gap-2 px-5 py-3 rounded-full bg-[var(--color-danger,#DC2626)] text-white text-[14px] font-semibold hover:bg-[#B91C1C] disabled:opacity-40 transition-all duration-200">
-              <AlertTriangle className="w-4 h-4" /> Confirmar exclusão
+        <motion.div {...fade} className="p-4 sm:p-5 rounded-2xl border border-[var(--color-danger,#DC2626)]/20 bg-[var(--color-danger,#DC2626)]/5">
+          <label htmlFor="confirm-delete" className="block text-sm font-semibold text-[var(--color-danger,#DC2626)] mb-2">Digite &quot;EXCLUIR&quot; para confirmar:</label>
+          <input id="confirm-delete" value={delText} onChange={(e) => setDelText(e.target.value)} placeholder="EXCLUIR"
+            className={`${INPUT} border-[var(--color-danger,#DC2626)]/25 focus:ring-[var(--color-danger,#DC2626)]/30 mb-4`} />
+          <div className="flex flex-wrap gap-3">
+            <button type="button" onClick={deleteAccount} disabled={delText !== 'EXCLUIR' || deleting}
+              className="flex items-center gap-2 px-5 py-3 rounded-full bg-[var(--color-danger,#DC2626)] text-white text-sm font-semibold hover:bg-[#B91C1C] disabled:opacity-40 transition-all duration-200 min-h-[44px]">
+              {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />} {deleting ? 'Excluindo...' : 'Confirmar exclusão'}
             </button>
             <button type="button" onClick={() => { setShow(false); setDelText('') }}
-              className="px-5 py-3 rounded-full border border-[#ECECEC] text-[14px] font-medium text-[#7A7A7A] hover:bg-[#F7F7F7] transition-colors duration-200">
+              className="px-5 py-3 rounded-full border border-[#ECECEC] text-sm font-medium text-[#7A7A7A] hover:bg-[#F7F7F7] transition-colors duration-200 min-h-[44px]">
               Cancelar
             </button>
           </div>
@@ -253,7 +275,7 @@ export default function ProfilePanel() {
   }
 
   if (loading) return (
-    <div className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] p-8 flex flex-col items-center gap-3">
+    <div className={`${CARD} flex flex-col items-center gap-3`}>
       <Loader2 className="h-5 w-5 animate-spin text-[#7A7A7A]" />
       <p className="text-sm text-[#7A7A7A]">Carregando perfil...</p>
     </div>
@@ -261,11 +283,12 @@ export default function ProfilePanel() {
   if (!userId) return null
 
   return (
-    <section className="space-y-5 max-w-[520px]">
+    <section className="space-y-4">
       <AnimatePresence>
         {toast && (
           <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
-            className={`fixed top-6 right-6 z-50 px-6 py-3.5 rounded-full text-[14px] font-semibold shadow-[0_18px_50px_rgba(0,0,0,.12)] ${toast.type === 'success' ? 'bg-[var(--color-success,#16A34A)] text-white' : 'bg-[var(--color-danger,#DC2626)] text-white'}`}>
+            role="status" aria-live="polite"
+            className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-full text-sm font-semibold shadow-[0_18px_50px_rgba(0,0,0,.12)] max-w-[calc(100vw-48px)] ${toast.type === 'success' ? 'bg-[var(--color-success,#16A34A)] text-white' : 'bg-[var(--color-danger,#DC2626)] text-white'}`}>
             {toast.message}
           </motion.div>
         )}
@@ -276,8 +299,8 @@ export default function ProfilePanel() {
       <SecuritySection userId={userId} toast={showToast} />
 
       <motion.button {...fade} type="button" onClick={saveProfile} disabled={saving || uploading}
-        className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-full bg-[#111111] text-white text-[15px] font-semibold hover:bg-[#2D2D2D] disabled:opacity-40 transition-all duration-200 shadow-[0_8px_24px_rgba(0,0,0,.12)]">
-        {saving ? <Loader2 className="w-[18px] h-[18px] animate-spin" /> : <Save className="w-[18px] h-[18px]" />}
+        className="w-full flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full bg-[#111] text-white text-sm font-semibold hover:bg-[#2D2D2D] disabled:opacity-40 transition-all duration-200 shadow-[0_8px_24px_rgba(0,0,0,.12)] min-h-[48px]">
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
         {saving ? 'Salvando...' : 'Salvar alterações'}
       </motion.button>
 
