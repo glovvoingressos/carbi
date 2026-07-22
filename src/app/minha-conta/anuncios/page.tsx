@@ -1,27 +1,36 @@
-import { Metadata } from 'next'
-import MyListingsDashboard from '@/components/marketplace/MyListingsDashboard'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Meus anúncios | Carbi',
-  description: 'Gerencie seus anúncios com edição real de preço, descrição e fotos.',
-  robots: {
-    index: false,
-    follow: false,
-  },
-}
+import AccountLayout from '@/components/marketplace/AccountLayout'
+import MyListingsDashboard from '@/components/marketplace/MyListingsDashboard'
+import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
 
 export default function MyListingsPage() {
+  const router = useRouter()
+  const [user, setUser] = useState<{ email: string; fullName: string; avatarUrl: string } | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!isSupabaseBrowserConfigured()) { router.replace('/entrar'); return }
+    const supabase = getSupabaseBrowserClient()
+    const load = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) { router.replace('/entrar?redirect=/minha-conta/anuncios'); return }
+      const { data } = await supabase.from('users').select('full_name,avatar_url').eq('id', session.user.id).maybeSingle()
+      setUser({ email: session.user.email || '', fullName: data?.full_name || '', avatarUrl: data?.avatar_url || '' })
+      setLoading(false)
+    }
+    load()
+  }, [router])
+
+  if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="w-6 h-6 animate-spin text-[var(--color-text-secondary)]" /></div>
+  if (!user) return null
+
   return (
-    <main className="min-h-screen pb-16 pt-28">
-      <div className="container max-w-6xl">
-        <div className="hero-bento p-8 sm:p-12 mb-6">
-          <h1 className="mt-3 text-balance">Meus anúncios</h1>
-          <p className="mt-3 text-lg font-medium text-[#52607A]">
-            Ajuste seu anúncio em tempo real: título, preço, descrição e fotos.
-          </p>
-        </div>
-        <MyListingsDashboard />
-      </div>
-    </main>
+    <AccountLayout user={user}>
+      <MyListingsDashboard />
+    </AccountLayout>
   )
 }
