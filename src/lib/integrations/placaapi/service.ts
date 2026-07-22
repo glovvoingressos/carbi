@@ -42,13 +42,16 @@ export async function lookupPlate(plate: string): Promise<PlacaLookupResult> {
       dataAtualizacao: data.data || '',
     }
 
-    // Extract FIPE data if available
-    const fipeData = data.fipe?.dados?.[0]
-    if (fipeData) {
-      const priceStr = fipeData.texto_valor || ''
+    // Extract FIPE data - pick the best match (highest score)
+    const fipeEntries = data.fipe?.dados
+    if (fipeEntries && Array.isArray(fipeEntries) && fipeEntries.length > 0) {
+      // Sort by score descending to get best match
+      const sorted = [...fipeEntries].sort((a, b) => (b.score || 0) - (a.score || 0))
+      const bestMatch = sorted[0]
+      const priceStr = bestMatch.texto_valor || ''
       const priceNum = parseFloat(priceStr.replace(/[^\d,]/g, '').replace(',', '.'))
       vehicleData.fipe_price = priceNum || null
-      vehicleData.fipe_reference_month = fipeData.mes_referencia || null
+      vehicleData.fipe_reference_month = bestMatch.mes_referencia || null
     }
 
     // If no FIPE from API, try our own FIPE lookup
