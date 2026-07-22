@@ -35,9 +35,10 @@ const fade = {
 interface AccountLayoutProps {
   children: React.ReactNode
   user: { email: string; fullName: string; avatarUrl: string }
+  stats?: { label: string; value: string | number; icon: any }[]
 }
 
-export default function AccountLayout({ children, user }: AccountLayoutProps) {
+export default function AccountLayout({ children, user, stats = [] }: AccountLayoutProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [loggingOut, setLoggingOut] = useState(false)
@@ -57,10 +58,10 @@ export default function AccountLayout({ children, user }: AccountLayoutProps) {
 
   return (
     <div className="min-h-screen bg-[#F7F7F7] pb-16 pt-0">
-      <div className="relative h-44 bg-gradient-to-br from-[#E8E0F0] via-[#D6E4F0] to-[#F0E0D0]">
+      <div className="relative h-44 md:h-52 bg-gradient-to-br from-[#E8E0F0] via-[#D6E4F0] to-[#F0E0D0]">
         <div className="absolute inset-0 bg-gradient-to-t from-[#F7F7F7] via-transparent to-transparent" />
       </div>
-      <div className="relative max-w-2xl mx-auto px-4 -mt-16 z-10">
+      <div className="relative max-w-2xl lg:max-w-4xl mx-auto px-4 -mt-16 z-10">
         <div className="flex justify-center mb-4">
           <div className="w-24 h-24 rounded-full border-[4px] border-white bg-white shadow-[0_8px_30px_rgba(0,0,0,0.08)] overflow-hidden flex items-center justify-center">
             {user.avatarUrl ? (
