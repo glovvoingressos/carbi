@@ -8,6 +8,7 @@ import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import { trackEvent } from '@/lib/analytics'
 import AuthCard from '@/components/marketplace/AuthCard'
+import PlateInput from '@/components/marketplace/PlateInput'
 import {
   LISTING_ALLOWED_TYPES,
   LISTING_MAX_IMAGES,
@@ -978,7 +979,7 @@ export default function ListingForm() {
             <div>
               <h3 className="fingen-flow-card-title max-[330px]:text-[18px]">Selecione seu veículo</h3>
               <p className="fingen-flow-card-desc max-[330px]:text-[13px]">
-                Vamos guiar você passo a passo. Comece escolhendo a marca.
+                Comece pela placa. Com ela puxamos todos os dados automaticamente.
               </p>
             </div>
 
@@ -1000,217 +1001,82 @@ export default function ListingForm() {
               ))}
             </div>
             <div className="flex justify-between text-[11px] font-medium text-[#767676] -mt-2">
-              <span className={listingSubStep >= 1 ? 'text-[#1A1A1A]' : ''}>Marca</span>
-              <span className={listingSubStep >= 2 ? 'text-[#1A1A1A]' : ''}>Modelo</span>
-              <span className={listingSubStep >= 3 ? 'text-[#1A1A1A]' : ''}>Ano</span>
-              <span className={listingSubStep >= 4 ? 'text-[#1A1A1A]' : ''}>Versão</span>
+              <span className={listingSubStep >= 1 ? 'text-[#1A1A1A]' : ''}>Placa</span>
+              <span className={listingSubStep >= 2 ? 'text-[#1A1A1A]' : ''}>Ano</span>
+              <span className={listingSubStep >= 3 ? 'text-[#1A1A1A]' : ''}>Versão</span>
+              <span className={listingSubStep >= 4 ? 'text-[#1A1A1A]' : ''}>Confirmar</span>
             </div>
 
             <input type="hidden" value={form.vehicle_type} />
 
-            {/* Sub-step 1: Brand */}
+            {/* Sub-step 1: Plate Lookup */}
             {listingSubStep === 1 && (
               <div className="fingen-flow-substep-card p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="fingen-flow-field-label">Marca</p>
+                  <p className="fingen-flow-field-label">Placa do veículo</p>
                   <span className="fingen-flow-badge-accent text-[10px]">Passo 1 de 4</span>
                 </div>
-                <select
-                  id="listing-brand"
-                  className="fingen-flow-input text-[15px]"
-                  value={selectedBrandCode}
-                  onChange={(e) => {
-                    const code = e.target.value
-                    setSelectedBrandCode(code)
-                    const selected = brands.find((item) => item.code === code)
-                    handleInput('brand', selected?.name || '')
-                  }}
-                  aria-label="Marca do veículo"
-                >
-                  <option value="">Selecione a marca</option>
-                  {brands.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
-                </select>
-                {selectedBrandCode && (
-                  <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
-                    Continuar
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                )}
+                <p className="text-[13px] text-[#767676]">Digite a placa para preencher marca, modelo e dados automaticamente.</p>
+                <PlateInput onPlateFound={(data: { brand: string; model: string; year: number; yearModel: number; color: string; fuel: string; engine: string; transmission: string; bodyType: string; plate: string; fipePrice?: number | null; fipeReference?: string | null }) => {
+                  handleInput('brand', data.brand)
+                  handleInput('model', data.model)
+                  handleInput('year', String(data.year))
+                  handleInput('yearModel', String(data.yearModel))
+                  handleInput('color', data.color)
+                  handleInput('fuel', data.fuel)
+                  handleInput('engine', data.engine)
+                  handleInput('transmission', data.transmission)
+                  handleInput('bodyType', data.bodyType)
+                  handleInput('plateFinal', data.plate)
+                }} />
+                <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
+                  Continuar <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             )}
 
-            {/* Sub-step 2: Model */}
+            {/* Sub-step 2: Confirm auto-filled data */}
             {listingSubStep === 2 && (
               <div className="fingen-flow-substep-card p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="fingen-flow-field-label">Modelo</p>
-                  <span className="fingen-flow-badge-accent text-[10px]">Passo 2 de 4</span>
+                  <p className="fingen-flow-field-label">Dados do veículo</p>
+                  <span className="fingen-flow-badge-accent text-[10px]">Verifique</span>
                 </div>
-                <select
-                  id="listing-model"
-                  className="fingen-flow-input text-[15px]"
-                  value={selectedModelCode}
-                  onChange={(e) => {
-                    const code = e.target.value
-                    setSelectedModelCode(code)
-                    const selected = models.find((item) => item.code === code)
-                    const rawName = selected?.name || ''
-                    handleInput('model', resolveCatalogModelName(form.brand, rawName))
-                  }}
-                  disabled={models.length === 0}
-                  aria-label="Modelo do veículo"
-                >
-                  <option value="">Selecione o modelo</option>
-                  {models.map((item) => <option key={item.code} value={item.code}>{item.name}</option>)}
-                </select>
-                {selectedModelCode && (
-                  <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
-                    Continuar
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                )}
+                <p className="text-[13px] text-[#767676]">Revise os dados abaixo. Altere o que precisar.</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-medium text-[#767676]">Marca</label>
+                    <input className="fingen-flow-input text-[14px] mt-1" value={form.brand} onChange={(e) => handleInput('brand', e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-medium text-[#767676]">Modelo</label>
+                    <input className="fingen-flow-input text-[14px] mt-1" value={form.model} onChange={(e) => handleInput('model', e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-medium text-[#767676]">Ano</label>
+                    <input className="fingen-flow-input text-[14px] mt-1" value={form.year} onChange={(e) => handleInput('year', e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-medium text-[#767676]">Cor</label>
+                    <input className="fingen-flow-input text-[14px] mt-1" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-medium text-[#767676]">Combustível</label>
+                    <input className="fingen-flow-input text-[14px] mt-1" value={form.fuel} onChange={(e) => handleInput('fuel', e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-medium text-[#767676]">Câmbio</label>
+                    <input className="fingen-flow-input text-[14px] mt-1" value={form.transmission} onChange={(e) => handleInput('transmission', e.target.value)} />
+                  </div>
+                </div>
+                <button type="button" onClick={() => { setCurrentStep(2); setListingSubStep(1); }} className="fingen-flow-btn-primary w-full mt-2">
+                  Continuar para preço e fotos <ArrowRight className="h-4 w-4" />
+                </button>
+                <button type="button" onClick={() => setListingSubStep(1)} className="w-full text-center text-[13px] text-[#767676] font-medium mt-1 hover:text-[#1A1A1A]">
+                  Voltar e consultar outra placa
+                </button>
               </div>
             )}
-
-            {/* Sub-step 3: Year */}
-            {listingSubStep === 3 && (
-              <div className="fingen-flow-substep-card p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="fingen-flow-field-label">Ano</p>
-                  <span className="fingen-flow-badge-accent text-[10px]">Passo 3 de 4</span>
-                </div>
-                <select
-                  id="listing-year"
-                  className="fingen-flow-input text-[15px]"
-                  value={selectedYear ?? ''}
-                  onChange={(e) => {
-                    const code = e.target.value
-                    setSelectedYear(Number(code))
-                    setSelectedVersionCode('')
-                    handleInput('year', code)
-                    handleInput('yearModel', code)
-                  }}
-                  aria-label="Ano do veículo"
-                >
-                  <option value="">Selecione o ano</option>
-                  {years.map((year) => <option key={year} value={year}>{year}</option>)}
-                </select>
-                {selectedYear && (
-                  <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
-                    Continuar
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Sub-step 4: Version + FIPE */}
-            {listingSubStep === 4 && (
-              <div className="space-y-4 animate-fade-in">
-                <div className="fingen-flow-substep-card p-5 space-y-4 max-[330px]:p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="fingen-flow-field-label">Versões disponíveis</p>
-                    <span className="fingen-flow-badge-accent text-[10px]">Passo 4 de 4</span>
-                  </div>
-                  <div className="fingen-flow-fipe-summary p-4 flex flex-wrap items-center gap-x-6 gap-y-2 max-[330px]:p-3">
-                    <div>
-                      <span className="fingen-flow-fipe-summary-label">Marca</span>
-                      <p className="text-sm font-bold text-[#1A1A1A]">{form.brand || '-'}</p>
-                    </div>
-                    <div>
-                      <span className="fingen-flow-fipe-summary-label">Modelo</span>
-                      <p className="text-sm font-bold text-[#1A1A1A]">{form.model || '-'}</p>
-                    </div>
-                    <div>
-                      <span className="fingen-flow-fipe-summary-label">Ano</span>
-                      <p className="text-sm font-bold text-[#1A1A1A]">{form.year || '-'}</p>
-                    </div>
-                  </div>
-                  {versions.length > 0 ? (
-                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                      {versions.map((v) => (
-                        <button
-                          key={v.code}
-                          type="button"
-                          onClick={() => {
-                            setSelectedVersionCode(v.code)
-                            handleInput('version', v.name)
-                            handleInput('title', `${form.brand} ${form.model} ${form.yearModel} ${v.name}`.trim())
-                          }}
-                          className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                            selectedVersionCode === v.code
-                              ? 'border-[#1A1A1A] bg-[#1A1A1A]/5 shadow-sm'
-                              : 'border-[#EAEAE8] hover:border-[#1A1A1A]/30 bg-white'
-                          }`}
-                        >
-                          <p className="text-[14px] font-bold text-[#1A1A1A]">{v.name}</p>
-                          {v.code !== selectedVersionCode && selectedVersionCode && (
-                            <p className="text-[11px] text-[#767676] mt-0.5">Clique para selecionar</p>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  ) : fipeLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin text-[#767676]" />
-                      <span className="ml-3 text-sm text-[#525252]">Carregando versões...</span>
-                    </div>
-                  ) : (
-                    <div className="text-center py-6 space-y-3">
-                      <p className="text-sm text-[#525252]">Nenhuma versão encontrada para esta combinação.</p>
-                      <label htmlFor="listing-version-manual" className="sr-only">Versão do veículo</label>
-                      <input
-                        id="listing-version-manual"
-                        className="fingen-flow-input text-center"
-                        placeholder="Informe a versão do veículo"
-                        value={form.version}
-                        onChange={(e) => handleInput('version', e.target.value)}
-                        aria-label="Versão do veículo"
-                      />
-                      <button type="button" onClick={prevStep} className="text-sm text-[#D4F576] font-medium mt-2 hover:underline min-h-[44px] px-4">
-                        Voltar e escolher outro ano
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-            <div className="fingen-flow-fipe-card p-8 relative overflow-hidden max-[330px]:p-4">
-              <div className="fingen-flow-fipe-card-deco" />
-              <div className="flex items-center justify-between gap-3 mb-6 max-[330px]:mb-4 max-[330px]:gap-2">
-                <p className="fingen-flow-fipe-card-title max-[330px]:text-[16px]">Referência FIPE</p>
-                <span className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest shadow-sm max-[330px]:px-3 max-[330px]:py-1.5 ${hasAskingPrice && comparison.status === 'below' ? 'fingen-flow-fipe-badge-below' : hasAskingPrice && comparison.status === 'above' ? 'fingen-flow-fipe-badge-above' : hasAskingPrice && comparison.status === 'near' ? 'fingen-flow-fipe-badge-near' : 'fingen-flow-fipe-badge-pending'}`}>
-                  {!hasAskingPrice && 'Preço pendente'}
-                  {hasAskingPrice && comparison.status === 'below' && 'Abaixo'}
-                  {hasAskingPrice && comparison.status === 'near' && 'Próximo'}
-                  {hasAskingPrice && comparison.status === 'above' && 'Acima'}
-                  {hasAskingPrice && comparison.status === 'unknown' && 'Sem ref.'}
-                </span>
-              </div>
-              {!selectedYear ? (
-                <p className="text-sm font-medium text-[#525252] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8] max-[330px]:text-[13px] max-[330px]:p-3">Complete marca, modelo e ano para carregar os dados automáticos.</p>
-              ) : fipeLoading ? (
-                <p className="text-sm font-medium text-[#D4F576] bg-[#FAFAF9] p-4 rounded-xl border border-[#EAEAE8] flex items-center gap-2 max-[330px]:text-[13px] max-[330px]:p-3"><Loader2 className="w-4 h-4 animate-spin" /> Consultando valor atualizado...</p>
-              ) : fipeResult ? (
-                <div className="grid gap-3 text-sm font-medium text-[#525252] max-[330px]:gap-2.5 max-[330px]:text-[13px]">
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#6F6F6F]">Versão automática:</span> <strong className="text-[#1A1A1A]">{form.version || 'Não informada'}</strong></div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#6F6F6F]">Preço FIPE:</span> <strong className="text-[#1A1A1A]">{fipeResult.price}</strong></div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#6F6F6F]">Seu anúncio:</span> <strong className="text-[#1A1A1A]">{hasAskingPrice ? formatBRL(priceNumber) : 'Informe o preço na próxima etapa'}</strong></div>
-                  {hasAskingPrice ? (
-                    <>
-                      <div className="flex justify-between items-center py-2 border-b border-[#EAEAE8]"><span className="text-[#6F6F6F]">Diferença:</span> <strong className="text-[#1A1A1A]">{comparison.diffValue === null ? '-' : formatBRL(comparison.diffValue)}</strong></div>
-                      <div className="flex justify-between items-center py-2"><span className="text-[#6F6F6F]">Percentual:</span> <strong className="text-[#1A1A1A]">{comparison.diffPercent === null ? '-' : `${comparison.diffPercent.toFixed(2)}%`}</strong></div>
-                    </>
-                  ) : null}
-                </div>
-              ) : (
-                <p className="text-sm font-medium text-red-700 bg-red-50 p-4 rounded-xl border border-red-200">
-                  Não foi possível carregar referência FIPE para essa combinação, mas você pode continuar normalmente.
-                </p>
-              )}
-            </div>
-              </div>
-        )}
-
           </div>
         )}
 
