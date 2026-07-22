@@ -7178,7 +7178,7 @@ p {
 .comparison-card {
   margin: 48px 0;
   padding: 32px;
-  background: linear-gradient(135deg, #1A1A1A 0%, #0D1F12 50%, #1A2F1E 100%);
+  background: #1A2F1E;
   border-radius: 24px;
   color: #fff;
   position: relative;
