@@ -18,7 +18,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <section className="auth-hero-card surface-strong">
           <div className="auth-hero-image-wrap">
             <img
-              src="/images/Rendering Porsche 911 GT3 #3D #c4d #redshift #car #porsche #porsche911 #porscheGT3 #design #art #graphic.jpg"
+              src="/images/porsche-hero.jpg"
               alt="Porsche 911 GT3 em movimento"
               className="auth-hero-image"
               loading="eager"
