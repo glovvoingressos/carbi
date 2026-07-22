@@ -51,7 +51,7 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
         {uploading && <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center"><Loader2 className="w-5 h-5 text-white animate-spin" /></div>}
       </div>
       <div>
-        <p className="text-base font-semibold text-[var(--color-text-primary)]">{fullName || 'Seu nome'}</p>
+        <p className="text-sm md:text-base font-semibold text-[var(--color-text-primary)]">{fullName || 'Seu nome'}</p>
         <p className="text-sm text-[var(--color-text-secondary)]">{email}</p>
       </div>
     </div>

@@ -38,7 +38,7 @@ export default function ConfiguracoesPage() {
             <Settings className="w-5 h-5 text-[var(--color-text-secondary)]" strokeWidth={1.5} />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">Configurações</h1>
+            <h1 className="text-base md:text-lg font-semibold text-[var(--color-text-primary)]">Configurações</h1>
             <p className="text-sm text-[var(--color-text-secondary)]">Preferências da sua conta</p>
           </div>
         </div>

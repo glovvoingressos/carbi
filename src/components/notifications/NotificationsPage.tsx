@@ -49,7 +49,7 @@ function NotificationHeader({ unreadCount, onMarkAllRead, markingAll }: { unread
           <Bell size={18} className="text-white" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[var(--color-text-primary)] tracking-tight">Notificações</h1>
+          <h1 className="text-lg md:text-xl font-bold text-[var(--color-text-primary)] tracking-tight">Notificações</h1>
           {unreadCount > 0 && <p className="text-sm text-[var(--color-text-secondary)]">{unreadCount} não lida{unreadCount > 1 ? 's' : ''}</p>}
         </div>
       </div>
@@ -90,7 +90,7 @@ function EmptyState() {
   return (
     <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-20 text-center">
       <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4"><Bell size={28} className="text-gray-400" /></div>
-      <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-1">Nenhuma notificação ainda</h3>
+      <h3 className="text-base md:text-lg font-semibold text-[var(--color-text-primary)] mb-1">Nenhuma notificação ainda</h3>
       <p className="text-sm text-[var(--color-text-secondary)] max-w-xs leading-relaxed">Quando alguém interagir com seus anúncios, você será notificado aqui.</p>
     </motion.div>
   )
