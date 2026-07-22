@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, type DragEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion } from 'motion/react'
 import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2, Check } from 'lucide-react'
 import Link from 'next/link'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
@@ -717,11 +718,9 @@ export default function ListingForm() {
 
   const validateStep = (step: number): string | null => {
     if (step === 1) {
-      if (!form.vehicle_type) {
-        return 'Selecione o tipo de veículo.'
-      }
-      if (!selectedBrandCode || !selectedModelCode || !selectedYear || !form.brand || !form.model || !form.year || !form.yearModel || !form.version.trim()) {
-        return 'Selecione marca, modelo, ano e versão para continuar.'
+      // Step 1 is now plate-based: brand must be filled (from plate or manually)
+      if (!form.brand) {
+        return 'Consulte uma placa ou preencha a marca manualmente.'
       }
     }
 
@@ -983,26 +982,58 @@ export default function ListingForm() {
               </p>
             </div>
 
-            {/* Step indicator */}
+            {/* Step indicator with morphing animation */}
             <div className="flex items-center gap-2">
               {[1, 2].map((s) => (
                 <div key={s} className="flex items-center gap-2 flex-1">
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-[12px] font-bold transition-all ${
-                    listingSubStep === s
-                      ? 'bg-[#1A1A1A] text-white scale-110 shadow-md'
-                      : listingSubStep > s
-                      ? 'bg-[#D4F576] text-[#1A1A1A]'
-                      : 'bg-[#EAEAE8] text-[#767676]'
-                  }`}>
-                    {listingSubStep > s ? <Check className="w-4 h-4" /> : s}
-                  </div>
-                  {s < 2 && <div className={`h-0.5 flex-1 rounded-full transition-colors ${listingSubStep > s ? 'bg-[#D4F576]' : 'bg-[#EAEAE8]'}`} />}
+                  <motion.div
+                    layout
+                    className={`flex items-center justify-center w-8 h-8 rounded-full text-[12px] font-bold ${
+                      listingSubStep === s
+                        ? 'bg-[#1A1A1A] text-white shadow-md'
+                        : listingSubStep > s
+                        ? 'bg-[#D4F576] text-[#1A1A1A]'
+                        : 'bg-[#EAEAE8] text-[#767676]'
+                    }`}
+                    animate={{
+                      scale: listingSubStep === s ? 1.1 : 1,
+                      backgroundColor: listingSubStep === s ? '#1A1A1A' : listingSubStep > s ? '#D4F576' : '#EAEAE8',
+                    }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  >
+                    <motion.div
+                      key={listingSubStep > s ? 'check' : s}
+                      initial={{ scale: 0, rotate: -90 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      exit={{ scale: 0, rotate: 90 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    >
+                      {listingSubStep > s ? <Check className="w-4 h-4" /> : s}
+                    </motion.div>
+                  </motion.div>
+                  {s < 2 && (
+                    <motion.div
+                      className="h-0.5 flex-1 rounded-full"
+                      animate={{
+                        backgroundColor: listingSubStep > s ? '#D4F576' : '#EAEAE8',
+                        scaleX: listingSubStep > s ? 1 : 0,
+                      }}
+                      style={{ transformOrigin: 'left' }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 0.1 }}
+                    />
+                  )}
                 </div>
               ))}
             </div>
             <div className="flex justify-between text-[11px] font-medium text-[#767676] -mt-2">
-              <span className={listingSubStep >= 1 ? 'text-[#1A1A1A]' : ''}>Placa</span>
-              <span className={listingSubStep >= 2 ? 'text-[#1A1A1A]' : ''}>Confirmar</span>
+              <motion.span
+                animate={{ color: listingSubStep >= 1 ? '#1A1A1A' : '#767676' }}
+                transition={{ duration: 0.2 }}
+              >Placa</motion.span>
+              <motion.span
+                animate={{ color: listingSubStep >= 2 ? '#1A1A1A' : '#767676' }}
+                transition={{ duration: 0.2 }}
+              >Confirmar</motion.span>
             </div>
 
             <input type="hidden" value={form.vehicle_type} />
