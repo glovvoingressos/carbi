@@ -14,6 +14,7 @@ import Logo from '@/components/ui/Logo'
 import { GridPattern } from '@/components/ui/grid-pattern'
 import { cn } from '@/lib/utils'
 import { GlareCard } from '@/components/ui/glare-card'
+import BrandLogo from '@/components/brand/BrandLogo'
 
 export const dynamic = 'force-dynamic'
 
@@ -356,7 +357,9 @@ export default async function HomePage() {
                   href={`/carros-a-venda?brand=${encodeURIComponent(brand)}`}
                   className="fingen-brand-chip"
                 >
-                  <div className="fingen-brand-initial">{brandInitials(brand)}</div>
+                  <div className="fingen-brand-logo-wrap">
+                    <BrandLogo brandName={brand} domain={`${brand.toLowerCase().replace(/\s+/g, '')}.com.br`} className="w-full h-full object-contain" />
+                  </div>
                   <div className="fingen-brand-info">
                     <div className="fingen-brand-name">{brand}</div>
                     <div className="fingen-brand-count">{count} anúncio{count === 1 ? '' : 's'}</div>

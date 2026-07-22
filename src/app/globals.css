@@ -7541,6 +7541,19 @@ p {
   flex-shrink: 0;
 }
 
+.fingen-brand-logo-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--color-bg-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 4px;
+}
+
 .fingen-brand-info {
   min-width: 0;
 }
