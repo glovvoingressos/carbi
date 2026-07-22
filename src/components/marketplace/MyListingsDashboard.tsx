@@ -8,7 +8,6 @@ import { LISTING_ALLOWED_TYPES, LISTING_MAX_IMAGES, LISTING_MAX_IMAGE_SIZE_MB, p
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from './MarketplaceListingImage'
-import AIAssistant from './AIAssistant'
 
 interface DashboardImage { id: string; public_url: string; storage_path: string; sort_order: number; is_primary: boolean }
 interface DashboardListing { id: string; slug: string; title: string; description: string; brand: string; model: string; version: string | null; year: number; year_model: number; vin?: string | null; mileage: number; price: number; city: string; state: string; status: string; transmission: string; fuel: string; color: string; body_type: string; optional_items: string[]; engine: string | null; horsepower: number | null; doors: number | null; plate_final: string | null; images: DashboardImage[] | null; view_count?: number }
@@ -371,7 +370,7 @@ export default function MyListingsDashboard() {
         </AnimatePresence>
       </main>
       {globalError && <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] bg-[var(--color-danger)] text-white px-6 py-3 rounded-full font-bold text-sm shadow-xl flex items-center gap-2 animate-in slide-in-from-bottom-8"><AlertCircle className="w-4 h-4" /> {globalError}<button onClick={() => setGlobalError(null)} className="ml-3 opacity-60 hover:opacity-100" aria-label="Fechar">✕</button></div>}
-      <AIAssistant onApply={(data) => { setFormData((p) => ({ ...p, title: data.title, description: data.description, brand: data.brand, model: data.model, year: data.year })); setIsDirty(true) }} />
+
       <style jsx global>{`.custom-scrollbar::-webkit-scrollbar{width:4px;height:4px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(0,0,0,.05);border-radius:10px}@media(max-width:1024px){.no-scrollbar-mobile::-webkit-scrollbar{display:none}.no-scrollbar-mobile{-ms-overflow-style:none;scrollbar-width:none}}`}</style>
     </div>
   )
