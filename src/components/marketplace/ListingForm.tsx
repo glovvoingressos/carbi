@@ -767,9 +767,9 @@ export default function ListingForm() {
   }
 
   const handleSubStepNext = () => {
-    if (listingSubStep === 1 && !selectedBrandCode) { setError('Selecione uma marca.'); return }
-    if (listingSubStep === 2 && !selectedModelCode) { setError('Selecione um modelo.'); return }
-    if (listingSubStep === 3 && !selectedYear) { setError('Selecione o ano.'); return }
+    // On sub-step 1 (plate lookup), brand is auto-filled from plate
+    // Only require manual brand selection if no brand was auto-filled
+    if (listingSubStep === 1 && !form.brand) { setError('Consulte uma placa ou selecione a marca manualmente.'); return }
     setError(null)
     setListingSubStep((prev) => Math.min(4, prev + 1))
   }
