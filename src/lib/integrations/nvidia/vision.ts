@@ -1,7 +1,7 @@
 import type { CarImageAnalysis, FormAssistance, DocumentExtraction } from './types'
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
-const MODEL = 'nvidia/llama-3.2-11b-vision-instruct'
+const MODEL = 'nvidia/nemotron-nano-12b-v2-vl:free'
 
 function getApiKey(): string {
   const key = process.env.OPENROUTER_API_KEY
