@@ -1,8 +1,9 @@
 import type { PlacaApiResponse, PlacaLookupResult } from './types'
 import { getFipePrice } from '@/lib/fipe-api'
 
-const PLACA_API_BASE = 'https://wdapi2.com.br/consulta/placa'
-const PLACA_API_TOKEN = process.env.PLACA_API_TOKEN || '55fd95285b8689b5c643b902c6c82beb'
+const REGCHECK_BASE = 'https://www.regcheck.org.uk/api/json.aspx'
+const REGCHECK_USER = process.env.REGCHECK_USERNAME || ''
+const REGCHECK_PASS = process.env.REGCHECK_API_KEY || ''
 
 export async function lookupPlate(plate: string): Promise<PlacaLookupResult> {
   try {
@@ -11,14 +12,44 @@ export async function lookupPlate(plate: string): Promise<PlacaLookupResult> {
       return { success: false, error: 'Placa deve ter 7 caracteres (ABC1D23 ou ABC1234)' }
     }
 
-    const response = await fetch(`${PLACA_API_BASE}/${cleanPlate}?token=${PLACA_API_TOKEN}`)
-    const data = await response.json()
-
-    if (data.message) {
-      return { success: false, error: 'Placa não encontrada ou formato inválido. Verifique e tente novamente.' }
+    if (!REGCHECK_USER || !REGCHECK_PASS) {
+      return { success: false, error: 'Credenciais da API não configuradas.' }
     }
 
-    const vehicleData = data as PlacaApiResponse
+    const auth = Buffer.from(`${REGCHECK_USER}:${REGCHECK_PASS}`).toString('base64')
+    const response = await fetch(`${REGCHECK_BASE}/CheckBrazil/${cleanPlate}`, {
+      headers: { 'Authorization': `Basic ${auth}` },
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      return { success: false, error: 'Placa não encontrada ou erro na consulta.' }
+    }
+
+    const data = await response.json()
+
+    // Map RegCheck response to our format
+    const vehicleData: PlacaApiResponse = {
+      placa: cleanPlate,
+      chassi: data.Vin || '',
+      renavam: '',
+      marca: data.CarMake?.CurrentTextValue || data.MakeDescription || '',
+      modelo: data.CarModel?.CurrentTextValue || data.ModelDescription || '',
+      anoFabricacao: parseInt(data.RegistrationYear) || 0,
+      anoModelo: parseInt(data.RegistrationYear) || 0,
+      cor: data.Colour || '',
+      combustivel: data.Fuel || '',
+      cilindradas: data.EngineSize?.CurrentTextValue || '',
+      potencia: data.Power || '',
+      cambio: data.Transmission?.CurrentTextValue || '',
+      tipoVeiculo: data.Type || '',
+      situacao: '',
+      uf: data.Location?.split(', ')[1] || '',
+      municipio: data.Location?.split(', ')[0] || '',
+      cpfCnpjProprietario: '',
+      nomeProprietario: '',
+      dataAtualizacao: '',
+    }
 
     // Fetch FIPE price after getting plate data
     try {
