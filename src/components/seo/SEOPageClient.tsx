@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { BenefitGrid, SEOSection, FAQSection, SEOCallToAction } from './SEOContentSection'

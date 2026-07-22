@@ -6,7 +6,7 @@ import {
   ChevronRight, Check, AlertCircle, Image as ImageIcon, 
   GripVertical, Star, X, Info, BadgeDollarSign, Car, MessageSquare
 } from 'lucide-react'
-import { motion, AnimatePresence, Reorder } from 'framer-motion'
+import { motion, AnimatePresence, Reorder } from 'motion/react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import {
   LISTING_ALLOWED_TYPES,

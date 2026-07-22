@@ -6,7 +6,7 @@ import {
   Search, SlidersHorizontal, X, ChevronDown,
   Check, ChevronLeft, ChevronRight, CarFront,
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'motion/react'
 import ListingCard from '@/components/marketplace/ListingCard'
 import { ListingPublic } from '@/lib/marketplace'
 import { ListingSort, ListingsPageInput } from '@/lib/marketplace-server'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'motion/react'
 import { ChevronDown, MessageSquare, DollarSign, ArrowLeftRight, Check, X, Clock, History } from 'lucide-react'
 import { formatBRL } from '@/data/cars'
 import { OfferRow, PAYMENT_METHOD_LABELS, OFFER_STATUS_LABELS, OFFER_STATUS_COLORS } from '@/lib/offers'

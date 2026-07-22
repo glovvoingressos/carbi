@@ -29,7 +29,6 @@
     "autoprefixer": "^10.4.27",
     "car-query": "^1.0.12",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",
     "motion": "^12.42.2",
     "n": "^10.2.0",

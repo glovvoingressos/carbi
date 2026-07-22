@@ -3,7 +3,7 @@
 import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'motion/react'
 import {
   User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight,
   Loader2, Check, AlertCircle, CreditCard,

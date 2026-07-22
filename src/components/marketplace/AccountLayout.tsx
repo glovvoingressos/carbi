@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import {
   LayoutDashboard, Car, Heart, MessageCircle, Bell, Settings, LogOut, User,
 } from 'lucide-react'

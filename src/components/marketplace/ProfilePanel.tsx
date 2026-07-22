@@ -1,7 +1,7 @@
 'use client'
 
 import { ChangeEvent, useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'motion/react'
 import {
   User, Mail, Phone, Lock, Camera, Save, Loader2,
   ChevronRight, AlertTriangle,
