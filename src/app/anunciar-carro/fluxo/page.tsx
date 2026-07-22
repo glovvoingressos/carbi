@@ -41,10 +41,9 @@ export default function AnunciarFluxoPage() {
           <div className="fingen-flow-form-grid">
             {/* Side card — dark card */}
             <aside className="fingen-flow-side-card">
-              <span className="fingen-section-label">Onboarding</span>
-              <h2>Preencha pouco, publique bem.</h2>
-              <p>
-                Dados estruturados, FIPE real no fluxo, até 10 fotos e contato protegido por chat interno.
+              <img src="/images/Midjourney 💅🏻.jpg" alt="Carro em movimento" className="w-full h-48 object-cover rounded-xl mb-4" />
+              <p className="text-white/80 text-sm leading-relaxed">
+                Monte seu anúncio em poucos segundos.
               </p>
               <div className="fingen-flow-side-list">
                 {['FIPE durante o preenchimento', 'Upload real de imagens', 'Preview e revisão final', 'Negociação protegida'].map((item) => (
