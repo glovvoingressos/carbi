@@ -60,7 +60,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
   return (
     <div className="w-full">
       <div className={`relative flex items-center gap-2 rounded-xl border-2 ${borderColor} bg-white p-1.5 transition-all duration-200 focus-within:ring-2 ${focusRing}`}>
-        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100">
+        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 shrink-0">
           <Car className="w-5 h-5 text-gray-500" />
         </div>
         <input
@@ -68,10 +68,10 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
           value={plate}
           onChange={(e) => { setPlate(formatPlate(e.target.value)); setError(null); setSuccess(false); setVehicleData(null) }}
           onKeyDown={(e) => { if (e.key === 'Enter' && !loading && plate.length === 7) handleLookup() }}
-          placeholder="ABC1D23 ou ABC1234"
+          placeholder="ABC1D23"
           maxLength={7}
           disabled={loading}
-          className="flex-1 h-10 px-2 text-lg font-mono font-semibold tracking-wider text-gray-800 placeholder:text-gray-400 outline-none bg-transparent disabled:opacity-50"
+          className="flex-1 min-w-0 h-10 px-2 text-lg font-mono font-semibold tracking-wider text-gray-800 placeholder:text-gray-400 outline-none bg-transparent disabled:opacity-50"
         />
         <motion.button
           type="button"
@@ -79,10 +79,10 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
           disabled={loading || plate.length < 7}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center gap-2 h-10 px-5 rounded-lg bg-blue-600 text-white font-medium text-sm transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 h-10 px-4 sm:px-5 rounded-lg bg-blue-600 text-white font-medium text-sm transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-          Consultar
+          <span className="hidden sm:inline">Consultar</span>
         </motion.button>
       </div>
       <AnimatePresence mode="wait">

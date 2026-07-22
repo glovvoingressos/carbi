@@ -63,7 +63,7 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
       role="link"
       aria-label={`${car.brand} ${car.model} ${car.year} - ${formatBRL(car.priceBrl)}`}
     >
-      <div className="relative w-full aspect-square bg-[#FFF8DF] overflow-hidden">
+      <div className="relative w-full aspect-square bg-[#F4F4F1] overflow-hidden">
         {badge && (
           <span className={`absolute top-3 left-3 z-10 badge ${badge.tone === 'dark' ? 'badge-inverse' : 'badge-glass'}`}>
             {badge.label}

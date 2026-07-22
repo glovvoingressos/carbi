@@ -84,7 +84,7 @@ export default function SafeMarketplaceImage({
   if (status === 'error') {
     return (
       <div
-        className={`relative flex items-center justify-center overflow-hidden bg-[#FFF8DF] ${containerClassName}`}
+        className={`relative flex items-center justify-center overflow-hidden bg-[#F4F4F1] ${containerClassName}`}
         aria-label="Imagem indisponível"
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.95),_rgba(255,248,223,0.95))]" />
@@ -97,10 +97,10 @@ export default function SafeMarketplaceImage({
   }
 
   return (
-    <div className={`relative overflow-hidden bg-[#FFF8DF] ${containerClassName}`} aria-busy={status === 'loading'}>
+    <div className={`relative overflow-hidden ${containerClassName}`} aria-busy={status === 'loading'}>
       {status !== 'ready' ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#FFF8DF]">
-          <div className="h-1.5 w-12 animate-pulse rounded-full bg-white/80 shadow-sm" />
+        <div className="absolute inset-0 flex items-center justify-center bg-[#F4F4F1]">
+          <div className="h-1.5 w-12 animate-pulse rounded-full bg-black/10" />
           <span className="sr-only">{loadingLabel}</span>
         </div>
       ) : null}
@@ -109,7 +109,7 @@ export default function SafeMarketplaceImage({
         <img
           src={resolvedSrc}
           alt={alt}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${status === 'ready' ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${status === 'ready' ? 'opacity-100' : 'opacity-0'}`}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
         />
