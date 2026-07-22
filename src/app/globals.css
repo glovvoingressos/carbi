@@ -3664,6 +3664,25 @@ p {
 .profile-hero {
   padding: 36px;
 }
+
+.auth-hero-image-wrap {
+  margin: -36px -36px 28px -36px;
+  overflow: hidden;
+  border-radius: 0 0 20px 20px;
+}
+
+.auth-hero-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .auth-hero-image {
+    height: 260px;
+  }
+}
 .auth-hero-kicker {
   display: inline-flex;
   align-items: center;

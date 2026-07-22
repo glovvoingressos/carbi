@@ -16,6 +16,14 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <div className="auth-page-shell">
       <div className="auth-page-grid">
         <section className="auth-hero-card surface-strong">
+          <div className="auth-hero-image-wrap">
+            <img
+              src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=800&q=80"
+              alt="Carro moderno em movimento"
+              className="auth-hero-image"
+              loading="eager"
+            />
+          </div>
           <h1 className="auth-hero-title">Anuncie carros grátis em minutos.</h1>
           <p className="auth-hero-copy">
             Cadastro rápido com FIPE integrada, chat interno e divulgação gratuita para seus anúncios.
