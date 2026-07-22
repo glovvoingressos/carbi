@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { Search, Car, Check, AlertCircle, Loader2 } from 'lucide-react'
+import { Search, Car, Check, AlertCircle, Loader2, TrendingUp } from 'lucide-react'
 import { lookupPlateClient } from '@/lib/integrations/placaapi/client'
 
 interface PlateInputProps {
@@ -17,6 +17,8 @@ interface PlateInputProps {
     transmission: string
     bodyType: string
     plate: string
+    fipePrice?: number | null
+    fipeReference?: string | null
   }) => void
 }
 
@@ -25,7 +27,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [vehicleData, setVehicleData] = useState<{ brand: string; model: string; year: number; color: string } | null>(null)
+  const [vehicleData, setVehicleData] = useState<{ brand: string; model: string; year: number; color: string; fipePrice?: number | null } | null>(null)
 
   const formatPlate = (v: string) => {
     const c = v.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 7)
@@ -38,11 +40,12 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
     try {
       const data = await lookupPlateClient(plate)
       setSuccess(true)
-      setVehicleData({ brand: data.marca, model: data.modelo, year: data.anoFabricacao, color: data.cor })
+      setVehicleData({ brand: data.marca, model: data.modelo, year: data.anoFabricacao, color: data.cor, fipePrice: data.fipe_price })
       onPlateFound({
         brand: data.marca, model: data.modelo, year: data.anoFabricacao, yearModel: data.anoModelo,
         color: data.cor, fuel: data.combustivel, engine: `${data.cilindradas} ${data.potencia}`,
         transmission: data.cambio, bodyType: data.tipoVeiculo, plate: data.placa,
+        fipePrice: data.fipe_price || null, fipeReference: data.fipe_reference_month || null,
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao consultar placa')
@@ -51,6 +54,8 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
 
   const borderColor = success ? 'border-green-500' : error ? 'border-red-500' : 'border-gray-200'
   const focusRing = success ? 'focus:ring-green-500/20' : error ? 'focus:ring-red-500/20' : 'focus:ring-blue-500/20'
+
+  const formatBRL = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
   return (
     <div className="w-full">
@@ -89,14 +94,22 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
         )}
         {success && vehicleData && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="flex items-center gap-3 mt-3 px-4 py-3 rounded-lg bg-green-50 border border-green-200">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
-              <Check className="w-4 h-4 text-green-600" />
+            className="mt-3 px-4 py-3 rounded-lg bg-green-50 border border-green-200">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
+                <Check className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-green-800">{vehicleData.brand} {vehicleData.model}</p>
+                <p className="text-xs text-green-600">{vehicleData.year} • {vehicleData.color}</p>
+              </div>
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-green-800">{vehicleData.brand} {vehicleData.model}</p>
-              <p className="text-xs text-green-600">{vehicleData.year} • {vehicleData.color}</p>
-            </div>
+            {vehicleData.fipePrice != null && vehicleData.fipePrice > 0 && (
+              <div className="flex items-center gap-2 mt-2 pt-2 border-t border-green-200">
+                <TrendingUp className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-semibold text-green-800">Tabela FIPE: {formatBRL(vehicleData.fipePrice)}</span>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

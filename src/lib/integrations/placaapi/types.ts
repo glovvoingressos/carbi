@@ -18,6 +18,8 @@ export interface PlacaApiResponse {
   cpfCnpjProprietario: string
   nomeProprietario: string
   dataAtualizacao: string
+  fipe_price?: number | null
+  fipe_reference_month?: string | null
 }
 
 export interface PlacaLookupResult {
