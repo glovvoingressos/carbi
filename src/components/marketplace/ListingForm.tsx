@@ -985,7 +985,7 @@ export default function ListingForm() {
 
             {/* Step indicator */}
             <div className="flex items-center gap-2">
-              {[1, 2, 3, 4].map((s) => (
+              {[1, 2].map((s) => (
                 <div key={s} className="flex items-center gap-2 flex-1">
                   <div className={`flex items-center justify-center w-8 h-8 rounded-full text-[12px] font-bold transition-all ${
                     listingSubStep === s
@@ -996,15 +996,13 @@ export default function ListingForm() {
                   }`}>
                     {listingSubStep > s ? <Check className="w-4 h-4" /> : s}
                   </div>
-                  {s < 4 && <div className={`h-0.5 flex-1 rounded-full transition-colors ${listingSubStep > s ? 'bg-[#D4F576]' : 'bg-[#EAEAE8]'}`} />}
+                  {s < 2 && <div className={`h-0.5 flex-1 rounded-full transition-colors ${listingSubStep > s ? 'bg-[#D4F576]' : 'bg-[#EAEAE8]'}`} />}
                 </div>
               ))}
             </div>
             <div className="flex justify-between text-[11px] font-medium text-[#767676] -mt-2">
               <span className={listingSubStep >= 1 ? 'text-[#1A1A1A]' : ''}>Placa</span>
-              <span className={listingSubStep >= 2 ? 'text-[#1A1A1A]' : ''}>Ano</span>
-              <span className={listingSubStep >= 3 ? 'text-[#1A1A1A]' : ''}>Versão</span>
-              <span className={listingSubStep >= 4 ? 'text-[#1A1A1A]' : ''}>Confirmar</span>
+              <span className={listingSubStep >= 2 ? 'text-[#1A1A1A]' : ''}>Confirmar</span>
             </div>
 
             <input type="hidden" value={form.vehicle_type} />
