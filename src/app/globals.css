@@ -6475,10 +6475,16 @@ p {
   aspect-ratio: 4 / 3;
   background: var(--color-bg-muted);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .fingen-car-card-image img {
   transition: transform 0.3s ease;
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
 }
 
 .fingen-car-card:hover .fingen-car-card-image img {
