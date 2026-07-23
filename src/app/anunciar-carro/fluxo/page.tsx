@@ -29,7 +29,7 @@ export default function AnunciarFluxoPage() {
 
         {/* Formulário */}
         <section className="fingen-flow-form-section">
-          <div className="max-w-[680px] mx-auto">
+          <div className="max-w-[680px] mx-auto px-[3.5%] sm:px-0">
             <ListingForm />
           </div>
         </section>

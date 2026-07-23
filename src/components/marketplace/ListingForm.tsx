@@ -1271,7 +1271,7 @@ export default function ListingForm() {
             {/* Header */}
             <div className="mb-10">
               <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#999] mb-3">Confirmação</p>
-              <h2 className="text-[28px] sm:text-[32px] font-bold text-[#111] leading-tight tracking-[-0.02em] mb-2">
+              <h2 className="text-[22px] sm:text-[26px] font-bold text-[#111] leading-tight tracking-[-0.02em] mb-2">
                 Confira os dados do seu veículo
               </h2>
               <p className="text-[15px] text-[#666] leading-relaxed">
@@ -1282,7 +1282,7 @@ export default function ListingForm() {
             {/* Quality Score — clean, no card */}
             <div className="mb-10">
               <div className="flex items-baseline gap-3 mb-3">
-                <span className="text-[48px] sm:text-[56px] font-black text-[#111] leading-none tracking-[-0.03em]">{qualityScore}</span>
+                <span className="text-[40px] sm:text-[48px] font-black text-[#111] leading-none tracking-[-0.03em]">{qualityScore}</span>
                 <span className="text-lg font-medium text-[#999]">/100</span>
               </div>
               <div className="h-1.5 bg-[#EAEAEA] rounded-full overflow-hidden mb-3">
