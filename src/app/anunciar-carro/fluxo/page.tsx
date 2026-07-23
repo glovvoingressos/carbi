@@ -16,28 +16,28 @@ export default function AnunciarFluxoPage() {
   return (
     <div className="fingen-page">
       <main className="fingen-main">
-        {/* Hero */}
-        <section className="tfp-hero" style={{ minHeight: 'auto', padding: '40px 0 0' }}>
-          <div className="tfp-hero-inner" style={{ alignItems: 'start' }}>
+        {/* Hero - exact copy from tráfego pago */}
+        <section className="tfp-hero" style={{ padding: '60px 0 40px' }}>
+          <div className="tfp-hero-inner" style={{ maxWidth: '90%', gap: '48px' }}>
             {/* Left side - Image + Text */}
-            <div className="tfp-hero-content" style={{ gap: '24px' }}>
+            <div className="tfp-hero-content">
               <Link href="/carros-a-venda" className="tfp-btn-secondary">
                 <ArrowLeft size={16} />
                 Voltar
               </Link>
               <img src="/images/Midjourney 💅🏻.jpg" alt="Carro em movimento" className="w-full aspect-video sm:aspect-[21/9] object-cover rounded-2xl" />
               <div>
-                <h1 className="tfp-hero-title" style={{ fontSize: 'clamp(28px, 4vw, 48px)' }}>
+                <h1 className="tfp-hero-title">
                   Monte seu anúncio
                 </h1>
-                <p className="tfp-hero-sub" style={{ maxWidth: '400px', marginTop: '12px' }}>
+                <p className="tfp-hero-sub">
                   Preencha os dados, adicione fotos e publique gratuitamente.
                 </p>
               </div>
             </div>
 
             {/* Right side - Form */}
-            <div style={{ width: '100%' }}>
+            <div>
               <ListingForm />
             </div>
           </div>
