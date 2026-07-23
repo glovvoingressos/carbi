@@ -219,7 +219,7 @@ function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
 }
 
 /* ─── Main ─── */
-export default function ProfilePanel() {
+export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: () => void }) {
   const supabaseReady = isSupabaseBrowserConfigured()
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
@@ -270,6 +270,7 @@ export default function ProfilePanel() {
       }).eq('id', userId)
       if (error) throw error
       showToast('success', 'Perfil atualizado com sucesso.')
+      onProfileUpdate?.()
     } catch (e) { showToast('error', e instanceof Error ? e.message : 'Não foi possível salvar.') }
     finally { setSaving(false) }
   }
@@ -294,7 +295,6 @@ export default function ProfilePanel() {
         )}
       </AnimatePresence>
 
-      <AvatarSection avatarUrl={avatarUrl} fullName={fullName} email={email} userId={userId} onAvatarChange={setAvatarUrl} uploading={uploading} />
       <PersonalInfo fullName={fullName} email={email} phone={phone} onNameChange={setFullName} onPhoneChange={setPhone} />
       <SecuritySection userId={userId} toast={showToast} />
 

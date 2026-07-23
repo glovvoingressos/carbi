@@ -3,15 +3,25 @@
 import AccountLayout from '@/components/marketplace/AccountLayout'
 import ProfilePanel from '@/components/marketplace/ProfilePanel'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, Car, Eye, Heart, Star } from 'lucide-react'
+import { Loader2, Car, Eye } from 'lucide-react'
 
 export default function MinhaContaPage() {
   const router = useRouter()
   const [user, setUser] = useState<{ email: string; fullName: string; avatarUrl: string } | null>(null)
   const [stats, setStats] = useState<{ label: string; value: string | number; icon: any }[]>([])
   const [loading, setLoading] = useState(true)
+
+  const loadUserData = useCallback(async () => {
+    if (!isSupabaseBrowserConfigured()) return
+    const supabase = getSupabaseBrowserClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
+
+    const { data } = await supabase.from('users').select('full_name,avatar_url').eq('id', session.user.id).maybeSingle()
+    setUser({ email: session.user.email || '', fullName: data?.full_name || '', avatarUrl: data?.avatar_url || '' })
+  }, [])
 
   useEffect(() => {
     if (!isSupabaseBrowserConfigured()) {
@@ -62,7 +72,7 @@ export default function MinhaContaPage() {
 
   return (
     <AccountLayout user={user} stats={stats}>
-      <ProfilePanel />
+      <ProfilePanel onProfileUpdate={loadUserData} />
     </AccountLayout>
   )
 }
