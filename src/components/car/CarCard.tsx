@@ -51,7 +51,7 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
 
   return (
     <article
-      className="surface-strong overflow-hidden transition-all duration-200 group cursor-pointer hover:-translate-y-1 hover:shadow-xl"
+      className="surface-strong overflow-hidden transition-all duration-200 group cursor-pointer hover:-translate-y-1 hover:shadow-xl flex flex-col !border-0 !p-0"
       onClick={() => router.push(detailUrl)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -63,13 +63,8 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
       role="link"
       aria-label={`${car.brand} ${car.model} ${car.year} - ${formatBRL(car.priceBrl)}`}
     >
-      <div className="relative w-full aspect-square bg-[#F4F4F1] overflow-hidden">
-        {badge && (
-          <span className={`absolute top-3 left-3 z-10 badge ${badge.tone === 'dark' ? 'badge-inverse' : 'badge-glass'}`}>
-            {badge.label}
-          </span>
-        )}
-
+      {/* Image - 100% width, only top corners rounded */}
+      <div className="relative w-full h-[280px] overflow-hidden rounded-t-[28px]">
         <CarImage
           id={car.id}
           brand={car.brand}
@@ -77,12 +72,19 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
           year={car.year}
           src={car.image}
           fit="cover"
-          aspectRatio="1/1"
-          className="h-full w-full transition-transform duration-700 group-hover:scale-[1.03]"
+          className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-[1.03]"
         />
 
+        {/* Badge overlay */}
+        {badge && (
+          <span className={`absolute top-4 left-4 z-10 badge ${badge.tone === 'dark' ? 'badge-inverse' : 'badge-glass'}`}>
+            {badge.label}
+          </span>
+        )}
+
+        {/* Favorite button overlay */}
         <button
-          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/95 backdrop-blur flex items-center justify-center shadow-sm border border-white/70"
+          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/95 backdrop-blur flex items-center justify-center shadow-sm border border-white/70 z-10"
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
@@ -94,9 +96,10 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
         </button>
       </div>
 
-        <div className="p-5 flex flex-col flex-1">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-1">
+      {/* Content - with internal padding */}
+      <div className="px-6 py-5 flex flex-col flex-1">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1">
             <Star className="w-3.5 h-3.5 fill-[#FACC15] text-[#FACC15]" />
             <span className="text-[13px] font-medium text-[#0A0A0A]">{rating}</span>
           </div>
@@ -105,28 +108,28 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
           </span>
         </div>
 
-        <h3 className="text-[15px] font-semibold text-[#0A0A0A] leading-tight tracking-tight mb-0.5 truncate">
+        <h3 className="text-[17px] font-bold text-[#0A0A0A] leading-tight tracking-tight mb-0.5 truncate">
           {car.model}
         </h3>
-        <p className="text-[12px] text-[#A3A3A3] mb-4 truncate">{car.version}</p>
+        <p className="text-[13px] text-[#A3A3A3] mb-3 truncate">{car.version}</p>
 
-        <p className="text-[18px] font-semibold text-[#0A0A0A] tracking-tight mb-4">
+        <p className="text-[20px] font-bold text-[#0A0A0A] tracking-tight mb-4">
           {formatBRL(car.priceBrl)}
         </p>
 
-        <div className="flex gap-1.5 flex-wrap mb-5">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#52607A] bg-white/80 border border-white/70 px-2.5 py-1 rounded-full">
+        <div className="flex gap-1.5 flex-wrap mb-4">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#52607A] bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-full">
             <Fuel className="w-3 h-3" strokeWidth={1.75} /> {car.engineType}
           </span>
           {car.horsepower > 0 && (
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#52607A] bg-white/80 border border-white/70 px-2.5 py-1 rounded-full">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#52607A] bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-full">
               <Zap className="w-3 h-3" strokeWidth={1.75} /> {car.horsepower} cv
             </span>
           )}
         </div>
 
-        <div className="mt-auto pt-4 border-t border-white/70 flex items-center justify-between">
-          <span className="text-[13px] font-medium text-[#0A0A0A] inline-flex items-center gap-1.5 group-hover:gap-2 transition-all">
+        <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+          <span className="text-[13px] font-semibold text-[#0A0A0A] inline-flex items-center gap-1.5 group-hover:gap-2 transition-all">
             Ver detalhes
             <ArrowRight className="w-3.5 h-3.5" strokeWidth={2} />
           </span>
