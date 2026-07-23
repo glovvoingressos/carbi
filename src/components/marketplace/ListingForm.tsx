@@ -982,60 +982,6 @@ export default function ListingForm() {
               </p>
             </div>
 
-            {/* Step indicator with morphing animation */}
-            <div className="flex items-center gap-2">
-              {[1, 2].map((s) => (
-                <div key={s} className="flex items-center gap-2 flex-1">
-                  <motion.div
-                    layout
-                    className={`flex items-center justify-center w-8 h-8 rounded-full text-[12px] font-bold ${
-                      listingSubStep === s
-                        ? 'bg-[#1A1A1A] text-white shadow-md'
-                        : listingSubStep > s
-                        ? 'bg-[#D4F576] text-[#1A1A1A]'
-                        : 'bg-[#EAEAE8] text-[#767676]'
-                    }`}
-                    animate={{
-                      scale: listingSubStep === s ? 1.1 : 1,
-                      backgroundColor: listingSubStep === s ? '#1A1A1A' : listingSubStep > s ? '#D4F576' : '#EAEAE8',
-                    }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                  >
-                    <motion.div
-                      key={listingSubStep > s ? 'check' : s}
-                      initial={{ scale: 0, rotate: -90 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      exit={{ scale: 0, rotate: 90 }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    >
-                      {listingSubStep > s ? <Check className="w-4 h-4" /> : s}
-                    </motion.div>
-                  </motion.div>
-                  {s < 2 && (
-                    <motion.div
-                      className="h-0.5 flex-1 rounded-full"
-                      animate={{
-                        backgroundColor: listingSubStep > s ? '#D4F576' : '#EAEAE8',
-                        scaleX: listingSubStep > s ? 1 : 0,
-                      }}
-                      style={{ transformOrigin: 'left' }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 0.1 }}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-between text-[11px] font-medium text-[#767676] -mt-2">
-              <motion.span
-                animate={{ color: listingSubStep >= 1 ? '#1A1A1A' : '#767676' }}
-                transition={{ duration: 0.2 }}
-              >Placa</motion.span>
-              <motion.span
-                animate={{ color: listingSubStep >= 2 ? '#1A1A1A' : '#767676' }}
-                transition={{ duration: 0.2 }}
-              >Confirmar</motion.span>
-            </div>
-
             <input type="hidden" value={form.vehicle_type} />
 
             {/* Sub-step 1: Plate Lookup */}
@@ -1216,7 +1162,7 @@ export default function ListingForm() {
               </div>
               <div>
                 <label htmlFor="listing-description" className="sr-only">Descrição do veículo</label>
-                <textarea id="listing-description" className="fingen-flow-input min-h-[120px] py-3 resize-none leading-relaxed max-[330px]:min-h-[100px]" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} aria-label="Descrição do veículo" />
+                <textarea id="listing-description" className="fingen-flow-input min-h-[180px] sm:min-h-[200px] py-3 resize-none leading-relaxed" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} aria-label="Descrição do veículo" />
               </div>
               <div>
                 <label htmlFor="listing-optionals" className="sr-only">Opcionais extras</label>
