@@ -972,7 +972,7 @@ export default function ListingForm() {
         </p>
       </div>
 
-      <div className="fingen-flow-form-card p-6 sm:p-8 space-y-8 max-[330px]:p-4 max-[330px]:space-y-6">
+      <div className="fingen-flow-form-card p-4 sm:p-8 space-y-6 sm:space-y-8">
         {currentStep === 1 && (
           <div className="space-y-6 max-[330px]:space-y-5">
             <div>
@@ -1068,35 +1068,36 @@ export default function ListingForm() {
                   <p className="fingen-flow-field-label">Dados do veículo</p>
                   <span className="fingen-flow-badge-accent text-[10px]">Verifique</span>
                 </div>
-                <p className="text-[13px] text-[#767676]">Revise os dados abaixo. Altere o que precisar.</p>
+                <p className="text-[12px] text-[#767676]">Revise os dados abaixo. Altere o que precisar.</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[11px] font-medium text-[#767676]">Marca</label>
-                    <input className="fingen-flow-input text-[14px] mt-1" value={form.brand} onChange={(e) => handleInput('brand', e.target.value)} />
+                    <label className="text-[10px] font-medium text-[#767676]">Marca</label>
+                    <input className="fingen-flow-input text-[12px] mt-1" value={form.brand} onChange={(e) => handleInput('brand', e.target.value)} />
                   </div>
                   <div>
-                    <label className="text-[11px] font-medium text-[#767676]">Modelo</label>
-                    <input className="fingen-flow-input text-[14px] mt-1" value={form.model} onChange={(e) => handleInput('model', e.target.value)} />
+                    <label className="text-[10px] font-medium text-[#767676]">Modelo</label>
+                    <input className="fingen-flow-input text-[12px] mt-1" value={form.model} onChange={(e) => handleInput('model', e.target.value)} />
                   </div>
                   <div>
-                    <label className="text-[11px] font-medium text-[#767676]">Ano</label>
-                    <input className="fingen-flow-input text-[14px] mt-1" value={form.year} onChange={(e) => handleInput('year', e.target.value)} />
+                    <label className="text-[10px] font-medium text-[#767676]">Ano</label>
+                    <input className="fingen-flow-input text-[12px] mt-1" value={form.year} onChange={(e) => handleInput('year', e.target.value)} />
                   </div>
                   <div>
-                    <label className="text-[11px] font-medium text-[#767676]">Cor</label>
-                    <input className="fingen-flow-input text-[14px] mt-1" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
+                    <label className="text-[10px] font-medium text-[#767676]">Cor</label>
+                    <input className="fingen-flow-input text-[12px] mt-1" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
                   </div>
                   <div>
-                    <label className="text-[11px] font-medium text-[#767676]">Combustível</label>
-                    <input className="fingen-flow-input text-[14px] mt-1" value={form.fuel} onChange={(e) => handleInput('fuel', e.target.value)} />
+                    <label className="text-[10px] font-medium text-[#767676]">Combustível</label>
+                    <input className="fingen-flow-input text-[12px] mt-1" value={form.fuel} onChange={(e) => handleInput('fuel', e.target.value)} />
                   </div>
                   <div>
-                    <label className="text-[11px] font-medium text-[#767676]">Câmbio</label>
-                    <input className="fingen-flow-input text-[14px] mt-1" value={form.transmission} onChange={(e) => handleInput('transmission', e.target.value)} />
+                    <label className="text-[10px] font-medium text-[#767676]">Câmbio</label>
+                    <input className="fingen-flow-input text-[12px] mt-1" value={form.transmission} onChange={(e) => handleInput('transmission', e.target.value)} />
                   </div>
                 </div>
                 <button type="button" onClick={() => { setCurrentStep(2); setListingSubStep(1); }} className="fingen-flow-btn-primary w-full mt-2">
-                  Continuar para preço e fotos <ArrowRight className="h-4 w-4" />
+                  <span className="truncate">Continuar para preço e fotos</span>
+                  <ArrowRight className="h-4 w-4 shrink-0" />
                 </button>
                 <button type="button" onClick={() => setListingSubStep(1)} className="w-full text-center text-[13px] text-[#767676] font-medium mt-1 hover:text-[#1A1A1A]">
                   Voltar e consultar outra placa
