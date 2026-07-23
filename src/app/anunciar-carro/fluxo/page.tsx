@@ -14,22 +14,29 @@ export const metadata: Metadata = {
 
 export default function AnunciarFluxoPage() {
   return (
-    <div className="fingen-flow-page">
+    <div className="fingen-page">
       <main className="fingen-main">
         {/* Hero */}
-        <section className="fingen-flow-hero">
-          <div className="fingen-flow-hero-inner">
-            <div className="fingen-balance-header">
-              <Link href="/carros-a-venda" className="fingen-section-link">
-                <ArrowLeft size={14} /> Voltar
+        <section className="tfp-hero" style={{ minHeight: 'auto', padding: '60px 0 40px' }}>
+          <div className="tfp-hero-inner" style={{ gridTemplateColumns: '1fr', gap: '0' }}>
+            <div className="tfp-hero-content" style={{ alignItems: 'center', textAlign: 'center', gap: '16px' }}>
+              <Link href="/carros-a-venda" className="tfp-btn-secondary" style={{ marginBottom: '8px' }}>
+                <ArrowLeft size={16} />
+                Voltar
               </Link>
+              <h1 className="tfp-hero-title" style={{ fontSize: 'clamp(28px, 5vw, 44px)' }}>
+                Monte seu anúncio
+              </h1>
+              <p className="tfp-hero-sub" style={{ maxWidth: '400px' }}>
+                Preencha os dados, adicione fotos e publique gratuitamente.
+              </p>
             </div>
           </div>
         </section>
 
         {/* Formulário */}
-        <section className="fingen-flow-form-section">
-          <div className="max-w-[680px] mx-auto w-[93%] sm:w-auto sm:px-0">
+        <section className="tfp-section" style={{ paddingTop: '0' }}>
+          <div style={{ maxWidth: '640px', margin: '0 auto', padding: '0 40px' }}>
             <ListingForm />
           </div>
         </section>

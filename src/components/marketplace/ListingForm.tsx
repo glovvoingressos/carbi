@@ -950,10 +950,10 @@ export default function ListingForm() {
   }
 
   return (
-    <div className="listing-form-ref fingen-flow-form space-y-8 pb-4 max-w-3xl mx-auto max-[330px]:space-y-6 max-[330px]:pb-20">
+    <div className="listing-form-ref space-y-8 pb-4 max-w-3xl mx-auto">
       <div className="space-y-3">
         <div
-          className="fingen-flow-progress-bar-track"
+          className="tfp-progress-track"
           role="progressbar"
           aria-valuenow={currentStep}
           aria-valuemin={1}
@@ -961,23 +961,23 @@ export default function ListingForm() {
           aria-label={`Etapa ${currentStep} de 3`}
         >
           <div
-            className="fingen-flow-progress-bar-fill"
+            className="tfp-progress-fill"
             style={{ width: `${(currentStep / 3) * 100}%` }}
           />
         </div>
-        <p className="fingen-flow-step-label">
+        <p className="tfp-step-label">
           {currentStep === 1 && 'Etapa 1 de 3: Selecione seu carro'}
           {currentStep === 2 && 'Etapa 2 de 3: Preço, dados básicos e fotos'}
           {currentStep === 3 && 'Etapa 3 de 3: Revisar e publicar'}
         </p>
       </div>
 
-      <div className="fingen-flow-form-card p-4 sm:p-8 space-y-6 sm:space-y-8">
+      <div className="space-y-6">
         {currentStep === 1 && (
-          <div className="space-y-6 max-[330px]:space-y-5">
+          <div className="space-y-6">
             <div>
-              <h3 className="fingen-flow-card-title max-[330px]:text-[18px]">Selecione seu veículo</h3>
-              <p className="fingen-flow-card-desc max-[330px]:text-[13px]">
+              <h3 className="tfp-section-title" style={{ fontSize: 'clamp(22px, 3vw, 28px)' }}>Selecione seu veículo</h3>
+              <p className="tfp-section-sub" style={{ maxWidth: '100%', marginTop: '8px' }}>
                 Comece pela placa. Com ela puxamos todos os dados automaticamente.
               </p>
             </div>
@@ -1108,10 +1108,10 @@ export default function ListingForm() {
         )}
 
         {currentStep === 2 && (
-          <div className="space-y-8 animate-fade-in max-[330px]:space-y-5">
+          <div className="space-y-8 animate-fade-in">
             <div>
-              <h3 className="fingen-flow-card-title max-[330px]:text-[18px]">Dados essenciais</h3>
-              <p className="fingen-flow-card-desc max-[330px]:text-[13px]">
+              <h3 className="tfp-section-title" style={{ fontSize: 'clamp(22px, 3vw, 28px)' }}>Dados essenciais</h3>
+              <p className="tfp-section-sub" style={{ maxWidth: '100%', marginTop: '8px' }}>
                 Só pedimos o necessário para publicar rápido. O restante pode ser completado depois.
               </p>
             </div>
@@ -1271,11 +1271,11 @@ export default function ListingForm() {
           <div className="animate-fade-in">
             {/* Header */}
             <div className="mb-10">
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#999] mb-3">Confirmação</p>
-              <h2 className="text-[22px] sm:text-[26px] font-bold text-[#111] leading-tight tracking-[-0.02em] mb-2">
+              <p className="tfp-section-label">Confirmação</p>
+              <h2 className="tfp-section-title" style={{ fontSize: 'clamp(22px, 3vw, 28px)' }}>
                 Confira os dados do seu veículo
               </h2>
-              <p className="text-[15px] text-[#666] leading-relaxed">
+              <p className="tfp-section-sub" style={{ maxWidth: '100%', marginTop: '8px' }}>
                 Revise as informações abaixo antes de continuar.
               </p>
             </div>
@@ -1391,7 +1391,7 @@ export default function ListingForm() {
               <button
                 type="button"
                 onClick={prevStep}
-                className="flex items-center justify-center gap-2 px-6 py-4 rounded-2xl text-sm font-semibold text-[#666] hover:bg-[#F5F5F5] transition-colors min-h-[56px]"
+                className="tfp-btn-secondary"
                 disabled={saving || fipeLoading}
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -1407,12 +1407,12 @@ export default function ListingForm() {
               <button
                 type="button"
                 onClick={currentStep === 3 ? handleSubmit : nextStep}
-                className="flex items-center justify-center gap-2.5 w-full sm:w-auto sm:min-w-[240px] px-8 py-4 rounded-2xl bg-[#111] text-white text-[15px] font-bold hover:bg-[#222] active:scale-[0.98] transition-all duration-200 min-h-[58px] disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_4px_20px_rgba(0,0,0,0.15)]"
+                className="tfp-btn-primary"
                 disabled={saving || fipeLoading}
               >
                 {saving ? (
                   <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     Publicando...
                   </>
                 ) : currentStep === 3 ? (
@@ -1434,13 +1434,13 @@ export default function ListingForm() {
               type="button"
               disabled={saving}
               onClick={handleSubmit}
-              className="w-full py-4 rounded-2xl bg-[#111] text-white text-[15px] font-bold shadow-[0_-4px_20px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all duration-200 min-h-[56px]"
+              className="tfp-btn-primary w-full justify-center"
             >
               {saving ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Publicando...
-                </span>
+                </>
               ) : (
                 'Publicar anúncio'
               )}
