@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CheckCircle2, DollarSign, Zap, ArrowRight, ShieldCheck, Star } from 'lucide-react'
-import { Badge } from '@/components/ui/Badge'
 
 export const metadata: Metadata = {
   title: 'Melhor Carro para Aplicativo 2026 | Ranking carbi',
@@ -58,7 +57,7 @@ export default function AppRankingPage() {
         </div>
         
         <div className="fingen-shell-content" style={{ position: "relative", zIndex: 1 }}>
-          <Badge className="mb-6 bg-white/10 text-white border-white/20">Guia 2026 — Inteligência de Mercado</Badge>
+          <span className="mb-6 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">Guia 2026 — Inteligência de Mercado</span>
           <h1 className="text-balance">
             Melhor carro para aplicativo 2026
           </h1>

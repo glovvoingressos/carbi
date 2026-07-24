@@ -4,11 +4,6 @@ import { ChangeEvent, useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { User, Mail, Phone, Lock, Camera, Save, Loader2, ChevronDown, AlertTriangle, Eye, EyeOff } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/Badge'
 
 const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -12 }, transition: { duration: 0.2 } }
 
@@ -42,8 +37,8 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
 
   return (
     <motion.div {...fade}>
-      <Card>
-        <CardContent className="flex items-center gap-4 sm:gap-6 p-5 sm:p-7">
+      <div className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] border border-gray-200">
+        <div className="flex items-center gap-4 sm:gap-6 p-5 sm:p-7">
           <div className="relative group shrink-0">
             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-[var(--color-bg,#F7F7F7)] border-2 border-[var(--color-border,#ECECEC)]">
               {avatarUrl
@@ -65,8 +60,8 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
             <p className="text-base font-bold text-[#111] truncate">{fullName || 'Seu nome'}</p>
             <p className="text-sm text-[#7A7A7A] mt-0.5 truncate">{email}</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   )
 }
@@ -78,31 +73,31 @@ function PersonalInfo({ fullName, email, phone, onNameChange, onPhoneChange }: {
 }) {
   return (
     <motion.div {...fade}>
-      <Card>
-        <CardContent className="p-5 sm:p-7">
+      <div className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] border border-gray-200">
+        <div className="p-5 sm:p-7">
           <h2 className="text-sm font-bold text-[#111] mb-5 font-[family-name:var(--font-heading)]">Informações pessoais</h2>
           <div className="space-y-4">
             <div>
               <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">Nome completo</label>
-              <Input value={fullName} onChange={(e) => onNameChange(e.target.value)} placeholder="Ex: João Silva" className="rounded-2xl min-h-[44px]" />
+              <input value={fullName} onChange={(e) => onNameChange(e.target.value)} placeholder="Ex: João Silva" className="rounded-2xl min-h-[44px]" />
             </div>
             <div>
               <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">E-mail</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C0C0C0] pointer-events-none" strokeWidth={1.5} />
-                <Input value={email} disabled className="rounded-2xl pl-11 bg-[#F7F7F7] opacity-60 cursor-not-allowed min-h-[44px]" />
+                <input value={email} disabled className="rounded-2xl pl-11 bg-[#F7F7F7] opacity-60 cursor-not-allowed min-h-[44px]" />
               </div>
             </div>
             <div>
               <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">Telefone</label>
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C0C0C0] pointer-events-none" strokeWidth={1.5} />
-                <Input value={phone} onChange={(e) => onPhoneChange(formatPhone(e.target.value))} placeholder="(00) 00000-0000" inputMode="tel" maxLength={15} className="rounded-2xl pl-11 min-h-[44px]" />
+                <input value={phone} onChange={(e) => onPhoneChange(formatPhone(e.target.value))} placeholder="(00) 00000-0000" inputMode="tel" maxLength={15} className="rounded-2xl pl-11 min-h-[44px]" />
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   )
 }
@@ -130,14 +125,14 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
 
   return (
     <motion.div {...fade}>
-      <Card>
-        <CardContent className="p-5 sm:p-7">
+      <div className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] border border-gray-200">
+        <div className="p-5 sm:p-7">
           <h2 className="text-sm font-bold text-[#111] mb-5 font-[family-name:var(--font-heading)]">Segurança</h2>
-          <Button type="button" variant="outline" onClick={() => setOpen(!open)}
+          <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => setOpen(!open)}
             className="w-full justify-between rounded-2xl min-h-[44px]">
             <span className="flex items-center gap-3"><Lock className="w-4 h-4 text-[#7A7A7A]" strokeWidth={1.5} /> Alterar senha</span>
             <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}><ChevronDown className="w-4 h-4 text-[#7A7A7A]" strokeWidth={1.5} /></motion.span>
-          </Button>
+          </button>
           <AnimatePresence>
             {open && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className="overflow-hidden">
@@ -145,40 +140,40 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
                   <div>
                     <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">Nova senha</label>
                     <div className="relative">
-                      <Input type={showNewPw ? 'text' : 'password'} value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="Mínimo 8 caracteres" className="rounded-2xl pr-14 min-h-[44px]" />
-                      <Button type="button" variant="ghost" size="icon" onClick={() => setShowNewPw(!showNewPw)} className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8" aria-label={showNewPw ? 'Ocultar senha' : 'Mostrar senha'}>
+                      <input type={showNewPw ? 'text' : 'password'} value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="Mínimo 8 caracteres" className="rounded-2xl pr-14 min-h-[44px]" />
+                      <button type="button" className="inline-flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px]" onClick={() => setShowNewPw(!showNewPw)} className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8" aria-label={showNewPw ? 'Ocultar senha' : 'Mostrar senha'}>
                         {showNewPw ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
-                      </Button>
+                      </button>
                     </div>
                   </div>
                   <div>
                     <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">Confirmar senha</label>
                     <div className="relative">
-                      <Input type={showConfirmPw ? 'text' : 'password'} value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="Repita a senha" className="rounded-2xl pr-14 min-h-[44px]" />
-                      <Button type="button" variant="ghost" size="icon" onClick={() => setShowConfirmPw(!showConfirmPw)} className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8" aria-label={showConfirmPw ? 'Ocultar senha' : 'Mostrar senha'}>
+                      <input type={showConfirmPw ? 'text' : 'password'} value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="Repita a senha" className="rounded-2xl pr-14 min-h-[44px]" />
+                      <button type="button" className="inline-flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px]" onClick={() => setShowConfirmPw(!showConfirmPw)} className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8" aria-label={showConfirmPw ? 'Ocultar senha' : 'Mostrar senha'}>
                         {showConfirmPw ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
-                      </Button>
+                      </button>
                     </div>
                   </div>
                   {newPw && confirmPw && newPw !== confirmPw && (
                     <p className="text-xs font-medium text-[var(--color-danger,#DC2626)]">As senhas não coincidem.</p>
                   )}
               <div className="flex gap-3 pt-1">
-                <Button type="button" onClick={changePw} disabled={saving || newPw.length < 8 || newPw !== confirmPw}
+                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors min-h-[44px]" onClick={changePw} disabled={saving || newPw.length < 8 || newPw !== confirmPw}
                   className="rounded-full min-h-[44px]">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar
-                </Button>
-                <Button type="button" variant="outline" onClick={() => { setOpen(false); setNewPw(''); setConfirmPw('') }}
+                </button>
+                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => { setOpen(false); setNewPw(''); setConfirmPw('') }}
                   className="rounded-full min-h-[44px]">
                   Cancelar
-                </Button>
+                </button>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   )
 }
@@ -201,34 +196,34 @@ function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
 
   return (
     <motion.div {...fade}>
-      <Card className="border-[var(--color-danger,#DC2626)]/20">
-        <CardContent className="p-5 sm:p-7">
+      <div className="border-[var(--color-danger,#DC2626)]/20">
+        <div className="p-5 sm:p-7">
           <h2 className="text-sm font-bold text-[var(--color-danger,#DC2626)] mb-2 font-[family-name:var(--font-heading)]">Excluir conta</h2>
           <p className="text-sm text-[#7A7A7A] mb-4 leading-relaxed">Essa ação é permanente e não pode ser desfeita.</p>
           {!show ? (
-            <Button type="button" variant="destructive" onClick={() => setShow(true)}
+            <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors min-h-[44px]" onClick={() => setShow(true)}
               className="rounded-full min-h-[44px]">
               <AlertTriangle className="w-4 h-4" /> Excluir conta
-            </Button>
+            </button>
           ) : (
             <motion.div {...fade} className="p-4 sm:p-5 rounded-2xl border border-[var(--color-danger,#DC2626)]/20 bg-[var(--color-danger,#DC2626)]/5">
               <label htmlFor="confirm-delete" className="block text-sm font-semibold text-[var(--color-danger,#DC2626)] mb-2">Digite &quot;EXCLUIR&quot; para confirmar:</label>
-              <Input id="confirm-delete" value={delText} onChange={(e) => setDelText(e.target.value)} placeholder="EXCLUIR"
+              <input id="confirm-delete" value={delText} onChange={(e) => setDelText(e.target.value)} placeholder="EXCLUIR"
                 className="rounded-2xl border-[var(--color-danger,#DC2626)]/25 focus:ring-[var(--color-danger,#DC2626)]/30 mb-4 min-h-[44px]" />
               <div className="flex flex-wrap gap-3">
-                <Button type="button" variant="destructive" onClick={deleteAccount} disabled={delText !== 'EXCLUIR' || deleting}
+                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors min-h-[44px]" onClick={deleteAccount} disabled={delText !== 'EXCLUIR' || deleting}
                   className="rounded-full min-h-[44px]">
                   {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />} {deleting ? 'Excluindo...' : 'Confirmar exclusão'}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => { setShow(false); setDelText('') }}
+                </button>
+                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => { setShow(false); setDelText('') }}
                   className="rounded-full min-h-[44px]">
                   Cancelar
-                </Button>
+                </button>
               </div>
             </motion.div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   )
 }
@@ -291,12 +286,12 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
   }
 
   if (loading) return (
-    <Card>
-      <CardContent className="flex flex-col items-center gap-3 p-8">
+    <div className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] border border-gray-200">
+      <div className="flex flex-col items-center gap-3 p-8">
         <Loader2 className="h-5 w-5 animate-spin text-[#7A7A7A]" />
         <p className="text-sm text-[#7A7A7A]">Carregando perfil...</p>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
   if (!userId) return null
 
@@ -316,11 +311,11 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
       <SecuritySection userId={userId} toast={showToast} />
 
       <motion.div {...fade}>
-        <Button type="button" onClick={saveProfile} disabled={saving || uploading}
+        <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors min-h-[44px]" onClick={saveProfile} disabled={saving || uploading}
           className="w-full rounded-full min-h-[48px] shadow-[0_8px_24px_rgba(0,0,0,.12)]">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {saving ? 'Salvando...' : 'Salvar alterações'}
-        </Button>
+        </button>
       </motion.div>
 
       <DangerZone userId={userId} toast={showToast} />
