@@ -464,16 +464,14 @@ export default function MyListingsDashboard() {
   if (!isAuthenticated) return <AuthCard onAuthenticated={() => setIsAuthenticated(true)} />
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Meus anúncios</h1>
-          <p className="text-sm text-gray-500 mt-1">{listings.length} anúncio{listings.length !== 1 ? 's' : ''}</p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Meus anúncios</h1>
+        <p className="text-sm text-gray-500 mt-1.5">{listings.length} anúncio{listings.length !== 1 ? 's' : ''}</p>
       </div>
 
-      <div className="lg:grid lg:grid-cols-[320px_1fr] lg:gap-8 items-start">
+      <div className="lg:grid lg:grid-cols-[320px_1fr] lg:gap-10 items-start">
       <ListingSidebar
         listings={listings}
         selectedId={selectedId}

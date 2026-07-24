@@ -47,17 +47,17 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
   }
 
   return (
-    <div className="min-h-dvh bg-gray-50 pb-24 lg:pb-0">
-      {/* Top bar - clean and minimal */}
+    <div className="min-h-dvh bg-gray-50 pb-28 lg:pb-0">
+      {/* Top bar */}
       <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-sm">
               <span className="text-white text-sm font-bold">C</span>
             </div>
             <span className="text-lg font-bold text-gray-900 hidden sm:block">Carbi</span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               aria-label="Configurações"
               onClick={() => router.push('/minha-conta/configuracoes')}
@@ -65,7 +65,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
             >
               <Settings className="w-5 h-5" strokeWidth={1.75} />
             </button>
-            <div className="w-10 h-10 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center border-2 border-white shadow-sm">
+            <div className="w-10 h-10 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center border-2 border-white shadow-sm ml-1">
               {user.avatarUrl ? (
                 <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -76,13 +76,13 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 py-8 lg:py-12">
         {/* Desktop: Welcome header */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease }}
-          className="hidden lg:block mb-10"
+          className="hidden lg:block mb-12"
         >
           <div className="flex items-end justify-between">
             <div>
@@ -92,11 +92,11 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
               <p className="text-base text-gray-500 mt-2">Gerencie sua conta e anúncios</p>
             </div>
             {stats.length > 0 && (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-5">
                 {stats.map((stat) => (
-                  <div key={stat.label} className="bg-white rounded-2xl px-6 py-4 border border-gray-200 shadow-sm">
+                  <div key={stat.label} className="bg-white rounded-2xl px-6 py-5 border border-gray-200 shadow-sm">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                      <div className="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center">
                         <stat.icon className="w-5 h-5 text-blue-600" strokeWidth={1.75} />
                       </div>
                       <div>
@@ -111,10 +111,10 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
           </div>
         </motion.div>
 
-        <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-10 lg:items-start">
+        <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-12 lg:items-start">
 
           {/* ── Sidebar ── */}
-          <div className="lg:sticky lg:top-24 space-y-4 mb-6 lg:mb-0">
+          <div className="lg:sticky lg:top-28 space-y-5 mb-8 lg:mb-0">
             {/* User Info Card - Desktop */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -139,21 +139,21 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
               </div>
             </motion.div>
 
-            {/* Navigation - iFood style */}
+            {/* Navigation */}
             <motion.nav
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.1, ease }}
             >
               {/* Mobile: horizontal scroll */}
-              <div className="lg:hidden flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none">
+              <div className="lg:hidden flex gap-2.5 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-none">
                 {navItems.map((item) => {
                   const active = isActive(item.href)
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-medium whitespace-nowrap transition-all ${
+                      className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-sm font-medium whitespace-nowrap transition-all ${
                         active
                           ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
                           : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
@@ -216,16 +216,16 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
         </div>
       </div>
 
-      {/* ── Mobile Bottom Navigation - iFood style ── */}
+      {/* ── Mobile Bottom Navigation ── */}
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-100 safe-area-pb">
-        <div className="flex items-center justify-around px-2 py-2">
+        <div className="flex items-center justify-around px-3 py-3">
           {navItems.slice(0, 5).map((item) => {
             const active = isActive(item.href)
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all min-w-0 ${
+                className={`flex flex-col items-center gap-1.5 px-3 py-2 rounded-2xl transition-all min-w-0 ${
                   active ? 'text-blue-600 bg-blue-50' : 'text-gray-400'
                 }`}
               >

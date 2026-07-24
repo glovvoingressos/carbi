@@ -68,24 +68,24 @@ function NotificationItem({ notification, onRead }: { notification: Notification
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       onClick={() => { if (!read) onRead(notification.id); if (notification.link) window.location.href = notification.link }}
-      className={`w-full text-left flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${
+      className={`w-full text-left flex items-start gap-5 p-5 rounded-2xl border transition-all cursor-pointer ${
         read ? 'bg-white border-gray-200 hover:border-gray-300' : 'bg-blue-50 border-blue-200'
       }`}
     >
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${cfg.bgClass} ${cfg.colorClass}`}>
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${cfg.bgClass} ${cfg.colorClass}`}>
         {cfg.icon}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <p className={`text-sm leading-snug ${read ? 'font-medium text-gray-600' : 'font-semibold text-gray-900'}`}>
+        <div className="flex items-start justify-between gap-3">
+          <p className={`text-base leading-snug ${read ? 'font-medium text-gray-600' : 'font-semibold text-gray-900'}`}>
             {notification.title}
           </p>
-          {!read && <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1.5" />}
+          {!read && <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0 mt-1.5" />}
         </div>
         {notification.body && (
-          <p className="text-sm text-gray-500 mt-1 leading-snug line-clamp-2">{notification.body}</p>
+          <p className="text-sm text-gray-500 mt-1.5 leading-relaxed line-clamp-2">{notification.body}</p>
         )}
-        <p className="text-xs text-gray-400 mt-2">{relativeTime(notification.created_at)}</p>
+        <p className="text-xs text-gray-400 mt-2.5">{relativeTime(notification.created_at)}</p>
       </div>
     </motion.button>
   )
@@ -165,18 +165,18 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter(n => !n.read).length
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Notificações</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Notificações</h1>
+          <p className="text-sm text-gray-500 mt-1.5">
             {unreadCount > 0 ? `${unreadCount} não lida${unreadCount > 1 ? 's' : ''}` : 'Tudo lido'}
           </p>
         </div>
         {unreadCount > 0 && (
-          <button onClick={markAllRead} disabled={markingAll} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors border border-blue-200">
-            {markingAll ? <Loader2 size={14} className="animate-spin" /> : <CheckCheck size={14} />}
+          <button onClick={markAllRead} disabled={markingAll} className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors border border-blue-200">
+            {markingAll ? <Loader2 size={16} className="animate-spin" /> : <CheckCheck size={16} />}
             Marcar como lidas
           </button>
         )}
@@ -185,9 +185,9 @@ export default function NotificationsPage() {
       <div className="max-w-3xl">
         <NotificationHeader unreadCount={unreadCount} onMarkAllRead={markAllRead} markingAll={markingAll} />
         {loading ? (
-          <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <NotificationSkeleton key={i} />)}</div>
+          <div className="space-y-4">{Array.from({ length: 5 }).map((_, i) => <NotificationSkeleton key={i} />)}</div>
         ) : notifications.length === 0 ? <EmptyState /> : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <AnimatePresence mode="popLayout">
               {notifications.map(n => <NotificationItem key={n.id} notification={n} onRead={markRead} />)}
             </AnimatePresence>

@@ -252,57 +252,57 @@ export default function ConversationInbox() {
   }
 
   const listPanel = (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-200 overflow-hidden">
-      <div className="p-5 border-b border-gray-100">
-        <h2 className="text-base font-semibold text-gray-900 mb-3">Minhas conversas</h2>
+    <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+      <div className="p-6 border-b border-gray-100">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Minhas conversas</h2>
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input type="text" placeholder="Buscar conversas..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all" />
+            className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all" />
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {loadingConversations && filtered.length === 0 && (
-          <p className="text-center text-sm text-gray-400 py-12">Carregando conversas...</p>
+          <p className="text-center text-sm text-gray-400 py-16">Carregando conversas...</p>
         )}
         {filtered.map((c) => (
           <button
             key={c.id}
             type="button"
             onClick={() => { setSelectedId(c.id); setMobileView('chat') }}
-            className={`w-full flex items-center gap-4 p-4 transition-all text-left border-b border-gray-100 ${
+            className={`w-full flex items-center gap-4 p-5 transition-all text-left border-b border-gray-100 ${
               selectedId === c.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : 'hover:bg-gray-50'
             }`}
           >
             <ConversationThumb
               images={c.vehicle_listings_public.images}
               title={c.vehicle_listings_public.title}
-              className="w-12 h-12 rounded-xl"
+              className="w-14 h-14 rounded-xl"
             />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
+              <p className="text-base font-semibold text-gray-900 truncate">
                 {c.vehicle_listings_public.title}
               </p>
-              <p className="text-xs text-gray-500 truncate mt-0.5">
+              <p className="text-sm text-gray-500 truncate mt-1">
                 {formatBRL(Number(c.vehicle_listings_public.price))} · {c.vehicle_listings_public.city}/{c.vehicle_listings_public.state}
               </p>
-              <p className="text-xs text-gray-400 truncate mt-1">
+              <p className="text-sm text-gray-400 truncate mt-1.5">
                 {c.last_message_preview || 'Conversa iniciada'}
               </p>
             </div>
             {c.is_unread && selectedId !== c.id && (
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0" />
+              <span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" />
             )}
           </button>
         ))}
         {filtered.length === 0 && !loadingConversations && (
-          <div className="flex flex-col items-center justify-center py-16 text-center px-4">
-            <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-              <MessageSquare className="w-7 h-7 text-blue-500" strokeWidth={1.5} />
+          <div className="flex flex-col items-center justify-center py-20 text-center px-6">
+            <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-5">
+              <MessageSquare className="w-9 h-9 text-blue-500" strokeWidth={1.5} />
             </div>
-            <p className="text-base font-semibold text-gray-900">Nenhuma conversa</p>
-            <p className="text-sm text-gray-500 mt-1 max-w-[240px]">Conversas com vendedores aparecerão aqui.</p>
+            <p className="text-lg font-semibold text-gray-900">Nenhuma conversa</p>
+            <p className="text-sm text-gray-500 mt-2 max-w-[280px]">Conversas com vendedores aparecerão aqui.</p>
           </div>
         )}
       </div>
@@ -310,29 +310,29 @@ export default function ConversationInbox() {
   )
 
   const chatPanel = selectedConversation ? (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-200 overflow-hidden">
-      <div className="flex items-center gap-4 px-5 py-4 border-b border-gray-200 shrink-0">
+    <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+      <div className="flex items-center gap-4 px-6 py-5 border-b border-gray-200 shrink-0">
         <button type="button" onClick={() => setMobileView('list')} className="md:hidden p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors" aria-label="Voltar">
           <ArrowLeft className="w-5 h-5 text-gray-900" />
         </button>
-        <ConversationThumb images={selectedConversation.vehicle_listings_public.images} title={selectedConversation.vehicle_listings_public.title} className="w-11 h-11 rounded-xl" />
+        <ConversationThumb images={selectedConversation.vehicle_listings_public.images} title={selectedConversation.vehicle_listings_public.title} className="w-12 h-12 rounded-xl" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 truncate">{selectedConversation.vehicle_listings_public.title}</p>
-          <p className="text-xs text-gray-500 truncate">
+          <p className="text-base font-semibold text-gray-900 truncate">{selectedConversation.vehicle_listings_public.title}</p>
+          <p className="text-sm text-gray-500 truncate mt-0.5">
             {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} · {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
           </p>
         </div>
-        <Link href={`/anuncios/${selectedConversation.vehicle_listings_public.slug}`} className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-xs font-medium shrink-0 hover:bg-gray-200 transition-colors">
-          Ver anúncio <ArrowUpRight className="w-3.5 h-3.5" strokeWidth={2} />
+        <Link href={`/anuncios/${selectedConversation.vehicle_listings_public.slug}`} className="flex items-center gap-1.5 px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium shrink-0 hover:bg-gray-200 transition-colors">
+          Ver anúncio <ArrowUpRight className="w-4 h-4" strokeWidth={2} />
         </Link>
       </div>
-      <div className="mx-4 mt-4 px-4 py-3 flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-xs shrink-0">
-        <ShieldCheck className="w-4 h-4 shrink-0" strokeWidth={1.8} />
+      <div className="mx-5 mt-5 px-5 py-4 flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm shrink-0">
+        <ShieldCheck className="w-5 h-5 shrink-0" strokeWidth={1.8} />
         <span className="font-medium">Negociação segura: evite compartilhar telefone ou dados bancários no chat.</span>
       </div>
-      <div className="flex-1 overflow-y-auto px-5 py-4">
-        {loadingMessages && messages.length === 0 && <p className="text-center text-sm text-gray-400 py-12">Carregando mensagens...</p>}
-        <div className="grid gap-3">
+      <div className="flex-1 overflow-y-auto px-6 py-5">
+        {loadingMessages && messages.length === 0 && <p className="text-center text-sm text-gray-400 py-16">Carregando mensagens...</p>}
+        <div className="grid gap-4">
           {messages.map((msg, i) => {
             const isMine = msg.sender_user_id === myUserId
             const prev = messages[i - 1]
@@ -342,34 +342,34 @@ export default function ConversationInbox() {
           <div ref={messagesEndRef} />
         </div>
       </div>
-      <div className="px-4 pb-4 pt-3 shrink-0 border-t border-gray-100">
-        <div className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-200 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+      <div className="px-5 pb-5 pt-4 shrink-0 border-t border-gray-100">
+        <div className="flex items-center gap-3 p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
           <input type="text" value={messageText} onChange={(e) => setMessageText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage() } }}
-            placeholder="Digite sua mensagem..." className="flex-1 px-3 py-2.5 bg-transparent text-sm text-gray-900 placeholder-gray-400 focus:outline-none" aria-label="Mensagem" />
+            placeholder="Digite sua mensagem..." className="flex-1 px-3 py-3 bg-transparent text-sm text-gray-900 placeholder-gray-400 focus:outline-none" aria-label="Mensagem" />
           <button type="button" disabled={sending || !messageText.trim()} onClick={() => void sendMessage()}
-            className="p-2.5 bg-blue-600 text-white rounded-xl disabled:opacity-40 hover:bg-blue-700 transition-colors" aria-label="Enviar">
-            {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" strokeWidth={1.75} />}
+            className="p-3 bg-blue-600 text-white rounded-xl disabled:opacity-40 hover:bg-blue-700 transition-colors" aria-label="Enviar">
+            {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" strokeWidth={1.75} />}
           </button>
         </div>
       </div>
     </div>
   ) : (
-    <div className="flex flex-col items-center justify-center h-full bg-white rounded-2xl border border-gray-200 text-center px-8">
-      <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-        <MessageSquare className="w-7 h-7 text-blue-500" strokeWidth={1.5} />
+    <div className="flex flex-col items-center justify-center h-full bg-white rounded-2xl border border-gray-200 text-center px-10 shadow-sm">
+      <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-5">
+        <MessageSquare className="w-9 h-9 text-blue-500" strokeWidth={1.5} />
       </div>
-      <h2 className="text-base font-semibold text-gray-900">Selecione uma conversa</h2>
-      <p className="text-sm text-gray-500 mt-2 max-w-[280px]">O histórico de mensagens aparecerá aqui em tempo real.</p>
+      <h2 className="text-lg font-semibold text-gray-900">Selecione uma conversa</h2>
+      <p className="text-sm text-gray-500 mt-2 max-w-[300px]">O histórico de mensagens aparecerá aqui em tempo real.</p>
     </div>
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-gray-900">Mensagens</h1>
-        <p className="text-sm text-gray-500 mt-1">{conversations.length} conversa{conversations.length !== 1 ? 's' : ''}</p>
+        <h1 className="text-2xl font-bold text-gray-900">Mensagens</h1>
+        <p className="text-sm text-gray-500 mt-1.5">{conversations.length} conversa{conversations.length !== 1 ? 's' : ''}</p>
       </div>
 
       <div className="min-h-[500px] lg:h-[calc(100vh-280px)]">
@@ -393,7 +393,7 @@ export default function ConversationInbox() {
       </div>
 
       {error && (
-        <div className="fixed bottom-24 lg:bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 bg-red-600 text-white text-sm font-semibold rounded-2xl shadow-lg z-50">
+        <div className="fixed bottom-28 lg:bottom-6 left-1/2 -translate-x-1/2 px-6 py-3.5 bg-red-600 text-white text-sm font-semibold rounded-2xl shadow-lg z-50">
           {error}
         </div>
       )}
