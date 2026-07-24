@@ -43,8 +43,8 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
   return (
     <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
       {/* Cover */}
-      <div className="h-32 bg-gradient-to-br from-[#1A1A1A] via-[#2D2D2D] to-[#1A1A1A] relative">
-        <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-10" />
+      <div className="h-32 bg-gradient-to-br from-[#16855C] via-[#1A7A54] to-[#146B4A] relative">
+        <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
       </div>
       
       {/* Profile Info */}
