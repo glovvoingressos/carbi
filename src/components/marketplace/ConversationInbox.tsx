@@ -363,7 +363,7 @@ export default function ConversationInbox() {
   )
 
   return (
-    <div className="max-w-[1240px] mx-auto h-[calc(100vh-260px)] min-h-[400px]">
+    <div className="max-w-[1240px] mx-auto min-h-[500px] lg:h-[calc(100vh-260px)]">
       <div className="md:hidden h-full">
         <AnimatePresence mode="wait">
           {mobileView === 'list' ? (

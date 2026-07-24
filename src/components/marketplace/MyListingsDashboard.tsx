@@ -129,7 +129,7 @@ function ListingSidebar({ listings, selectedId, onSelect, loading, searchQuery, 
 function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDirty, setIsDirty, saveStatus, onSave, onDelete, isDeleting, isBlurring, onBlurPlates, localImages, onImageRemove, onImageSetPrimary, onImageReorder, onImageAdd, onImageSync, isUploading, pendingUploads, imageError, isDraggingPhotos, onDragEnter, onDragLeave, onDragOver, onDrop }: {
   listing: DashboardListing; formData: Partial<DashboardListing>; setFormData: (fn: (p: Partial<DashboardListing>) => Partial<DashboardListing>) => void
   errors: Record<string, string>; setErrors: (e: Record<string, string>) => void; isDirty: boolean; setIsDirty: (d: boolean) => void
-  saveStatus: 'idle' | 'saving' | 'saved' | 'error'; onSave: () => void; onDelete: () => void; isDeleting: boolean; isBlurring: boolean; onBlurPlates: () => void
+  saveStatus: 'idle' | 'saving' | 'saved' | 'error'; onSave: () => void; onDelete: () => void; isDeleting: boolean
   localImages: UploadImageItem[]; onImageRemove: (id: string) => void; onImageSetPrimary: (id: string) => void; onImageReorder: (next: UploadImageItem[]) => void
   onImageAdd: (files: FileList | null) => void; onImageSync: () => void; isUploading: boolean; pendingUploads: number; imageError: string | null
   isDraggingPhotos: boolean; onDragEnter: (e: React.DragEvent) => void; onDragLeave: (e: React.DragEvent) => void; onDragOver: (e: React.DragEvent) => void; onDrop: (e: React.DragEvent) => void
@@ -237,9 +237,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
         <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">VIN (Opcional)</label>
           <div className="relative">
             <input className={`${ic('vin')} pr-20 md:pr-28 font-mono text-xs`} value={formData.vin || ''} maxLength={17} placeholder="17 caracteres" onChange={(e) => update('vin', e.target.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, ''))} />
-            <button onClick={onBlurPlates} disabled={isBlurring} className="absolute right-1.5 top-1.5 bottom-1.5 px-3 bg-white rounded-lg text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] flex items-center gap-1 border border-[var(--color-border)]">
-              {isBlurring ? <Loader2 className="w-3 h-3 animate-spin" /> : <ScanSearch className="w-3 h-3" />} Borrar Placas
-            </button>
+            
           </div>
         </div>
       </div>
@@ -277,7 +275,7 @@ export default function MyListingsDashboard() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [isBlurring, setIsBlurring] = useState(false)
+  
   const [isUploading, setIsUploading] = useState(false)
   const [pendingUploads, setPendingUploads] = useState(0)
   const [imageError, setImageError] = useState<string | null>(null)
@@ -361,11 +359,7 @@ export default function MyListingsDashboard() {
     catch (err) { setGlobalError(err instanceof Error ? err.message : 'Erro ao excluir') } finally { setIsDeleting(false) }
   }, [selected, listings, selectedId])
 
-  const handleBlurPlates = useCallback(async () => {
-    if (!selected) return; setIsBlurring(true)
-    try { const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); const res = await fetch(`/api/marketplace/listings/${selected.id}/blur-plates`, { method: 'POST', headers: authH(session!.access_token) }); if (!res.ok) throw new Error('Falha ao borrar placas'); await loadListings() }
-    catch (err) { setGlobalError(err instanceof Error ? err.message : 'Erro ao borrar placas') } finally { setIsBlurring(false) }
-  }, [selected, loadListings])
+
 
   if (!sessionReady) return <div className="flex flex-col items-center justify-center p-12 text-center"><Loader2 className="h-6 w-6 animate-spin text-[var(--color-text-tertiary)]" /><p className="mt-4 text-sm font-medium text-[var(--color-text-tertiary)]">Carregando…</p></div>
   if (!isAuthenticated) return <AuthCard onAuthenticated={() => setIsAuthenticated(true)} />
@@ -377,7 +371,7 @@ export default function MyListingsDashboard() {
         <AnimatePresence mode="wait">
           {selected ? (
             <motion.div key={selected.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.3 }}>
-              <ListingEditor listing={selected} formData={formData} setFormData={setFormData} errors={errors} setErrors={setErrors} isDirty={isDirty} setIsDirty={setIsDirty} saveStatus={saveStatus} onSave={() => void saveListing(false)} onDelete={handleDelete} isDeleting={isDeleting} isBlurring={isBlurring} onBlurPlates={handleBlurPlates} localImages={localImages} onImageRemove={removeImage} onImageSetPrimary={setPrimary} onImageReorder={(next) => { setLocalImages(next); localImgRef.current = next; setIsDirty(true); schedSync(next) }} onImageAdd={handleImageSelect} onImageSync={() => void syncImages()} isUploading={isUploading} pendingUploads={pendingUploads} imageError={imageError} isDraggingPhotos={isDraggingPhotos} onDragEnter={(e) => handlePhotosDrag(e, true)} onDragLeave={(e) => handlePhotosDrag(e, false)} onDragOver={(e) => { e.preventDefault(); e.stopPropagation() }} onDrop={handlePhotosDrop} />
+              <ListingEditor listing={selected} formData={formData} setFormData={setFormData} errors={errors} setErrors={setErrors} isDirty={isDirty} setIsDirty={setIsDirty} saveStatus={saveStatus} onSave={() => void saveListing(false)} onDelete={handleDelete} isDeleting={isDeleting} localImages={localImages} onImageRemove={removeImage} onImageSetPrimary={setPrimary} onImageReorder={(next) => { setLocalImages(next); localImgRef.current = next; setIsDirty(true); schedSync(next) }} onImageAdd={handleImageSelect} onImageSync={() => void syncImages()} isUploading={isUploading} pendingUploads={pendingUploads} imageError={imageError} isDraggingPhotos={isDraggingPhotos} onDragEnter={(e) => handlePhotosDrag(e, true)} onDragLeave={(e) => handlePhotosDrag(e, false)} onDragOver={(e) => { e.preventDefault(); e.stopPropagation() }} onDrop={handlePhotosDrop} />
             </motion.div>
           ) : (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center rounded-2xl border border-[var(--color-border-strong)] bg-white p-8 md:p-16 text-center">
