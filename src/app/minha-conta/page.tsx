@@ -111,8 +111,8 @@ export default function MinhaContaPage() {
     <AccountLayout user={user} stats={stats}>
       <div className="space-y-6">
         {/* Hero Welcome */}
-        <div className="bg-gradient-to-br from-[#1A1A1A] via-[#2D2D2D] to-[#1A1A1A] rounded-2xl p-8 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-10" />
+        <div className="bg-gradient-to-br from-[#16855C] via-[#1A7A54] to-[#146B4A] rounded-2xl p-8 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
           <div className="relative z-10">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               Olá, {user.fullName?.split(' ')[0] || 'Usuário'} 👋
