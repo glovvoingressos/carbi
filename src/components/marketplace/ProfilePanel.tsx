@@ -128,8 +128,7 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
       <div className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] border border-gray-200">
         <div className="p-5 sm:p-7">
           <h2 className="text-sm font-bold text-[#111] mb-5 font-[family-name:var(--font-heading)]">Segurança</h2>
-          <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => setOpen(!open)}
-            className="w-full justify-between rounded-2xl min-h-[44px]">
+          <button type="button" className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => setOpen(!open)}>
             <span className="flex items-center gap-3"><Lock className="w-4 h-4 text-[#7A7A7A]" strokeWidth={1.5} /> Alterar senha</span>
             <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}><ChevronDown className="w-4 h-4 text-[#7A7A7A]" strokeWidth={1.5} /></motion.span>
           </button>
