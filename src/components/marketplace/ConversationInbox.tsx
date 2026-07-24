@@ -34,6 +34,8 @@ interface MessageItem {
 
 const formatTime = (iso: string) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
+const ease = [0.23, 1, 0.32, 1] as const
+
 function ConversationThumb({ images, title, className }: { images?: Array<{ url: string }> | null; title: string; className?: string }) {
   const url = getCarImageCandidates([images?.[0]?.url || null])[0]
   return (

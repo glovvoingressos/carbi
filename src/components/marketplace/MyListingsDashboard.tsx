@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { Loader2, Save, Upload, Trash2, Check, AlertCircle, Image as ImageIcon, GripVertical, Star, X, Search, Car, Plus, Filter, Grid, List, Eye, TrendingUp, BarChart3 } from 'lucide-react'
 import { motion, AnimatePresence, Reorder } from 'motion/react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
@@ -15,6 +16,8 @@ interface DashboardListing { id: string; slug: string; title: string; descriptio
 interface UploadImageItem { id: string; file?: File; previewUrl: string; isExisting: boolean; originalImage?: DashboardImage; is_primary: boolean; sort_order: number }
 
 const authH = (t: string) => ({ Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' })
+
+const ease = [0.23, 1, 0.32, 1] as const
 
 // ── StatusBadge ────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
@@ -381,6 +384,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
 
 // ── Main Dashboard ─────────────────────────────────────
 export default function MyListingsDashboard() {
+  const router = useRouter()
   const supabaseReady = isSupabaseBrowserConfigured()
   const [sessionReady, setSessionReady] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
