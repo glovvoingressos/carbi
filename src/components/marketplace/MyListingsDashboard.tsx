@@ -465,15 +465,15 @@ export default function MyListingsDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Desktop header */}
-      <div className="hidden lg:flex items-center justify-between">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-bold text-[#1A1A1A]">Meus anúncios</h1>
-          <p className="text-sm text-gray-400 mt-0.5">{listings.length} anúncio{listings.length !== 1 ? 's' : ''} encontrado{listings.length !== 1 ? 's' : ''}</p>
+          <h1 className="text-xl font-bold text-gray-900">Meus anúncios</h1>
+          <p className="text-sm text-gray-500 mt-1">{listings.length} anúncio{listings.length !== 1 ? 's' : ''}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start">
+      <div className="lg:grid lg:grid-cols-[320px_1fr] lg:gap-8 items-start">
       <ListingSidebar
         listings={listings}
         selectedId={selectedId}

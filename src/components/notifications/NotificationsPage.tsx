@@ -166,28 +166,28 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Desktop header */}
-      <div className="hidden lg:flex items-center justify-between">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-bold text-[#1A1A1A]">Notificações</h1>
-          <p className="text-sm text-gray-400 mt-0.5">
+          <h1 className="text-xl font-bold text-gray-900">Notificações</h1>
+          <p className="text-sm text-gray-500 mt-1">
             {unreadCount > 0 ? `${unreadCount} não lida${unreadCount > 1 ? 's' : ''}` : 'Tudo lido'}
           </p>
         </div>
         {unreadCount > 0 && (
-          <button onClick={markAllRead} disabled={markingAll} className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-gray-500 hover:bg-gray-100 transition-colors">
-            {markingAll ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={12} />}
+          <button onClick={markAllRead} disabled={markingAll} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors border border-blue-200">
+            {markingAll ? <Loader2 size={14} className="animate-spin" /> : <CheckCheck size={14} />}
             Marcar como lidas
           </button>
         )}
       </div>
 
-      <div className="max-w-2xl">
+      <div className="max-w-3xl">
         <NotificationHeader unreadCount={unreadCount} onMarkAllRead={markAllRead} markingAll={markingAll} />
         {loading ? (
-          <div className="space-y-1">{Array.from({ length: 5 }).map((_, i) => <NotificationSkeleton key={i} />)}</div>
+          <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <NotificationSkeleton key={i} />)}</div>
         ) : notifications.length === 0 ? <EmptyState /> : (
-          <div className="space-y-1">
+          <div className="space-y-3">
             <AnimatePresence mode="popLayout">
               {notifications.map(n => <NotificationItem key={n.id} notification={n} onRead={markRead} />)}
             </AnimatePresence>

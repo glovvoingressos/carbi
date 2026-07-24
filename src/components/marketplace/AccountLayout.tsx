@@ -48,58 +48,62 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
 
   return (
     <div className="min-h-dvh bg-gray-50 pb-24 lg:pb-0">
-      {/* Top bar - iFood style */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center">
-              <span className="text-white text-xs font-bold">C</span>
+      {/* Top bar - clean and minimal */}
+      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-sm">
+              <span className="text-white text-sm font-bold">C</span>
             </div>
-            <span className="text-base font-bold text-gray-900">Carbi</span>
+            <span className="text-lg font-bold text-gray-900 hidden sm:block">Carbi</span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               aria-label="Configurações"
               onClick={() => router.push('/minha-conta/configuracoes')}
-              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-600"
+              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-500"
             >
               <Settings className="w-5 h-5" strokeWidth={1.75} />
             </button>
-            <div className="w-9 h-9 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center border-2 border-white shadow-sm">
               {user.avatarUrl ? (
                 <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
               ) : (
-                <User className="w-4 h-4 text-blue-600" strokeWidth={2} />
+                <User className="w-5 h-5 text-blue-600" strokeWidth={2} />
               )}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
         {/* Desktop: Welcome header */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease }}
-          className="hidden lg:block mb-8"
+          className="hidden lg:block mb-10"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-end justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Olá, {user.fullName?.split(' ')[0] || 'Usuário'}
+              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                Olá, {user.fullName?.split(' ')[0] || 'Usuário'} 👋
               </h1>
-              <p className="text-sm text-gray-500 mt-1">Gerencie sua conta e anúncios</p>
+              <p className="text-base text-gray-500 mt-2">Gerencie sua conta e anúncios</p>
             </div>
             {stats.length > 0 && (
-              <div className="flex items-center gap-8">
+              <div className="flex items-center gap-4">
                 {stats.map((stat) => (
-                  <div key={stat.label} className="bg-white rounded-2xl px-6 py-4 border border-gray-200">
-                    <div className="flex items-center gap-2">
-                      <stat.icon className="w-5 h-5 text-blue-600" strokeWidth={1.75} />
-                      <span className="text-2xl font-bold text-gray-900">{stat.value}</span>
+                  <div key={stat.label} className="bg-white rounded-2xl px-6 py-4 border border-gray-200 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                        <stat.icon className="w-5 h-5 text-blue-600" strokeWidth={1.75} />
+                      </div>
+                      <div>
+                        <span className="text-2xl font-bold text-gray-900 block leading-none">{stat.value}</span>
+                        <span className="text-xs text-gray-500 mt-1 block">{stat.label}</span>
+                      </div>
                     </div>
-                    <span className="text-xs text-gray-500 mt-1 block">{stat.label}</span>
                   </div>
                 ))}
               </div>
@@ -107,7 +111,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
           </div>
         </motion.div>
 
-        <div className="lg:grid lg:grid-cols-[260px_1fr] lg:gap-8 lg:items-start">
+        <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-10 lg:items-start">
 
           {/* ── Sidebar ── */}
           <div className="lg:sticky lg:top-24 space-y-4 mb-6 lg:mb-0">
@@ -116,21 +120,21 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, ease }}
-              className="hidden lg:block bg-white rounded-2xl border border-gray-200 p-5"
+              className="hidden lg:block bg-white rounded-2xl border border-gray-200 p-6 shadow-sm"
             >
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center shrink-0">
+                <div className="w-16 h-16 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center shrink-0 border-4 border-white shadow-md">
                   {user.avatarUrl ? (
                     <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <User className="w-6 h-6 text-blue-600" strokeWidth={1.5} />
+                    <User className="w-7 h-7 text-blue-600" strokeWidth={1.5} />
                   )}
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-sm font-semibold text-gray-900 truncate">
+                  <h2 className="text-base font-semibold text-gray-900 truncate">
                     {user.fullName || 'Usuário'}
                   </h2>
-                  <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
+                  <p className="text-sm text-gray-500 truncate mt-0.5">{user.email}</p>
                 </div>
               </div>
             </motion.div>
@@ -142,16 +146,16 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
               transition={{ duration: 0.3, delay: 0.1, ease }}
             >
               {/* Mobile: horizontal scroll */}
-              <div className="lg:hidden flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
+              <div className="lg:hidden flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none">
                 {navItems.map((item) => {
                   const active = isActive(item.href)
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                      className={`flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-medium whitespace-nowrap transition-all ${
                         active
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
                           : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
                       }`}
                     >
@@ -163,22 +167,22 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
               </div>
 
               {/* Desktop: card list */}
-              <div className="hidden lg:block bg-white rounded-2xl border border-gray-200 overflow-hidden">
+              <div className="hidden lg:block bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
                 {navItems.map((item, index) => {
                   const active = isActive(item.href)
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-3 px-4 py-3.5 text-sm font-medium transition-all ${
+                      className={`flex items-center gap-4 px-5 py-4 text-sm font-medium transition-all ${
                         active
                           ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-600'
-                          : 'text-gray-700 hover:bg-gray-50 border-l-4 border-transparent'
+                          : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'
                       } ${index < navItems.length - 1 ? 'border-b border-gray-100' : ''}`}
                     >
                       <item.icon className={`w-5 h-5 ${active ? 'text-blue-600' : 'text-gray-400'}`} strokeWidth={1.75} />
-                      {item.label}
-                      <ChevronRight className={`w-4 h-4 ml-auto ${active ? 'text-blue-400' : 'text-gray-300'}`} />
+                      <span className="flex-1">{item.label}</span>
+                      <ChevronRight className={`w-4 h-4 ${active ? 'text-blue-400' : 'text-gray-300'}`} />
                     </Link>
                   )
                 })}
@@ -186,12 +190,12 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
             </motion.nav>
 
             {/* Logout - Desktop only */}
-            <div className="hidden lg:block">
+            <div className="hidden lg:block pt-2">
               <button
                 type="button"
                 onClick={handleLogout}
                 disabled={loggingOut}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition-colors disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all disabled:opacity-50 border border-gray-200 hover:border-red-200"
               >
                 <LogOut className="w-4 h-4" strokeWidth={1.75} />
                 {loggingOut ? 'Saindo...' : 'Sair da conta'}
@@ -213,7 +217,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
       </div>
 
       {/* ── Mobile Bottom Navigation - iFood style ── */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-gray-200 safe-area-pb">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-100 safe-area-pb">
         <div className="flex items-center justify-around px-2 py-2">
           {navItems.slice(0, 5).map((item) => {
             const active = isActive(item.href)
@@ -221,11 +225,11 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all min-w-0 ${
-                  active ? 'text-blue-600' : 'text-gray-500'
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all min-w-0 ${
+                  active ? 'text-blue-600 bg-blue-50' : 'text-gray-400'
                 }`}
               >
-                <item.icon className={`w-5 h-5 ${active ? 'text-blue-600' : 'text-gray-500'}`} strokeWidth={active ? 2.5 : 1.75} />
+                <item.icon className={`w-5 h-5 ${active ? 'text-blue-600' : 'text-gray-400'}`} strokeWidth={active ? 2.5 : 1.75} />
                 <span className={`text-[10px] ${active ? 'font-bold' : 'font-medium'}`}>
                   {item.label}
                 </span>

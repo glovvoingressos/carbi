@@ -335,14 +335,20 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
             exit={{ opacity: 0, y: -16 }}
             role="status"
             aria-live="polite"
-            className={`fixed top-20 right-4 z-50 px-4 py-2.5 rounded-full text-xs font-semibold shadow-lg max-w-[calc(100vw-32px)] ${
-              toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
+            className={`fixed top-20 right-4 z-50 px-5 py-3 rounded-xl text-sm font-semibold shadow-lg max-w-[calc(100vw-32px)] ${
+              toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
             }`}
           >
             {toast.message}
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Header */}
+      <div>
+        <h1 className="text-xl font-bold text-gray-900">Meu perfil</h1>
+        <p className="text-sm text-gray-500 mt-1">Atualize suas informações pessoais</p>
+      </div>
 
       {/* Desktop: 2-column grid */}
       <div className="lg:grid lg:grid-cols-[1fr_1fr] lg:gap-6">
@@ -356,15 +362,18 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
         </div>
       </div>
 
-      <button
-        type="button"
-        className="w-full py-3.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-40 flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
-        onClick={saveProfile}
-        disabled={saving || uploading}
-      >
-        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-        {saving ? 'Salvando...' : 'Salvar alterações'}
-      </button>
+      {/* Save button - sticky on mobile */}
+      <div className="sticky bottom-24 lg:bottom-6 pt-4 pb-2">
+        <button
+          type="button"
+          className="w-full py-4 rounded-2xl bg-blue-600 text-white text-base font-semibold hover:bg-blue-700 transition-all disabled:opacity-40 flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30"
+          onClick={saveProfile}
+          disabled={saving || uploading}
+        >
+          {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+          {saving ? 'Salvando...' : 'Salvar alterações'}
+        </button>
+      </div>
     </section>
   )
 }
