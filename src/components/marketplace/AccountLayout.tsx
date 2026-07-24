@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
 import {
   LayoutDashboard, Car, MessageCircle, Bell, Settings,
-  LogOut, User, Eye, Heart, Star
+  LogOut, User, Heart
 } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
 
@@ -14,6 +14,7 @@ const navItems = [
   { href: '/minha-conta', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/minha-conta/anuncios', label: 'Meus anúncios', icon: Car },
   { href: '/minha-conta/conversas', label: 'Mensagens', icon: MessageCircle },
+  { href: '/minha-conta/favoritos', label: 'Favoritos', icon: Heart },
   { href: '/minha-conta/notificacoes', label: 'Notificações', icon: Bell },
   { href: '/minha-conta/configuracoes', label: 'Configurações', icon: Settings },
 ]
@@ -51,7 +52,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
   }
 
   return (
-    <div className="min-h-dvh bg-[#F5F5F5] pb-20 fingen-shell">
+    <div className="min-h-dvh bg-[#F5F5F5] pb-24 lg:pb-8 fingen-shell">
       {/* Hero banner */}
       <div className="relative h-44 md:h-52 bg-gradient-to-br from-[#1A1A1A] via-[#2A2A2A] to-[#111111] overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-10" />
@@ -205,6 +206,33 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
 
         </div>
       </div>
+
+      {/* ── Mobile Bottom Navigation ── */}
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-sm border-t border-gray-200/80 safe-area-pb">
+        <div className="flex items-center justify-around px-1 py-2">
+          {navItems.slice(0, 5).map((item) => {
+            const active = isActive(item.href)
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors min-w-0 ${
+                  active ? 'text-[#1A1A1A]' : 'text-gray-400'
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-2xl flex items-center justify-center transition-colors ${
+                  active ? 'bg-[#1A1A1A]' : 'bg-transparent'
+                }`}>
+                  <item.icon className={`w-4 h-4 ${active ? 'text-[#D4F576]' : 'text-gray-400'}`} strokeWidth={1.75} />
+                </div>
+                <span className={`text-[10px] font-semibold truncate max-w-[52px] text-center ${active ? 'text-[#1A1A1A]' : 'text-gray-400'}`}>
+                  {item.label.split(' ')[0]}
+                </span>
+              </Link>
+            )
+          })}
+        </div>
+      </nav>
     </div>
   )
 }

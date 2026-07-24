@@ -17,22 +17,29 @@ const formatPhone = (v: string) => {
 type ToastFn = (type: 'success' | 'error', message: string) => void
 
 /* ─── Avatar ─── */
-function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, uploading }: {
+function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, uploading, onUploadingChange }: {
   avatarUrl: string; fullName: string; email: string; userId: string
-  onAvatarChange: (url: string) => void; uploading: boolean
+  onAvatarChange: (url: string) => void; uploading: boolean; onUploadingChange: (v: boolean) => void
 }) {
   const upload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !userId) return
-    const sb = getSupabaseBrowserClient()
-    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-    const path = `${userId}/avatar.${ext}`
-    const { error } = await sb.storage.from('profile-avatars').upload(path, file, { upsert: true, contentType: file.type })
-    if (error) throw error
-    const { data } = sb.storage.from('profile-avatars').getPublicUrl(path)
-    onAvatarChange(data.publicUrl)
-    await sb.from('users').update({ avatar_url: data.publicUrl }).eq('id', userId)
-    e.target.value = ''
+    onUploadingChange(true)
+    try {
+      const sb = getSupabaseBrowserClient()
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+      const path = `${userId}/avatar.${ext}`
+      const { error } = await sb.storage.from('profile-avatars').upload(path, file, { upsert: true, contentType: file.type })
+      if (error) throw error
+      const { data } = sb.storage.from('profile-avatars').getPublicUrl(path)
+      onAvatarChange(data.publicUrl)
+      await sb.from('users').update({ avatar_url: data.publicUrl }).eq('id', userId)
+      e.target.value = ''
+    } catch (e) {
+      // silently ignore avatar upload errors in this inner component
+    } finally {
+      onUploadingChange(false)
+    }
   }
 
   return (
@@ -295,6 +302,7 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
         )}
       </AnimatePresence>
 
+      <AvatarSection avatarUrl={avatarUrl} fullName={fullName} email={email} userId={userId} onAvatarChange={setAvatarUrl} uploading={uploading} onUploadingChange={setUploading} />
       <PersonalInfo fullName={fullName} email={email} phone={phone} onNameChange={setFullName} onPhoneChange={setPhone} />
       <SecuritySection userId={userId} toast={showToast} />
 

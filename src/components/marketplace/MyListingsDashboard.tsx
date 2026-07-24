@@ -227,7 +227,10 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="sm:col-span-1">
             <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Preço (R$)</label>
-            <input className={ic('price')} value={formData.price ?? ''} onChange={(e) => update('price', e.target.value)} placeholder="0" />
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400 pointer-events-none">R$</span>
+              <input className={`${ic('price')} pl-9`} value={formData.price ?? ''} onChange={(e) => update('price', e.target.value)} placeholder="0,00" />
+            </div>
             {errors.price && <p className="text-xs font-semibold text-red-600 mt-1">{errors.price}</p>}
           </div>
           <div>
@@ -433,9 +436,9 @@ export default function MyListingsDashboard() {
           )}
         </AnimatePresence>
       </main>
-      {globalError && <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] bg-[var(--color-danger)] text-white px-6 py-3 rounded-full font-bold text-sm shadow-xl flex items-center gap-2 animate-in slide-in-from-bottom-8"><AlertCircle className="w-4 h-4" /> {globalError}<button onClick={() => setGlobalError(null)} className="ml-3 opacity-60 hover:opacity-100" aria-label="Fechar">✕</button></div>}
+      {globalError && <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[200] lg:bottom-6 bg-[var(--color-danger)] text-white px-6 py-3 rounded-full font-bold text-sm shadow-xl flex items-center gap-2 animate-in slide-in-from-bottom-8"><AlertCircle className="w-4 h-4" /> {globalError}<button onClick={() => setGlobalError(null)} className="ml-3 opacity-60 hover:opacity-100" aria-label="Fechar">✕</button></div>}
 
-      <style jsx global>{`.custom-scrollbar::-webkit-scrollbar{width:4px;height:4px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(0,0,0,.05);border-radius:10px}@media(max-width:1024px){.no-scrollbar-mobile::-webkit-scrollbar{display:none}.no-scrollbar-mobile{-ms-overflow-style:none;scrollbar-width:none}}`}</style>
+      <style>{`.custom-scrollbar::-webkit-scrollbar{width:4px;height:4px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(0,0,0,.05);border-radius:10px}@media(max-width:1024px){.no-scrollbar-mobile::-webkit-scrollbar{display:none}.no-scrollbar-mobile{-ms-overflow-style:none;scrollbar-width:none}}`}</style>
     </div>
   )
 }

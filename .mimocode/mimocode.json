@@ -1,0 +1,10 @@
+{
+  "$schema": "https://mimo.xiaomi.com/mimocode/config.json",
+  "mcp": {
+    "browser": {
+      "type": "local",
+      "command": ["npx", "-y", "chrome-devtools-mcp", "--headless"],
+      "timeout": 30000
+    }
+  }
+}
