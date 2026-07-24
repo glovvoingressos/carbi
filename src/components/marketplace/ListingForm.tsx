@@ -625,7 +625,7 @@ export default function ListingForm() {
   const requiredItems = [
     { label: 'Marca', complete: Boolean(form.brand.trim()) },
     { label: 'Modelo', complete: Boolean(form.model.trim()) },
-    { label: 'Versão', complete: Boolean(form.version.trim()) },
+    // Versão é opcional (preenchida pela API quando disponível)
     { label: 'Ano', complete: Boolean(form.year.trim() && form.yearModel.trim()) },
     { label: 'Quilometragem', complete: Boolean(form.mileage.trim()) },
     { label: 'Combustível', complete: Boolean(resolvedFuelValue.trim()) },
