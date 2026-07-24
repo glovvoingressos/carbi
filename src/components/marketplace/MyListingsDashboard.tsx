@@ -138,107 +138,158 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
     setFormData((p) => ({ ...p, [field]: value })); setIsDirty(true)
     const next = { ...errors }
     if (field === 'price' && (Number(value) <= 0 || isNaN(Number(value)))) next.price = 'Preço deve ser maior que zero'
-    else if (field === 'title' && String(value).length < 8) next.title = 'Mín. 8 caracteres'
-    else if (field === 'description' && String(value).length < 20) next.description = 'Mín. 20 caracteres'
+    else if (field === 'title' && String(value).length < 5) next.title = 'Mín. 5 caracteres'
+    else if (field === 'description' && String(value).length < 10) next.description = 'Mín. 10 caracteres'
     else if (field === 'mileage' && Number(value) < 0) next.mileage = 'KM inválida'
     else delete next[field]
     setErrors(next)
   }, [errors, setFormData, setIsDirty, setErrors])
 
-  const ic = (f: string, x = '') => `w-full h-11 px-4 rounded-xl bg-[var(--color-bg)] border-2 border-transparent font-bold text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)] transition-colors ${x} ${errors[f] ? '!border-[var(--color-danger)]/20 text-[var(--color-danger)]' : ''}`
+  const ic = (f: string, x = '') => `w-full h-11 px-4 rounded-xl bg-gray-50 border border-gray-200 font-medium text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:bg-white transition-all ${x} ${errors[f] ? '!border-red-500 text-red-600' : ''}`
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-3 bg-white border border-[var(--color-border-strong)] rounded-xl px-4 py-3">
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${saveStatus === 'saving' ? 'bg-[var(--color-info-bg)] text-[var(--color-info)]' : saveStatus === 'saved' ? 'bg-emerald-50 text-emerald-600' : saveStatus === 'error' ? 'bg-[var(--color-danger-bg)] text-[var(--color-danger)]' : 'bg-[var(--color-bg)] text-[var(--color-text-tertiary)]'}`}>
-          {saveStatus === 'saving' ? <Loader2 className="w-3 h-3 animate-spin" /> : saveStatus === 'saved' ? <Check className="w-3 h-3" /> : saveStatus === 'error' ? <AlertCircle className="w-3 h-3" /> : <div className="w-2 h-2 rounded-full bg-current opacity-30" />}
-          {saveStatus === 'saving' ? 'Salvando…' : saveStatus === 'saved' ? 'Salvo' : saveStatus === 'error' ? 'Erro' : 'Tudo salvo'}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${saveStatus === 'saving' ? 'bg-amber-50 text-amber-700 border border-amber-200' : saveStatus === 'saved' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : saveStatus === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-gray-100 text-gray-600'}`}>
+          {saveStatus === 'saving' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : saveStatus === 'saved' ? <Check className="w-3.5 h-3.5" /> : saveStatus === 'error' ? <AlertCircle className="w-3.5 h-3.5" /> : <div className="w-2 h-2 rounded-full bg-emerald-500" />}
+          {saveStatus === 'saving' ? 'Salvando alterações…' : saveStatus === 'saved' ? 'Alterações salvas!' : saveStatus === 'error' ? 'Erro ao salvar' : 'Todas alterações salvas'}
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="h-9 px-5 rounded-full bg-[var(--color-text-primary)] text-white text-xs font-bold flex items-center gap-1.5 disabled:opacity-40"><Save className="w-3.5 h-3.5" /> Salvar</button>
-          <button onClick={onDelete} disabled={isDeleting} className="h-10 w-10 rounded-full border border-[var(--color-danger)] flex items-center justify-center text-[var(--color-danger)] hover:bg-[var(--color-danger-bg)] transition-colors" title="Excluir">
-            {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="h-10 px-5 rounded-full bg-gray-950 text-white text-xs font-semibold flex items-center gap-2 hover:bg-gray-800 transition-colors disabled:opacity-40 shadow-sm">
+            <Save className="w-3.5 h-3.5 text-[#D4F576]" /> Salvar anúncio
+          </button>
+          <button onClick={onDelete} disabled={isDeleting} className="h-10 w-10 rounded-full border border-red-200 flex items-center justify-center text-red-600 hover:bg-red-50 transition-colors" title="Excluir anúncio">
+            {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="bg-white border border-[var(--color-border-strong)] rounded-xl px-5 py-4 flex items-center justify-between">
-        <div><div className="text-sm font-heading font-bold text-[var(--color-text-primary)]">{(listing.view_count || 0).toLocaleString('pt-BR')}</div><div className="text-[10px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider">visualizações</div></div>
-        <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-[var(--color-text-primary)] underline underline-offset-2 hover:text-[var(--color-success)]">Ver anúncio →</a>
+      {/* Stats Header */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 flex items-center justify-between shadow-sm">
+        <div>
+          <div className="text-xl font-bold text-gray-900 font-[family-name:var(--font-heading)]">{(listing.view_count || 0).toLocaleString('pt-BR')}</div>
+          <div className="text-xs font-medium text-gray-500">Visualizações no site</div>
+        </div>
+        <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-900 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors">
+          Ver anúncio ao vivo →
+        </a>
       </div>
 
-      {/* Plate Lookup */}
+      {/* Plate Auto-Fill Lookup */}
       <PlateInput onPlateFound={(data) => {
         setFormData(prev => ({
           ...prev,
-          brand: data.brand,
-          model: data.model,
-          year: data.year,
-          yearModel: data.yearModel,
-          color: data.color,
-          fuel: data.fuel,
-          engine: data.engine,
-          transmission: data.transmission,
-          bodyType: data.bodyType,
-          plate: data.plate,
+          brand: data.brand || prev.brand,
+          model: data.model || prev.model,
+          year: data.year || prev.year,
+          year_model: data.yearModel || data.year || prev.year_model,
+          color: data.color || prev.color,
+          fuel: data.fuel || prev.fuel,
+          engine: data.engine || prev.engine,
+          transmission: data.transmission || prev.transmission,
+          body_type: data.bodyType || prev.body_type,
+          plate_final: data.plate ? data.plate.slice(-1).toUpperCase() : prev.plate_final,
+          price: data.fipePrice && (!prev.price || Number(prev.price) === 0) ? data.fipePrice : prev.price,
+          title: data.brand && data.model && data.year ? `${data.brand} ${data.model} ${data.year}` : (prev.title || ''),
         }))
         setIsDirty(true)
       }} />
 
       {/* Basic Info */}
-      <div className="bg-white border border-[var(--color-border-strong)] rounded-xl p-5 space-y-3">
-        <h3 className="font-heading font-bold text-xs text-[var(--color-text-primary)]">Informações Básicas</h3>
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+        <h3 className="font-bold text-sm text-gray-900 font-[family-name:var(--font-heading)]">Informações Básicas</h3>
         <div>
-          <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Título</label>
-          <input autoFocus className={ic('title')} value={formData.title || ''} onChange={(e) => update('title', e.target.value)} placeholder="Ex: Toyota Corolla 2.0 XEi 2024" />
-          {errors.title && <p className="text-xs font-bold text-[var(--color-danger)] mt-1 ml-1">{errors.title}</p>}
+          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Título do Anúncio</label>
+          <input className={ic('title')} value={formData.title || ''} onChange={(e) => update('title', e.target.value)} placeholder="Ex: Toyota Corolla 2.0 XEi 2024" />
+          {errors.title && <p className="text-xs font-semibold text-red-600 mt-1">{errors.title}</p>}
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Ano Fab.</label><input type="number" className={ic('year')} value={formData.year || ''} onChange={(e) => update('year', parseBrazilianInt(e.target.value))} /></div>
-          <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Ano Mod.</label><input type="number" className={ic('year_model')} value={formData.year_model || ''} onChange={(e) => update('year_model', parseBrazilianInt(e.target.value))} /></div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div><label className="text-xs font-semibold text-gray-600 mb-1.5 block">Marca</label><input className={ic('brand')} value={formData.brand || ''} onChange={(e) => update('brand', e.target.value)} /></div>
+          <div><label className="text-xs font-semibold text-gray-600 mb-1.5 block">Modelo</label><input className={ic('model')} value={formData.model || ''} onChange={(e) => update('model', e.target.value)} /></div>
+          <div><label className="text-xs font-semibold text-gray-600 mb-1.5 block">Ano Fab.</label><input type="number" className={ic('year')} value={formData.year || ''} onChange={(e) => update('year', parseBrazilianInt(e.target.value))} /></div>
+          <div><label className="text-xs font-semibold text-gray-600 mb-1.5 block">Ano Mod.</label><input type="number" className={ic('year_model')} value={formData.year_model || ''} onChange={(e) => update('year_model', parseBrazilianInt(e.target.value))} /></div>
         </div>
-        <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Status</label>
-          <select className={`${ic('status')} appearance-none cursor-pointer`} value={formData.status || 'active'} onChange={(e) => update('status', e.target.value)}>
-            <option value="active">🟢 Ativo</option><option value="paused">🟠 Pausado</option><option value="sold">✅ Vendido</option><option value="archived">⚪ Arquivado</option>
+        <div>
+          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Status da Publicação</label>
+          <select className={`${ic('status')} cursor-pointer`} value={formData.status || 'active'} onChange={(e) => update('status', e.target.value)}>
+            <option value="active">🟢 Ativo (Visível no site)</option>
+            <option value="paused">🟠 Pausado (Oculto temporariamente)</option>
+            <option value="sold">✅ Vendido</option>
+            <option value="archived">⚪ Arquivado</option>
           </select>
         </div>
       </div>
 
       {/* Price & Location */}
-      <div className="bg-white border border-[var(--color-border-strong)] rounded-xl p-5 space-y-3">
-        <h3 className="font-heading font-bold text-xs text-[var(--color-text-primary)]">Preço e Localização</h3>
-        <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Valor (R$)</label>
-          <input className={`${ic('price')}`} value={formData.price || ''} onChange={(e) => update('price', e.target.value)} />
-          {errors.price && <p className="text-xs font-bold text-[var(--color-danger)] mt-1 ml-1">{errors.price}</p>}
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+        <h3 className="font-bold text-sm text-gray-900 font-[family-name:var(--font-heading)]">Preço e Localização</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="sm:col-span-1">
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Preço (R$)</label>
+            <input className={ic('price')} value={formData.price ?? ''} onChange={(e) => update('price', e.target.value)} placeholder="0" />
+            {errors.price && <p className="text-xs font-semibold text-red-600 mt-1">{errors.price}</p>}
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Cidade</label>
+            <input className={ic('city')} value={formData.city || ''} onChange={(e) => update('city', e.target.value)} />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">UF</label>
+            <input className={`${ic('state')} text-center font-bold`} value={formData.state || ''} maxLength={2} onChange={(e) => update('state', e.target.value.toUpperCase())} />
+          </div>
         </div>
-        <div className="grid grid-cols-[1fr_70px] gap-3">
-          <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">Cidade</label><input className={ic('city')} value={formData.city || ''} onChange={(e) => update('city', e.target.value)} /></div>
-          <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">UF</label><input className={`${ic('state')} text-center`} value={formData.state || ''} maxLength={2} onChange={(e) => update('state', e.target.value.toUpperCase())} /></div>
-        </div>
-        <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">KM Atual</label>
-          <input type="number" className={ic('mileage')} value={formatBrazilianInt(formData.mileage)} onChange={(e) => update('mileage', parseBrazilianInt(e.target.value))} />
-          {errors.mileage && <p className="text-xs font-bold text-[var(--color-danger)] mt-1 ml-1">{errors.mileage}</p>}
+        <div>
+          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Quilometragem (KM)</label>
+          <input type="number" className={ic('mileage')} value={formData.mileage ?? ''} onChange={(e) => update('mileage', parseBrazilianInt(e.target.value))} />
+          {errors.mileage && <p className="text-xs font-semibold text-red-600 mt-1">{errors.mileage}</p>}
         </div>
       </div>
 
       {/* Specs */}
-      <div className="bg-white border border-[var(--color-border-strong)] rounded-xl p-5 space-y-3">
-        <h3 className="font-heading font-bold text-xs text-[var(--color-text-primary)]">Especificações</h3>
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+        <h3 className="font-bold text-sm text-gray-900 font-[family-name:var(--font-heading)]">Especificações do Veículo</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {([['transmission', 'Câmbio', ['Manual', 'Automático', 'CVT', 'DCT']], ['fuel', 'Combustível', ['Flex', 'Gasolina', 'Etanol', 'Diesel', 'Híbrido', 'Elétrico']], ['engine', 'Motor', null], ['color', 'Cor', null], ['plate_final', 'Placa', null]] as const).map(([f, lbl, opts]) => (
-            <div key={f}><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">{lbl}</label>
-              {opts ? <select className={`${ic(f)} appearance-none cursor-pointer text-xs`} value={(formData as any)[f] || ''} onChange={(e) => update(f as any, e.target.value)}>{opts.map((o) => <option key={o} value={o}>{o}</option>)}</select>
-               : <input className={ic(f)} value={(formData as any)[f] || ''} maxLength={f === 'plate_final' ? 1 : undefined} onChange={(e) => update(f as any, e.target.value)} />}
-            </div>
-          ))}
-        </div>
-        <div><label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-disabled)] ml-1 mb-1 block">VIN (Opcional)</label>
-          <div className="relative">
-            <input className={`${ic('vin')} pr-20 md:pr-28 font-mono text-xs`} value={formData.vin || ''} maxLength={17} placeholder="17 caracteres" onChange={(e) => update('vin', e.target.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, ''))} />
-            
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Câmbio</label>
+            <select className={`${ic('transmission')} cursor-pointer`} value={formData.transmission || ''} onChange={(e) => update('transmission', e.target.value)}>
+              <option value="Manual">Manual</option>
+              <option value="Automático">Automático</option>
+              <option value="CVT">CVT</option>
+              <option value="DCT">Automático DCT</option>
+            </select>
           </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Combustível</label>
+            <select className={`${ic('fuel')} cursor-pointer`} value={formData.fuel || ''} onChange={(e) => update('fuel', e.target.value)}>
+              <option value="Flex">Flex</option>
+              <option value="Gasolina">Gasolina</option>
+              <option value="Etanol">Etanol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Híbrido">Híbrido</option>
+              <option value="Elétrico">Elétrico</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Motor</label>
+            <input className={ic('engine')} value={formData.engine || ''} placeholder="Ex: 2.0 Flex" onChange={(e) => update('engine', e.target.value)} />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Cor</label>
+            <input className={ic('color')} value={formData.color || ''} onChange={(e) => update('color', e.target.value)} />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Carroceria</label>
+            <input className={ic('body_type')} value={formData.body_type || ''} placeholder="Hatch, SUV, Sedan..." onChange={(e) => update('body_type', e.target.value)} />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Final da Placa</label>
+            <input className={`${ic('plate_final')} font-mono uppercase text-center font-bold`} maxLength={1} value={formData.plate_final || ''} onChange={(e) => update('plate_final', e.target.value.toUpperCase())} />
+          </div>
+        </div>
+        <div>
+          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Número Chassi / VIN (Opcional)</label>
+          <input className={`${ic('vin')} font-mono uppercase`} value={formData.vin || ''} maxLength={17} placeholder="17 caracteres" onChange={(e) => update('vin', e.target.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, ''))} />
         </div>
       </div>
 

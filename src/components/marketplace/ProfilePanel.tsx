@@ -73,27 +73,25 @@ function PersonalInfo({ fullName, email, phone, onNameChange, onPhoneChange }: {
 }) {
   return (
     <motion.div {...fade}>
-      <div className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] border border-gray-200">
-        <div className="p-5 sm:p-7">
-          <h2 className="text-sm font-bold text-[#111] mb-5 font-[family-name:var(--font-heading)]">Informações pessoais</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">Nome completo</label>
-              <input value={fullName} onChange={(e) => onNameChange(e.target.value)} placeholder="Ex: João Silva" className="rounded-2xl min-h-[44px]" />
+      <div className="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6 shadow-sm">
+        <h2 className="text-sm font-bold text-gray-900 mb-4 font-[family-name:var(--font-heading)]">Informações Pessoais</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Nome completo</label>
+            <input value={fullName} onChange={(e) => onNameChange(e.target.value)} placeholder="Ex: João Silva" className="w-full h-11 px-4 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium text-gray-900 focus:outline-none focus:border-gray-900 focus:bg-white transition-all" />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">E-mail</label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" strokeWidth={1.75} />
+              <input value={email} disabled className="w-full h-11 pl-11 pr-4 rounded-xl bg-gray-100 border border-gray-200 text-sm font-medium text-gray-500 cursor-not-allowed opacity-75" />
             </div>
-            <div>
-              <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">E-mail</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C0C0C0] pointer-events-none" strokeWidth={1.5} />
-                <input value={email} disabled className="rounded-2xl pl-11 bg-[#F7F7F7] opacity-60 cursor-not-allowed min-h-[44px]" />
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">Telefone</label>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C0C0C0] pointer-events-none" strokeWidth={1.5} />
-                <input value={phone} onChange={(e) => onPhoneChange(formatPhone(e.target.value))} placeholder="(00) 00000-0000" inputMode="tel" maxLength={15} className="rounded-2xl pl-11 min-h-[44px]" />
-              </div>
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Telefone / WhatsApp</label>
+            <div className="relative">
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" strokeWidth={1.75} />
+              <input value={phone} onChange={(e) => onPhoneChange(formatPhone(e.target.value))} placeholder="(00) 00000-0000" inputMode="tel" maxLength={15} className="w-full h-11 pl-11 pr-4 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium text-gray-900 focus:outline-none focus:border-gray-900 focus:bg-white transition-all" />
             </div>
           </div>
         </div>
@@ -125,51 +123,49 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
 
   return (
     <motion.div {...fade}>
-      <div className="bg-white rounded-[28px] shadow-[0_18px_50px_rgba(0,0,0,.05)] border border-gray-200">
-        <div className="p-5 sm:p-7">
-          <h2 className="text-sm font-bold text-[#111] mb-5 font-[family-name:var(--font-heading)]">Segurança</h2>
-          <button type="button" className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => setOpen(!open)}>
-            <span className="flex items-center gap-3"><Lock className="w-4 h-4 text-[#7A7A7A]" strokeWidth={1.5} /> Alterar senha</span>
-            <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}><ChevronDown className="w-4 h-4 text-[#7A7A7A]" strokeWidth={1.5} /></motion.span>
-          </button>
-          <AnimatePresence>
-            {open && (
-              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className="overflow-hidden">
-                <div className="pt-4 space-y-4">
-                  <div>
-                    <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">Nova senha</label>
-                    <div className="relative">
-                      <input type={showNewPw ? 'text' : 'password'} value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="Mínimo 8 caracteres" className="rounded-2xl pr-14 min-h-[44px]" />
-                      <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px]" onClick={() => setShowNewPw(!showNewPw)} aria-label={showNewPw ? 'Ocultar senha' : 'Mostrar senha'}>
-                        {showNewPw ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
-                      </button>
-                    </div>
+      <div className="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6 shadow-sm">
+        <h2 className="text-sm font-bold text-gray-900 mb-4 font-[family-name:var(--font-heading)]">Segurança e Senha</h2>
+        <button type="button" className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-semibold text-gray-800 hover:bg-gray-100 transition-colors min-h-[44px]" onClick={() => setOpen(!open)}>
+          <span className="flex items-center gap-3"><Lock className="w-4 h-4 text-gray-500" strokeWidth={1.75} /> Alterar minha senha</span>
+          <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}><ChevronDown className="w-4 h-4 text-gray-500" strokeWidth={1.75} /></motion.span>
+        </button>
+        <AnimatePresence>
+          {open && (
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className="overflow-hidden">
+              <div className="pt-4 space-y-4">
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Nova senha</label>
+                  <div className="relative">
+                    <input type={showNewPw ? 'text' : 'password'} value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="Mínimo 8 caracteres" className="w-full h-11 pl-4 pr-12 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium text-gray-900 focus:outline-none focus:border-gray-900 focus:bg-white transition-all" />
+                    <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-gray-900 transition-colors" onClick={() => setShowNewPw(!showNewPw)} aria-label={showNewPw ? 'Ocultar senha' : 'Mostrar senha'}>
+                      {showNewPw ? <EyeOff className="w-4 h-4" strokeWidth={1.75} /> : <Eye className="w-4 h-4" strokeWidth={1.75} />}
+                    </button>
                   </div>
-                  <div>
-                    <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">Confirmar senha</label>
-                    <div className="relative">
-                      <input type={showConfirmPw ? 'text' : 'password'} value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="Repita a senha" className="rounded-2xl pr-14 min-h-[44px]" />
-                      <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px]" onClick={() => setShowConfirmPw(!showConfirmPw)} aria-label={showConfirmPw ? 'Ocultar senha' : 'Mostrar senha'}>
-                        {showConfirmPw ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
-                      </button>
-                    </div>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Confirmar nova senha</label>
+                  <div className="relative">
+                    <input type={showConfirmPw ? 'text' : 'password'} value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="Repita a nova senha" className="w-full h-11 pl-4 pr-12 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium text-gray-900 focus:outline-none focus:border-gray-900 focus:bg-white transition-all" />
+                    <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-gray-900 transition-colors" onClick={() => setShowConfirmPw(!showConfirmPw)} aria-label={showConfirmPw ? 'Ocultar senha' : 'Mostrar senha'}>
+                      {showConfirmPw ? <EyeOff className="w-4 h-4" strokeWidth={1.75} /> : <Eye className="w-4 h-4" strokeWidth={1.75} />}
+                    </button>
                   </div>
-                  {newPw && confirmPw && newPw !== confirmPw && (
-                    <p className="text-xs font-medium text-[var(--color-danger,#DC2626)]">As senhas não coincidem.</p>
-                  )}
-              <div className="flex gap-3 pt-1">
-                <button type="button" className="flex items-center gap-2 px-5 py-3 rounded-full bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-colors min-h-[44px]" onClick={changePw} disabled={saving || newPw.length < 8 || newPw !== confirmPw}>
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar
-                </button>
-                <button type="button" className="px-5 py-3 rounded-full border border-gray-200 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => { setOpen(false); setNewPw(''); setConfirmPw('') }}>
-                  Cancelar
-                </button>
+                </div>
+                {newPw && confirmPw && newPw !== confirmPw && (
+                  <p className="text-xs font-semibold text-red-600">As senhas não coincidem.</p>
+                )}
+                <div className="flex gap-3 pt-1">
+                  <button type="button" className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-gray-950 text-white text-xs font-semibold hover:bg-gray-800 transition-colors disabled:opacity-40 min-h-[40px]" onClick={changePw} disabled={saving || newPw.length < 8 || newPw !== confirmPw}>
+                    {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5 text-[#D4F576]" />} Salvar Senha
+                  </button>
+                  <button type="button" className="px-5 py-2.5 rounded-full border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors min-h-[40px]" onClick={() => { setOpen(false); setNewPw(''); setConfirmPw('') }}>
+                    Cancelar
+                  </button>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   )
@@ -193,30 +189,28 @@ function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
 
   return (
     <motion.div {...fade}>
-      <div className="border-[var(--color-danger,#DC2626)]/20">
-        <div className="p-5 sm:p-7">
-          <h2 className="text-sm font-bold text-[var(--color-danger,#DC2626)] mb-2 font-[family-name:var(--font-heading)]">Excluir conta</h2>
-          <p className="text-sm text-[#7A7A7A] mb-4 leading-relaxed">Essa ação é permanente e não pode ser desfeita.</p>
-          {!show ? (
-            <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors min-h-[44px]" onClick={() => setShow(true)}>
-              <AlertTriangle className="w-4 h-4" /> Excluir conta
-            </button>
-          ) : (
-            <motion.div {...fade} className="p-4 sm:p-5 rounded-2xl border border-[var(--color-danger,#DC2626)]/20 bg-[var(--color-danger,#DC2626)]/5">
-              <label htmlFor="confirm-delete" className="block text-sm font-semibold text-[var(--color-danger,#DC2626)] mb-2">Digite &quot;EXCLUIR&quot; para confirmar:</label>
-              <input id="confirm-delete" value={delText} onChange={(e) => setDelText(e.target.value)} placeholder="EXCLUIR"
-                className="rounded-2xl border-[var(--color-danger,#DC2626)]/25 focus:ring-[var(--color-danger,#DC2626)]/30 mb-4 min-h-[44px]" />
-              <div className="flex flex-wrap gap-3">
-                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors min-h-[44px]" onClick={deleteAccount} disabled={delText !== 'EXCLUIR' || deleting}>
-                  {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />} {deleting ? 'Excluindo...' : 'Confirmar exclusão'}
-                </button>
-                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => { setShow(false); setDelText('') }}>
-                  Cancelar
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </div>
+      <div className="bg-red-50/50 rounded-2xl border border-red-200/80 p-5 sm:p-6 shadow-sm">
+        <h2 className="text-sm font-bold text-red-700 mb-1 font-[family-name:var(--font-heading)]">Excluir Conta</h2>
+        <p className="text-xs text-red-600/80 mb-4 leading-relaxed">Essa ação é permanente e irá excluir todos os seus anúncios, favoritos e dados.</p>
+        {!show ? (
+          <button type="button" className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors min-h-[40px]" onClick={() => setShow(true)}>
+            <AlertTriangle className="w-3.5 h-3.5" /> Excluir minha conta
+          </button>
+        ) : (
+          <motion.div {...fade} className="p-4 sm:p-5 rounded-xl border border-red-200 bg-white space-y-3">
+            <label htmlFor="confirm-delete" className="block text-xs font-bold text-red-700">Digite &quot;EXCLUIR&quot; para confirmar:</label>
+            <input id="confirm-delete" value={delText} onChange={(e) => setDelText(e.target.value)} placeholder="EXCLUIR"
+              className="w-full h-11 px-4 rounded-xl bg-gray-50 border border-red-200 text-sm font-mono font-bold text-red-600 focus:outline-none focus:border-red-600 transition-all" />
+            <div className="flex flex-wrap gap-2 pt-1">
+              <button type="button" className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-red-600 text-white text-xs font-bold hover:bg-red-700 transition-colors min-h-[40px] disabled:opacity-40" onClick={deleteAccount} disabled={delText !== 'EXCLUIR' || deleting}>
+                {deleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <AlertTriangle className="w-3.5 h-3.5" />} {deleting ? 'Excluindo...' : 'Confirmar exclusão'}
+              </button>
+              <button type="button" className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors min-h-[40px]" onClick={() => { setShow(false); setDelText('') }}>
+                Cancelar
+              </button>
+            </div>
+          </motion.div>
+        )}
       </div>
     </motion.div>
   )
