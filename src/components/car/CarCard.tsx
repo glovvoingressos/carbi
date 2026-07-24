@@ -114,9 +114,12 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
         </h3>
         <p className="text-[13px] text-[#A3A3A3] mb-3 truncate">{car.version}</p>
 
-        <p className="text-[20px] font-bold text-[#0A0A0A] tracking-tight mb-4">
-          {formatBRL(car.priceBrl)}
-        </p>
+        <div className="flex items-baseline gap-1 mb-4">
+          <span className="text-[13px] font-semibold text-[#52607A]">R$</span>
+          <p className="text-[22px] font-bold text-[#0A0A0A] tracking-tight leading-none">
+            {formatBRL(car.priceBrl).replace('R$', '').trim()}
+          </p>
+        </div>
 
         <div className="flex gap-1.5 flex-wrap mb-4">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#52607A] bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-full">
