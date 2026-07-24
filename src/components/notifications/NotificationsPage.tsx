@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { Bell, CheckCheck, MessageCircle, Tag, Car, Settings, Loader2 } from 'lucide-react'
+import { Bell, CheckCheck, MessageCircle, Tag, Car, Settings, Loader2, Check, Inbox } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import AuthCard from '@/components/marketplace/AuthCard'
 
@@ -12,12 +12,12 @@ interface Notification {
 }
 
 const TYPE_CONFIG: Record<string, { icon: React.ReactNode; colorClass: string; bgClass: string }> = {
-  message:           { icon: <MessageCircle size={16} />, colorClass: 'text-blue-600',   bgClass: 'bg-blue-50' },
-  offer:             { icon: <Tag size={16} />,           colorClass: 'text-green-600',  bgClass: 'bg-green-50' },
-  listing_published: { icon: <Car size={16} />,           colorClass: 'text-orange-600', bgClass: 'bg-orange-50' },
-  listing_removed:   { icon: <Car size={16} />,           colorClass: 'text-red-600',    bgClass: 'bg-red-50' },
+  message:           { icon: <MessageCircle size={18} />, colorClass: 'text-blue-600',   bgClass: 'bg-blue-100' },
+  offer:             { icon: <Tag size={18} />,           colorClass: 'text-[#16855C]',  bgClass: 'bg-[#16855C]/10' },
+  listing_published: { icon: <Car size={18} />,           colorClass: 'text-[#F59E0B]', bgClass: 'bg-[#F59E0B]/10' },
+  listing_removed:   { icon: <Car size={18} />,           colorClass: 'text-[#DC2626]',    bgClass: 'bg-[#DC2626]/10' },
 }
-const DEFAULT_TYPE = { icon: <Settings size={16} />, colorClass: 'text-gray-500', bgClass: 'bg-gray-100' } as const
+const DEFAULT_TYPE = { icon: <Settings size={18} />, colorClass: 'text-gray-500', bgClass: 'bg-gray-100' } as const
 
 function relativeTime(dateStr: string) {
   const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
@@ -30,9 +30,9 @@ function relativeTime(dateStr: string) {
 
 function NotificationSkeleton() {
   return (
-    <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-gray-200 animate-pulse">
-      <div className="w-10 h-10 rounded-xl bg-gray-100" />
-      <div className="flex-1 space-y-2">
+    <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-gray-100 animate-pulse">
+      <div className="w-12 h-12 rounded-xl bg-gray-100" />
+      <div className="flex-1 space-y-3">
         <div className="h-4 bg-gray-100 rounded w-3/4" />
         <div className="h-3 bg-gray-100 rounded w-full" />
         <div className="h-3 bg-gray-100 rounded w-1/4" />
@@ -41,64 +41,14 @@ function NotificationSkeleton() {
   )
 }
 
-function NotificationHeader({ unreadCount, onMarkAllRead, markingAll }: { unreadCount: number; onMarkAllRead: () => void; markingAll: boolean }) {
-  return (
-    <div className="flex items-center justify-between mb-4 lg:hidden">
-      <div>
-        <h1 className="text-base font-bold text-gray-900">Notificações</h1>
-        {unreadCount > 0 && <p className="text-xs text-gray-500 mt-0.5">{unreadCount} não lida{unreadCount > 1 ? 's' : ''}</p>}
-      </div>
-      {unreadCount > 0 && (
-        <button onClick={onMarkAllRead} disabled={markingAll} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors">
-          {markingAll ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={12} />}
-          Marcar como lidas
-        </button>
-      )}
-    </div>
-  )
-}
-
-function NotificationItem({ notification, onRead }: { notification: Notification; onRead: (id: string) => void }) {
-  const cfg = TYPE_CONFIG[notification.type] ?? DEFAULT_TYPE
-  const read = notification.read
-  return (
-    <motion.button
-      layout
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      onClick={() => { if (!read) onRead(notification.id); if (notification.link) window.location.href = notification.link }}
-      className={`w-full text-left flex items-start gap-5 p-5 rounded-2xl border transition-all cursor-pointer ${
-        read ? 'bg-white border-gray-200 hover:border-gray-300' : 'bg-blue-50 border-blue-200'
-      }`}
-    >
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${cfg.bgClass} ${cfg.colorClass}`}>
-        {cfg.icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-3">
-          <p className={`text-base leading-snug ${read ? 'font-medium text-gray-600' : 'font-semibold text-gray-900'}`}>
-            {notification.title}
-          </p>
-          {!read && <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0 mt-1.5" />}
-        </div>
-        {notification.body && (
-          <p className="text-sm text-gray-500 mt-1.5 leading-relaxed line-clamp-2">{notification.body}</p>
-        )}
-        <p className="text-xs text-gray-400 mt-2.5">{relativeTime(notification.created_at)}</p>
-      </div>
-    </motion.button>
-  )
-}
-
 function EmptyState() {
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-        <Bell size={24} className="text-blue-500" />
+    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="w-24 h-24 rounded-2xl bg-[#F8F9FA] flex items-center justify-center mb-6">
+        <Inbox size={40} className="text-gray-300" />
       </div>
-      <h3 className="text-base font-semibold text-gray-900 mb-1">Nenhuma notificação</h3>
-      <p className="text-sm text-gray-500 max-w-[280px]">
+      <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">Nenhuma notificação</h3>
+      <p className="text-sm text-gray-500 max-w-[320px] leading-relaxed">
         Quando alguém interagir com seus anúncios, você será notificado aqui.
       </p>
     </motion.div>
@@ -159,23 +109,30 @@ export default function NotificationsPage() {
     } catch {}
   }, [token])
 
-  if (!ready) return <div className="flex items-center justify-center py-20"><Loader2 className="h-5 w-5 animate-spin text-gray-300" /></div>
+  if (!ready) return (
+    <div className="space-y-6">
+      <div className="h-10 bg-gray-100 rounded-2xl animate-pulse w-48" />
+      <div className="space-y-3">
+        {[1, 2, 3, 4, 5].map((i) => <NotificationSkeleton key={i} />)}
+      </div>
+    </div>
+  )
   if (!authenticated) return <div className="py-20"><AuthCard redirectTo="/notificacoes" /></div>
 
   const unreadCount = notifications.filter(n => !n.read).length
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Notificações</h1>
-          <p className="text-sm text-gray-500 mt-1.5">
+          <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">Notificações</h1>
+          <p className="text-sm text-gray-500 mt-1">
             {unreadCount > 0 ? `${unreadCount} não lida${unreadCount > 1 ? 's' : ''}` : 'Tudo lido'}
           </p>
         </div>
         {unreadCount > 0 && (
-          <button onClick={markAllRead} disabled={markingAll} className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors border border-blue-200">
+          <button onClick={markAllRead} disabled={markingAll} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-[#1A1A1A] bg-[#D4F576] hover:bg-[#C8E64E] transition-colors shadow-sm">
             {markingAll ? <Loader2 size={16} className="animate-spin" /> : <CheckCheck size={16} />}
             Marcar como lidas
           </button>
@@ -183,13 +140,48 @@ export default function NotificationsPage() {
       </div>
 
       <div className="max-w-3xl">
-        <NotificationHeader unreadCount={unreadCount} onMarkAllRead={markAllRead} markingAll={markingAll} />
         {loading ? (
-          <div className="space-y-4">{Array.from({ length: 5 }).map((_, i) => <NotificationSkeleton key={i} />)}</div>
-        ) : notifications.length === 0 ? <EmptyState /> : (
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => <NotificationSkeleton key={i} />)}
+          </div>
+        ) : notifications.length === 0 ? (
+          <EmptyState />
+        ) : (
           <div className="space-y-4">
             <AnimatePresence mode="popLayout">
-              {notifications.map(n => <NotificationItem key={n.id} notification={n} onRead={markRead} />)}
+              {notifications.map(n => {
+                const cfg = TYPE_CONFIG[n.type] ?? DEFAULT_TYPE
+                const read = n.read
+                return (
+                  <motion.button
+                    key={n.id}
+                    layout
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    onClick={() => { if (!read) markRead(n.id); if (n.link) window.location.href = n.link }}
+                    className={`w-full text-left flex items-start gap-5 p-5 rounded-2xl border transition-all cursor-pointer ${
+                      read ? 'bg-white border-gray-100 hover:border-gray-200 hover:shadow-sm' : 'bg-[#D4F576]/5 border-[#D4F576]/30'
+                    }`}
+                  >
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${cfg.bgClass} ${cfg.colorClass}`}>
+                      {cfg.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className={`text-base leading-snug ${read ? 'font-medium text-gray-600' : 'font-bold text-[#1A1A1A]'}`}>
+                          {n.title}
+                        </p>
+                        {!read && <span className="w-3 h-3 rounded-full bg-[#D4F576] shrink-0 mt-1.5" />}
+                      </div>
+                      {n.body && (
+                        <p className="text-sm text-gray-500 mt-1.5 leading-relaxed line-clamp-2">{n.body}</p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-2.5">{relativeTime(n.created_at)}</p>
+                    </div>
+                  </motion.button>
+                )
+              })}
             </AnimatePresence>
           </div>
         )}
