@@ -30,12 +30,12 @@ function relativeTime(dateStr: string) {
 
 function NotificationSkeleton() {
   return (
-    <div className="flex items-start gap-3 p-3 rounded-xl animate-pulse">
-      <div className="w-8 h-8 rounded-full bg-gray-100" />
+    <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-gray-200 animate-pulse">
+      <div className="w-10 h-10 rounded-xl bg-gray-100" />
       <div className="flex-1 space-y-2">
-        <div className="h-3 bg-gray-100 rounded w-3/4" />
-        <div className="h-2.5 bg-gray-100 rounded w-full" />
-        <div className="h-2.5 bg-gray-100 rounded w-1/4" />
+        <div className="h-4 bg-gray-100 rounded w-3/4" />
+        <div className="h-3 bg-gray-100 rounded w-full" />
+        <div className="h-3 bg-gray-100 rounded w-1/4" />
       </div>
     </div>
   )
@@ -43,13 +43,13 @@ function NotificationSkeleton() {
 
 function NotificationHeader({ unreadCount, onMarkAllRead, markingAll }: { unreadCount: number; onMarkAllRead: () => void; markingAll: boolean }) {
   return (
-    <div className="flex items-center justify-between mb-4">
+    <div className="flex items-center justify-between mb-4 lg:hidden">
       <div>
-        <h1 className="text-sm font-bold text-[#1A1A1A]">Notificações</h1>
-        {unreadCount > 0 && <p className="text-xs text-gray-400 mt-0.5">{unreadCount} não lida{unreadCount > 1 ? 's' : ''}</p>}
+        <h1 className="text-base font-bold text-gray-900">Notificações</h1>
+        {unreadCount > 0 && <p className="text-xs text-gray-500 mt-0.5">{unreadCount} não lida{unreadCount > 1 ? 's' : ''}</p>}
       </div>
       {unreadCount > 0 && (
-        <button onClick={onMarkAllRead} disabled={markingAll} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-gray-500 hover:bg-gray-100 transition-colors">
+        <button onClick={onMarkAllRead} disabled={markingAll} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-50 transition-colors">
           {markingAll ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={12} />}
           Marcar como lidas
         </button>
@@ -68,24 +68,24 @@ function NotificationItem({ notification, onRead }: { notification: Notification
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       onClick={() => { if (!read) onRead(notification.id); if (notification.link) window.location.href = notification.link }}
-      className={`w-full text-left flex items-start gap-3 p-3 rounded-xl transition-all cursor-pointer ${
-        read ? 'hover:bg-gray-50' : 'bg-gray-50'
+      className={`w-full text-left flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${
+        read ? 'bg-white border-gray-200 hover:border-gray-300' : 'bg-blue-50 border-blue-200'
       }`}
     >
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${cfg.bgClass} ${cfg.colorClass}`}>
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${cfg.bgClass} ${cfg.colorClass}`}>
         {cfg.icon}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <p className={`text-sm leading-snug ${read ? 'font-medium text-gray-600' : 'font-semibold text-[#1A1A1A]'}`}>
+          <p className={`text-sm leading-snug ${read ? 'font-medium text-gray-600' : 'font-semibold text-gray-900'}`}>
             {notification.title}
           </p>
-          {!read && <span className="w-1.5 h-1.5 rounded-full bg-[#D4F576] shrink-0 mt-1.5" />}
+          {!read && <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1.5" />}
         </div>
         {notification.body && (
-          <p className="text-xs text-gray-500 mt-1 leading-snug line-clamp-2">{notification.body}</p>
+          <p className="text-sm text-gray-500 mt-1 leading-snug line-clamp-2">{notification.body}</p>
         )}
-        <p className="text-[11px] text-gray-400 mt-1">{relativeTime(notification.created_at)}</p>
+        <p className="text-xs text-gray-400 mt-2">{relativeTime(notification.created_at)}</p>
       </div>
     </motion.button>
   )
@@ -94,11 +94,11 @@ function NotificationItem({ notification, onRead }: { notification: Notification
 function EmptyState() {
   return (
     <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-        <Bell size={20} className="text-gray-400" />
+      <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+        <Bell size={24} className="text-blue-500" />
       </div>
-      <h3 className="text-sm font-medium text-[#1A1A1A] mb-1">Nenhuma notificação</h3>
-      <p className="text-xs text-gray-400 max-w-[240px]">
+      <h3 className="text-base font-semibold text-gray-900 mb-1">Nenhuma notificação</h3>
+      <p className="text-sm text-gray-500 max-w-[280px]">
         Quando alguém interagir com seus anúncios, você será notificado aqui.
       </p>
     </motion.div>

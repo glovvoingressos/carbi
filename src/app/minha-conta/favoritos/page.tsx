@@ -32,18 +32,18 @@ export default function FavoritosPage() {
   return (
     <AccountLayout user={user}>
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-          <Heart className="w-5 h-5 text-gray-400" strokeWidth={1.75} />
+        <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+          <Heart className="w-7 h-7 text-blue-500" strokeWidth={1.75} />
         </div>
-        <h2 className="text-sm font-bold text-[#1A1A1A] mb-1">Nenhum favorito ainda</h2>
-        <p className="text-xs text-gray-400 mb-5 max-w-[240px]">
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">Nenhum favorito ainda</h2>
+        <p className="text-sm text-gray-500 mb-6 max-w-[280px]">
           Salve carros favoritos para acompanhar preços e comparar ofertas.
         </p>
         <Link
           href="/carros-a-venda"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-full text-xs font-semibold hover:bg-gray-800 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
         >
-          <Search className="w-3.5 h-3.5 text-[#D4F576]" strokeWidth={2} />
+          <Search className="w-4 h-4" strokeWidth={2} />
           Buscar seminovos
         </Link>
       </div>
