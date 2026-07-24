@@ -29,6 +29,7 @@ const YEAR_RANGE = Array.from({ length: 7 }, (_, i) => String(2020 + i))
 const CATEGORY_INTENTS = [
   'ate-50-mil', 'ate-100-mil', 'economicos', 'para-familia',
   '7-lugares', 'hibridos', 'off-road', 'esportivos',
+  'eletricos', 'suv-automaticos', 'sedan-automaticos', 'picapes-diesel',
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

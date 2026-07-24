@@ -27,6 +27,7 @@ export function LocalBusinessSchema() {
     'image': absoluteUrl('/logo.png'),
     '@id': SITE_URL,
     'url': SITE_URL,
+    'description': 'Marketplace automotivo premium para anunciar e comprar carros usados e seminovos com dados reais da FIPE.',
     'address': {
       '@type': 'PostalAddress',
       'streetAddress': 'Belo Horizonte',
@@ -53,6 +54,19 @@ export function LocalBusinessSchema() {
       ],
       'opens': '00:00',
       'closes': '23:59'
+    },
+    'sameAs': [
+      'https://www.instagram.com/carbioficial',
+      'https://www.facebook.com/carbioficial',
+      'https://twitter.com/carbioficial',
+      'https://www.linkedin.com/company/carbi',
+    ],
+    'priceRange': '$$',
+    'currenciesAccepted': 'BRL',
+    'paymentAccepted': 'Dinheiro, Cartão de crédito, PIX',
+    'areaServed': {
+      '@type': 'Country',
+      'name': 'Brasil'
     }
   }
   return <JSONLD data={schema} />

@@ -1,16 +1,12 @@
 import type { Metadata } from 'next'
-import { Poppins, Manrope } from 'next/font/google'
+import { Poppins, Manrope, Geist } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
 import { OrganizationSchema, WebSiteSchema } from '@/components/seo/JSONLD'
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics'
+import { cn } from "@/lib/utils";
 
-const font = Poppins({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-sans',
-  display: 'swap',
-})
+const geist = Geist({subsets:['latin'],variable:'--font-sans'})
 
 const fontHeading = Manrope({
   subsets: ['latin'],
@@ -54,6 +50,12 @@ export const metadata: Metadata = {
     title: 'Carbi | anunciar carros grátis e comprar seminovos',
     description: 'Marketplace para anunciar carros grátis, comparar preço com FIPE e negociar seminovos com chat interno seguro.',
   },
+  alternates: {
+    canonical: '/',
+    languages: {
+      'pt-BR': '/',
+    },
+  },
   robots: {
     index: true,
     follow: true,
@@ -73,8 +75,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR" className={`${font.variable} ${fontHeading.variable} ${fontMono.variable}`}>
-      <body className={font.className}>
+    <html lang="pt-BR" className={cn(fontHeading.variable, fontMono.variable, "font-sans", geist.variable)}>
+      <body className={geist.className}>
         <GoogleAnalytics />
         <WebSiteSchema />
         <OrganizationSchema />
