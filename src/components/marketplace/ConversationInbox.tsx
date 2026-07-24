@@ -55,22 +55,22 @@ function MessageBubble({ message, isMine, showName }: { message: MessageItem; is
       className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
     >
       <div
-        className={`max-w-[75%] px-4 py-2.5 rounded-2xl ${
+        className={`max-w-[75%] px-3 py-2 rounded-2xl ${
           isMine
-            ? 'bg-[var(--color-accent)] text-[var(--color-text-primary)]'
-            : 'bg-gray-100 text-[var(--color-text-primary)]'
+            ? 'bg-[#1A1A1A] text-white rounded-br-md'
+            : 'bg-gray-100 text-[#1A1A1A] rounded-bl-md'
         }`}
       >
         {!isMine && showName && (
-          <p className="text-xs font-bold text-[var(--color-text-secondary)] mb-1">{message.sender_name}</p>
+          <p className="text-[10px] font-semibold text-gray-500 mb-1">{message.sender_name}</p>
         )}
-        <p className="text-sm leading-relaxed break-words font-sans">{message.message}</p>
-        <div className={`flex items-center gap-1.5 mt-1 ${isMine ? 'justify-end' : 'justify-start'}`}>
-          <time className={`text-[10px] font-semibold ${isMine ? 'text-[var(--color-text-secondary)]' : 'text-gray-400'}`}>
+        <p className="text-sm leading-relaxed break-words">{message.message}</p>
+        <div className={`flex items-center gap-1 mt-1 ${isMine ? 'justify-end' : 'justify-start'}`}>
+          <time className={`text-[10px] ${isMine ? 'text-white/50' : 'text-gray-400'}`}>
             {formatTime(message.created_at)}
           </time>
           {isMine && (
-            <svg width="14" height="9" viewBox="0 0 14 9" fill="none" className="text-[var(--color-text-secondary)]">
+            <svg width="12" height="8" viewBox="0 0 14 9" fill="none" className="text-white/50">
               <path d="M1 4.5L4 7.5L8.5 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M5 4.5L8 7.5L12.5 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -252,55 +252,52 @@ export default function ConversationInbox() {
   }
 
   const listPanel = (
-    <div className="flex flex-col h-full bg-white border border-gray-200 rounded-2xl overflow-hidden">
-      <div className="px-5 pt-5 pb-3">
-        <h2 className="text-sm font-bold text-[var(--color-text-primary)] font-[family-name:var(--font-heading)]">Minhas conversas</h2>
-        <div className="relative mt-3">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input type="text" placeholder="Buscar conversas..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-[var(--color-text-primary)] placeholder-gray-400 focus:outline-none focus:border-[var(--color-accent)] transition-colors" />
+    <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      <div className="px-4 pt-4 pb-3">
+        <h2 className="text-sm font-bold text-[#1A1A1A] mb-3">Conversas</h2>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+          <input type="text" placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-gray-300 transition-colors" />
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 pb-3">
+      <div className="flex-1 overflow-y-auto px-2 pb-2">
         {loadingConversations && filtered.length === 0 && (
-          <p className="text-center text-sm text-gray-400 py-8">Carregando...</p>
+          <p className="text-center text-xs text-gray-400 py-8">Carregando...</p>
         )}
         {filtered.map((c) => (
           <button
             key={c.id}
             type="button"
             onClick={() => { setSelectedId(c.id); setMobileView('chat') }}
-            className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left mb-1 ${
-              selectedId === c.id ? 'bg-[var(--color-accent)]/15' : 'hover:bg-gray-50'
+            className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left ${
+              selectedId === c.id ? 'bg-gray-100' : 'hover:bg-gray-50'
             }`}
           >
             <ConversationThumb
               images={c.vehicle_listings_public.images}
               title={c.vehicle_listings_public.title}
-              className="w-12 h-12 rounded-2xl"
+              className="w-10 h-10 rounded-xl"
             />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[var(--color-text-primary)] truncate">
+              <p className="text-sm font-medium text-[#1A1A1A] truncate">
                 {c.vehicle_listings_public.title}
               </p>
-              <p className="text-xs text-[var(--color-text-secondary)] truncate mt-0.5">
-                {formatBRL(Number(c.vehicle_listings_public.price))} · {c.vehicle_listings_public.city}/{c.vehicle_listings_public.state}
-              </p>
-              <p className="text-xs text-gray-400 truncate mt-1">
-                {c.last_message_preview || 'Conversa iniciada.'}
+              <p className="text-xs text-gray-400 truncate mt-0.5">
+                {c.last_message_preview || 'Conversa iniciada'}
               </p>
             </div>
             {c.is_unread && selectedId !== c.id && (
-              <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-accent)] shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-[#D4F576] shrink-0" />
             )}
           </button>
         ))}
         {filtered.length === 0 && !loadingConversations && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <MessageSquare className="w-8 h-8 text-gray-300 mb-3" strokeWidth={1.5} />
-            <p className="text-sm font-bold text-[var(--color-text-primary)]">Nenhuma conversa ainda</p>
-            <p className="text-xs text-gray-400 mt-1 max-w-[200px]">Quando alguém chamar em um anúncio, a conversa aparece aqui.</p>
+            <MessageSquare className="w-6 h-6 text-gray-300 mb-2" strokeWidth={1.5} />
+            <p className="text-sm font-medium text-[#1A1A1A]">Nenhuma conversa</p>
+            <p className="text-xs text-gray-400 mt-1 max-w-[200px]">Conversas com vendedores aparecem aqui.</p>
           </div>
         )}
       </div>
@@ -308,29 +305,29 @@ export default function ConversationInbox() {
   )
 
   const chatPanel = selectedConversation ? (
-    <div className="flex flex-col h-full bg-white border border-gray-200 rounded-2xl overflow-hidden">
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 shrink-0">
-        <button type="button" onClick={() => setMobileView('list')} className="md:hidden p-2 -ml-2 rounded-2xl hover:bg-gray-100 transition-colors" aria-label="Voltar">
-          <ArrowLeft className="w-5 h-5 text-[var(--color-text-primary)]" />
+    <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 shrink-0">
+        <button type="button" onClick={() => setMobileView('list')} className="md:hidden p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors" aria-label="Voltar">
+          <ArrowLeft className="w-5 h-5 text-[#1A1A1A]" />
         </button>
-        <ConversationThumb images={selectedConversation.vehicle_listings_public.images} title={selectedConversation.vehicle_listings_public.title} className="w-10 h-10 rounded-2xl" />
+        <ConversationThumb images={selectedConversation.vehicle_listings_public.images} title={selectedConversation.vehicle_listings_public.title} className="w-9 h-9 rounded-xl" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-[var(--color-text-primary)] truncate">{selectedConversation.vehicle_listings_public.title}</p>
-          <p className="text-xs text-[var(--color-text-secondary)] truncate">
-            {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} · {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
+          <p className="text-sm font-medium text-[#1A1A1A] truncate">{selectedConversation.vehicle_listings_public.title}</p>
+          <p className="text-xs text-gray-400 truncate">
+            {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
           </p>
         </div>
-        <Link href={`/anuncios/${selectedConversation.vehicle_listings_public.slug}`} className="flex items-center gap-1 px-3 py-1.5 bg-[var(--color-text-primary)] text-[var(--color-accent)] rounded-2xl text-xs font-bold shrink-0 hover:opacity-90 transition-opacity">
-          Ver anúncio <ArrowUpRight className="w-3.5 h-3.5" strokeWidth={2} />
+        <Link href={`/anuncios/${selectedConversation.vehicle_listings_public.slug}`} className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-[#1A1A1A] rounded-full text-xs font-medium shrink-0 hover:bg-gray-200 transition-colors">
+          Ver anúncio <ArrowUpRight className="w-3 h-3" strokeWidth={2} />
         </Link>
       </div>
-      <div className="mx-4 mt-3 px-3 py-2 flex items-center gap-2 rounded-2xl bg-[var(--color-accent)]/15 text-[var(--color-text-primary)] text-xs font-bold shrink-0">
-        <ShieldCheck className="w-4 h-4 shrink-0" strokeWidth={1.8} />
-        <span>Negociação protegida: evite compartilhar telefone, e-mail ou dados bancários no chat.</span>
+      <div className="mx-3 mt-3 px-3 py-2 flex items-center gap-2 rounded-xl bg-amber-50 text-amber-700 text-xs shrink-0">
+        <ShieldCheck className="w-3.5 h-3.5 shrink-0" strokeWidth={1.8} />
+        <span>Evite compartilhar telefone ou dados bancários no chat.</span>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        {loadingMessages && messages.length === 0 && <p className="text-center text-sm text-gray-400 py-8">Carregando mensagens...</p>}
-        <div className="grid gap-3">
+        {loadingMessages && messages.length === 0 && <p className="text-center text-xs text-gray-400 py-8">Carregando...</p>}
+        <div className="grid gap-2">
           {messages.map((msg, i) => {
             const isMine = msg.sender_user_id === myUserId
             const prev = messages[i - 1]
@@ -340,25 +337,25 @@ export default function ConversationInbox() {
           <div ref={messagesEndRef} />
         </div>
       </div>
-      <div className="px-4 pb-4 pt-2 shrink-0">
-        <div className="flex items-center gap-2 p-2 border border-gray-200 rounded-2xl focus-within:border-[var(--color-accent)] transition-colors">
+      <div className="px-3 pb-3 pt-2 shrink-0">
+        <div className="flex items-center gap-2 p-1.5 border border-gray-200 rounded-xl focus-within:border-gray-300 transition-colors">
           <input type="text" value={messageText} onChange={(e) => setMessageText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage() } }}
-            placeholder="Digite sua mensagem..." className="flex-1 px-3 py-2 bg-transparent text-sm text-[var(--color-text-primary)] placeholder-gray-400 focus:outline-none font-sans" aria-label="Digite sua mensagem" />
+            placeholder="Digite sua mensagem..." className="flex-1 px-3 py-2 bg-transparent text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none" aria-label="Mensagem" />
           <button type="button" disabled={sending || !messageText.trim()} onClick={() => void sendMessage()}
-            className="p-2.5 bg-[var(--color-text-primary)] text-[var(--color-accent)] rounded-2xl disabled:opacity-40 hover:opacity-90 transition-opacity" aria-label="Enviar mensagem">
+            className="p-2 bg-[#1A1A1A] text-[#D4F576] rounded-lg disabled:opacity-40 hover:opacity-90 transition-opacity" aria-label="Enviar">
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" strokeWidth={1.75} />}
           </button>
         </div>
       </div>
     </div>
   ) : (
-    <div className="flex flex-col items-center justify-center h-full bg-white border border-gray-200 rounded-2xl text-center px-8">
-      <div className="w-16 h-16 rounded-full bg-[var(--color-accent)] flex items-center justify-center mb-4">
-        <MessageSquare className="w-7 h-7 text-[var(--color-text-primary)]" strokeWidth={1.5} />
+    <div className="flex flex-col items-center justify-center h-full bg-white rounded-2xl border border-gray-100 text-center px-8">
+      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+        <MessageSquare className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
       </div>
-      <h2 className="text-sm font-bold text-[var(--color-text-primary)] font-[family-name:var(--font-heading)]">Selecione uma conversa</h2>
-      <p className="text-sm text-[var(--color-text-secondary)] mt-2 max-w-[300px]">O histórico e as novas mensagens aparecem em tempo real.</p>
+      <h2 className="text-sm font-medium text-[#1A1A1A]">Selecione uma conversa</h2>
+      <p className="text-xs text-gray-400 mt-1 max-w-[240px]">Mensagens aparecem em tempo real.</p>
     </div>
   )
 
@@ -382,7 +379,7 @@ export default function ConversationInbox() {
         {chatPanel}
       </div>
       {error && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 bg-[var(--color-text-primary)] text-white text-sm font-bold rounded-2xl shadow-lg z-50">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2.5 bg-red-600 text-white text-xs font-semibold rounded-full shadow-lg z-50">
           {error}
         </div>
       )}

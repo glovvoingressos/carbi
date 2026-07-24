@@ -3,7 +3,6 @@
 import AccountLayout from '@/components/marketplace/AccountLayout'
 import Link from 'next/link'
 import { Heart, Search } from 'lucide-react'
-import { motion } from 'motion/react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -27,23 +26,27 @@ export default function FavoritosPage() {
     load()
   }, [router])
 
-  if (loading) return <div className="flex items-center justify-center min-h-dvh bg-[#F7F7F7]"><Loader2 className="w-5 h-5 animate-spin text-[#999]" /></div>
+  if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-5 h-5 animate-spin text-gray-300" /></div>
   if (!user) return null
 
   return (
     <AccountLayout user={user}>
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-        <div className="bg-white rounded-2xl border border-gray-200/80 p-8 sm:p-12 text-center shadow-sm">
-          <div className="w-16 h-16 rounded-2xl bg-[#D4F576]/30 flex items-center justify-center mx-auto mb-5 border border-[#D4F576]">
-            <Heart className="w-7 h-7 text-gray-900" strokeWidth={1.75} />
-          </div>
-          <h2 className="text-base font-bold text-gray-900 mb-2 font-[family-name:var(--font-heading)]">Nenhum veículo favorito ainda</h2>
-          <p className="text-xs text-gray-500 mb-6 max-w-sm mx-auto leading-relaxed">Salve seus carros favoritos para acompanhar variações de preço, comparar ofertas e contatar vendedores.</p>
-          <Link href="/carros-a-venda" className="inline-flex items-center gap-2 px-6 py-3 bg-gray-950 text-white rounded-full text-xs font-semibold hover:bg-gray-800 transition-colors shadow-sm min-h-[44px]">
-            <Search className="w-4 h-4 text-[#D4F576]" strokeWidth={2} /> Buscar ofertas de seminovos
-          </Link>
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <Heart className="w-5 h-5 text-gray-400" strokeWidth={1.75} />
         </div>
-      </motion.div>
+        <h2 className="text-sm font-bold text-[#1A1A1A] mb-1">Nenhum favorito ainda</h2>
+        <p className="text-xs text-gray-400 mb-5 max-w-[240px]">
+          Salve carros favoritos para acompanhar preços e comparar ofertas.
+        </p>
+        <Link
+          href="/carros-a-venda"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A1A1A] text-white rounded-full text-xs font-semibold hover:bg-black transition-colors"
+        >
+          <Search className="w-3.5 h-3.5 text-[#D4F576]" strokeWidth={2} />
+          Buscar seminovos
+        </Link>
+      </div>
     </AccountLayout>
   )
 }

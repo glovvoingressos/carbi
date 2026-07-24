@@ -1,8 +1,7 @@
 'use client'
 
 import AccountLayout from '@/components/marketplace/AccountLayout'
-import { motion } from 'motion/react'
-import { Settings, Shield, Bell } from 'lucide-react'
+import { Shield, Bell, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import { useEffect, useState } from 'react'
@@ -27,46 +26,47 @@ export default function ConfiguracoesPage() {
     load()
   }, [router])
 
-  if (loading) return <div className="flex items-center justify-center min-h-dvh bg-[#F7F7F7]"><Loader2 className="w-5 h-5 animate-spin text-[#999]" /></div>
+  if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-5 h-5 animate-spin text-gray-300" /></div>
   if (!user) return null
 
   return (
     <AccountLayout user={user}>
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="space-y-4">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-2xl bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
-            <Settings className="w-5 h-5 text-gray-700" strokeWidth={1.75} />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-gray-900 font-[family-name:var(--font-heading)]">Configurações</h2>
-            <p className="text-xs text-gray-500">Gerencie preferências e privacidade da sua conta</p>
-          </div>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-sm font-bold text-[#1A1A1A] mb-1">Configurações</h2>
+          <p className="text-xs text-gray-400">Preferências e privacidade da conta</p>
         </div>
 
-        <Link href="/minha-conta" className="block bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm hover:border-gray-300 transition-all">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
-              <Shield className="w-5 h-5 text-gray-700" strokeWidth={1.75} />
+        <div className="space-y-0.5">
+          <Link
+            href="/minha-conta"
+            className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 hover:bg-gray-50 transition-colors group"
+          >
+            <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+              <Shield className="w-4 h-4 text-gray-500" strokeWidth={1.75} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-gray-900">Conta e Segurança</p>
-              <p className="text-xs text-gray-500 mt-0.5">Gerencie seu nome, telefone, email e alteração de senha.</p>
+              <p className="text-sm font-medium text-[#1A1A1A]">Conta e Segurança</p>
+              <p className="text-xs text-gray-400 mt-0.5">Nome, telefone, email e senha</p>
             </div>
-          </div>
-        </Link>
+            <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
+          </Link>
 
-        <Link href="/minha-conta/notificacoes" className="block bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm hover:border-gray-300 transition-all">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
-              <Bell className="w-5 h-5 text-gray-700" strokeWidth={1.75} />
+          <Link
+            href="/minha-conta/notificacoes"
+            className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 hover:bg-gray-50 transition-colors group"
+          >
+            <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+              <Bell className="w-4 h-4 text-gray-500" strokeWidth={1.75} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-gray-900">Notificações e Alertas</p>
-              <p className="text-xs text-gray-500 mt-0.5">Configure alertas de mensagens, propostas recebidas e atualizações.</p>
+              <p className="text-sm font-medium text-[#1A1A1A]">Notificações</p>
+              <p className="text-xs text-gray-400 mt-0.5">Alertas de mensagens e propostas</p>
             </div>
-          </div>
-        </Link>
-      </motion.div>
+            <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
+          </Link>
+        </div>
+      </div>
     </AccountLayout>
   )
 }

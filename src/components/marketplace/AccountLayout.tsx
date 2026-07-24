@@ -11,20 +11,15 @@ import {
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 const navItems = [
-  { href: '/minha-conta', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/minha-conta/anuncios', label: 'Meus anúncios', icon: Car },
-  { href: '/minha-conta/conversas', label: 'Mensagens', icon: MessageCircle },
+  { href: '/minha-conta', label: 'Início', icon: LayoutDashboard },
+  { href: '/minha-conta/anuncios', label: 'Anúncios', icon: Car },
+  { href: '/minha-conta/conversas', label: 'Chat', icon: MessageCircle },
   { href: '/minha-conta/favoritos', label: 'Favoritos', icon: Heart },
-  { href: '/minha-conta/notificacoes', label: 'Notificações', icon: Bell },
-  { href: '/minha-conta/configuracoes', label: 'Configurações', icon: Settings },
+  { href: '/minha-conta/notificacoes', label: 'Alertas', icon: Bell },
+  { href: '/minha-conta/configuracoes', label: 'Config', icon: Settings },
 ]
 
 const ease = [0.23, 1, 0.32, 1] as const
-const fade = {
-  initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.35, ease },
-}
 
 interface AccountLayoutProps {
   children: React.ReactNode
@@ -52,181 +47,142 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
   }
 
   return (
-    <div className="min-h-dvh bg-[#F5F5F5] pb-24 lg:pb-8 fingen-shell">
-      {/* Hero banner */}
-      <div className="relative h-44 md:h-52 bg-gradient-to-br from-[#1A1A1A] via-[#2A2A2A] to-[#111111] overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#F5F5F5] via-[#F5F5F5]/40 to-transparent" />
+    <div className="min-h-dvh bg-[#FAFAFA] pb-24 lg:pb-0">
+      {/* Minimal top bar */}
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+          <Link href="/" className="text-sm font-bold text-[#1A1A1A] tracking-tight">
+            Carbi
+          </Link>
+          <div className="flex items-center gap-1">
+            <button
+              aria-label="Configurações"
+              onClick={() => router.push('/minha-conta/configuracoes')}
+              className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-500"
+            >
+              <Settings className="w-4 h-4" strokeWidth={1.75} />
+            </button>
+            <div className="w-8 h-8 rounded-full bg-[#1A1A1A] overflow-hidden flex items-center justify-center ml-1">
+              {user.avatarUrl ? (
+                <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-4 h-4 text-[#D4F576]" strokeWidth={2} />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 -mt-20 z-10">
-        <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8 lg:items-start space-y-6 lg:space-y-0">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+        <div className="lg:grid lg:grid-cols-[240px_1fr] lg:gap-10 lg:items-start">
 
           {/* ── Sidebar ── */}
-          <div className="lg:sticky lg:top-20 space-y-5">
-            {/* User Profile Card */}
-            <div className="bg-white rounded-[24px] p-6 border border-gray-200/80 shadow-[0_4px_24px_rgba(0,0,0,0.04)] text-center space-y-4">
-              {/* Avatar */}
-              <div className="relative flex justify-center">
-                <div className="w-24 h-24 rounded-full border-4 border-white bg-gray-100 shadow-[0_8px_24px_rgba(0,0,0,0.08)] overflow-hidden flex items-center justify-center shrink-0">
-                  {user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt={`Foto de perfil de ${user.fullName || 'usuário'}`} className="w-full h-full object-cover" />
-                  ) : (
-                    <User className="w-10 h-10 text-gray-400" strokeWidth={1.5} />
-                  )}
-                </div>
-              </div>
-
-              {/* Name & badges */}
-              <motion.div {...fade}>
-                <h1 className="text-lg font-bold text-[#1A1A1A] leading-tight font-[family-name:var(--font-heading)]">
-                  {user.fullName || 'Usuário'}
-                </h1>
-                <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
-                <div className="flex items-center justify-center gap-2 mt-3">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold bg-gray-100 text-gray-700">
-                    Vendedor
-                  </span>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold bg-[#D4F576]/30 text-gray-900 border border-[#D4F576]">
-                    ✓ Verificado
-                  </span>
-                </div>
-              </motion.div>
-
-              {/* Stats */}
-              {stats.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.35, delay: 0.1, ease }}
-                  className="grid grid-cols-2 gap-2.5 pt-2 border-t border-gray-100"
-                >
-                  {stats.map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="bg-gray-50/80 rounded-2xl p-3 text-center flex flex-col items-center border border-gray-100"
-                    >
-                      <stat.icon className="w-4 h-4 mb-1 text-gray-500" strokeWidth={1.75} />
-                      <p className="text-base font-bold text-[#1A1A1A] leading-none font-[family-name:var(--font-heading)]">{stat.value}</p>
-                      <p className="text-[11px] text-gray-500 font-medium mt-1">{stat.label}</p>
-                    </div>
-                  ))}
-                </motion.div>
-              )}
-
-              {/* Action buttons */}
-              <div className="flex items-center justify-center gap-2 pt-2 border-t border-gray-100">
-                <button onClick={() => router.push('/minha-conta')} className="flex-1 flex items-center justify-center gap-2 h-11 rounded-full bg-[#1A1A1A] text-white text-xs font-semibold hover:bg-black transition-colors shadow-sm">
-                  <User className="w-3.5 h-3.5 text-[#D4F576]" strokeWidth={2} />
-                  Perfil
-                </button>
-                <button aria-label="Configurações" onClick={() => router.push('/minha-conta/configuracoes')} className="w-11 h-11 rounded-full bg-gray-100 border border-gray-200/80 flex items-center justify-center hover:bg-gray-200 transition-colors shrink-0">
-                  <Settings className="w-4 h-4 text-gray-700" strokeWidth={1.75} />
-                </button>
-                <button aria-label="Notificações" onClick={() => router.push('/minha-conta/notificacoes')} className="w-11 h-11 rounded-full bg-gray-100 border border-gray-200/80 flex items-center justify-center hover:bg-gray-200 transition-colors shrink-0">
-                  <Bell className="w-4 h-4 text-gray-700" strokeWidth={1.75} />
-                </button>
-              </div>
-            </div>
-
-            {/* Mobile Nav Tabs */}
+          <div className="lg:sticky lg:top-20 space-y-6 mb-6 lg:mb-0">
+            {/* User Info - Compact */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.2, ease }}
+              transition={{ duration: 0.3, ease }}
             >
-              <div className="relative lg:hidden">
-                <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all min-h-[44px] ${
-                        isActive(item.href)
-                          ? 'bg-[#1A1A1A] text-[#D4F576] shadow-sm'
-                          : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      <item.icon className="w-4 h-4" strokeWidth={1.75} />
-                      {item.label}
-                    </Link>
-                  ))}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center shrink-0">
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <User className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <h1 className="text-sm font-bold text-[#1A1A1A] truncate">
+                    {user.fullName || 'Usuário'}
+                  </h1>
+                  <p className="text-xs text-gray-400 truncate">{user.email}</p>
                 </div>
               </div>
 
-              {/* Desktop Nav Sidebar */}
-              <div className="hidden lg:flex flex-col gap-1.5 bg-white p-2 rounded-[24px] border border-gray-200/80 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
-                {navItems.map((item) => {
-                  const active = isActive(item.href)
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all min-h-[44px] ${
-                        active
-                          ? 'bg-[#1A1A1A] text-white shadow-sm'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                      }`}
-                    >
-                      <item.icon className={`w-4 h-4 ${active ? 'text-[#D4F576]' : 'text-gray-500'}`} strokeWidth={1.75} />
-                      {item.label}
-                      {active && (
-                        <div className="ml-auto w-2 h-2 rounded-full bg-[#D4F576]" />
-                      )}
-                    </Link>
-                  )
-                })}
-              </div>
+              {/* Stats - Inline */}
+              {stats.length > 0 && (
+                <div className="flex gap-4 mb-4">
+                  {stats.map((stat) => (
+                    <div key={stat.label} className="flex items-center gap-2">
+                      <stat.icon className="w-3.5 h-3.5 text-gray-400" strokeWidth={1.75} />
+                      <span className="text-sm font-bold text-[#1A1A1A]">{stat.value}</span>
+                      <span className="text-xs text-gray-400">{stat.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
-          </div>
 
-          {/* ── Main content ── */}
-          <div className="space-y-4">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
+            {/* Navigation - Clean list */}
+            <motion.nav
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.25, ease }}
-              className="bg-white rounded-[24px] border border-gray-200/80 shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-5 sm:p-7"
+              transition={{ duration: 0.3, delay: 0.1, ease }}
+              className="space-y-0.5"
             >
-              {children}
-            </motion.div>
+              {navItems.map((item) => {
+                const active = isActive(item.href)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      active
+                        ? 'bg-[#1A1A1A] text-white'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    }`}
+                  >
+                    <item.icon className={`w-4 h-4 ${active ? 'text-[#D4F576]' : 'text-gray-400'}`} strokeWidth={1.75} />
+                    {item.label}
+                  </Link>
+                )
+              })}
+            </motion.nav>
 
-            <div className="flex justify-center pt-2">
+            {/* Logout */}
+            <div className="pt-2 border-t border-gray-100">
               <button
                 type="button"
                 onClick={handleLogout}
                 disabled={loggingOut}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 min-h-[44px]"
+                className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
               >
-                <LogOut className="w-4 h-4" strokeWidth={1.75} />
-                {loggingOut ? 'Saindo...' : 'Sair da conta'}
+                <LogOut className="w-3.5 h-3.5" strokeWidth={1.75} />
+                {loggingOut ? 'Saindo...' : 'Sair'}
               </button>
             </div>
           </div>
+
+          {/* ── Main content ── */}
+          <motion.main
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.15, ease }}
+            className="min-h-[60vh]"
+          >
+            {children}
+          </motion.main>
 
         </div>
       </div>
 
       {/* ── Mobile Bottom Navigation ── */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-sm border-t border-gray-200/80 safe-area-pb">
-        <div className="flex items-center justify-around px-1 py-2">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-white/90 backdrop-blur-xl border-t border-gray-100 safe-area-pb">
+        <div className="flex items-center justify-around px-2 py-1.5">
           {navItems.slice(0, 5).map((item) => {
             const active = isActive(item.href)
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors min-w-0 ${
+                className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all min-w-0 ${
                   active ? 'text-[#1A1A1A]' : 'text-gray-400'
                 }`}
               >
-                <div className={`w-8 h-8 rounded-2xl flex items-center justify-center transition-colors ${
-                  active ? 'bg-[#1A1A1A]' : 'bg-transparent'
-                }`}>
-                  <item.icon className={`w-4 h-4 ${active ? 'text-[#D4F576]' : 'text-gray-400'}`} strokeWidth={1.75} />
-                </div>
-                <span className={`text-[10px] font-semibold truncate max-w-[52px] text-center ${active ? 'text-[#1A1A1A]' : 'text-gray-400'}`}>
-                  {item.label.split(' ')[0]}
+                <item.icon className={`w-5 h-5 ${active ? 'text-[#1A1A1A]' : 'text-gray-400'}`} strokeWidth={active ? 2 : 1.75} />
+                <span className={`text-[10px] ${active ? 'font-bold' : 'font-medium'}`}>
+                  {item.label}
                 </span>
               </Link>
             )

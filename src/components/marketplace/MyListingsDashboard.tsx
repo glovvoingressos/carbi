@@ -18,9 +18,9 @@ const authH = (t: string) => ({ Authorization: `Bearer ${t}`, 'Content-Type': 'a
 
 // ── StatusBadge ────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
-  const s: Record<string, string> = { active: 'bg-emerald-50 text-emerald-700 border-emerald-200', paused: 'bg-amber-50 text-amber-700 border-amber-200', sold: 'bg-gray-100 text-gray-500 border-gray-200' }
+  const s: Record<string, string> = { active: 'bg-emerald-50 text-emerald-600', paused: 'bg-amber-50 text-amber-600', sold: 'bg-gray-100 text-gray-500' }
   const l: Record<string, string> = { active: 'Ativo', paused: 'Pausado', sold: 'Vendido', archived: 'Arquivado' }
-  return <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${s[status] || s.active}`}>{l[status] || status}</span>
+  return <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold ${s[status] || s.active}`}>{l[status] || status}</span>
 }
 
 // ── PhotoGrid ──────────────────────────────────────────
@@ -30,49 +30,72 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
   isUploading: boolean; pendingUploads: number; imageError: string | null; isDirty: boolean
 }) {
   return (
-    <div className={`bg-white p-5 rounded-2xl border transition-colors ${isDragging ? 'border-[var(--color-accent)] bg-[var(--color-accent-soft)]/20' : 'border-[var(--color-border-strong)]'}`}
-      onDragEnter={onDragEnter} onDragLeave={onDragLeave} onDragOver={onDragOver} onDrop={onDrop}>
-      <div className="flex items-center justify-between mb-4">
-        <div><h3 className="font-heading font-bold text-xs text-[var(--color-text-primary)]">Fotos</h3><p className="text-xs text-[var(--color-text-tertiary)]">Arraste para reordenar. A primeira é capa.</p></div>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Fotos</h3>
         <div className="flex gap-2">
-          <label className="h-8 px-3 rounded-full bg-[var(--color-bg)] hover:bg-[var(--color-bg-muted)] text-[var(--color-text-primary)] text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors border border-[var(--color-border)]">
+          <label className="h-7 px-3 rounded-full bg-gray-100 hover:bg-gray-200 text-[#1A1A1A] text-xs font-medium flex items-center gap-1 cursor-pointer transition-colors">
             <Upload className="w-3 h-3" /> Adicionar
             <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { onAdd(e.target.files); e.target.value = '' }} />
           </label>
-          <button onClick={onSync} disabled={!isDirty || isUploading} className="h-8 px-4 rounded-full bg-[var(--color-text-primary)] text-white text-xs font-bold flex items-center gap-1 disabled:opacity-40">
+          <button onClick={onSync} disabled={!isDirty || isUploading} className="h-7 px-3 rounded-full bg-[#1A1A1A] text-white text-xs font-medium flex items-center gap-1 disabled:opacity-40">
             {isUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} Salvar
           </button>
         </div>
       </div>
-      {(isUploading || pendingUploads > 0) && <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--color-info-bg)] text-xs text-[var(--color-text-primary)] mb-3"><Loader2 className="w-3 h-3 animate-spin text-[var(--color-info)]" />{isUploading ? 'Enviando fotos…' : `${pendingUploads} foto(s) prontas`}</div>}
-      {imageError && <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[var(--color-danger-bg)] text-xs text-[var(--color-danger)] mb-3"><AlertCircle className="w-3 h-3 mt-0.5 shrink-0" /> {imageError}</div>}
-      {images.length === 0 ? (
-        <label className="block cursor-pointer rounded-xl border-2 border-dashed border-[var(--color-border-strong)] bg-[var(--color-bg)] p-6 text-center transition-colors hover:border-[var(--color-accent)]">
-          <ImageIcon className="mx-auto mb-3 h-10 w-10 text-[var(--color-text-disabled)]" />
-          <p className="text-sm font-bold text-[var(--color-text-primary)]">Arraste fotos ou clique para selecionar</p>
-          <p className="text-xs text-[var(--color-text-tertiary)] mt-1">JPG, PNG ou WEBP · até {LISTING_MAX_IMAGES} · máx {LISTING_MAX_IMAGE_SIZE_MB}MB</p>
-          <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { onAdd(e.target.files); e.target.value = '' }} />
-        </label>
-      ) : (
-        <Reorder.Group axis="x" values={images} onReorder={onReorder} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {images.map((img) => (
-            <Reorder.Item key={img.id} value={img} className="relative aspect-[4/3] rounded-xl overflow-hidden group cursor-grab active:cursor-grabbing border border-[var(--color-border)] bg-[var(--color-bg)]">
-              <img src={img.previewUrl} className="w-full h-full object-cover select-none" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
-                <div className="flex justify-between">
-                  <div className="bg-white/90 p-1 rounded-md"><GripVertical className="w-3 h-3 text-[var(--color-text-tertiary)]" /></div>
-                  <button onClick={() => onRemove(img.id)} className="w-8 h-8 bg-[var(--color-danger)] text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform"><X className="w-3 h-3" /></button>
+
+      <div
+        className={`bg-white rounded-2xl border transition-colors ${isDragging ? 'border-[#D4F576] bg-[#D4F576]/5' : 'border-gray-100'} p-4`}
+        onDragEnter={onDragEnter} onDragLeave={onDragLeave} onDragOver={onDragOver} onDrop={onDrop}
+      >
+        {(isUploading || pendingUploads > 0) && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 text-xs text-blue-600 mb-3">
+            <Loader2 className="w-3 h-3 animate-spin" />
+            {isUploading ? 'Enviando...' : `${pendingUploads} foto(s) prontas`}
+          </div>
+        )}
+        {imageError && (
+          <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-red-50 text-xs text-red-600 mb-3">
+            <AlertCircle className="w-3 h-3 mt-0.5 shrink-0" /> {imageError}
+          </div>
+        )}
+
+        {images.length === 0 ? (
+          <label className="block cursor-pointer rounded-xl border-2 border-dashed border-gray-200 p-8 text-center transition-colors hover:border-gray-300">
+            <ImageIcon className="mx-auto mb-3 h-8 w-8 text-gray-300" />
+            <p className="text-sm font-medium text-[#1A1A1A]">Arraste fotos ou clique</p>
+            <p className="text-xs text-gray-400 mt-1">JPG, PNG ou WEBP · até {LISTING_MAX_IMAGES} · máx {LISTING_MAX_IMAGE_SIZE_MB}MB</p>
+            <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { onAdd(e.target.files); e.target.value = '' }} />
+          </label>
+        ) : (
+          <Reorder.Group axis="x" values={images} onReorder={onReorder} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {images.map((img) => (
+              <Reorder.Item key={img.id} value={img} className="relative aspect-[4/3] rounded-xl overflow-hidden group cursor-grab active:cursor-grabbing bg-gray-100">
+                <img src={img.previewUrl} className="w-full h-full object-cover select-none" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                  <div className="flex justify-between">
+                    <div className="bg-white/90 p-1 rounded-md"><GripVertical className="w-3 h-3 text-gray-500" /></div>
+                    <button onClick={() => onRemove(img.id)} className="w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <button onClick={() => onSetPrimary(img.id)} className={`w-full py-1.5 rounded-lg text-[10px] font-semibold transition-colors ${img.is_primary ? 'bg-emerald-500 text-white' : 'bg-white text-[#1A1A1A]'}`}>
+                    {img.is_primary ? 'Capa' : 'Definir capa'}
+                  </button>
                 </div>
-                <button onClick={() => onSetPrimary(img.id)} className={`w-full py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${img.is_primary ? 'bg-[var(--color-success)] text-white' : 'bg-white text-[var(--color-text-primary)]'}`}>
-                  {img.is_primary ? 'Capa' : 'Definir Capa'}
-                </button>
-              </div>
-              {img.is_primary && <div className="absolute top-1.5 left-1.5 bg-[var(--color-success)] text-white px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider flex items-center gap-0.5"><Star className="w-2.5 h-2.5 fill-current" /> Capa</div>}
-              {!img.isExisting && <div className="absolute top-1.5 right-1.5 bg-[var(--color-accent)] text-[var(--color-text-primary)] px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider">Novo</div>}
-            </Reorder.Item>
-          ))}
-        </Reorder.Group>
-      )}
+                {img.is_primary && (
+                  <div className="absolute top-1.5 left-1.5 bg-emerald-500 text-white px-2 py-0.5 rounded-full text-[9px] font-semibold flex items-center gap-0.5">
+                    <Star className="w-2.5 h-2.5 fill-current" /> Capa
+                  </div>
+                )}
+                {!img.isExisting && (
+                  <div className="absolute top-1.5 right-1.5 bg-[#D4F576] text-[#1A1A1A] px-2 py-0.5 rounded-full text-[9px] font-semibold">Novo</div>
+                )}
+              </Reorder.Item>
+            ))}
+          </Reorder.Group>
+        )}
+      </div>
     </div>
   )
 }
@@ -88,34 +111,36 @@ function ListingSidebar({ listings, selectedId, onSelect, loading, searchQuery, 
   }), [listings, searchQuery, statusFilter])
 
   return (
-    <aside className="space-y-3 lg:sticky lg:top-24">
-      <h3 className="font-heading font-bold text-[10px] uppercase tracking-widest text-[var(--color-text-tertiary)] px-1">Anúncios ({filtered.length})</h3>
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-disabled)]" />
-        <input className="w-full h-10 pl-9 pr-3 rounded-xl bg-[var(--color-bg)] border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] placeholder:text-[var(--color-text-disabled)] focus:outline-none focus:border-[var(--color-accent)] transition-colors" placeholder="Buscar anúncio…" value={searchQuery} onChange={(e) => onSearchChange(e.target.value)} />
+    <aside className="space-y-3 lg:sticky lg:top-20">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-semibold text-gray-400">Anúncios</h3>
+        <span className="text-xs text-gray-300">{filtered.length}</span>
       </div>
-      <div className="flex gap-1.5 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+        <input className="w-full h-10 pl-9 pr-3 rounded-xl bg-gray-50 border border-gray-100 text-sm text-[#1A1A1A] placeholder-gray-300 focus:outline-none focus:border-gray-300 transition-colors" placeholder="Buscar..." value={searchQuery} onChange={(e) => onSearchChange(e.target.value)} />
+      </div>
+      <div className="flex gap-1 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
         {(['all', 'active', 'paused', 'sold'] as const).map((s) => (
-          <button key={s} onClick={() => onStatusFilterChange(s)} className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors border ${statusFilter === s ? 'bg-[var(--color-text-primary)] text-white border-[var(--color-text-primary)]' : 'bg-white text-[var(--color-text-tertiary)] border-[var(--color-border)] hover:border-[var(--color-border-strong)]'}`}>
+          <button key={s} onClick={() => onStatusFilterChange(s)} className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${statusFilter === s ? 'bg-[#1A1A1A] text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
             {s === 'all' ? 'Todos' : s === 'active' ? 'Ativos' : s === 'paused' ? 'Pausados' : 'Vendidos'}
           </button>
         ))}
       </div>
-      <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto lg:max-h-[calc(100vh-220px)] pb-2 lg:pb-0 custom-scrollbar no-scrollbar-mobile">
-        {loading ? [1, 2, 3].map((i) => <div key={i} className="min-w-[200px] lg:w-full h-20 bg-white rounded-xl animate-pulse" />)
-         : filtered.length === 0 ? <div className="w-full p-6 text-center rounded-xl bg-white border border-[var(--color-border)]"><Car className="w-8 h-8 mx-auto text-[var(--color-text-disabled)] mb-2" /><p className="text-xs font-bold text-[var(--color-text-tertiary)]">Nenhum anúncio</p></div>
+      <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto lg:max-h-[calc(100vh-200px)] pb-2 lg:pb-0 custom-scrollbar no-scrollbar-mobile">
+        {loading ? [1, 2, 3].map((i) => <div key={i} className="min-w-[200px] lg:w-full h-16 bg-white rounded-xl animate-pulse" />)
+         : filtered.length === 0 ? <div className="w-full p-6 text-center rounded-xl bg-white border border-gray-100"><Car className="w-6 h-6 mx-auto text-gray-300 mb-2" /><p className="text-xs text-gray-400">Nenhum anúncio</p></div>
          : filtered.map((l) => (
-          <button key={l.id} onClick={() => onSelect(l.id)} className={`min-w-[220px] lg:w-full text-left p-3 rounded-xl border transition-all flex-shrink-0 ${selectedId === l.id ? 'bg-[var(--color-text-primary)] border-[var(--color-text-primary)] shadow-lg' : 'bg-white border-[var(--color-border)] hover:border-[var(--color-border-strong)]'}`}>
+          <button key={l.id} onClick={() => onSelect(l.id)} className={`min-w-[200px] lg:w-full text-left p-3 rounded-xl transition-all flex-shrink-0 ${selectedId === l.id ? 'bg-[#1A1A1A]' : 'hover:bg-gray-50'}`}>
             <div className="flex gap-3 items-center">
-              <div className="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-[var(--color-bg)]">
+              <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
                 <MarketplaceListingImage brand={l.brand} model={l.model} year={l.year_model} imageUrls={l.images?.map((img) => img.public_url) || []} alt={l.title} className="h-full w-full object-cover" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <p className={`text-sm font-bold truncate ${selectedId === l.id ? 'text-white' : 'text-[var(--color-text-primary)]'}`}>{l.title}</p>
-                  <StatusBadge status={l.status} />
+                  <p className={`text-sm font-medium truncate ${selectedId === l.id ? 'text-white' : 'text-[#1A1A1A]'}`}>{l.title}</p>
                 </div>
-                <p className={`text-xs font-bold mt-0.5 ${selectedId === l.id ? 'text-white/60' : 'text-[var(--color-text-secondary)]'}`}>{formatBRL(l.price)}</p>
+                <p className={`text-xs mt-0.5 ${selectedId === l.id ? 'text-white/60' : 'text-gray-400'}`}>{formatBRL(l.price)}</p>
               </div>
             </div>
           </button>
@@ -145,34 +170,36 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
     setErrors(next)
   }, [errors, setFormData, setIsDirty, setErrors])
 
-  const ic = (f: string, x = '') => `w-full h-11 px-4 rounded-xl bg-gray-50 border border-gray-200 font-medium text-sm text-gray-900 focus:outline-none focus:border-gray-900 focus:bg-white transition-all ${x} ${errors[f] ? '!border-red-500 text-red-600' : ''}`
+  const ic = (f: string, x = '') => `w-full h-10 px-3 rounded-xl bg-gray-50 border border-gray-100 text-sm text-[#1A1A1A] placeholder-gray-300 focus:outline-none focus:border-gray-300 transition-colors ${x} ${errors[f] ? '!border-red-400 text-red-600' : ''}`
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${saveStatus === 'saving' ? 'bg-amber-50 text-amber-700 border border-amber-200' : saveStatus === 'saved' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : saveStatus === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-gray-100 text-gray-600'}`}>
-          {saveStatus === 'saving' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : saveStatus === 'saved' ? <Check className="w-3.5 h-3.5" /> : saveStatus === 'error' ? <AlertCircle className="w-3.5 h-3.5" /> : <div className="w-2 h-2 rounded-full bg-emerald-500" />}
-          {saveStatus === 'saving' ? 'Salvando alterações…' : saveStatus === 'saved' ? 'Alterações salvas!' : saveStatus === 'error' ? 'Erro ao salvar' : 'Todas alterações salvas'}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className={`flex items-center gap-1.5 text-xs font-medium ${saveStatus === 'saving' ? 'text-amber-600' : saveStatus === 'saved' ? 'text-emerald-600' : saveStatus === 'error' ? 'text-red-600' : 'text-gray-400'}`}>
+          {saveStatus === 'saving' ? <Loader2 className="w-3 h-3 animate-spin" /> : saveStatus === 'saved' ? <Check className="w-3 h-3" /> : saveStatus === 'error' ? <AlertCircle className="w-3 h-3" /> : <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+          {saveStatus === 'saving' ? 'Salvando...' : saveStatus === 'saved' ? 'Salvo' : saveStatus === 'error' ? 'Erro' : 'Salvo'}
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="h-10 px-5 rounded-full bg-gray-950 text-white text-xs font-semibold flex items-center gap-2 hover:bg-gray-800 transition-colors disabled:opacity-40 shadow-sm">
-            <Save className="w-3.5 h-3.5 text-[#D4F576]" /> Salvar anúncio
+          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="h-9 px-4 rounded-full bg-[#1A1A1A] text-white text-xs font-semibold flex items-center gap-1.5 hover:bg-black transition-colors disabled:opacity-40">
+            <Save className="w-3 h-3 text-[#D4F576]" /> Salvar
           </button>
-          <button onClick={onDelete} disabled={isDeleting} className="h-10 w-10 rounded-full border border-red-200 flex items-center justify-center text-red-600 hover:bg-red-50 transition-colors" title="Excluir anúncio">
-            {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+          <button onClick={onDelete} disabled={isDeleting} className="h-9 w-9 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 transition-colors" title="Excluir">
+            {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>
 
       {/* Stats Header */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 flex items-center justify-between shadow-sm">
-        <div>
-          <div className="text-xl font-bold text-gray-900 font-[family-name:var(--font-heading)]">{(listing.view_count || 0).toLocaleString('pt-BR')}</div>
-          <div className="text-xs font-medium text-gray-500">Visualizações no site</div>
+      <div className="flex items-center justify-between py-3 border-b border-gray-100">
+        <div className="flex items-center gap-4">
+          <div>
+            <span className="text-lg font-bold text-[#1A1A1A]">{(listing.view_count || 0).toLocaleString('pt-BR')}</span>
+            <span className="text-xs text-gray-400 ml-1.5">visualizações</span>
+          </div>
         </div>
-        <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-900 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors">
-          Ver anúncio ao vivo →
+        <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-[#1A1A1A] transition-colors">
+          Ver ao vivo →
         </a>
       </div>
 
@@ -197,112 +224,125 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       }} />
 
       {/* Basic Info */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
-        <h3 className="font-bold text-sm text-gray-900 font-[family-name:var(--font-heading)]">Informações Básicas</h3>
-        <div>
-          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Título do Anúncio</label>
-          <input className={ic('title')} value={formData.title || ''} onChange={(e) => update('title', e.target.value)} placeholder="Ex: Toyota Corolla 2.0 XEi 2024" />
-          {errors.title && <p className="text-xs font-semibold text-red-600 mt-1">{errors.title}</p>}
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div><label className="text-xs font-semibold text-gray-600 mb-1.5 block">Marca</label><input className={ic('brand')} value={formData.brand || ''} onChange={(e) => update('brand', e.target.value)} /></div>
-          <div><label className="text-xs font-semibold text-gray-600 mb-1.5 block">Modelo</label><input className={ic('model')} value={formData.model || ''} onChange={(e) => update('model', e.target.value)} /></div>
-          <div><label className="text-xs font-semibold text-gray-600 mb-1.5 block">Ano Fab.</label><input type="number" className={ic('year')} value={formData.year || ''} onChange={(e) => update('year', parseBrazilianInt(e.target.value))} /></div>
-          <div><label className="text-xs font-semibold text-gray-600 mb-1.5 block">Ano Mod.</label><input type="number" className={ic('year_model')} value={formData.year_model || ''} onChange={(e) => update('year_model', parseBrazilianInt(e.target.value))} /></div>
-        </div>
-        <div>
-          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Status da Publicação</label>
-          <select className={`${ic('status')} cursor-pointer`} value={formData.status || 'active'} onChange={(e) => update('status', e.target.value)}>
-            <option value="active">🟢 Ativo (Visível no site)</option>
-            <option value="paused">🟠 Pausado (Oculto temporariamente)</option>
-            <option value="sold">✅ Vendido</option>
-            <option value="archived">⚪ Arquivado</option>
-          </select>
+      <div className="space-y-3">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Informações básicas</h3>
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+          <div>
+            <label className="text-xs text-gray-400 mb-1.5 block">Título do Anúncio</label>
+            <input className={ic('title')} value={formData.title || ''} onChange={(e) => update('title', e.target.value)} placeholder="Ex: Toyota Corolla 2.0 XEi 2024" />
+            {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div><label className="text-xs text-gray-400 mb-1.5 block">Marca</label><input className={ic('brand')} value={formData.brand || ''} onChange={(e) => update('brand', e.target.value)} /></div>
+            <div><label className="text-xs text-gray-400 mb-1.5 block">Modelo</label><input className={ic('model')} value={formData.model || ''} onChange={(e) => update('model', e.target.value)} /></div>
+            <div><label className="text-xs text-gray-400 mb-1.5 block">Ano Fab.</label><input type="number" className={ic('year')} value={formData.year || ''} onChange={(e) => update('year', parseBrazilianInt(e.target.value))} /></div>
+            <div><label className="text-xs text-gray-400 mb-1.5 block">Ano Mod.</label><input type="number" className={ic('year_model')} value={formData.year_model || ''} onChange={(e) => update('year_model', parseBrazilianInt(e.target.value))} /></div>
+          </div>
+          <div>
+            <label className="text-xs text-gray-400 mb-1.5 block">Status</label>
+            <select className={`${ic('status')} cursor-pointer`} value={formData.status || 'active'} onChange={(e) => update('status', e.target.value)}>
+              <option value="active">Ativo</option>
+              <option value="paused">Pausado</option>
+              <option value="sold">Vendido</option>
+              <option value="archived">Arquivado</option>
+            </select>
+          </div>
         </div>
       </div>
 
       {/* Price & Location */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
-        <h3 className="font-bold text-sm text-gray-900 font-[family-name:var(--font-heading)]">Preço e Localização</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="sm:col-span-1">
-            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Preço (R$)</label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400 pointer-events-none">R$</span>
-              <input className={`${ic('price')} pl-9`} value={formData.price ?? ''} onChange={(e) => update('price', e.target.value)} placeholder="0,00" />
+      <div className="space-y-3">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Preço e localização</h3>
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-1">
+              <label className="text-xs text-gray-400 mb-1.5 block">Preço (R$)</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">R$</span>
+                <input className={`${ic('price')} pl-8`} value={formData.price ?? ''} onChange={(e) => update('price', e.target.value)} placeholder="0,00" />
+              </div>
+              {errors.price && <p className="text-xs text-red-500 mt-1">{errors.price}</p>}
             </div>
-            {errors.price && <p className="text-xs font-semibold text-red-600 mt-1">{errors.price}</p>}
+            <div>
+              <label className="text-xs text-gray-400 mb-1.5 block">Cidade</label>
+              <input className={ic('city')} value={formData.city || ''} onChange={(e) => update('city', e.target.value)} />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-1.5 block">UF</label>
+              <input className={`${ic('state')} text-center font-bold uppercase`} value={formData.state || ''} maxLength={2} onChange={(e) => update('state', e.target.value.toUpperCase())} />
+            </div>
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Cidade</label>
-            <input className={ic('city')} value={formData.city || ''} onChange={(e) => update('city', e.target.value)} />
+            <label className="text-xs text-gray-400 mb-1.5 block">Quilometragem (KM)</label>
+            <input type="number" className={ic('mileage')} value={formData.mileage ?? ''} onChange={(e) => update('mileage', parseBrazilianInt(e.target.value))} />
+            {errors.mileage && <p className="text-xs text-red-500 mt-1">{errors.mileage}</p>}
           </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">UF</label>
-            <input className={`${ic('state')} text-center font-bold`} value={formData.state || ''} maxLength={2} onChange={(e) => update('state', e.target.value.toUpperCase())} />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Quilometragem (KM)</label>
-          <input type="number" className={ic('mileage')} value={formData.mileage ?? ''} onChange={(e) => update('mileage', parseBrazilianInt(e.target.value))} />
-          {errors.mileage && <p className="text-xs font-semibold text-red-600 mt-1">{errors.mileage}</p>}
         </div>
       </div>
 
       {/* Specs */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
-        <h3 className="font-bold text-sm text-gray-900 font-[family-name:var(--font-heading)]">Especificações do Veículo</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Câmbio</label>
-            <select className={`${ic('transmission')} cursor-pointer`} value={formData.transmission || ''} onChange={(e) => update('transmission', e.target.value)}>
-              <option value="Manual">Manual</option>
-              <option value="Automático">Automático</option>
-              <option value="CVT">CVT</option>
-              <option value="DCT">Automático DCT</option>
-            </select>
+      <div className="space-y-3">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Especificações</h3>
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="text-xs text-gray-400 mb-1.5 block">Câmbio</label>
+              <select className={`${ic('transmission')} cursor-pointer`} value={formData.transmission || ''} onChange={(e) => update('transmission', e.target.value)}>
+                <option value="Manual">Manual</option>
+                <option value="Automático">Automático</option>
+                <option value="CVT">CVT</option>
+                <option value="DCT">Automático DCT</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-1.5 block">Combustível</label>
+              <select className={`${ic('fuel')} cursor-pointer`} value={formData.fuel || ''} onChange={(e) => update('fuel', e.target.value)}>
+                <option value="Flex">Flex</option>
+                <option value="Gasolina">Gasolina</option>
+                <option value="Etanol">Etanol</option>
+                <option value="Diesel">Diesel</option>
+                <option value="Híbrido">Híbrido</option>
+                <option value="Elétrico">Elétrico</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-1.5 block">Motor</label>
+              <input className={ic('engine')} value={formData.engine || ''} placeholder="Ex: 2.0 Flex" onChange={(e) => update('engine', e.target.value)} />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-1.5 block">Cor</label>
+              <input className={ic('color')} value={formData.color || ''} onChange={(e) => update('color', e.target.value)} />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-1.5 block">Carroceria</label>
+              <input className={ic('body_type')} value={formData.body_type || ''} placeholder="Hatch, SUV, Sedan..." onChange={(e) => update('body_type', e.target.value)} />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-1.5 block">Final da Placa</label>
+              <input className={`${ic('plate_final')} text-center font-bold uppercase`} maxLength={1} value={formData.plate_final || ''} onChange={(e) => update('plate_final', e.target.value.toUpperCase())} />
+            </div>
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Combustível</label>
-            <select className={`${ic('fuel')} cursor-pointer`} value={formData.fuel || ''} onChange={(e) => update('fuel', e.target.value)}>
-              <option value="Flex">Flex</option>
-              <option value="Gasolina">Gasolina</option>
-              <option value="Etanol">Etanol</option>
-              <option value="Diesel">Diesel</option>
-              <option value="Híbrido">Híbrido</option>
-              <option value="Elétrico">Elétrico</option>
-            </select>
+            <label className="text-xs text-gray-400 mb-1.5 block">VIN / Chassi (opcional)</label>
+            <input className={`${ic('vin')} uppercase font-mono text-xs`} value={formData.vin || ''} maxLength={17} placeholder="17 caracteres" onChange={(e) => update('vin', e.target.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, ''))} />
           </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Motor</label>
-            <input className={ic('engine')} value={formData.engine || ''} placeholder="Ex: 2.0 Flex" onChange={(e) => update('engine', e.target.value)} />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Cor</label>
-            <input className={ic('color')} value={formData.color || ''} onChange={(e) => update('color', e.target.value)} />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Carroceria</label>
-            <input className={ic('body_type')} value={formData.body_type || ''} placeholder="Hatch, SUV, Sedan..." onChange={(e) => update('body_type', e.target.value)} />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Final da Placa</label>
-            <input className={`${ic('plate_final')} font-mono uppercase text-center font-bold`} maxLength={1} value={formData.plate_final || ''} onChange={(e) => update('plate_final', e.target.value.toUpperCase())} />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Número Chassi / VIN (Opcional)</label>
-          <input className={`${ic('vin')} font-mono uppercase`} value={formData.vin || ''} maxLength={17} placeholder="17 caracteres" onChange={(e) => update('vin', e.target.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, ''))} />
         </div>
       </div>
 
       {/* Description */}
-      <div className="bg-white border border-[var(--color-border-strong)] rounded-xl p-5 space-y-3">
-        <h3 className="font-heading font-bold text-xs text-[var(--color-text-primary)]">Descrição</h3>
-        <textarea className={`w-full min-h-[120px] p-4 rounded-xl bg-[var(--color-bg)] border-2 border-transparent text-sm font-medium text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)] transition-colors leading-relaxed resize-y ${errors.description ? '!border-[var(--color-danger)]/20 text-[var(--color-danger)]' : ''}`} value={formData.description || ''} onChange={(e) => update('description', e.target.value)} placeholder="Descreva conservação, revisões, opcionais…" />
-        <div className="flex justify-between px-1">
-          {errors.description ? <p className="text-xs font-bold text-[var(--color-danger)]">{errors.description}</p> : <p className="text-xs text-[var(--color-text-disabled)]">Seja transparente.</p>}
-          <p className="text-xs text-[var(--color-text-disabled)] font-bold">{(formData.description || '').length} chars</p>
+      <div className="space-y-3">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Descrição</h3>
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <textarea
+            className={`w-full min-h-[100px] text-sm text-[#1A1A1A] placeholder-gray-300 focus:outline-none resize-y leading-relaxed ${errors.description ? 'text-red-500' : ''}`}
+            value={formData.description || ''}
+            onChange={(e) => update('description', e.target.value)}
+            placeholder="Descreva conservação, revisões, opcionais..."
+          />
+          <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-50">
+            {errors.description ? <p className="text-xs text-red-500">{errors.description}</p> : <p className="text-xs text-gray-300">Seja transparente</p>}
+            <p className="text-xs text-gray-300">{(formData.description || '').length}</p>
+          </div>
         </div>
       </div>
 
@@ -415,28 +455,90 @@ export default function MyListingsDashboard() {
 
 
 
-  if (!sessionReady) return <div className="flex flex-col items-center justify-center p-12 text-center"><Loader2 className="h-6 w-6 animate-spin text-[var(--color-text-tertiary)]" /><p className="mt-4 text-sm font-medium text-[var(--color-text-tertiary)]">Carregando…</p></div>
+  if (!sessionReady) return (
+    <div className="flex items-center justify-center py-20">
+      <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
+    </div>
+  )
   if (!isAuthenticated) return <AuthCard onAuthenticated={() => setIsAuthenticated(true)} />
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 items-start">
-      <ListingSidebar listings={listings} selectedId={selectedId} onSelect={setSelectedId} loading={loadingListings} searchQuery={searchQuery} onSearchChange={setSearchQuery} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} />
+    <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 items-start">
+      <ListingSidebar
+        listings={listings}
+        selectedId={selectedId}
+        onSelect={setSelectedId}
+        loading={loadingListings}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+      />
       <main>
         <AnimatePresence mode="wait">
           {selected ? (
-            <motion.div key={selected.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.3 }}>
-              <ListingEditor listing={selected} formData={formData} setFormData={setFormData} errors={errors} setErrors={setErrors} isDirty={isDirty} setIsDirty={setIsDirty} saveStatus={saveStatus} onSave={() => void saveListing(false)} onDelete={handleDelete} isDeleting={isDeleting} localImages={localImages} onImageRemove={removeImage} onImageSetPrimary={setPrimary} onImageReorder={(next) => { setLocalImages(next); localImgRef.current = next; setIsDirty(true); schedSync(next) }} onImageAdd={handleImageSelect} onImageSync={() => void syncImages()} isUploading={isUploading} pendingUploads={pendingUploads} imageError={imageError} isDraggingPhotos={isDraggingPhotos} onDragEnter={(e) => handlePhotosDrag(e, true)} onDragLeave={(e) => handlePhotosDrag(e, false)} onDragOver={(e) => { e.preventDefault(); e.stopPropagation() }} onDrop={handlePhotosDrop} />
+            <motion.div
+              key={selected.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ListingEditor
+                listing={selected}
+                formData={formData}
+                setFormData={setFormData}
+                errors={errors}
+                setErrors={setErrors}
+                isDirty={isDirty}
+                setIsDirty={setIsDirty}
+                saveStatus={saveStatus}
+                onSave={() => void saveListing(false)}
+                onDelete={handleDelete}
+                isDeleting={isDeleting}
+                localImages={localImages}
+                onImageRemove={removeImage}
+                onImageSetPrimary={setPrimary}
+                onImageReorder={(next) => { setLocalImages(next); localImgRef.current = next; setIsDirty(true); schedSync(next) }}
+                onImageAdd={handleImageSelect}
+                onImageSync={() => void syncImages()}
+                isUploading={isUploading}
+                pendingUploads={pendingUploads}
+                imageError={imageError}
+                isDraggingPhotos={isDraggingPhotos}
+                onDragEnter={(e) => handlePhotosDrag(e, true)}
+                onDragLeave={(e) => handlePhotosDrag(e, false)}
+                onDragOver={(e) => { e.preventDefault(); e.stopPropagation() }}
+                onDrop={handlePhotosDrop}
+              />
             </motion.div>
           ) : (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center rounded-2xl border border-[var(--color-border-strong)] bg-white p-8 md:p-16 text-center">
-              <Car className="h-12 w-12 text-[var(--color-text-disabled)] mb-4" />
-              <h2 className="font-heading font-bold text-sm text-[var(--color-text-primary)]">Selecione um anúncio</h2>
-              <p className="mt-2 text-sm text-[var(--color-text-tertiary)] max-w-xs">Escolha um dos seus veículos para editar detalhes, fotos e preço.</p>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col items-center justify-center py-16 text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                <Car className="h-5 w-5 text-gray-400" />
+              </div>
+              <h2 className="text-sm font-medium text-[#1A1A1A]">Selecione um anúncio</h2>
+              <p className="mt-1 text-xs text-gray-400 max-w-[240px]">
+                Edite detalhes, fotos e preço do seu veículo.
+              </p>
             </motion.div>
           )}
         </AnimatePresence>
       </main>
-      {globalError && <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[200] lg:bottom-6 bg-[var(--color-danger)] text-white px-6 py-3 rounded-full font-bold text-sm shadow-xl flex items-center gap-2 animate-in slide-in-from-bottom-8"><AlertCircle className="w-4 h-4" /> {globalError}<button onClick={() => setGlobalError(null)} className="ml-3 opacity-60 hover:opacity-100" aria-label="Fechar">✕</button></div>}
+
+      {globalError && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[200] lg:bottom-6 bg-red-600 text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-lg flex items-center gap-2">
+          <AlertCircle className="w-3.5 h-3.5" />
+          {globalError}
+          <button onClick={() => setGlobalError(null)} className="ml-2 opacity-60 hover:opacity-100" aria-label="Fechar">
+            ✕
+          </button>
+        </div>
+      )}
 
       <style>{`.custom-scrollbar::-webkit-scrollbar{width:4px;height:4px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(0,0,0,.05);border-radius:10px}@media(max-width:1024px){.no-scrollbar-mobile::-webkit-scrollbar{display:none}.no-scrollbar-mobile{-ms-overflow-style:none;scrollbar-width:none}}`}</style>
     </div>
