@@ -62,7 +62,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
             >
               <Settings className="w-4 h-4" strokeWidth={1.75} />
             </button>
-            <div className="w-8 h-8 rounded-full bg-[#1A1A1A] overflow-hidden flex items-center justify-center ml-1">
+            <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center ml-1">
               {user.avatarUrl ? (
                 <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -129,7 +129,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
                     href={item.href}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                       active
-                        ? 'bg-[#1A1A1A] text-white'
+                        ? 'bg-gray-900 text-white'
                         : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                     }`}
                   >

@@ -41,7 +41,7 @@ export default function FavoritosPage() {
         </p>
         <Link
           href="/carros-a-venda"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A1A1A] text-white rounded-full text-xs font-semibold hover:bg-black transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-full text-xs font-semibold hover:bg-gray-800 transition-colors"
         >
           <Search className="w-3.5 h-3.5 text-[#D4F576]" strokeWidth={2} />
           Buscar seminovos

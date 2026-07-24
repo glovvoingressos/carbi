@@ -57,7 +57,7 @@ function MessageBubble({ message, isMine, showName }: { message: MessageItem; is
       <div
         className={`max-w-[75%] px-3 py-2 rounded-2xl ${
           isMine
-            ? 'bg-[#1A1A1A] text-white rounded-br-md'
+            ? 'bg-gray-900 text-white rounded-br-md'
             : 'bg-gray-100 text-[#1A1A1A] rounded-bl-md'
         }`}
       >
@@ -343,7 +343,7 @@ export default function ConversationInbox() {
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage() } }}
             placeholder="Digite sua mensagem..." className="flex-1 px-3 py-2 bg-transparent text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none" aria-label="Mensagem" />
           <button type="button" disabled={sending || !messageText.trim()} onClick={() => void sendMessage()}
-            className="p-2 bg-[#1A1A1A] text-[#D4F576] rounded-lg disabled:opacity-40 hover:opacity-90 transition-opacity" aria-label="Enviar">
+            className="p-2 bg-gray-900 text-[#D4F576] rounded-lg disabled:opacity-40 hover:opacity-90 transition-opacity" aria-label="Enviar">
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" strokeWidth={1.75} />}
           </button>
         </div>

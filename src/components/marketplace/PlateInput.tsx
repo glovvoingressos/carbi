@@ -79,95 +79,97 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-gray-900 to-black text-white p-5 sm:p-6 rounded-2xl border border-gray-800 shadow-lg">
-      <div className="flex items-center gap-2.5 mb-3">
-        <div className="w-8 h-8 rounded-xl bg-[#D4F576]/20 flex items-center justify-center shrink-0">
-          <Sparkles className="w-4 h-4 text-[#D4F576]" />
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+          <Sparkles className="w-3.5 h-3.5 text-gray-500" />
         </div>
         <div>
-          <h4 className="text-sm font-bold text-white font-[family-name:var(--font-heading)]">Preencher dados pela Placa</h4>
-          <p className="text-xs text-gray-400">Consulte FIPE e Denatran para preencher modelo, ano e versão automaticamente</p>
+          <h4 className="text-xs font-semibold text-[#1A1A1A]">Preencher pela placa</h4>
+          <p className="text-[11px] text-gray-400">Consulta FIPE e Denatran automática</p>
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-stretch gap-3 mt-4">
-        <div className="relative flex-1">
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
-            <Car className="w-4 h-4 text-gray-400" />
-            <span className="text-xs font-bold font-mono tracking-widest text-[#D4F576] bg-[#D4F576]/10 px-1.5 py-0.5 rounded">BR</span>
+      <div className="bg-white rounded-2xl border border-gray-100 p-4">
+        <div className="flex flex-col sm:flex-row items-stretch gap-3">
+          <div className="relative flex-1">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+              <Car className="w-4 h-4 text-gray-400" />
+              <span className="text-[10px] font-semibold text-gray-400">BR</span>
+            </div>
+            <input
+              type="text"
+              value={plate}
+              onChange={(e) => { setPlate(formatPlate(e.target.value)); setError(null); setSuccess(false); setVehicleData(null) }}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !loading && plate.length === 7) handleLookup() }}
+              placeholder="ABC1D23"
+              maxLength={7}
+              disabled={loading}
+              className="w-full h-10 pl-16 pr-4 rounded-xl bg-gray-50 border border-gray-100 text-sm font-mono font-semibold tracking-wider text-[#1A1A1A] placeholder:text-gray-300 focus:outline-none focus:border-gray-300 transition-colors uppercase"
+            />
           </div>
-          <input
-            type="text"
-            value={plate}
-            onChange={(e) => { setPlate(formatPlate(e.target.value)); setError(null); setSuccess(false); setVehicleData(null) }}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !loading && plate.length === 7) handleLookup() }}
-            placeholder="ABC1D23"
-            maxLength={7}
-            disabled={loading}
-            className="w-full h-12 pl-24 pr-4 rounded-xl bg-white/10 border border-white/20 text-lg font-mono font-bold tracking-widest text-white placeholder:text-gray-500 focus:outline-none focus:border-[#D4F576] transition-all uppercase"
-          />
+
+          <button
+            type="button"
+            onClick={handleLookup}
+            disabled={loading || plate.length < 7}
+            className="h-10 px-5 rounded-xl bg-[#1A1A1A] text-white text-xs font-semibold flex items-center justify-center gap-1.5 hover:bg-black transition-colors disabled:opacity-40 shrink-0"
+          >
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
+            Buscar
+          </button>
         </div>
 
-        <motion.button
-          type="button"
-          onClick={handleLookup}
-          disabled={loading || plate.length < 7}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="h-12 px-6 rounded-xl bg-[#D4F576] text-gray-950 font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#c8e64e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
-        >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-          <span>Buscar Placa</span>
-        </motion.button>
-      </div>
+        <AnimatePresence mode="wait">
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="flex items-center gap-2 mt-3 p-2.5 rounded-lg bg-red-50 text-red-600 text-xs">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{error}</span>
+              </div>
+            </motion.div>
+          )}
 
-      <AnimatePresence mode="wait">
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            className="flex items-center gap-2 mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-medium"
-          >
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
-            <span>{error}</span>
-          </motion.div>
-        )}
-
-        {success && vehicleData && (
-          <motion.div
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            className="mt-4 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs space-y-2"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+          {success && vehicleData && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-3 p-3 rounded-lg bg-emerald-50 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-sm font-semibold text-[#1A1A1A]">{vehicleData.brand} {vehicleData.model}</span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
+                    Preenchido
+                  </span>
                 </div>
-                <span className="font-bold text-white text-sm">{vehicleData.brand} {vehicleData.model}</span>
-              </div>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold">
-                Preenchido com sucesso!
-              </span>
-            </div>
 
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-gray-300 pt-1 text-[11px]">
-              <span>Ano: <strong>{vehicleData.year}{vehicleData.yearModel ? `/${vehicleData.yearModel}` : ''}</strong></span>
-              <span>Cor: <strong>{vehicleData.color}</strong></span>
-              {vehicleData.fuel && <span>Combustível: <strong>{vehicleData.fuel}</strong></span>}
-            </div>
+                <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-600">
+                  <span>Ano: <strong>{vehicleData.year}{vehicleData.yearModel ? `/${vehicleData.yearModel}` : ''}</strong></span>
+                  <span>Cor: <strong>{vehicleData.color}</strong></span>
+                  {vehicleData.fuel && <span>Combustível: <strong>{vehicleData.fuel}</strong></span>}
+                </div>
 
-            {vehicleData.fipePrice != null && vehicleData.fipePrice > 0 && (
-              <div className="flex items-center gap-2 pt-2 border-t border-emerald-500/20 text-emerald-400 font-bold">
-                <TrendingUp className="w-3.5 h-3.5" />
-                <span>Valor Tabela FIPE: {formatBRL(vehicleData.fipePrice)}</span>
+                {vehicleData.fipePrice != null && vehicleData.fipePrice > 0 && (
+                  <div className="flex items-center gap-1.5 pt-2 border-t border-emerald-100 text-emerald-700 text-xs font-semibold">
+                    <TrendingUp className="w-3 h-3" />
+                    <span>FIPE: {formatBRL(vehicleData.fipePrice)}</span>
+                  </div>
+                )}
               </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

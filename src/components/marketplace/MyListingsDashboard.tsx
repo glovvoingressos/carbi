@@ -38,7 +38,7 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
             <Upload className="w-3 h-3" /> Adicionar
             <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { onAdd(e.target.files); e.target.value = '' }} />
           </label>
-          <button onClick={onSync} disabled={!isDirty || isUploading} className="h-7 px-3 rounded-full bg-[#1A1A1A] text-white text-xs font-medium flex items-center gap-1 disabled:opacity-40">
+          <button onClick={onSync} disabled={!isDirty || isUploading} className="h-7 px-3 rounded-full bg-gray-900 text-white text-xs font-medium flex items-center gap-1 disabled:opacity-40">
             {isUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} Salvar
           </button>
         </div>
@@ -122,7 +122,7 @@ function ListingSidebar({ listings, selectedId, onSelect, loading, searchQuery, 
       </div>
       <div className="flex gap-1 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
         {(['all', 'active', 'paused', 'sold'] as const).map((s) => (
-          <button key={s} onClick={() => onStatusFilterChange(s)} className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${statusFilter === s ? 'bg-[#1A1A1A] text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
+          <button key={s} onClick={() => onStatusFilterChange(s)} className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${statusFilter === s ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
             {s === 'all' ? 'Todos' : s === 'active' ? 'Ativos' : s === 'paused' ? 'Pausados' : 'Vendidos'}
           </button>
         ))}
@@ -131,7 +131,7 @@ function ListingSidebar({ listings, selectedId, onSelect, loading, searchQuery, 
         {loading ? [1, 2, 3].map((i) => <div key={i} className="min-w-[200px] lg:w-full h-16 bg-white rounded-xl animate-pulse" />)
          : filtered.length === 0 ? <div className="w-full p-6 text-center rounded-xl bg-white border border-gray-100"><Car className="w-6 h-6 mx-auto text-gray-300 mb-2" /><p className="text-xs text-gray-400">Nenhum anúncio</p></div>
          : filtered.map((l) => (
-          <button key={l.id} onClick={() => onSelect(l.id)} className={`min-w-[200px] lg:w-full text-left p-3 rounded-xl transition-all flex-shrink-0 ${selectedId === l.id ? 'bg-[#1A1A1A]' : 'hover:bg-gray-50'}`}>
+          <button key={l.id} onClick={() => onSelect(l.id)} className={`min-w-[200px] lg:w-full text-left p-3 rounded-xl transition-all flex-shrink-0 ${selectedId === l.id ? 'bg-gray-900' : 'hover:bg-gray-50'}`}>
             <div className="flex gap-3 items-center">
               <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
                 <MarketplaceListingImage brand={l.brand} model={l.model} year={l.year_model} imageUrls={l.images?.map((img) => img.public_url) || []} alt={l.title} className="h-full w-full object-cover" />
@@ -181,7 +181,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
           {saveStatus === 'saving' ? 'Salvando...' : saveStatus === 'saved' ? 'Salvo' : saveStatus === 'error' ? 'Erro' : 'Salvo'}
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="h-9 px-4 rounded-full bg-[#1A1A1A] text-white text-xs font-semibold flex items-center gap-1.5 hover:bg-black transition-colors disabled:opacity-40">
+          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="h-9 px-4 rounded-full bg-gray-900 text-white text-xs font-semibold flex items-center gap-1.5 hover:bg-gray-800 transition-colors disabled:opacity-40">
             <Save className="w-3 h-3 text-[#D4F576]" /> Salvar
           </button>
           <button onClick={onDelete} disabled={isDeleting} className="h-9 w-9 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 transition-colors" title="Excluir">

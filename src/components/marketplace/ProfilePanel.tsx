@@ -171,7 +171,7 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
                 <div className="flex gap-2 pt-1">
                   <button
                     type="button"
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1A1A1A] text-white text-xs font-semibold hover:bg-black transition-colors disabled:opacity-40"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800 transition-colors disabled:opacity-40"
                     onClick={changePw}
                     disabled={saving || newPw.length < 8 || newPw !== confirmPw}
                   >
@@ -347,7 +347,7 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
 
       <button
         type="button"
-        className="w-full py-3 rounded-full bg-[#1A1A1A] text-white text-sm font-semibold hover:bg-black transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+        className="w-full py-3 rounded-full bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
         onClick={saveProfile}
         disabled={saving || uploading}
       >
