@@ -140,7 +140,7 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
                     <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">Nova senha</label>
                     <div className="relative">
                       <input type={showNewPw ? 'text' : 'password'} value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="Mínimo 8 caracteres" className="rounded-2xl pr-14 min-h-[44px]" />
-                      <button type="button" className="inline-flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px]" onClick={() => setShowNewPw(!showNewPw)} className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8" aria-label={showNewPw ? 'Ocultar senha' : 'Mostrar senha'}>
+                      <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px]" onClick={() => setShowNewPw(!showNewPw)} aria-label={showNewPw ? 'Ocultar senha' : 'Mostrar senha'}>
                         {showNewPw ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
                       </button>
                     </div>
@@ -149,7 +149,7 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
                     <label className="text-xs font-semibold text-[#7A7A7A] mb-1.5 block">Confirmar senha</label>
                     <div className="relative">
                       <input type={showConfirmPw ? 'text' : 'password'} value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="Repita a senha" className="rounded-2xl pr-14 min-h-[44px]" />
-                      <button type="button" className="inline-flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px]" onClick={() => setShowConfirmPw(!showConfirmPw)} className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8" aria-label={showConfirmPw ? 'Ocultar senha' : 'Mostrar senha'}>
+                      <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px]" onClick={() => setShowConfirmPw(!showConfirmPw)} aria-label={showConfirmPw ? 'Ocultar senha' : 'Mostrar senha'}>
                         {showConfirmPw ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
                       </button>
                     </div>
