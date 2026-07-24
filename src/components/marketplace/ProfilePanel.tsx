@@ -158,12 +158,10 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
                     <p className="text-xs font-medium text-[var(--color-danger,#DC2626)]">As senhas não coincidem.</p>
                   )}
               <div className="flex gap-3 pt-1">
-                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors min-h-[44px]" onClick={changePw} disabled={saving || newPw.length < 8 || newPw !== confirmPw}
-                  className="rounded-full min-h-[44px]">
+                <button type="button" className="flex items-center gap-2 px-5 py-3 rounded-full bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-colors min-h-[44px]" onClick={changePw} disabled={saving || newPw.length < 8 || newPw !== confirmPw}>
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar
                 </button>
-                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => { setOpen(false); setNewPw(''); setConfirmPw('') }}
-                  className="rounded-full min-h-[44px]">
+                <button type="button" className="px-5 py-3 rounded-full border border-gray-200 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => { setOpen(false); setNewPw(''); setConfirmPw('') }}>
                   Cancelar
                 </button>
               </div>
