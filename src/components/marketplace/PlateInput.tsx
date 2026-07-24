@@ -43,8 +43,8 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
       setVehicleData({ brand: data.marca, model: data.modelo, year: data.anoFabricacao, color: data.cor, fipePrice: data.fipe_price })
       onPlateFound({
         brand: data.marca, model: data.modelo, year: data.anoFabricacao, yearModel: data.anoModelo,
-        color: data.cor, fuel: data.combustivel, engine: `${data.cilindradas} ${data.potencia}`,
-        transmission: data.cambio, bodyType: data.tipoVeiculo, plate: data.placa,
+        color: data.cor, fuel: data.combustivel, engine: data.cilindradas || '',
+        horsepower: data.potencia || '', transmission: data.cambio, bodyType: data.tipoVeiculo, plate: data.placa,
         fipePrice: data.fipe_price || null, fipeReference: data.fipe_reference_month || null,
       })
     } catch (err) {

@@ -997,6 +997,7 @@ export default function ListingForm() {
                   handleInput('color', data.color)
                   handleInput('fuel', data.fuel)
                   handleInput('engine', data.engine)
+                  handleInput('horsepower', data.horsepower)
                   handleInput('transmission', data.transmission)
                   handleInput('bodyType', data.bodyType)
                   handleInput('plateFinal', data.plate)
@@ -1043,6 +1044,10 @@ export default function ListingForm() {
                   <div>
                     <label className="text-[10px] font-medium text-[#767676]">Motor</label>
                     <input className="fingen-flow-input text-[12px] mt-1" value={form.engine} onChange={(e) => handleInput('engine', e.target.value)} placeholder="Ex: 2.0 Turbo" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-medium text-[#767676]">Potência (cv)</label>
+                    <input className="fingen-flow-input text-[12px] mt-1" value={form.horsepower} onChange={(e) => handleInput('horsepower', e.target.value)} placeholder="Ex: 116" />
                   </div>
                   <div>
                     <label className="text-[10px] font-medium text-[#767676]">Placa</label>
@@ -1263,6 +1268,7 @@ export default function ListingForm() {
                   { label: 'Veículo', value: `${form.brand} ${form.model} ${form.version}` },
                   { label: 'Ano', value: `${form.year}/${form.yearModel}` },
                   { label: 'Motor', value: form.engine || 'Não informado' },
+                  { label: 'Potência', value: form.horsepower ? `${form.horsepower} cv` : 'Não informado' },
                   { label: 'Preço', value: form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado' },
                   { label: 'Quilometragem', value: form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Não informado' },
                   { label: 'Cidade/UF', value: `${form.city || '-'}${form.state ? `/${form.state}` : ''}` },

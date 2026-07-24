@@ -31,7 +31,7 @@ export async function lookupPlate(plate: string): Promise<PlacaLookupResult> {
       cor: data.cor || '',
       combustivel: extra.combustivel || '',
       cilindradas: extra.cilindradas || '',
-      potencia: '',
+      potencia: extra.potencia || extra.hp || '',
       cambio: extra.caixa_cambio || '',
       tipoVeiculo: extra.tipo_veiculo || '',
       situacao: data.situacao || '',
