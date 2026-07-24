@@ -81,8 +81,8 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-          <Sparkles className="w-3.5 h-3.5 text-gray-500" />
+        <div className="w-7 h-7 rounded-full bg-[#16855C]/10 flex items-center justify-center shrink-0">
+          <Sparkles className="w-3.5 h-3.5 text-[#16855C]" />
         </div>
         <div>
           <h4 className="text-xs font-semibold text-[#1A1A1A]">Preencher pela placa</h4>
@@ -105,7 +105,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
               placeholder="ABC1D23"
               maxLength={7}
               disabled={loading}
-              className="w-full h-10 pl-16 pr-4 rounded-xl bg-gray-50 border border-gray-100 text-sm font-mono font-semibold tracking-wider text-[#1A1A1A] placeholder:text-gray-300 focus:outline-none focus:border-gray-300 transition-colors uppercase"
+              className="w-full h-10 pl-16 pr-4 rounded-xl bg-gray-50 border border-gray-200 text-sm font-mono font-semibold tracking-wider text-[#1A1A1A] placeholder:text-gray-300 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all uppercase"
             />
           </div>
 
@@ -113,7 +113,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
             type="button"
             onClick={handleLookup}
             disabled={loading || plate.length < 7}
-            className="h-10 px-5 rounded-xl bg-[#1A1A1A] text-white text-xs font-semibold flex items-center justify-center gap-1.5 hover:bg-black transition-colors disabled:opacity-40 shrink-0"
+            className="h-10 px-5 rounded-xl bg-[#16855C] text-white text-xs font-semibold flex items-center justify-center gap-1.5 hover:bg-[#146B4A] transition-colors disabled:opacity-40 shrink-0"
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
             Buscar
