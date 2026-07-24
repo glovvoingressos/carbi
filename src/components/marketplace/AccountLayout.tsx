@@ -121,10 +121,10 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
                 <User className="w-4 h-4" strokeWidth={2} />
                 Editar Perfil
               </button>
-              <button aria-label="Configurações" className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:bg-gray-50 transition-colors">
+              <button aria-label="Configurações" onClick={() => router.push('/minha-conta/configuracoes')} className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:bg-gray-50 transition-colors">
                 <Settings className="w-5 h-5 text-[#555]" strokeWidth={1.75} />
               </button>
-              <button aria-label="Notificações" className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:bg-gray-50 transition-colors">
+              <button aria-label="Notificações" onClick={() => router.push('/minha-conta/notificacoes')} className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:bg-gray-50 transition-colors">
                 <Bell className="w-5 h-5 text-[#555]" strokeWidth={1.75} />
               </button>
             </motion.div>

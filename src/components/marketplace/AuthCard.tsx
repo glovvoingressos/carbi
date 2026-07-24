@@ -153,6 +153,14 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         if (signUpError) { setError(signUpError.message.includes('already') ? 'Este e-mail já está cadastrado.' : 'Não foi possível criar a conta. Verifique os dados e tente novamente.'); return }
         if (data.session && data.user) {
           await supabase.from('users').upsert({ id: data.user.id, email, full_name: fullName }, { onConflict: 'id' })
+          // Send welcome email
+          try {
+            await fetch('/api/auth/welcome', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, name: fullName }),
+            })
+          } catch (e) { console.error('Welcome email failed:', e) }
           onAuthenticated?.()
           if (redirectTo) router.push(redirectTo)
         } else {

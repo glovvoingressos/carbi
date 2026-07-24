@@ -32,7 +32,7 @@ export async function sendNewMessageEmail(params: NewMessageEmailParams) {
   const { recipientEmail, recipientName, senderName, vehicleTitle, messageContent, conversationId } = params
 
   try {
-    const chatLink = `${SITE_URL}/painel/mensagens/${conversationId}`
+    const chatLink = `${SITE_URL}/minha-conta/conversas?conversation=${conversationId}`
 
     const data = await resend.emails.send({
       from: FROM_EMAIL,
@@ -425,6 +425,71 @@ export async function sendListingDeletedEmail(params: ListingDeletedEmailParams)
     return { success: true, data }
   } catch (error) {
     console.error('Falha ao enviar e-mail de exclusão de anúncio:', error)
+    return { success: false, error }
+  }
+}
+
+// 7. E-mail de Boas-vindas (Conta Criada)
+interface WelcomeEmailParams {
+  userEmail: string
+  userName: string
+}
+
+export async function sendWelcomeEmail(params: WelcomeEmailParams) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY não configurada. Simulando envio de e-mail de boas-vindas.')
+    return { success: true, warning: 'RESEND_API_KEY not configured' }
+  }
+
+  const { userEmail, userName } = params
+
+  try {
+    const data = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: userEmail,
+      subject: 'Bem-vindo à Carbi! 🚗',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 20px;">
+          <h2 style="color: #2563eb;">Bem-vindo à Carbi!</h2>
+          <p>Olá, <strong>${userName || 'Parceiro'}</strong>!</p>
+          <p>Sua conta foi criada com sucesso. Agora você pode anunciar seus carros e encontrar os melhores seminovos do Brasil.</p>
+
+          <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 16px; border-radius: 4px; margin: 24px 0;">
+            <p style="margin: 0; font-size: 14px; font-weight: bold; color: #065f46;">
+              O que você pode fazer agora:
+            </p>
+            <ul style="margin: 8px 0 0 0; padding-left: 20px; color: #047857; font-size: 14px;">
+              <li>Anunciar seu carro grátis em poucos minutos</li>
+              <li>Comparar preços com a tabela FIPE</li>
+              <li>Receber tráfego pago grátis no Google e Meta Ads</li>
+              <li>Negociar seguro pelo chat interno</li>
+            </ul>
+          </div>
+
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="${SITE_URL}/anunciar-carro" style="background-color: #2563eb; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+              Anunciar meu primeiro carro
+            </a>
+          </div>
+
+          <div style="text-align: center; margin-top: 16px;">
+            <a href="${SITE_URL}/carros-a-venda" style="color: #2563eb; text-decoration: none; font-weight: bold;">
+              Ou explorar carros à venda
+            </a>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
+          <p style="font-size: 12px; color: #6b7280; text-align: center;">
+            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Por favor, não responda a este e-mail.
+          </p>
+        </div>
+      `,
+    })
+
+    return { success: true, data }
+  } catch (error) {
+    console.error('Falha ao enviar e-mail de boas-vindas:', error)
     return { success: false, error }
   }
 }
