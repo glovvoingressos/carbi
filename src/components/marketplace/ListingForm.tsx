@@ -989,7 +989,7 @@ export default function ListingForm() {
               <div className="fingen-flow-substep-card p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
                 <p className="fingen-flow-field-label">Placa do veículo</p>
                 <p className="text-[13px] text-[#767676]">Digite a placa para preencher marca, modelo e dados automaticamente.</p>
-                <PlateInput onPlateFound={(data: { brand: string; model: string; year: number; yearModel: number; color: string; fuel: string; engine: string; transmission: string; bodyType: string; plate: string; fipePrice?: number | null; fipeReference?: string | null }) => {
+                <PlateInput onPlateFound={(data: { brand: string; model: string; year: number; yearModel: number; color: string; fuel: string; engine: string; horsepower: string; transmission: string; bodyType: string; plate: string; fipePrice?: number | null; fipeReference?: string | null }) => {
                   handleInput('brand', data.brand)
                   handleInput('model', data.model)
                   handleInput('year', String(data.year))

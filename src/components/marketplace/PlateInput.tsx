@@ -14,6 +14,7 @@ interface PlateInputProps {
     color: string
     fuel: string
     engine: string
+    horsepower: string
     transmission: string
     bodyType: string
     plate: string
