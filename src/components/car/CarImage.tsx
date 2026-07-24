@@ -197,14 +197,14 @@ export default function CarImage({
 
       {/* Loading Shimmer / Pulse */}
       {isLoading && resolvedCandidates.length > 0 && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#F4F4F1] animate-pulse z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-transparent animate-pulse z-10">
           <div className="w-12 h-1.5 bg-black/10 rounded-full animate-bounce" />
         </div>
       )}
 
       {/* Premium Fallback UI (Se tudo falhar) */}
       {hasFinalError && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-[#F4F4F1] to-[#E8E8E5]">
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-gray-100 to-gray-200">
            <div className="relative mb-3 flex items-center justify-center">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/60 backdrop-blur-md border border-white/70 rounded-full absolute animate-pulse" />
               <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white border border-white/70 shadow-sm rounded-xl flex items-center justify-center text-[#0A0A0A] rotate-[2deg] z-10">

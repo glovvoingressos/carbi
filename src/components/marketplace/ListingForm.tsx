@@ -976,8 +976,8 @@ export default function ListingForm() {
         {currentStep === 1 && (
           <div className="space-y-6">
             <div>
-              <h3 className="tfp-section-title" style={{ fontSize: 'clamp(22px, 3vw, 28px)' }}>Selecione seu veículo</h3>
-              <p className="tfp-section-sub" style={{ maxWidth: '100%', marginTop: '8px' }}>
+              <h3 className="tfp-section-title">Selecione seu veículo</h3>
+              <p className="tfp-section-sub">
                 Comece pela placa. Com ela puxamos todos os dados automaticamente.
               </p>
             </div>
@@ -1040,6 +1040,14 @@ export default function ListingForm() {
                     <label className="text-[10px] font-medium text-[#767676]">Câmbio</label>
                     <input className="fingen-flow-input text-[12px] mt-1" value={form.transmission} onChange={(e) => handleInput('transmission', e.target.value)} />
                   </div>
+                  <div>
+                    <label className="text-[10px] font-medium text-[#767676]">Motor</label>
+                    <input className="fingen-flow-input text-[12px] mt-1" value={form.engine} onChange={(e) => handleInput('engine', e.target.value)} placeholder="Ex: 2.0 Turbo" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-medium text-[#767676]">Placa</label>
+                    <input className="fingen-flow-input text-[12px] mt-1 uppercase" value={form.plateFinal} onChange={(e) => handleInput('plateFinal', e.target.value)} placeholder="ABC1D23" maxLength={7} />
+                  </div>
                 </div>
                 <button type="button" onClick={() => { setCurrentStep(2); setListingSubStep(1); }} className="fingen-flow-btn-primary w-full mt-2">
                   <span className="truncate">Continuar para preço e fotos</span>
@@ -1056,8 +1064,8 @@ export default function ListingForm() {
         {currentStep === 2 && (
           <div className="space-y-8 animate-fade-in">
             <div>
-              <h3 className="tfp-section-title" style={{ fontSize: 'clamp(22px, 3vw, 28px)' }}>Dados essenciais</h3>
-              <p className="tfp-section-sub" style={{ maxWidth: '100%', marginTop: '8px' }}>
+              <h3 className="tfp-section-title">Dados essenciais</h3>
+              <p className="tfp-section-sub">
                 Só pedimos o necessário para publicar rápido. O restante pode ser completado depois.
               </p>
             </div>
@@ -1218,10 +1226,10 @@ export default function ListingForm() {
             {/* Header */}
             <div className="mb-10">
               <p className="tfp-section-label">Confirmação</p>
-              <h2 className="tfp-section-title" style={{ fontSize: 'clamp(22px, 3vw, 28px)' }}>
+              <h2 className="tfp-section-title">
                 Confira os dados do seu veículo
               </h2>
-              <p className="tfp-section-sub" style={{ maxWidth: '100%', marginTop: '8px' }}>
+              <p className="tfp-section-sub">
                 Revise as informações abaixo antes de continuar.
               </p>
             </div>
@@ -1251,8 +1259,10 @@ export default function ListingForm() {
               <h3 className="text-sm font-semibold text-[#111] mb-6 uppercase tracking-[0.08em]">Informações</h3>
               <div className="space-y-5">
                 {[
+                  { label: 'Placa', value: form.plateFinal || 'Não informada' },
                   { label: 'Veículo', value: `${form.brand} ${form.model} ${form.version}` },
                   { label: 'Ano', value: `${form.year}/${form.yearModel}` },
+                  { label: 'Motor', value: form.engine || 'Não informado' },
                   { label: 'Preço', value: form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Não informado' },
                   { label: 'Quilometragem', value: form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Não informado' },
                   { label: 'Cidade/UF', value: `${form.city || '-'}${form.state ? `/${form.state}` : ''}` },

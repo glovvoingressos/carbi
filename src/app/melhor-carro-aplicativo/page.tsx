@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CheckCircle2, DollarSign, Zap, ArrowRight, ShieldCheck, Star } from 'lucide-react'
-import Badge from '@/components/ui/Badge'
+import { Badge } from '@/components/ui/Badge'
 
 export const metadata: Metadata = {
   title: 'Melhor Carro para Aplicativo 2026 | Ranking carbi',

@@ -51,7 +51,8 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
 
   return (
     <article
-      className="surface-strong overflow-hidden transition-all duration-200 group cursor-pointer hover:-translate-y-1 hover:shadow-xl flex flex-col !border-0 !p-0"
+      className="overflow-hidden transition-all duration-200 group cursor-pointer hover:-translate-y-1 hover:shadow-xl flex flex-col bg-white rounded-[28px] border-0 border-none"
+      style={{ border: 'none' }}
       onClick={() => router.push(detailUrl)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
