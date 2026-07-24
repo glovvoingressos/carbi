@@ -112,6 +112,7 @@ export default function SafeMarketplaceImage({
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${status === 'ready' ? 'opacity-100' : 'opacity-0'}`}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
+          style={{ transform: 'scale(1.02)' }}
         />
       ) : null}
     </div>

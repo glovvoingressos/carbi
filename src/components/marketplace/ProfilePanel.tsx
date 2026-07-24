@@ -198,8 +198,7 @@ function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
           <h2 className="text-sm font-bold text-[var(--color-danger,#DC2626)] mb-2 font-[family-name:var(--font-heading)]">Excluir conta</h2>
           <p className="text-sm text-[#7A7A7A] mb-4 leading-relaxed">Essa ação é permanente e não pode ser desfeita.</p>
           {!show ? (
-            <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors min-h-[44px]" onClick={() => setShow(true)}
-              className="rounded-full min-h-[44px]">
+            <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors min-h-[44px]" onClick={() => setShow(true)}>
               <AlertTriangle className="w-4 h-4" /> Excluir conta
             </button>
           ) : (
@@ -208,12 +207,10 @@ function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
               <input id="confirm-delete" value={delText} onChange={(e) => setDelText(e.target.value)} placeholder="EXCLUIR"
                 className="rounded-2xl border-[var(--color-danger,#DC2626)]/25 focus:ring-[var(--color-danger,#DC2626)]/30 mb-4 min-h-[44px]" />
               <div className="flex flex-wrap gap-3">
-                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors min-h-[44px]" onClick={deleteAccount} disabled={delText !== 'EXCLUIR' || deleting}
-                  className="rounded-full min-h-[44px]">
+                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors min-h-[44px]" onClick={deleteAccount} disabled={delText !== 'EXCLUIR' || deleting}>
                   {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />} {deleting ? 'Excluindo...' : 'Confirmar exclusão'}
                 </button>
-                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => { setShow(false); setDelText('') }}
-                  className="rounded-full min-h-[44px]">
+                <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors min-h-[44px]" onClick={() => { setShow(false); setDelText('') }}>
                   Cancelar
                 </button>
               </div>
@@ -308,8 +305,7 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
       <SecuritySection userId={userId} toast={showToast} />
 
       <motion.div {...fade}>
-        <button type="button" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors min-h-[44px]" onClick={saveProfile} disabled={saving || uploading}
-          className="w-full rounded-full min-h-[48px] shadow-[0_8px_24px_rgba(0,0,0,.12)]">
+        <button type="button" className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors min-h-[48px] shadow-[0_8px_24px_rgba(0,0,0,.12)]" onClick={saveProfile} disabled={saving || uploading}>
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {saving ? 'Salvando...' : 'Salvar alterações'}
         </button>
