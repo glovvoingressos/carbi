@@ -91,8 +91,8 @@ function PersonalInfo({ fullName, email, phone, onNameChange, onPhoneChange }: {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#D4F576]/20 flex items-center justify-center">
-          <User className="w-5 h-5 text-[#1A1A1A]" strokeWidth={1.75} />
+        <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
+          <User className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
         </div>
         <div>
           <h3 className="text-base font-bold text-[#1A1A1A]">Informações pessoais</h3>
@@ -103,7 +103,13 @@ function PersonalInfo({ fullName, email, phone, onNameChange, onPhoneChange }: {
       <div className="space-y-5">
         <div>
           <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Nome completo</label>
-          <input value={fullName} onChange={(e) => onNameChange(e.target.value)} placeholder="Seu nome" className="w-full h-12 px-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#1A1A1A] focus:ring-2 focus:ring-[#1A1A1A]/10 transition-all" />
+          <input 
+            type="text"
+            value={fullName} 
+            onChange={(e) => onNameChange(e.target.value)} 
+            placeholder="Seu nome" 
+            className="w-full h-12 px-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all" 
+          />
         </div>
         <div>
           <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">E-mail</label>
@@ -116,7 +122,15 @@ function PersonalInfo({ fullName, email, phone, onNameChange, onPhoneChange }: {
           <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Telefone / WhatsApp</label>
           <div className="relative">
             <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input value={phone} onChange={(e) => onPhoneChange(formatPhone(e.target.value))} placeholder="(00) 00000-0000" inputMode="tel" maxLength={15} className="w-full h-12 pl-11 pr-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#1A1A1A] focus:ring-2 focus:ring-[#1A1A1A]/10 transition-all" />
+            <input 
+              type="tel"
+              value={phone} 
+              onChange={(e) => onPhoneChange(formatPhone(e.target.value))} 
+              placeholder="(00) 00000-0000" 
+              inputMode="tel" 
+              maxLength={15} 
+              className="w-full h-12 pl-11 pr-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all" 
+            />
           </div>
         </div>
       </div>
@@ -148,8 +162,8 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#D4F576]/20 flex items-center justify-center">
-          <Shield className="w-5 h-5 text-[#1A1A1A]" strokeWidth={1.75} />
+        <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
+          <Shield className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
         </div>
         <div>
           <h3 className="text-base font-bold text-[#1A1A1A]">Segurança</h3>
@@ -187,7 +201,7 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
                   value={newPw}
                   onChange={(e) => setNewPw(e.target.value)}
                   placeholder="Nova senha (mín. 8 caracteres)"
-                  className="w-full h-12 px-4 pr-12 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#1A1A1A] focus:ring-2 focus:ring-[#1A1A1A]/10 transition-all"
+                  className="w-full h-12 px-4 pr-12 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all"
                 />
                 <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-[#1A1A1A] transition-colors" onClick={() => setShowNewPw(!showNewPw)}>
                   {showNewPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -199,7 +213,7 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
                   value={confirmPw}
                   onChange={(e) => setConfirmPw(e.target.value)}
                   placeholder="Confirmar nova senha"
-                  className="w-full h-12 px-4 pr-12 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#1A1A1A] focus:ring-2 focus:ring-[#1A1A1A]/10 transition-all"
+                  className="w-full h-12 px-4 pr-12 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all"
                 />
                 <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-[#1A1A1A] transition-colors" onClick={() => setShowConfirmPw(!showConfirmPw)}>
                   {showConfirmPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -211,7 +225,7 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#1A1A1A] text-[#D4F576] text-sm font-semibold hover:bg-[#2D2D2D] transition-colors disabled:opacity-40"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#16855C] text-white text-sm font-semibold hover:bg-[#146B4A] transition-colors disabled:opacity-40"
                   onClick={changePw}
                   disabled={saving || newPw.length < 8 || newPw !== confirmPw}
                 >
@@ -409,7 +423,7 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
       <div className="sticky bottom-28 lg:bottom-6 pt-4">
         <button
           type="button"
-          className="w-full py-4 rounded-xl bg-[#1A1A1A] text-[#D4F576] text-base font-bold hover:bg-[#2D2D2D] transition-all disabled:opacity-40 flex items-center justify-center gap-2 shadow-lg shadow-[#1A1A1A]/20"
+          className="w-full py-4 rounded-xl bg-[#16855C] text-white text-base font-bold hover:bg-[#146B4A] transition-all disabled:opacity-40 flex items-center justify-center gap-2 shadow-lg shadow-[#16855C]/20"
           onClick={saveProfile}
           disabled={saving || uploading}
         >
