@@ -41,42 +41,57 @@ Requisitos:
 5. Começar com uma frase gancho que chame atenção
 6. NÃO incluir preço (será exibido separadamente)
 7. NÃO incluir km (será exibido separadamente)
-8. Responder APENAS com a descrição, sem aspas ou formatação extra
+8. Responder APENAS com a descrição, sem aspas ou formatação extra`
 
-Exemplo de boa descrição:
-"O ${carData.model} ${carData.yearModel} combina economia com conforto. Motor ${carData.engine} e câmbio ${carData.transmission} oferecem dirigibilidade macia no dia a dia. Ideal para quem busca um carro confiável e com ótimo custo-benefício."`
+  try {
+    const response = await fetch(OPENROUTER_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://carbi.com.br',
+        'X-Title': 'Carbi - Marketplace Automotivo',
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        messages: [
+          {
+            role: 'system',
+            content: 'Você é um copywriter especializado em anúncios automotivos brasileiros. Gere descrições curtas, chamativas e otimizadas para SEO.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        max_tokens: 200,
+        temperature: 0.7,
+      }),
+    })
 
-  const response = await fetch(OPENROUTER_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://carbi.com.br',
-      'X-Title': 'Carbi - Marketplace Automotivo',
-    },
-    body: JSON.stringify({
-      model: 'nvidia/llama-3.1-nemotron-70b-instruct',
-      messages: [
-        {
-          role: 'system',
-          content: 'Você é um copywriter especializado em anúncios automotivos brasileiros. Gere descrições curtas, chamativas e otimizadas para SEO.',
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      max_tokens: 200,
-      temperature: 0.7,
-    }),
-  })
+    if (!response.ok) {
+      console.error(`OpenRouter API error: ${response.status}`)
+      return generateFallbackDescription(carData)
+    }
 
-  if (!response.ok) {
-    throw new Error(`OpenRouter API error: ${response.status}`)
+    const data = await response.json()
+    return data.choices[0].message.content.trim()
+  } catch (error) {
+    console.error('Error calling OpenRouter:', error)
+    return generateFallbackDescription(carData)
   }
+}
 
-  const data = await response.json()
-  return data.choices[0].message.content.trim()
+function generateFallbackDescription(carData: CarData): string {
+  const features = []
+  if (carData.engine && carData.engine !== 'N/A') features.push(`Motor ${carData.engine}`)
+  if (carData.horsepower && carData.horsepower !== '') features.push(`${carData.horsepower} cv de potência`)
+  if (carData.transmission) features.push(`câmbio ${carData.transmission}`)
+  if (carData.color) features.push(`cor ${carData.color}`)
+  
+  const featuresText = features.length > 0 ? `Com ${features.join(', ')}.` : ''
+  
+  return `O ${carData.model} ${carData.yearModel} é uma excelente opção no mercado de seminovos. ${featuresText} Confiável e com ótimo custo-benefício, é ideal para quem busca qualidade e economia.`
 }
 
 export async function POST(request: NextRequest) {
