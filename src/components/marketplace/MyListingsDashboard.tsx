@@ -463,7 +463,16 @@ export default function MyListingsDashboard() {
   if (!isAuthenticated) return <AuthCard onAuthenticated={() => setIsAuthenticated(true)} />
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 items-start">
+    <div className="space-y-6">
+      {/* Desktop header */}
+      <div className="hidden lg:flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-bold text-[#1A1A1A]">Meus anúncios</h1>
+          <p className="text-sm text-gray-400 mt-0.5">{listings.length} anúncio{listings.length !== 1 ? 's' : ''} encontrado{listings.length !== 1 ? 's' : ''}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start">
       <ListingSidebar
         listings={listings}
         selectedId={selectedId}
@@ -539,6 +548,7 @@ export default function MyListingsDashboard() {
           </button>
         </div>
       )}
+      </div>
 
       <style>{`.custom-scrollbar::-webkit-scrollbar{width:4px;height:4px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(0,0,0,.05);border-radius:10px}@media(max-width:1024px){.no-scrollbar-mobile::-webkit-scrollbar{display:none}.no-scrollbar-mobile{-ms-overflow-style:none;scrollbar-width:none}}`}</style>
     </div>

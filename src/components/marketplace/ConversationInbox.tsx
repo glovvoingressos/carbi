@@ -360,24 +360,35 @@ export default function ConversationInbox() {
   )
 
   return (
-    <div className="max-w-[1240px] mx-auto min-h-[500px] lg:h-[calc(100vh-260px)]">
-      <div className="md:hidden h-full">
-        <AnimatePresence mode="wait">
-          {mobileView === 'list' ? (
-            <motion.div key="list" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="h-full">
-              {listPanel}
-            </motion.div>
-          ) : (
-            <motion.div key="chat" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="h-full">
-              {chatPanel}
-            </motion.div>
-          )}
-        </AnimatePresence>
+    <div className="space-y-6">
+      {/* Desktop header */}
+      <div className="hidden lg:flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-bold text-[#1A1A1A]">Mensagens</h1>
+          <p className="text-sm text-gray-400 mt-0.5">{conversations.length} conversa{conversations.length !== 1 ? 's' : ''}</p>
+        </div>
       </div>
-      <div className="hidden md:grid grid-cols-[minmax(300px,390px)_minmax(0,1fr)] gap-4 h-full">
-        {listPanel}
-        {chatPanel}
+
+      <div className="max-w-[1240px] min-h-[500px] lg:h-[calc(100vh-280px)]">
+        <div className="md:hidden h-full">
+          <AnimatePresence mode="wait">
+            {mobileView === 'list' ? (
+              <motion.div key="list" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="h-full">
+                {listPanel}
+              </motion.div>
+            ) : (
+              <motion.div key="chat" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="h-full">
+                {chatPanel}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        <div className="hidden md:grid grid-cols-[minmax(320px,400px)_minmax(0,1fr)] gap-5 h-full">
+          {listPanel}
+          {chatPanel}
+        </div>
       </div>
+
       {error && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2.5 bg-red-600 text-white text-xs font-semibold rounded-full shadow-lg z-50">
           {error}

@@ -341,9 +341,17 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
         )}
       </AnimatePresence>
 
-      <AvatarSection avatarUrl={avatarUrl} fullName={fullName} email={email} userId={userId} onAvatarChange={setAvatarUrl} uploading={uploading} onUploadingChange={setUploading} />
-      <PersonalInfo fullName={fullName} email={email} phone={phone} onNameChange={setFullName} onPhoneChange={setPhone} />
-      <SecuritySection userId={userId} toast={showToast} />
+      {/* Desktop: 2-column grid */}
+      <div className="lg:grid lg:grid-cols-[1fr_1fr] lg:gap-6">
+        <div className="space-y-6">
+          <AvatarSection avatarUrl={avatarUrl} fullName={fullName} email={email} userId={userId} onAvatarChange={setAvatarUrl} uploading={uploading} onUploadingChange={setUploading} />
+          <PersonalInfo fullName={fullName} email={email} phone={phone} onNameChange={setFullName} onPhoneChange={setPhone} />
+        </div>
+        <div className="space-y-6">
+          <SecuritySection userId={userId} toast={showToast} />
+          <DangerZone userId={userId} toast={showToast} />
+        </div>
+      </div>
 
       <button
         type="button"
@@ -354,8 +362,6 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 text-[#D4F576]" />}
         {saving ? 'Salvando...' : 'Salvar alterações'}
       </button>
-
-      <DangerZone userId={userId} toast={showToast} />
     </section>
   )
 }

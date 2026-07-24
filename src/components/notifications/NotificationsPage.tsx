@@ -165,17 +165,35 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter(n => !n.read).length
 
   return (
-    <div className="space-y-4">
-      <NotificationHeader unreadCount={unreadCount} onMarkAllRead={markAllRead} markingAll={markingAll} />
-      {loading ? (
-        <div className="space-y-1">{Array.from({ length: 5 }).map((_, i) => <NotificationSkeleton key={i} />)}</div>
-      ) : notifications.length === 0 ? <EmptyState /> : (
-        <div className="space-y-1">
-          <AnimatePresence mode="popLayout">
-            {notifications.map(n => <NotificationItem key={n.id} notification={n} onRead={markRead} />)}
-          </AnimatePresence>
+    <div className="space-y-6">
+      {/* Desktop header */}
+      <div className="hidden lg:flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-bold text-[#1A1A1A]">Notificações</h1>
+          <p className="text-sm text-gray-400 mt-0.5">
+            {unreadCount > 0 ? `${unreadCount} não lida${unreadCount > 1 ? 's' : ''}` : 'Tudo lido'}
+          </p>
         </div>
-      )}
+        {unreadCount > 0 && (
+          <button onClick={markAllRead} disabled={markingAll} className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-gray-500 hover:bg-gray-100 transition-colors">
+            {markingAll ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={12} />}
+            Marcar como lidas
+          </button>
+        )}
+      </div>
+
+      <div className="max-w-2xl">
+        <NotificationHeader unreadCount={unreadCount} onMarkAllRead={markAllRead} markingAll={markingAll} />
+        {loading ? (
+          <div className="space-y-1">{Array.from({ length: 5 }).map((_, i) => <NotificationSkeleton key={i} />)}</div>
+        ) : notifications.length === 0 ? <EmptyState /> : (
+          <div className="space-y-1">
+            <AnimatePresence mode="popLayout">
+              {notifications.map(n => <NotificationItem key={n.id} notification={n} onRead={markRead} />)}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
