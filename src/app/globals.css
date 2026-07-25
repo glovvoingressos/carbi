@@ -1918,7 +1918,14 @@ p {
   background: var(--white);
   border: 1px solid rgba(0,0,0,.08);
   border-radius: 22px;
-  padding: 18px 20px;
+  padding: 16px;
+}
+
+@media (min-width: 640px) {
+  .listing-form-ref > .space-y-3:first-child,
+  .listing-form-ref > div:first-child {
+    padding: 18px 20px;
+  }
 }
 .listing-form-ref .surface,
 .listing-form-ref .surface-strong,
@@ -6335,7 +6342,7 @@ p {
 .fingen-main {
   max-width: 1320px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0;
 }
 
 /* Balance Section */
