@@ -220,7 +220,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
           </aside>
 
           {/* Main Content */}
-          <main className="p-4 sm:p-6 lg:p-8 pb-32 lg:pb-8">
+          <main className="px-2 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8 pb-32 lg:pb-8">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}

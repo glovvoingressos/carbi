@@ -62,15 +62,15 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
   isUploading: boolean; pendingUploads: number; imageError: string | null; isDirty: boolean
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-6">
-      <div className="flex items-center justify-between mb-5">
+    <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+      <div className="flex items-center justify-between mb-4 sm:mb-5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-            <ImageIcon className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
+            <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-[#16855C]" strokeWidth={1.75} />
           </div>
           <div>
-            <h3 className="text-base font-bold text-[#1A1A1A]">Fotos do veículo</h3>
-            <p className="text-xs text-gray-500">Arraste para reordenar. A primeira é a capa.</p>
+            <h3 className="text-sm sm:text-base font-bold text-[#1A1A1A]">Fotos do veículo</h3>
+            <p className="text-[11px] sm:text-xs text-gray-500">Arraste para reordenar. A primeira é a capa.</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -194,12 +194,12 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
     setErrors(next)
   }, [errors, setFormData, setIsDirty, setErrors])
 
-  const ic = (f: string, x = '') => `w-full h-12 px-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all ${x} ${errors[f] ? '!border-[#DC2626] !text-[#DC2626]' : ''}`
+  const ic = (f: string, x = '') => `w-full h-11 sm:h-12 px-3 sm:px-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all ${x} ${errors[f] ? '!border-[#DC2626] !text-[#DC2626]' : ''}`
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Toolbar */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-gray-100 p-3 sm:p-5 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
         <div className={`flex items-center gap-2 text-sm font-medium ${saveStatus === 'saving' ? 'text-[#F59E0B]' : saveStatus === 'saved' ? 'text-[#16855C]' : saveStatus === 'error' ? 'text-[#DC2626]' : 'text-gray-500'}`}>
           {saveStatus === 'saving' ? <Loader2 className="w-4 h-4 animate-spin" /> : saveStatus === 'saved' ? <Check className="w-4 h-4" /> : saveStatus === 'error' ? <AlertCircle className="w-4 h-4" /> : <div className="w-2 h-2 rounded-full bg-[#16855C]" />}
           {saveStatus === 'saving' ? 'Salvando alterações...' : saveStatus === 'saved' ? 'Alterações salvas' : saveStatus === 'error' ? 'Erro ao salvar' : 'Todas alterações salvas'}
@@ -216,20 +216,20 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       </div>
 
       {/* Stats Header */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-                <Eye className="w-6 h-6 text-[#16855C]" strokeWidth={1.75} />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
+                <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-[#16855C]" strokeWidth={1.75} />
               </div>
               <div>
-                <span className="text-3xl font-bold text-[#1A1A1A] block leading-none">{(listing.view_count || 0).toLocaleString('pt-BR')}</span>
-                <span className="text-xs text-gray-500 mt-1 block">visualizações</span>
+                <span className="text-xl sm:text-3xl font-bold text-[#1A1A1A] block leading-none">{(listing.view_count || 0).toLocaleString('pt-BR')}</span>
+                <span className="text-[11px] sm:text-xs text-gray-500 mt-1 block">visualizações</span>
               </div>
             </div>
           </div>
-          <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#16855C]/10 text-[#16855C] rounded-xl text-sm font-semibold hover:bg-[#16855C]/20 transition-colors">
+          <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-[#16855C]/10 text-[#16855C] rounded-xl text-xs sm:text-sm font-semibold hover:bg-[#16855C]/20 transition-colors">
             Ver ao vivo →
           </a>
         </div>
@@ -271,19 +271,19 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       }} />
 
       {/* Basic Info */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-            <Car className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+        <div className="flex items-center gap-3 mb-4 sm:mb-6">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
+            <Car className="w-4 h-4 sm:w-5 sm:h-5 text-[#16855C]" strokeWidth={1.75} />
           </div>
           <div>
-            <h3 className="text-base font-bold text-[#1A1A1A]">Informações do veículo</h3>
-            <p className="text-xs text-gray-500">Dados básicos do anúncio</p>
+            <h3 className="text-sm sm:text-base font-bold text-[#1A1A1A]">Informações do veículo</h3>
+            <p className="text-[11px] sm:text-xs text-gray-500">Dados básicos do anúncio</p>
           </div>
         </div>
-        <div className="space-y-5">
+        <div className="space-y-4">
           <div>
-            <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Título do anúncio</label>
+            <label className="text-xs sm:text-sm font-semibold text-[#1A1A1A] mb-1.5 sm:mb-2 block">Título do anúncio</label>
             <input className={ic('title')} value={formData.title || ''} onChange={(e) => update('title', e.target.value)} placeholder="Ex: Toyota Corolla 2.0 XEi 2024" />
             {errors.title && <p className="text-sm font-medium text-[#DC2626] mt-2">{errors.title}</p>}
           </div>
@@ -306,14 +306,14 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       </div>
 
       {/* Price & Location */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-            <TrendingUp className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+        <div className="flex items-center gap-3 mb-4 sm:mb-6">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#16855C]" strokeWidth={1.75} />
           </div>
           <div>
-            <h3 className="text-base font-bold text-[#1A1A1A]">Preço e localização</h3>
-            <p className="text-xs text-gray-500">Onde está o veículo</p>
+            <h3 className="text-sm sm:text-base font-bold text-[#1A1A1A]">Preço e localização</h3>
+            <p className="text-[11px] sm:text-xs text-gray-500">Onde está o veículo</p>
           </div>
         </div>
         <div className="space-y-5">
@@ -350,14 +350,14 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       </div>
 
       {/* Specs */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-            <BarChart3 className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+        <div className="flex items-center gap-3 mb-4 sm:mb-6">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
+            <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-[#16855C]" strokeWidth={1.75} />
           </div>
           <div>
-            <h3 className="text-base font-bold text-[#1A1A1A]">Especificações</h3>
-            <p className="text-xs text-gray-500">Detalhes técnicos do veículo</p>
+            <h3 className="text-sm sm:text-base font-bold text-[#1A1A1A]">Especificações</h3>
+            <p className="text-[11px] sm:text-xs text-gray-500">Detalhes técnicos do veículo</p>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -405,14 +405,14 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       </div>
 
       {/* Description */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-            <span className="text-[#16855C] text-lg font-bold">Aa</span>
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+        <div className="flex items-center gap-3 mb-4 sm:mb-6">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
+            <span className="text-[#16855C] text-base sm:text-lg font-bold">Aa</span>
           </div>
           <div>
-            <h3 className="text-base font-bold text-[#1A1A1A]">Descrição</h3>
-            <p className="text-xs text-gray-500">Detalhes sobre o veículo</p>
+            <h3 className="text-sm sm:text-base font-bold text-[#1A1A1A]">Descrição</h3>
+            <p className="text-[11px] sm:text-xs text-gray-500">Detalhes sobre o veículo</p>
           </div>
         </div>
         <textarea
@@ -559,7 +559,7 @@ export default function MyListingsDashboard() {
   return (
     <div className="space-y-6">
       {/* Hero Section */}
-      <div className="rounded-2xl p-8 relative overflow-hidden" style={{ backgroundColor: '#16855C', backgroundImage: 'linear-gradient(135deg, #16855C 0%, #1A7A54 50%, #146B4A 100%)' }}>
+      <div className="rounded-2xl p-5 sm:p-8 relative overflow-hidden" style={{ backgroundColor: '#16855C', backgroundImage: 'linear-gradient(135deg, #16855C 0%, #1A7A54 50%, #146B4A 100%)' }}>
         <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
         <div className="relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -596,7 +596,7 @@ export default function MyListingsDashboard() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-4">
+      <div className="bg-white rounded-2xl border border-gray-100 p-3 sm:p-4">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
