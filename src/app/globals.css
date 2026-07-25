@@ -6004,9 +6004,15 @@ p {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 24px 60px;
+  padding: 60px 16px 40px;
   overflow: hidden;
   text-align: center;
+}
+
+@media (min-width: 640px) {
+  .hero-creative {
+    padding: 80px 24px 60px;
+  }
 }
 
 /* Grid Pattern Background */
@@ -6107,24 +6113,31 @@ p {
 /* Mobile */
 @media (max-width: 640px) {
   .hero-creative {
-    min-height: 90vh;
-    padding: 60px 20px 60px;
+    min-height: 80vh;
+    padding: 60px 16px 40px;
   }
   .hero-creative-title {
-    font-size: clamp(36px, 12vw, 56px);
+    font-size: clamp(32px, 10vw, 48px);
     letter-spacing: -2px;
   }
 }
 
-/* Desktop */
-@media (min-width: 768px) {
+/* Tablet */
+@media (min-width: 641px) and (max-width: 1023px) {
   .hero-creative {
-    min-height: 80vh;
-    padding: 80px 48px 60px;
+    padding: 70px 24px 50px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .hero-creative {
+    min-height: 85vh;
+    padding: 80px 32px 60px;
   }
   .hero-creative-title {
-    font-size: clamp(56px, 8vw, 88px);
-    letter-spacing: -4px;
+    font-size: clamp(48px, 7vw, 80px);
+    letter-spacing: -3px;
   }
 }
 
@@ -6371,16 +6384,24 @@ p {
 .fingen-actions {
   display: flex;
   justify-content: center;
-  gap: 32px;
-  padding: 24px 0;
+  gap: 20px;
+  padding: 16px 0;
   animation: fingen-fade-in 0.5s ease 0.1s both;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 640px) {
+  .fingen-actions {
+    gap: 32px;
+    padding: 24px 0;
+  }
 }
 
 .fingen-action {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   text-decoration: none;
   color: var(--color-text-primary);
   transition: all 0.15s ease;
@@ -6391,8 +6412,8 @@ p {
 }
 
 .fingen-action-icon {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
@@ -6425,14 +6446,21 @@ p {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 18px 24px;
+  padding: 14px 18px;
   background: var(--color-text-primary);
   color: var(--color-text-inverse);
   border-radius: var(--radius-xl);
   text-decoration: none;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .fingen-cta-btn {
+    padding: 18px 24px;
+    font-size: 16px;
+  }
 }
 
 .fingen-cta-btn:active {
@@ -6456,18 +6484,18 @@ p {
 
 /* Section */
 .fingen-section {
-  padding: 40px 16px;
+  padding: 32px 16px;
 }
 
 @media (min-width: 640px) {
   .fingen-section {
-    padding: 56px 20px;
+    padding: 48px 20px;
   }
 }
 
 @media (min-width: 1024px) {
   .fingen-section {
-    padding: 56px 0;
+    padding: 64px 0;
   }
 }
 
@@ -6512,8 +6540,22 @@ p {
 /* Car Cards Grid */
 .fingen-cars-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .fingen-cars-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .fingen-cars-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
 }
 
 .fingen-car-card {
@@ -6640,9 +6682,16 @@ p {
 
 /* Free Traffic Banner */
 .fingen-banner {
-  margin: 0 -24px 48px;
-  padding: 0 24px;
+  margin: 0 -16px 32px;
+  padding: 0 16px;
   animation: fingen-fade-in 0.5s ease 0.25s both;
+}
+
+@media (min-width: 640px) {
+  .fingen-banner {
+    margin: 0 -24px 48px;
+    padding: 0 24px;
+  }
 }
 
 @media (min-width: 768px) {
@@ -6655,11 +6704,17 @@ p {
 .fingen-banner-content {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
+  gap: 12px;
+  padding: 14px 16px;
   background: var(--color-accent);
   border-radius: var(--radius-xl);
   overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .fingen-banner-content {
+    padding: 16px 20px;
+  }
 }
 
 .fingen-banner-icon {
@@ -6850,23 +6905,42 @@ p {
 
 .fingen-steps-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
-@media (max-width: 640px) {
+@media (min-width: 640px) {
   .fingen-steps-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
 }
 
+@media (min-width: 1024px) {
+  .fingen-steps-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
 .fingen-step-card {
-  padding: 28px 24px;
+  padding: 20px 16px;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   transition: all 0.25s ease;
+}
+
+@media (min-width: 640px) {
+  .fingen-step-card {
+    padding: 24px 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .fingen-step-card {
+    padding: 28px 24px;
+  }
 }
 
 .fingen-step-card:hover {
@@ -7033,15 +7107,24 @@ p {
 /* ━━━ Testimonials Slider ━━━ */
 .fingen-testimonials-track {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding: 4px 0 20px;
-  margin: 0 -24px;
-  padding-left: 24px;
-  padding-right: 24px;
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width: 640px) {
+  .fingen-testimonials-track {
+    gap: 16px;
+    margin: 0 -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 }
 
 .fingen-testimonials-track::-webkit-scrollbar {
@@ -7049,17 +7132,25 @@ p {
 }
 
 .fingen-testimonial-card {
-  min-width: 320px;
-  max-width: 360px;
+  min-width: 280px;
+  max-width: 320px;
   flex-shrink: 0;
   scroll-snap-align: start;
-  padding: 24px;
+  padding: 20px;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   display: flex;
   flex-direction: column;
   transition: all 0.25s ease;
+}
+
+@media (min-width: 640px) {
+  .fingen-testimonial-card {
+    min-width: 320px;
+    max-width: 360px;
+    padding: 24px;
+  }
 }
 
 .fingen-testimonial-card:hover {
@@ -7568,11 +7659,17 @@ p {
 /* Brands Scroll */
 .fingen-brands-scroll {
   display: flex;
-  gap: 16px;
+  gap: 10px;
   overflow-x: auto;
   padding-bottom: 8px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 640px) {
+  .fingen-brands-scroll {
+    gap: 12px;
+  }
 }
 
 .fingen-brands-scroll::-webkit-scrollbar {
@@ -7582,8 +7679,8 @@ p {
 .fingen-brand-chip {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 10px;
+  padding: 10px 14px;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
