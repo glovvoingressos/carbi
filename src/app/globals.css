@@ -6004,14 +6004,20 @@ p {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 16px 40px;
+  padding: 60px 20px 40px;
   overflow: hidden;
   text-align: center;
 }
 
 @media (min-width: 640px) {
   .hero-creative {
-    padding: 80px 24px 60px;
+    padding: 80px 32px 60px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-creative {
+    padding: 80px 48px 60px;
   }
 }
 
@@ -6114,7 +6120,7 @@ p {
 @media (max-width: 640px) {
   .hero-creative {
     min-height: 80vh;
-    padding: 60px 16px 40px;
+    padding: 60px 20px 40px;
   }
   .hero-creative-title {
     font-size: clamp(32px, 10vw, 48px);
@@ -6125,7 +6131,7 @@ p {
 /* Tablet */
 @media (min-width: 641px) and (max-width: 1023px) {
   .hero-creative {
-    padding: 70px 24px 50px;
+    padding: 70px 32px 50px;
   }
 }
 
@@ -6133,7 +6139,7 @@ p {
 @media (min-width: 1024px) {
   .hero-creative {
     min-height: 85vh;
-    padding: 80px 32px 60px;
+    padding: 80px 48px 60px;
   }
   .hero-creative-title {
     font-size: clamp(48px, 7vw, 80px);
@@ -6356,13 +6362,25 @@ p {
 .fingen-main {
   max-width: 1320px;
   margin: 0 auto;
-  padding: 0;
+  padding: 0 20px;
+}
+
+@media (min-width: 640px) {
+  .fingen-main {
+    padding: 0 32px;
+  }
 }
 
 /* Balance Section */
 .fingen-balance {
   padding: 32px 0;
   animation: fingen-fade-in 0.5s ease;
+}
+
+@media (max-width: 640px) {
+  .fingen-balance {
+    padding: 24px 0;
+  }
 }
 
 .fingen-balance-label {
@@ -6484,12 +6502,12 @@ p {
 
 /* Section */
 .fingen-section {
-  padding: 32px 16px;
+  padding: 32px 20px;
 }
 
 @media (min-width: 640px) {
   .fingen-section {
-    padding: 48px 20px;
+    padding: 48px 32px;
   }
 }
 
@@ -6682,15 +6700,15 @@ p {
 
 /* Free Traffic Banner */
 .fingen-banner {
-  margin: 0 -16px 32px;
-  padding: 0 16px;
+  margin: 0 -20px 32px;
+  padding: 0 20px;
   animation: fingen-fade-in 0.5s ease 0.25s both;
 }
 
 @media (min-width: 640px) {
   .fingen-banner {
-    margin: 0 -24px 48px;
-    padding: 0 24px;
+    margin: 0 -32px 48px;
+    padding: 0 32px;
   }
 }
 
@@ -7888,12 +7906,12 @@ p {
 .fingen-shell-content {
   max-width: 1320px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 20px;
 }
 
 @media (min-width: 640px) {
   .fingen-shell-content {
-    padding: 0 20px;
+    padding: 0 32px;
   }
 }
 
