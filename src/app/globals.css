@@ -5697,7 +5697,6 @@ p {
 .vehicle-card-mobile .vehicle-card-image {
   position: relative;
   aspect-ratio: 16 / 9;
-  background: var(--color-bg-muted);
   overflow: hidden;
 }
 
@@ -5705,6 +5704,7 @@ p {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .vehicle-card-mobile .vehicle-card-favorite {
