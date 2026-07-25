@@ -506,13 +506,13 @@ export default function MyListingsDashboard() {
   return (
     <div className="space-y-6">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-[#16855C] via-[#1A7A54] to-[#146B4A] rounded-2xl p-8 text-white relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#16855C] via-[#1A7A54] to-[#146B4A] rounded-2xl p-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
         <div className="relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Meus anúncios</h1>
-              <p className="text-white/70 mt-2">{listings.length} anúncio{listings.length !== 1 ? 's' : ''} encontrado{listings.length !== 1 ? 's' : ''}</p>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Meus anúncios</h1>
+              <p className="mt-2 text-white/80">{listings.length} anúncio{listings.length !== 1 ? 's' : ''} encontrado{listings.length !== 1 ? 's' : ''}</p>
             </div>
             <button
               onClick={() => router.push('/anunciar')}
