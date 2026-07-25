@@ -19,6 +19,19 @@ const authH = (t: string) => ({ Authorization: `Bearer ${t}`, 'Content-Type': 'a
 
 const ease = [0.23, 1, 0.32, 1] as const
 
+// Price formatting helpers
+const formatPriceDisplay = (value: number | string): string => {
+  const num = typeof value === 'string' ? parseFloat(value.replace(/[^\d]/g, '')) : value
+  if (isNaN(num) || num === 0) return ''
+  return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+const parsePriceInput = (input: string): number => {
+  const cleaned = input.replace(/[^\d]/g, '')
+  if (!cleaned) return 0
+  return parseInt(cleaned, 10)
+}
+
 // ── StatusBadge ────────────────────────────────────────
 function StatusBadge({ status, isSelected = false }: { status: string; isSelected?: boolean }) {
   const l: Record<string, string> = { active: 'Ativo', paused: 'Pausado', sold: 'Vendido', archived: 'Arquivado' }
@@ -306,10 +319,16 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
         <div className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="sm:col-span-1">
-              <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Preço (R$)</label>
+              <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Preço de venda</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-400 pointer-events-none">R$</span>
-                <input className={`${ic('price')} pl-10`} value={formData.price ?? ''} onChange={(e) => update('price', e.target.value)} placeholder="0,00" />
+                <input 
+                  className={`${ic('price')} pl-10`} 
+                  value={formData.price ? formatPriceDisplay(formData.price) : ''} 
+                  onChange={(e) => update('price', parsePriceInput(e.target.value))} 
+                  placeholder="0,00"
+                  inputMode="decimal"
+                />
               </div>
               {errors.price && <p className="text-sm font-medium text-[#DC2626] mt-2">{errors.price}</p>}
             </div>
@@ -476,7 +495,9 @@ export default function MyListingsDashboard() {
     if (!selected || !isDirty || Object.keys(errors).length > 0) return; if (!silent) setSaveStatus('saving'); else setSaveStatus('saving')
     try {
       const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); if (!session?.access_token) throw new Error('Sessão expirada.')
-      const body = { ...formData, price: typeof formData.price === 'string' ? parseMoneyInputToNumber(formData.price) : Number(formData.price), mileage: formData.mileage ? parseBrazilianInt(formData.mileage) : undefined, year: formData.year ? parseBrazilianInt(formData.year) : undefined, year_model: formData.year_model ? parseBrazilianInt(formData.year_model) : undefined, horsepower: formData.horsepower ? parseBrazilianInt(formData.horsepower) : undefined, doors: formData.doors ? parseBrazilianInt(formData.doors) : undefined }
+      // Remove plate_final from data - plate is only used for lookup, not published
+      const { plate_final, ...bodyWithoutPlate } = formData
+      const body = { ...bodyWithoutPlate, price: typeof formData.price === 'string' ? parseMoneyInputToNumber(formData.price) : Number(formData.price), mileage: formData.mileage ? parseBrazilianInt(formData.mileage) : undefined, year: formData.year ? parseBrazilianInt(formData.year) : undefined, year_model: formData.year_model ? parseBrazilianInt(formData.year_model) : undefined, horsepower: formData.horsepower ? parseBrazilianInt(formData.horsepower) : undefined, doors: formData.doors ? parseBrazilianInt(formData.doors) : undefined }
       const res = await fetch(`/api/marketplace/listings/${selected.id}`, { method: 'PATCH', headers: authH(session.access_token), body: JSON.stringify(body) }); const p = await res.json(); if (!res.ok) throw new Error(p.error || 'Erro ao salvar')
       setSaveStatus('saved'); setIsDirty(false); setListings((prev) => prev.map((l) => l.id === selected.id ? { ...l, ...formData } : l)); setTimeout(() => setSaveStatus('idle'), 3000)
     } catch (err) { setSaveStatus('error'); setGlobalError(err instanceof Error ? err.message : 'Falha ao salvar.') }

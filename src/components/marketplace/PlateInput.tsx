@@ -91,6 +91,11 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 p-4">
+        <div className="flex items-center gap-2 mb-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200">
+          <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+          <p className="text-[11px] text-amber-700">A placa é usada apenas para preencher os dados do veículo. Ela <strong>não será publicada</strong> no anúncio.</p>
+        </div>
+
         <div className="flex flex-col sm:flex-row items-stretch gap-3">
           <div className="relative flex-1">
             <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
