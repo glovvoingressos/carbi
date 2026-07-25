@@ -526,15 +526,15 @@ export default function MyListingsDashboard() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mt-6">
             <div className="bg-white/10 rounded-xl p-4">
-              <p className="text-2xl font-bold">{listings.length}</p>
+              <p className="text-2xl font-bold text-white">{listings.length}</p>
               <p className="text-xs text-white/70 mt-1">Total</p>
             </div>
             <div className="bg-white/10 rounded-xl p-4">
-              <p className="text-2xl font-bold">{listings.filter(l => l.status === 'active').length}</p>
+              <p className="text-2xl font-bold text-white">{listings.filter(l => l.status === 'active').length}</p>
               <p className="text-xs text-white/70 mt-1">Ativos</p>
             </div>
             <div className="bg-white/10 rounded-xl p-4">
-              <p className="text-2xl font-bold">{listings.reduce((sum, l) => sum + (l.view_count || 0), 0)}</p>
+              <p className="text-2xl font-bold text-white">{listings.reduce((sum, l) => sum + (l.view_count || 0), 0)}</p>
               <p className="text-xs text-white/70 mt-1">Visualizações</p>
             </div>
           </div>
