@@ -39,9 +39,19 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
       }
       const { data } = sb.storage.from('profile-avatars').getPublicUrl(path)
       onAvatarChange(data.publicUrl)
-      const { error: updateError } = await sb.from('users').update({ avatar_url: data.publicUrl }).eq('id', userId)
+
+      // Update avatar_url in users table
+      const { data: updateData, error: updateError } = await sb.from('users').update({ avatar_url: data.publicUrl }).eq('id', userId).select()
       if (updateError) {
-        console.error('Avatar URL update error:', updateError)
+        console.error('Avatar URL update error details:', {
+          message: updateError.message,
+          details: updateError.details,
+          hint: updateError.hint,
+          code: updateError.code
+        })
+        // Don't throw here - avatar was uploaded successfully
+      } else {
+        console.log('Avatar URL updated successfully:', updateData)
       }
       e.target.value = ''
     } catch (e) {
@@ -407,15 +417,30 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
         return
       }
 
-      const { error } = await sb.from('users').update({
-        full_name: fullName.trim() || null,
-        phone: phone.replace(/\D/g, '') || null,
-      }).eq('id', userId)
+      // Prepare update data - only send non-null values
+      const updateData: { full_name?: string | null; phone?: string | null } = {}
+      if (fullName.trim()) {
+        updateData.full_name = fullName.trim()
+      }
+      if (phone.replace(/\D/g, '')) {
+        updateData.phone = phone.replace(/\D/g, '')
+      }
+
+      console.log('Updating profile with:', { userId, updateData })
+
+      const { data, error } = await sb.from('users').update(updateData).eq('id', userId).select()
 
       if (error) {
-        console.error('Supabase update error:', error)
-        throw error
+        console.error('Supabase update error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        })
+        throw new Error(error.message || 'Erro ao salvar perfil')
       }
+
+      console.log('Profile updated successfully:', data)
       showToast('success', 'Perfil atualizado com sucesso!')
       onProfileUpdate?.()
     } catch (e) {
