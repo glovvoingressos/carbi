@@ -970,7 +970,7 @@ export default function ListingForm() {
   }
 
   return (
-    <div className="listing-form-ref space-y-8 pb-4 max-w-3xl mx-auto">
+    <div className="listing-form-ref space-y-6 sm:space-y-8 pb-4 w-full max-w-none sm:max-w-3xl mx-auto">
       <div className="space-y-3">
         <div
           className="tfp-progress-track"

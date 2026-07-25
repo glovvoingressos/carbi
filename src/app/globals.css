@@ -2045,7 +2045,13 @@ p {
 .fingen-flow-hero-inner {
   max-width: 1320px;
   margin: 0 auto;
-  padding: 0 clamp(16px, 4vw, 32px);
+  padding: 0 12px;
+}
+
+@media (min-width: 640px) {
+  .fingen-flow-hero-inner {
+    padding: 0 clamp(16px, 4vw, 32px);
+  }
 }
 
 .fingen-flow-hero-inner h1 {
@@ -2148,7 +2154,13 @@ p {
 
 /* Seção do formulário */
 .fingen-flow-form-section {
-  padding: 0 clamp(12px, 4vw, 32px);
+  padding: 0 8px;
+}
+
+@media (min-width: 640px) {
+  .fingen-flow-form-section {
+    padding: 0 clamp(16px, 4vw, 32px);
+  }
 }
 
 .fingen-flow-form-grid {
@@ -2156,8 +2168,9 @@ p {
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 16px;
   align-items: start;
+  width: 100%;
 }
 
 @media (min-width: 901px) {
