@@ -224,21 +224,36 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
 
       {/* Plate Input */}
       <PlateInput onPlateFound={(data) => {
-        setFormData(prev => ({
-          ...prev,
-          brand: data.brand || prev.brand,
-          model: data.model || prev.model,
-          year: data.year || prev.year,
-          year_model: data.yearModel || data.year || prev.year_model,
-          color: data.color || prev.color,
-          fuel: data.fuel || prev.fuel,
-          engine: data.engine || prev.engine,
-          transmission: data.transmission || prev.transmission,
-          body_type: data.bodyType || prev.body_type,
-          plate_final: data.plate ? data.plate.slice(-1).toUpperCase() : prev.plate_final,
-          price: data.fipePrice && (!prev.price || Number(prev.price) === 0) ? data.fipePrice : prev.price,
-          title: data.brand && data.model && data.year ? `${data.brand} ${data.model} ${data.year}` : (prev.title || ''),
-        }))
+        console.log('Plate data received:', data)
+        setFormData(prev => {
+          const newData = { ...prev }
+          
+          // Fill in empty fields with plate data
+          if (data.brand && !prev.brand) newData.brand = data.brand
+          if (data.model && !prev.model) newData.model = data.model
+          if (data.year && !prev.year) newData.year = data.year
+          if (data.yearModel && !prev.year_model) newData.year_model = data.yearModel
+          else if (data.year && !prev.year_model) newData.year_model = data.year
+          if (data.color && !prev.color) newData.color = data.color
+          if (data.fuel && !prev.fuel) newData.fuel = data.fuel
+          if (data.engine && !prev.engine) newData.engine = data.engine
+          if (data.transmission && !prev.transmission) newData.transmission = data.transmission
+          if (data.bodyType && !prev.body_type) newData.body_type = data.bodyType
+          if (data.plate && !prev.plate_final) newData.plate_final = data.plate.slice(-1).toUpperCase()
+          
+          // Always update title if empty
+          if (!prev.title && data.brand && data.model && data.year) {
+            newData.title = `${data.brand} ${data.model} ${data.year}`
+          }
+          
+          // Update price if empty or zero
+          if (data.fipePrice && (!prev.price || Number(prev.price) === 0)) {
+            newData.price = data.fipePrice
+          }
+          
+          console.log('Updated form data:', newData)
+          return newData
+        })
         setIsDirty(true)
       }} />
 

@@ -166,6 +166,10 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
                     <span>FIPE: {formatBRL(vehicleData.fipePrice)}</span>
                   </div>
                 )}
+
+                <p className="text-[10px] text-emerald-600 mt-1">
+                  ✓ Campos vazios foram preenchidos automaticamente
+                </p>
               </div>
             </motion.div>
           )}
