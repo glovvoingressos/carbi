@@ -7369,11 +7369,18 @@ p {
 }
 
 .comparison-title {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #FFFFFF;
   padding: 4px 0;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .comparison-title {
+    font-size: 28px;
+  }
 }
 
 .comparison-link {
@@ -7398,7 +7405,7 @@ p {
 
 .comparison-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   position: relative;
 }

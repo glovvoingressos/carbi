@@ -128,7 +128,7 @@ export default async function HomePage() {
     image: c.image,
     idealFor: c.idealFor,
   })
-  const comparisonCars = cars.filter((c) => c.isPopular).slice(0, 3).map(mapCar)
+  const comparisonCars = cars.filter((c) => c.isPopular).slice(0, 2).map(mapCar)
   const allComparisonCars = cars.map(mapCar)
 
   return (
