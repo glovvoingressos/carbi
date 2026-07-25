@@ -122,14 +122,16 @@ export default function MinhaContaPage() {
             <div className="flex flex-wrap gap-3 mt-6">
               <Link
                 href="/minha-conta/anuncios"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-[#D4F576] text-[#1A1A1A] rounded-xl text-sm font-bold hover:bg-[#C8E64E] transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition-colors"
+                style={{ backgroundColor: '#D4F576', color: '#1A1A1A' }}
               >
                 <Plus className="w-4 h-4" />
                 Novo anúncio
               </Link>
               <Link
                 href="/carros-a-venda"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 text-white rounded-xl text-sm font-semibold hover:bg-white/20 transition-colors border border-white/10"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-colors"
+                style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#FFFFFF', border: '1px solid rgba(255,255,255,0.2)' }}
               >
                 Explorar seminovos
                 <ArrowUpRight className="w-4 h-4" />

@@ -21,13 +21,25 @@ const ease = [0.23, 1, 0.32, 1] as const
 
 // ── StatusBadge ────────────────────────────────────────
 function StatusBadge({ status, isSelected = false }: { status: string; isSelected?: boolean }) {
-  const s: Record<string, string> = {
-    active: isSelected ? 'bg-white/20 text-white' : 'bg-[#16855C]/10 text-[#16855C]',
-    paused: isSelected ? 'bg-white/20 text-white' : 'bg-[#F59E0B]/10 text-[#F59E0B]',
-    sold: isSelected ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
-  }
   const l: Record<string, string> = { active: 'Ativo', paused: 'Pausado', sold: 'Vendido', archived: 'Arquivado' }
-  return <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold ${s[status] || s.active}`}>{l[status] || status}</span>
+
+  const getStyles = () => {
+    if (isSelected) {
+      return { backgroundColor: 'rgba(255,255,255,0.2)', color: '#FFFFFF' }
+    }
+    switch (status) {
+      case 'active': return { backgroundColor: 'rgba(22,133,92,0.1)', color: '#16855C' }
+      case 'paused': return { backgroundColor: 'rgba(245,158,11,0.1)', color: '#F59E0B' }
+      case 'sold': return { backgroundColor: '#F3F4F6', color: '#6B7280' }
+      default: return { backgroundColor: 'rgba(22,133,92,0.1)', color: '#16855C' }
+    }
+  }
+
+  return (
+    <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" style={getStyles()}>
+      {l[status] || status}
+    </span>
+  )
 }
 
 // ── PhotoGrid ──────────────────────────────────────────
@@ -53,7 +65,7 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
             <Upload className="w-4 h-4" /> Adicionar
             <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { onAdd(e.target.files); e.target.value = '' }} />
           </label>
-          <button onClick={onSync} disabled={!isDirty || isUploading} className="h-10 px-5 rounded-xl bg-[#16855C] text-white text-sm font-semibold flex items-center gap-2 disabled:opacity-40 hover:bg-[#146B4A] transition-colors">
+          <button onClick={onSync} disabled={!isDirty || isUploading} className="h-10 px-5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 disabled:opacity-40 transition-colors" style={{ backgroundColor: '#16855C' }}>
             {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar
           </button>
         </div>
@@ -122,25 +134,26 @@ function ListingCard({ listing, isSelected, onSelect }: { listing: DashboardList
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
       onClick={onSelect}
-      className={`w-full text-left p-3 rounded-2xl transition-all border ${
-        isSelected
-          ? 'bg-[#16855C] border-[#16855C] shadow-lg shadow-[#16855C]/20'
-          : 'bg-white border-gray-100 hover:border-[#16855C]/30 hover:shadow-md'
-      }`}
+      className="w-full text-left p-3 rounded-2xl transition-all border"
+      style={{
+        backgroundColor: isSelected ? '#16855C' : '#FFFFFF',
+        borderColor: isSelected ? '#16855C' : '#E5E7EB',
+        boxShadow: isSelected ? '0 4px 12px rgba(22,133,92,0.25)' : undefined
+      }}
     >
       <div className="flex gap-3">
-        <div className={`w-16 h-12 rounded-xl overflow-hidden flex-shrink-0 ${isSelected ? 'bg-[#146B4A]' : 'bg-gray-100'}`}>
+        <div className="w-16 h-12 rounded-xl overflow-hidden flex-shrink-0" style={{ backgroundColor: isSelected ? '#146B4A' : '#F3F4F6' }}>
           <MarketplaceListingImage brand={listing.brand} model={listing.model} year={listing.year_model} imageUrls={listing.images?.map((img) => img.public_url) || []} alt={listing.title} className="h-full w-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <p className={`text-xs font-bold truncate ${isSelected ? 'text-white' : 'text-[#1A1A1A]'}`}>{listing.title}</p>
+            <p className="text-xs font-bold truncate" style={{ color: isSelected ? '#FFFFFF' : '#1A1A1A' }}>{listing.title}</p>
             <StatusBadge status={listing.status} isSelected={isSelected} />
           </div>
-          <p className={`text-sm font-bold mt-1 ${isSelected ? 'text-white' : 'text-[#1A1A1A]'}`}>{formatBRL(listing.price)}</p>
+          <p className="text-sm font-bold mt-1" style={{ color: isSelected ? '#FFFFFF' : '#1A1A1A' }}>{formatBRL(listing.price)}</p>
           <div className="flex items-center gap-2 mt-1">
-            <span className={`text-[10px] ${isSelected ? 'text-white/70' : 'text-gray-500'}`}>{listing.year}/{listing.year_model}</span>
-            <span className={`text-[10px] ${isSelected ? 'text-white/70' : 'text-gray-500'}`}>{listing.mileage?.toLocaleString('pt-BR')} km</span>
+            <span className="text-[10px]" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : '#6B7280' }}>{listing.year}/{listing.year_model}</span>
+            <span className="text-[10px]" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : '#6B7280' }}>{listing.mileage?.toLocaleString('pt-BR')} km</span>
           </div>
         </div>
       </div>
@@ -183,7 +196,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
             {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
             Excluir
           </button>
-          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="h-11 px-8 rounded-xl bg-[#16855C] text-white text-sm font-bold flex items-center gap-2 hover:bg-[#146B4A] transition-colors disabled:opacity-40 shadow-lg shadow-[#16855C]/20">
+          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="h-11 px-8 rounded-xl text-white text-sm font-bold flex items-center gap-2 transition-colors disabled:opacity-40" style={{ backgroundColor: '#16855C', boxShadow: '0 4px 12px rgba(22,133,92,0.25)' }}>
             <Save className="w-4 h-4" /> Salvar anúncio
           </button>
         </div>
@@ -520,7 +533,8 @@ export default function MyListingsDashboard() {
             </div>
             <button
               onClick={() => router.push('/anunciar')}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-[#D4F576] text-[#1A1A1A] rounded-xl text-sm font-bold hover:bg-[#C8E64E] transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-colors"
+              style={{ backgroundColor: '#D4F576', color: '#1A1A1A' }}
             >
               <Plus className="w-5 h-5" />
               Novo anúncio
@@ -554,9 +568,11 @@ export default function MyListingsDashboard() {
           </div>
           <div className="flex gap-2 overflow-x-auto">
             {(['all', 'active', 'paused', 'sold'] as const).map((s) => (
-              <button key={s} onClick={() => setStatusFilter(s)} className={`px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
-                statusFilter === s ? 'bg-[#16855C] text-white' : 'bg-[#F8F9FA] text-gray-600 hover:bg-gray-200 border border-gray-200'
-              }`}>
+              <button key={s} onClick={() => setStatusFilter(s)} className="px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border" style={{
+                backgroundColor: statusFilter === s ? '#16855C' : '#F8F9FA',
+                color: statusFilter === s ? '#FFFFFF' : '#4B5563',
+                borderColor: statusFilter === s ? '#16855C' : '#E5E7EB'
+              }}>
                 {s === 'all' ? 'Todos' : s === 'active' ? 'Ativos' : s === 'paused' ? 'Pausados' : 'Vendidos'}
               </button>
             ))}
