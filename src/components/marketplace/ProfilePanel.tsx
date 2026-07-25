@@ -25,16 +25,27 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
     onUploadingChange(true)
     try {
       const sb = getSupabaseBrowserClient()
+      const { data: { session } } = await sb.auth.getSession()
+      if (!session) {
+        console.error('No session for avatar upload')
+        return
+      }
       const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
       const path = `${userId}/avatar.${ext}`
       const { error } = await sb.storage.from('profile-avatars').upload(path, file, { upsert: true, contentType: file.type })
-      if (error) throw error
+      if (error) {
+        console.error('Avatar upload error:', error)
+        throw error
+      }
       const { data } = sb.storage.from('profile-avatars').getPublicUrl(path)
       onAvatarChange(data.publicUrl)
-      await sb.from('users').update({ avatar_url: data.publicUrl }).eq('id', userId)
+      const { error: updateError } = await sb.from('users').update({ avatar_url: data.publicUrl }).eq('id', userId)
+      if (updateError) {
+        console.error('Avatar URL update error:', updateError)
+      }
       e.target.value = ''
     } catch (e) {
-      // silently ignore avatar upload errors
+      console.error('Avatar upload failed:', e)
     } finally {
       onUploadingChange(false)
     }
@@ -358,10 +369,22 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
   useEffect(() => {
     if (!userId || !supabaseReady) return
     const load = async () => {
-      const { data } = await getSupabaseBrowserClient()
-        .from('users').select('id,email,full_name,avatar_url,phone')
-        .eq('id', userId).maybeSingle()
-      if (data) { setFullName(data.full_name || ''); setAvatarUrl(data.avatar_url || ''); setPhone(data.phone || '') }
+      try {
+        const { data, error } = await getSupabaseBrowserClient()
+          .from('users').select('id,email,full_name,avatar_url,phone')
+          .eq('id', userId).maybeSingle()
+        if (error) {
+          console.error('Error loading user profile:', error)
+          return
+        }
+        if (data) {
+          setFullName(data.full_name || '')
+          setAvatarUrl(data.avatar_url || '')
+          setPhone(data.phone || '')
+        }
+      } catch (e) {
+        console.error('Failed to load profile:', e)
+      }
     }
     void load()
   }, [userId, supabaseReady])
@@ -371,17 +394,36 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
   }, [])
 
   const saveProfile = async () => {
-    if (!userId || !supabaseReady) return
+    if (!userId || !supabaseReady) {
+      showToast('error', 'Usuário não autenticado.')
+      return
+    }
     setSaving(true)
     try {
-      const { error } = await getSupabaseBrowserClient().from('users').update({
-        full_name: fullName.trim() || null, phone: phone.replace(/\D/g, '') || null,
+      const sb = getSupabaseBrowserClient()
+      const { data: { session } } = await sb.auth.getSession()
+      if (!session) {
+        showToast('error', 'Sessão expirada. Faça login novamente.')
+        return
+      }
+
+      const { error } = await sb.from('users').update({
+        full_name: fullName.trim() || null,
+        phone: phone.replace(/\D/g, '') || null,
       }).eq('id', userId)
-      if (error) throw error
+
+      if (error) {
+        console.error('Supabase update error:', error)
+        throw error
+      }
       showToast('success', 'Perfil atualizado com sucesso!')
       onProfileUpdate?.()
-    } catch (e) { showToast('error', e instanceof Error ? e.message : 'Erro ao salvar.') }
-    finally { setSaving(false) }
+    } catch (e) {
+      console.error('Save profile error:', e)
+      showToast('error', e instanceof Error ? e.message : 'Erro ao salvar perfil.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) return (
