@@ -27,6 +27,22 @@ import { brandsAreEquivalent } from '@/lib/brand-normalization'
 
 const DRAFT_KEY = 'carbi_listing_draft_v1'
 
+// Format price input: 123456 -> 1.234,56
+const formatPriceInput = (value: string): string => {
+  const numbers = value.replace(/\D/g, '')
+  if (!numbers) return ''
+  const num = parseInt(numbers, 10)
+  return num.toLocaleString('pt-BR')
+}
+
+// Parse formatted price: 1.234,56 -> 1234.56 (number)
+const parsePriceInput = (value: string): string => {
+  const cleaned = value.replace(/\./g, '').replace(',', '.')
+  const num = parseFloat(cleaned)
+  if (isNaN(num) || num < 0) return ''
+  return String(num)
+}
+
 interface UploadImageItem {
   file: File
   previewUrl: string
@@ -1111,7 +1127,19 @@ export default function ListingForm() {
             <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
               <div>
                 <label htmlFor="listing-price" className="sr-only">Preço pedido</label>
-                <input id="listing-price" className="fingen-flow-input" placeholder="Preço pedido (R$)" value={form.price} onChange={(e) => handleInput('price', e.target.value)} aria-label="Preço pedido" />
+                <input
+                  id="listing-price"
+                  className="fingen-flow-input"
+                  placeholder="Preço (R$)"
+                  value={formatPriceInput(form.price)}
+                  onChange={(e) => {
+                    const formatted = formatPriceInput(e.target.value)
+                    const raw = parsePriceInput(formatted)
+                    handleInput('price', raw)
+                  }}
+                  inputMode="decimal"
+                  aria-label="Preço pedido"
+                />
               </div>
               <div>
                 <label htmlFor="listing-mileage" className="sr-only">Quilometragem</label>
