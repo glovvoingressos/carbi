@@ -5686,7 +5686,7 @@ p {
   background: var(--color-bg-elevated);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  border: 1px solid var(--color-border);
+  border: none;
   transition: transform var(--duration) var(--ease-out), box-shadow var(--duration) var(--ease-out);
 }
 
@@ -5705,6 +5705,7 @@ p {
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
 .vehicle-card-mobile .vehicle-card-favorite {
@@ -5729,7 +5730,7 @@ p {
 }
 
 .vehicle-card-mobile .vehicle-card-content {
-  padding: 16px;
+  padding: 14px 16px 16px;
 }
 
 .vehicle-card-mobile .vehicle-card-title {
