@@ -117,7 +117,7 @@ export default function MinhaContaPage() {
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               Olá, {user.fullName?.split(' ')[0] || 'Usuário'} 👋
             </h1>
-            <p className="text-gray-400 mt-2 text-sm sm:text-base">Bem-vindo de volta à sua área de membros</p>
+            <p className="text-white/70 mt-2 text-sm sm:text-base">Bem-vindo de volta à sua área de membros</p>
             
             <div className="flex flex-wrap gap-3 mt-6">
               <Link
