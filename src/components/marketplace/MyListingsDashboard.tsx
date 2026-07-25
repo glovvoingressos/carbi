@@ -20,10 +20,14 @@ const authH = (t: string) => ({ Authorization: `Bearer ${t}`, 'Content-Type': 'a
 const ease = [0.23, 1, 0.32, 1] as const
 
 // ── StatusBadge ────────────────────────────────────────
-function StatusBadge({ status }: { status: string }) {
-  const s: Record<string, string> = { active: 'bg-[#16855C]/10 text-[#16855C]', paused: 'bg-[#F59E0B]/10 text-[#F59E0B]', sold: 'bg-gray-100 text-gray-500' }
+function StatusBadge({ status, isSelected = false }: { status: string; isSelected?: boolean }) {
+  const s: Record<string, string> = {
+    active: isSelected ? 'bg-white/20 text-white' : 'bg-[#16855C]/10 text-[#16855C]',
+    paused: isSelected ? 'bg-white/20 text-white' : 'bg-[#F59E0B]/10 text-[#F59E0B]',
+    sold: isSelected ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+  }
   const l: Record<string, string> = { active: 'Ativo', paused: 'Pausado', sold: 'Vendido', archived: 'Arquivado' }
-  return <span className={`inline-flex px-2.5 py-1 rounded-full text-[11px] font-semibold ${s[status] || s.active}`}>{l[status] || status}</span>
+  return <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold ${s[status] || s.active}`}>{l[status] || status}</span>
 }
 
 // ── PhotoGrid ──────────────────────────────────────────
@@ -118,25 +122,25 @@ function ListingCard({ listing, isSelected, onSelect }: { listing: DashboardList
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
       onClick={onSelect}
-      className={`w-full text-left p-4 rounded-2xl transition-all border ${
+      className={`w-full text-left p-3 rounded-2xl transition-all border ${
         isSelected
           ? 'bg-[#16855C] border-[#16855C] shadow-lg shadow-[#16855C]/20'
           : 'bg-white border-gray-100 hover:border-[#16855C]/30 hover:shadow-md'
       }`}
     >
-      <div className="flex gap-4">
-        <div className={`w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 ${isSelected ? 'bg-[#146B4A]' : 'bg-gray-100'}`}>
+      <div className="flex gap-3">
+        <div className={`w-16 h-12 rounded-xl overflow-hidden flex-shrink-0 ${isSelected ? 'bg-[#146B4A]' : 'bg-gray-100'}`}>
           <MarketplaceListingImage brand={listing.brand} model={listing.model} year={listing.year_model} imageUrls={listing.images?.map((img) => img.public_url) || []} alt={listing.title} className="h-full w-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <p className={`text-sm font-bold truncate ${isSelected ? 'text-white' : 'text-[#1A1A1A]'}`}>{listing.title}</p>
-            <StatusBadge status={listing.status} />
+            <p className={`text-xs font-bold truncate ${isSelected ? 'text-white' : 'text-[#1A1A1A]'}`}>{listing.title}</p>
+            <StatusBadge status={listing.status} isSelected={isSelected} />
           </div>
-          <p className={`text-lg font-bold mt-1 ${isSelected ? 'text-[#D4F576]' : 'text-[#1A1A1A]'}`}>{formatBRL(listing.price)}</p>
-          <div className="flex items-center gap-3 mt-2">
-            <span className={`text-xs ${isSelected ? 'text-white/70' : 'text-gray-500'}`}>{listing.year}/{listing.year_model}</span>
-            <span className={`text-xs ${isSelected ? 'text-white/70' : 'text-gray-500'}`}>{listing.mileage?.toLocaleString('pt-BR')} km</span>
+          <p className={`text-sm font-bold mt-1 ${isSelected ? 'text-white' : 'text-[#1A1A1A]'}`}>{formatBRL(listing.price)}</p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className={`text-[10px] ${isSelected ? 'text-white/70' : 'text-gray-500'}`}>{listing.year}/{listing.year_model}</span>
+            <span className={`text-[10px] ${isSelected ? 'text-white/70' : 'text-gray-500'}`}>{listing.mileage?.toLocaleString('pt-BR')} km</span>
           </div>
         </div>
       </div>
