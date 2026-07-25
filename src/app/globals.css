@@ -2050,7 +2050,7 @@ p {
 
 @media (min-width: 640px) {
   .fingen-flow-hero-inner {
-    padding: 0 clamp(16px, 4vw, 32px);
+    padding: 0 clamp(20px, 5vw, 40px);
   }
 }
 
@@ -2081,8 +2081,8 @@ p {
 
 /* Banner de progresso — accent bg como fingen-banner */
 .fingen-flow-progress-banner {
-  margin: 0 -24px 32px;
-  padding: 0 24px;
+  margin: 0 -12px 24px;
+  padding: 0 12px;
 }
 
 @media (min-width: 768px) {
@@ -2095,8 +2095,8 @@ p {
 .fingen-flow-progress-content {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
+  gap: 12px;
+  padding: 12px 16px;
   background: var(--color-accent);
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -2154,13 +2154,7 @@ p {
 
 /* Seção do formulário */
 .fingen-flow-form-section {
-  padding: 0 8px;
-}
-
-@media (min-width: 640px) {
-  .fingen-flow-form-section {
-    padding: 0 clamp(16px, 4vw, 32px);
-  }
+  padding: 0;
 }
 
 .fingen-flow-form-grid {
@@ -2402,12 +2396,12 @@ p {
 /* Select / Input / Textarea */
 .fingen-flow-form .fingen-flow-input {
   width: 100%;
-  min-height: 52px;
+  min-height: 48px;
   border: 1.5px solid var(--color-border-strong);
   border-radius: var(--radius-full);
   background: var(--color-bg-elevated);
   color: var(--color-text-primary);
-  padding: 14px 18px;
+  padding: 12px 16px;
   font-family: var(--font-sans);
   font-size: 15px;
   outline: none;
@@ -2415,8 +2409,8 @@ p {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%2317170F' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 18px center;
-  padding-right: 44px;
+  background-position: right 16px center;
+  padding-right: 40px;
 }
 
 .fingen-flow-form .fingen-flow-input:focus {

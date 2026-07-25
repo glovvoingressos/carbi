@@ -1006,7 +1006,7 @@ export default function ListingForm() {
 
             {/* Sub-step 1: Plate Lookup */}
             {listingSubStep === 1 && (
-              <div className="fingen-flow-substep-card p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
+              <div className="fingen-flow-substep-card p-3 sm:p-5 space-y-3 sm:space-y-4 animate-fade-in">
                 <p className="fingen-flow-field-label">Placa do veículo</p>
                 <p className="text-[13px] text-[#767676]">Digite a placa para preencher marca, modelo e dados automaticamente.</p>
                 <PlateInput onPlateFound={(data: { brand: string; model: string; year: number; yearModel: number; color: string; fuel: string; engine: string; horsepower: string; transmission: string; bodyType: string; plate: string; fipePrice?: number | null; fipeReference?: string | null }) => {
@@ -1043,7 +1043,7 @@ export default function ListingForm() {
 
             {/* Sub-step 2: Confirm auto-filled data */}
             {listingSubStep === 2 && (
-              <div className="fingen-flow-substep-card p-5 space-y-4 max-[330px]:p-4 max-[330px]:space-y-3 animate-fade-in">
+              <div className="fingen-flow-substep-card p-3 sm:p-5 space-y-3 sm:space-y-4 animate-fade-in">
                 <div className="flex items-center justify-between gap-3">
                   <p className="fingen-flow-field-label">Dados do veículo</p>
                   <span className="fingen-flow-badge-accent text-[10px]">Verifique</span>
