@@ -506,13 +506,13 @@ export default function MyListingsDashboard() {
   return (
     <div className="space-y-6">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-[#16855C] via-[#1A7A54] to-[#146B4A] rounded-2xl p-8 relative overflow-hidden">
+      <div className="rounded-2xl p-8 relative overflow-hidden" style={{ backgroundColor: '#16855C', backgroundImage: 'linear-gradient(135deg, #16855C 0%, #1A7A54 50%, #146B4A 100%)' }}>
         <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
         <div className="relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Meus anúncios</h1>
-              <p className="mt-2 text-white/80">{listings.length} anúncio{listings.length !== 1 ? 's' : ''} encontrado{listings.length !== 1 ? 's' : ''}</p>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight" style={{ color: '#FFFFFF' }}>Meus anúncios</h1>
+              <p className="mt-2" style={{ color: 'rgba(255,255,255,0.85)' }}>{listings.length} anúncio{listings.length !== 1 ? 's' : ''} encontrado{listings.length !== 1 ? 's' : ''}</p>
             </div>
             <button
               onClick={() => router.push('/anunciar')}
@@ -525,17 +525,17 @@ export default function MyListingsDashboard() {
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mt-6">
-            <div className="bg-white/10 rounded-xl p-4">
-              <p className="text-2xl font-bold text-white">{listings.length}</p>
-              <p className="text-xs text-white/70 mt-1">Total</p>
+            <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
+              <p className="text-2xl font-bold" style={{ color: '#FFFFFF' }}>{listings.length}</p>
+              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>Total</p>
             </div>
-            <div className="bg-white/10 rounded-xl p-4">
-              <p className="text-2xl font-bold text-white">{listings.filter(l => l.status === 'active').length}</p>
-              <p className="text-xs text-white/70 mt-1">Ativos</p>
+            <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
+              <p className="text-2xl font-bold" style={{ color: '#FFFFFF' }}>{listings.filter(l => l.status === 'active').length}</p>
+              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>Ativos</p>
             </div>
-            <div className="bg-white/10 rounded-xl p-4">
-              <p className="text-2xl font-bold text-white">{listings.reduce((sum, l) => sum + (l.view_count || 0), 0)}</p>
-              <p className="text-xs text-white/70 mt-1">Visualizações</p>
+            <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
+              <p className="text-2xl font-bold" style={{ color: '#FFFFFF' }}>{listings.reduce((sum, l) => sum + (l.view_count || 0), 0)}</p>
+              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>Visualizações</p>
             </div>
           </div>
         </div>

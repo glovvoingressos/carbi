@@ -64,7 +64,7 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
   return (
     <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
       {/* Cover */}
-      <div className="h-32 bg-gradient-to-br from-[#16855C] via-[#1A7A54] to-[#146B4A] relative">
+      <div className="h-32 relative" style={{ backgroundColor: '#16855C', backgroundImage: 'linear-gradient(135deg, #16855C 0%, #1A7A54 50%, #146B4A 100%)' }}>
         <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
       </div>
       
