@@ -2052,12 +2052,18 @@ p {
 .fingen-flow-hero-inner {
   max-width: 1320px;
   margin: 0 auto;
-  padding: 0 12px;
+  padding: 0 20px;
 }
 
 @media (min-width: 640px) {
   .fingen-flow-hero-inner {
-    padding: 0 clamp(20px, 5vw, 40px);
+    padding: 0 clamp(24px, 5vw, 48px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .fingen-flow-hero-inner {
+    padding: 0 32px;
   }
 }
 
@@ -2161,7 +2167,19 @@ p {
 
 /* Seção do formulário */
 .fingen-flow-form-section {
-  padding: 0;
+  padding: 0 16px;
+}
+
+@media (min-width: 640px) {
+  .fingen-flow-form-section {
+    padding: 0 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .fingen-flow-form-section {
+    padding: 0 32px;
+  }
 }
 
 .fingen-flow-form-grid {
@@ -6362,10 +6380,16 @@ p {
 .fingen-main {
   max-width: 1320px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 16px;
 }
 
 @media (min-width: 640px) {
+  .fingen-main {
+    padding: 0 24px;
+  }
+}
+
+@media (min-width: 1024px) {
   .fingen-main {
     padding: 0 32px;
   }
