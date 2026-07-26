@@ -7740,6 +7740,14 @@ p {
   transition: all 0.2s ease;
 }
 
+@media (min-width: 768px) {
+  .fingen-brand-chip {
+    padding: 16px 22px;
+    min-width: 200px;
+    gap: 16px;
+  }
+}
+
 .fingen-brand-chip:hover {
   border-color: var(--color-accent);
   transform: translateY(-2px);
@@ -7755,6 +7763,16 @@ p {
   justify-content: center;
   font-size: 16px;
   font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .fingen-brand-initial {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    font-size: 18px;
+  }
+}
   color: var(--color-text-secondary);
   flex-shrink: 0;
 }
@@ -7782,9 +7800,21 @@ p {
   margin-bottom: 2px;
 }
 
+@media (min-width: 768px) {
+  .fingen-brand-name {
+    font-size: 16px;
+  }
+}
+
 .fingen-brand-count {
   font-size: 13px;
   color: var(--color-text-tertiary);
+}
+
+@media (min-width: 768px) {
+  .fingen-brand-count {
+    font-size: 14px;
+  }
 }
 
 /* Final CTA */
