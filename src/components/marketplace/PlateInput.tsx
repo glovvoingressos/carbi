@@ -37,6 +37,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
     yearModel?: number
     color: string
     fuel?: string
+    version?: string
     fipePrice?: number | null
   } | null>(null)
 
@@ -57,6 +58,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
         yearModel: data.anoModelo,
         color: data.cor,
         fuel: data.combustivel,
+        version: data.versao || undefined,
         fipePrice: data.fipe_price
       })
       onPlateFound({
@@ -161,11 +163,12 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
                   </span>
                 </div>
 
-                <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-600">
-                  <span>Ano: <strong>{vehicleData.year}{vehicleData.yearModel ? `/${vehicleData.yearModel}` : ''}</strong></span>
-                  <span>Cor: <strong>{vehicleData.color}</strong></span>
-                  {vehicleData.fuel && <span>Combustível: <strong>{vehicleData.fuel}</strong></span>}
-                </div>
+<div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-600">
+                   <span>Ano: <strong>{vehicleData.year}{vehicleData.yearModel ? `/${vehicleData.yearModel}` : ''}</strong></span>
+                   {vehicleData.version && <span>Versão: <strong>{vehicleData.version}</strong></span>}
+                   <span>Cor: <strong>{vehicleData.color}</strong></span>
+                   {vehicleData.fuel && <span>Combustível: <strong>{vehicleData.fuel}</strong></span>}
+                 </div>
 
                 {vehicleData.fipePrice != null && vehicleData.fipePrice > 0 && (
                   <div className="flex items-center gap-1.5 pt-2 border-t border-emerald-100 text-emerald-700 text-xs font-semibold">
