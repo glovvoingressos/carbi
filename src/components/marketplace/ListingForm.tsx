@@ -1068,44 +1068,48 @@ export default function ListingForm() {
                   <span className="fingen-flow-badge-accent text-[10px]">Verifique</span>
                 </div>
                 <p className="text-[12px] text-[#767676]">Revise os dados abaixo. Altere o que precisar.</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[10px] font-medium text-[#767676]">Marca</label>
-                    <input className="fingen-flow-input text-[12px] mt-1" value={form.brand} onChange={(e) => handleInput('brand', e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-medium text-[#767676]">Modelo</label>
-                    <input className="fingen-flow-input text-[12px] mt-1" value={form.model} onChange={(e) => handleInput('model', e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-medium text-[#767676]">Ano</label>
-                    <input className="fingen-flow-input text-[12px] mt-1" value={form.year} onChange={(e) => handleInput('year', e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-medium text-[#767676]">Cor</label>
-                    <input className="fingen-flow-input text-[12px] mt-1" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-medium text-[#767676]">Combustível</label>
-                    <input className="fingen-flow-input text-[12px] mt-1" value={form.fuel} onChange={(e) => handleInput('fuel', e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-medium text-[#767676]">Câmbio</label>
-                    <input className="fingen-flow-input text-[12px] mt-1" value={form.transmission} onChange={(e) => handleInput('transmission', e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-medium text-[#767676]">Motor</label>
-                    <input className="fingen-flow-input text-[12px] mt-1" value={form.engine} onChange={(e) => handleInput('engine', e.target.value)} placeholder="Ex: 2.0 Turbo" />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-medium text-[#767676]">Potência (cv)</label>
-                    <input className="fingen-flow-input text-[12px] mt-1" value={form.horsepower} onChange={(e) => handleInput('horsepower', e.target.value)} placeholder="Ex: 116" />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-medium text-[#767676]">Placa</label>
-                    <input className="fingen-flow-input text-[12px] mt-1 uppercase" value={form.plateFinal} onChange={(e) => handleInput('plateFinal', e.target.value)} placeholder="ABC1D23" maxLength={7} />
-                  </div>
-                </div>
+<div className="grid grid-cols-2 gap-3">
+                   <div>
+                     <label className="text-[10px] font-medium text-[#767676]">Marca</label>
+                     <input className="fingen-flow-input text-[12px] mt-1" value={form.brand} onChange={(e) => handleInput('brand', e.target.value)} />
+                   </div>
+                   <div>
+                     <label className="text-[10px] font-medium text-[#767676]">Modelo</label>
+                     <input className="fingen-flow-input text-[12px] mt-1" value={form.model} onChange={(e) => handleInput('model', e.target.value)} />
+                   </div>
+                   <div>
+                     <label className="text-[10px] font-medium text-[#767676]">Versão</label>
+                     <input className="fingen-flow-input text-[12px] mt-1" value={form.version} onChange={(e) => handleInput('version', e.target.value)} placeholder="Ex: CROSSFOX" />
+                   </div>
+                   <div>
+                     <label className="text-[10px] font-medium text-[#767676]">Ano</label>
+                     <input className="fingen-flow-input text-[12px] mt-1" value={form.year} onChange={(e) => handleInput('year', e.target.value)} />
+                   </div>
+                   <div>
+                     <label className="text-[10px] font-medium text-[#767676]">Cor</label>
+                     <input className="fingen-flow-input text-[12px] mt-1" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
+                   </div>
+                   <div>
+                     <label className="text-[10px] font-medium text-[#767676]">Combustível</label>
+                     <input className="fingen-flow-input text-[12px] mt-1" value={form.fuel} onChange={(e) => handleInput('fuel', e.target.value)} />
+                   </div>
+                   <div>
+                     <label className="text-[10px] font-medium text-[#767676]">Câmbio</label>
+                     <input className="fingen-flow-input text-[12px] mt-1" value={form.transmission} onChange={(e) => handleInput('transmission', e.target.value)} />
+                   </div>
+                   <div>
+                     <label className="text-[10px] font-medium text-[#767676]">Motor</label>
+                     <input className="fingen-flow-input text-[12px] mt-1" value={form.engine} onChange={(e) => handleInput('engine', e.target.value)} placeholder="Ex: 2.0 Turbo" />
+                   </div>
+                   <div>
+                     <label className="text-[10px] font-medium text-[#767676]">Potência (cv)</label>
+                     <input className="fingen-flow-input text-[12px] mt-1" value={form.horsepower} onChange={(e) => handleInput('horsepower', e.target.value)} placeholder="Ex: 116" />
+                   </div>
+                   <div>
+                     <label className="text-[10px] font-medium text-[#767676]">Placa</label>
+                     <input className="fingen-flow-input text-[12px] mt-1 uppercase" value={form.plateFinal} onChange={(e) => handleInput('plateFinal', e.target.value)} placeholder="ABC1D23" maxLength={7} />
+                   </div>
+                 </div>
                 <button type="button" onClick={() => { setCurrentStep(2); setListingSubStep(1); }} className="fingen-flow-btn-primary w-full mt-2">
                   <span className="truncate">Continuar para preço e fotos</span>
                   <ArrowRight className="h-4 w-4 shrink-0" />
