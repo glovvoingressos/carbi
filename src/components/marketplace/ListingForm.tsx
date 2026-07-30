@@ -681,7 +681,8 @@ export default function ListingForm() {
     if (!form.brand || !form.model || !form.yearModel) return
     if (titleTouched && form.title.trim().length >= 8) return
 
-    const nextTitle = `${form.brand} ${form.model} ${form.yearModel}${form.version ? ` ${form.version}` : ''}`.trim()
+    const versionSuffix = form.version && form.version !== form.model ? ` ${form.version}` : ''
+    const nextTitle = `${form.brand} ${form.model} ${form.yearModel}${versionSuffix}`.trim()
     if (!nextTitle) return
 
     setForm((prev) => ({
@@ -848,7 +849,8 @@ export default function ListingForm() {
         : technical.horsepower !== 'Não informado'
           ? Number(technical.horsepower.replace(/[^\d]/g, ''))
           : null
-      const generatedTitle = `${form.brand} ${form.model} ${form.yearModel}${form.version ? ` ${form.version}` : ''}`
+      const versionSuffix = form.version && form.version !== form.model ? ` ${form.version}` : ''
+      const generatedTitle = `${form.brand} ${form.model} ${form.yearModel}${versionSuffix}`
         .replace(/\s+/g, ' ')
         .trim()
       const resolvedTitle = form.title.trim().length >= 8 ? form.title.trim() : generatedTitle
