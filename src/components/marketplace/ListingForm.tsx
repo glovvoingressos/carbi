@@ -680,8 +680,8 @@ export default function ListingForm() {
     if (!form.brand || !form.model || !form.yearModel) return
     if (titleTouched && form.title.trim().length >= 8) return
 
-    const yearSuffix = form.yearModel && form.yearModel !== form.model ? ` ${form.yearModel}` : ''
-    const versionSuffix = form.version && form.version !== form.model && !form.model.includes(form.version) ? ` ${form.version}` : ''
+    const yearSuffix = form.yearModel && !form.model.includes(form.yearModel) ? ` ${form.yearModel}` : ''
+    const versionSuffix = form.version && !form.model.includes(form.version) ? ` ${form.version}` : ''
     const nextTitle = `${form.brand} ${form.model}${yearSuffix}${versionSuffix}`.trim()
     if (!nextTitle) return
 
@@ -830,8 +830,8 @@ export default function ListingForm() {
         : technical.horsepower !== 'Não informado'
           ? Number(technical.horsepower.replace(/[^\d]/g, ''))
           : null
-      const yearSuffix = form.yearModel && form.yearModel !== form.model ? ` ${form.yearModel}` : ''
-      const versionSuffix = form.version && form.version !== form.model && !form.model.includes(form.version) ? ` ${form.version}` : ''
+      const yearSuffix = form.yearModel && !form.model.includes(form.yearModel) ? ` ${form.yearModel}` : ''
+      const versionSuffix = form.version && !form.model.includes(form.version) ? ` ${form.version}` : ''
       const generatedTitle = `${form.brand} ${form.model}${yearSuffix}${versionSuffix}`
         .replace(/\s+/g, ' ')
         .trim()
