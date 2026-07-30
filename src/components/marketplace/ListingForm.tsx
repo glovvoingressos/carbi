@@ -1025,32 +1025,35 @@ export default function ListingForm() {
               <div className="fingen-flow-substep-card p-3 sm:p-5 space-y-3 sm:space-y-4 animate-fade-in">
                 <p className="fingen-flow-field-label">Placa do veículo</p>
                 <p className="text-[13px] text-[#767676]">Digite a placa para preencher marca, modelo e dados automaticamente.</p>
-                <PlateInput onPlateFound={(data: { brand: string; model: string; year: number; yearModel: number; color: string; fuel: string; engine: string; horsepower: string; transmission: string; bodyType: string; plate: string; fipePrice?: number | null; fipeReference?: string | null }) => {
-                  handleInput('brand', data.brand)
-                  handleInput('model', data.model)
-                  handleInput('year', String(data.year))
-                  handleInput('yearModel', String(data.yearModel))
-                  handleInput('color', data.color)
-                  handleInput('fuel', data.fuel)
-                  handleInput('engine', data.engine)
-                  handleInput('horsepower', data.horsepower)
-                  handleInput('transmission', data.transmission)
-                  handleInput('bodyType', data.bodyType)
-                  handleInput('plateFinal', data.plate)
-                  // Generate AI description
-                  generateAIDescription({
-                    brand: data.brand,
-                    model: data.model,
-                    year: data.year,
-                    yearModel: data.yearModel,
-                    color: data.color,
-                    fuel: data.fuel,
-                    engine: data.engine,
-                    horsepower: data.horsepower,
-                    transmission: data.transmission,
-                    bodyType: data.bodyType,
-                  })
-                }} />
+<PlateInput onPlateFound={(data: { brand: string; model: string; year: number; yearModel: number; color: string; fuel: string; engine: string; horsepower: string; transmission: string; bodyType: string; plate: string; version: string; fipePrice?: number | null; fipeReference?: string | null }) => {
+                   handleInput('brand', data.brand)
+                   handleInput('model', data.model)
+                   handleInput('year', String(data.year))
+                   handleInput('yearModel', String(data.yearModel))
+                   handleInput('color', data.color)
+                   handleInput('fuel', data.fuel)
+                   handleInput('engine', data.engine)
+                   handleInput('horsepower', data.horsepower)
+                   handleInput('transmission', data.transmission)
+                   handleInput('bodyType', data.bodyType)
+                   handleInput('plateFinal', data.plate)
+                   if (data.version) {
+                     handleInput('version', data.version)
+                   }
+                   // Generate AI description
+                   generateAIDescription({
+                     brand: data.brand,
+                     model: data.model,
+                     year: data.year,
+                     yearModel: data.yearModel,
+                     color: data.color,
+                     fuel: data.fuel,
+                     engine: data.engine,
+                     horsepower: data.horsepower,
+                     transmission: data.transmission,
+                     bodyType: data.bodyType,
+                   })
+                 }} />
                 <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
                   Continuar <ArrowRight className="w-4 h-4" />
                 </button>

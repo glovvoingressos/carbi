@@ -19,6 +19,7 @@ interface PlateInputProps {
     transmission: string
     bodyType: string
     plate: string
+    version: string
     fipePrice?: number | null
     fipeReference?: string | null
   }) => void
@@ -70,6 +71,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
         transmission: data.cambio || 'Automático',
         bodyType: data.tipoVeiculo || 'Hatch',
         plate: data.placa || plate,
+        version: data.versao || '',
         fipePrice: data.fipe_price || null,
         fipeReference: data.fipe_reference_month || null,
       })

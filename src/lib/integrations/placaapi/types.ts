@@ -4,6 +4,7 @@ export interface PlacaApiResponse {
   renavam: string
   marca: string
   modelo: string
+  versao: string
   anoFabricacao: number
   anoModelo: number
   cor: string

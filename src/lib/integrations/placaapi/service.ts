@@ -26,6 +26,7 @@ export async function lookupPlate(plate: string): Promise<PlacaLookupResult> {
       renavam: '',
       marca: data.marca || '',
       modelo: data.modelo || '',
+      versao: data.VERSAO || '',
       anoFabricacao: parseInt(extra.ano_fabricacao || data.ano) || 0,
       anoModelo: parseInt(extra.ano_modelo || data.anoModelo) || 0,
       cor: data.cor || '',
