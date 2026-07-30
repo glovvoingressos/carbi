@@ -173,17 +173,31 @@ export async function POST(req: NextRequest) {
           }
         }
 
+        console.log('[email] listing created email attempt', {
+          userId: auth.userId,
+          userEmail,
+          userName,
+          hasResendKey: Boolean(process.env.RESEND_API_KEY),
+          listingSlug: data.slug,
+        })
+
         if (userEmail) {
-          await sendListingCreatedEmail({
+          const createdResult = await sendListingCreatedEmail({
             userEmail,
             userName,
             vehicleTitle: resolvedTitle,
             price: payload.price,
             listingSlug: data.slug
           })
+          console.log('[email] listing created email result', createdResult)
+        } else {
+          console.warn('[email] listing created email skipped: userEmail is empty', {
+            userId: auth.userId,
+            userProfile,
+          })
         }
 
-        await sendAdminNewListingEmail({
+        const adminResult = await sendAdminNewListingEmail({
           vehicleTitle: resolvedTitle,
           brand: payload.brand,
           model: payload.model,
@@ -195,8 +209,9 @@ export async function POST(req: NextRequest) {
           sellerName: userName,
           listingSlug: data.slug
         })
+        console.log('[email] admin new listing email result', adminResult)
       } catch (emailErr) {
-        console.error('Falha ao enviar e-mail de criação de anúncio:', emailErr)
+        console.error('[email] listing created email failed', emailErr)
       }
     })()
 
