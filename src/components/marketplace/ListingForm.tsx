@@ -680,8 +680,9 @@ export default function ListingForm() {
     if (!form.brand || !form.model || !form.yearModel) return
     if (titleTouched && form.title.trim().length >= 8) return
 
-    const versionSuffix = form.version && !form.model.includes(form.version) ? ` ${form.version}` : ''
-    const nextTitle = `${form.brand} ${form.model} ${form.yearModel}${versionSuffix}`.trim()
+    const yearSuffix = form.yearModel && form.yearModel !== form.model ? ` ${form.yearModel}` : ''
+    const versionSuffix = form.version && form.version !== form.model && !form.model.includes(form.version) ? ` ${form.version}` : ''
+    const nextTitle = `${form.brand} ${form.model}${yearSuffix}${versionSuffix}`.trim()
     if (!nextTitle) return
 
     setForm((prev) => ({
@@ -829,8 +830,9 @@ export default function ListingForm() {
         : technical.horsepower !== 'Não informado'
           ? Number(technical.horsepower.replace(/[^\d]/g, ''))
           : null
-      const versionSuffix = form.version && form.version !== form.model ? ` ${form.version}` : ''
-      const generatedTitle = `${form.brand} ${form.model} ${form.yearModel}${versionSuffix}`
+      const yearSuffix = form.yearModel && form.yearModel !== form.model ? ` ${form.yearModel}` : ''
+      const versionSuffix = form.version && form.version !== form.model && !form.model.includes(form.version) ? ` ${form.version}` : ''
+      const generatedTitle = `${form.brand} ${form.model}${yearSuffix}${versionSuffix}`
         .replace(/\s+/g, ' ')
         .trim()
       const resolvedTitle = form.title.trim().length >= 8 ? form.title.trim() : generatedTitle
