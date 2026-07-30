@@ -26,6 +26,13 @@ export default function AuthCallbackPage() {
                 id: user.id, email: user.email,
                 full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
               }, { onConflict: 'id' })
+              try {
+                await fetch('/api/auth/welcome', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: user.email, name: user.user_metadata?.full_name || user.email?.split('@')[0] }),
+                })
+              } catch (e) { console.error('Welcome email failed:', e) }
             }
             return router.replace('/minha-conta')
           }

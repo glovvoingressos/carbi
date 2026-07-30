@@ -151,21 +151,23 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
           },
         })
         if (signUpError) { setError(signUpError.message.includes('already') ? 'Este e-mail já está cadastrado.' : 'Não foi possível criar a conta. Verifique os dados e tente novamente.'); return }
-        if (data.session && data.user) {
-          await supabase.from('users').upsert({ id: data.user.id, email, full_name: fullName }, { onConflict: 'id' })
-          // Send welcome email
-          try {
-            await fetch('/api/auth/welcome', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, name: fullName }),
-            })
-          } catch (e) { console.error('Welcome email failed:', e) }
-          onAuthenticated?.()
-          if (redirectTo) router.push(redirectTo)
-        } else {
-          setMessage('Conta criada! Confirme seu e-mail para continuar. Verifique também a pasta de spam.')
-        }
+        await supabase.from('users').upsert({ id: data.user?.id, email, full_name: fullName }, { onConflict: 'id' })
+        let welcomeSent = false
+        try {
+          const res = await fetch('/api/auth/welcome', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, name: fullName }),
+          })
+          welcomeSent = res.ok
+          if (!welcomeSent) {
+            const text = await res.text().catch(() => '')
+            console.error('Welcome email endpoint failed:', res.status, text)
+          }
+        } catch (e) { console.error('Welcome email fetch failed:', e) }
+        setMessage(data.session ? 'Conta criada com sucesso!' : 'Conta criada! Confirme seu e-mail para continuar. Verifique também a pasta de spam.')
+        if (data.session && onAuthenticated) onAuthenticated()
+        if (data.session && redirectTo) router.push(redirectTo)
       } else if (mode === 'forgot') {
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/reset-password` : undefined })
         if (resetError) { setError(resetError.message); return }
