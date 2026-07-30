@@ -160,10 +160,21 @@ export async function PATCH(
             .eq('id', auth.userId)
             .maybeSingle()
 
-          if (userProfile?.email) {
+          let userEmail = userProfile?.email || ''
+          let userName = userProfile?.full_name || 'Anunciante'
+
+          if (!userEmail) {
+            const { data: authUser } = await supabase.auth.getUser(auth.accessToken)
+            userEmail = authUser?.user?.email || ''
+            if (!userName && authUser?.user?.user_metadata?.full_name) {
+              userName = authUser.user.user_metadata.full_name
+            }
+          }
+
+          if (userEmail) {
             await sendListingStatusChangedEmail({
-              userEmail: userProfile.email,
-              userName: userProfile.full_name || 'Anunciante',
+              userEmail,
+              userName,
               vehicleTitle: data.title || 'Veículo',
               newStatus: updates.status as 'active' | 'sold' | 'paused' | 'archived',
               listingSlug: data.slug || listingId,
@@ -237,12 +248,23 @@ export async function DELETE(
           .from('users')
           .select('email, full_name')
           .eq('id', auth.userId)
-          .single()
+          .maybeSingle()
 
-        if (userProfile?.email) {
+        let userEmail = userProfile?.email || ''
+        let userName = userProfile?.full_name || 'Anunciante'
+
+        if (!userEmail) {
+          const { data: authUser } = await supabase.auth.getUser(auth.accessToken)
+          userEmail = authUser?.user?.email || ''
+          if (!userName && authUser?.user?.user_metadata?.full_name) {
+            userName = authUser.user.user_metadata.full_name
+          }
+        }
+
+        if (userEmail) {
           await sendListingDeletedEmail({
-            userEmail: userProfile.email,
-            userName: userProfile.full_name || 'Anunciante',
+            userEmail,
+            userName,
             vehicleTitle: listing.title || 'Veículo'
           })
         }

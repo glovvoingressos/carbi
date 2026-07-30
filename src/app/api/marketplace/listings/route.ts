@@ -162,10 +162,21 @@ export async function POST(req: NextRequest) {
           .eq('id', auth.userId)
           .single()
 
-        if (userProfile?.email) {
+        let userEmail = userProfile?.email || ''
+        let userName = userProfile?.full_name || 'Anunciante'
+
+        if (!userEmail) {
+          const { data: authUser } = await supabase.auth.getUser(auth.accessToken)
+          userEmail = authUser?.user?.email || ''
+          if (!userName && authUser?.user?.user_metadata?.full_name) {
+            userName = authUser.user.user_metadata.full_name
+          }
+        }
+
+        if (userEmail) {
           await sendListingCreatedEmail({
-            userEmail: userProfile.email,
-            userName: userProfile.full_name || 'Anunciante',
+            userEmail,
+            userName,
             vehicleTitle: resolvedTitle,
             price: payload.price,
             listingSlug: data.slug
@@ -181,18 +192,11 @@ export async function POST(req: NextRequest) {
           price: payload.price,
           city: payload.city,
           state: payload.state,
-          sellerName: userProfile?.full_name || 'Anunciante',
+          sellerName: userName,
           listingSlug: data.slug
         })
-
-        // In-app notification
-        await notifyListingPublished({
-          userId: auth.userId,
-          vehicleTitle: resolvedTitle,
-          listingSlug: data.slug,
-        })
       } catch (emailErr) {
-        console.error('Falha ao enviar e-mail de confirmação de anúncio ativo:', emailErr)
+        console.error('Falha ao enviar e-mail de criação de anúncio:', emailErr)
       }
     })()
 
