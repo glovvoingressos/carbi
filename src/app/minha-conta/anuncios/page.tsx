@@ -9,7 +9,7 @@ import { Loader2 } from 'lucide-react'
 
 export default function MyListingsPage() {
   const router = useRouter()
-  const [user, setUser] = useState<{ email: string; fullName: string; avatarUrl: string } | null>(null)
+  const [user, setUser] = useState<{ email: string; fullName: string; avatarUrl: string; phone?: string } | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -18,8 +18,8 @@ export default function MyListingsPage() {
     const load = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) { router.replace('/entrar?redirect=/minha-conta/anuncios'); return }
-      const { data } = await supabase.from('users').select('full_name,avatar_url').eq('id', session.user.id).maybeSingle()
-      setUser({ email: session.user.email || '', fullName: data?.full_name || '', avatarUrl: data?.avatar_url || '' })
+      const { data } = await supabase.from('users').select('full_name,avatar_url,phone').eq('id', session.user.id).maybeSingle()
+      setUser({ email: session.user.email || '', fullName: data?.full_name || '', avatarUrl: data?.avatar_url || '', phone: data?.phone || '' })
       setLoading(false)
     }
     load()

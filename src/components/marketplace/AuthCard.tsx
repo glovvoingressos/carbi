@@ -150,8 +150,28 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
             emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
           },
         })
-        if (signUpError) { setError(signUpError.message.includes('already') ? 'Este e-mail já está cadastrado.' : 'Não foi possível criar a conta. Verifique os dados e tente novamente.'); return }
-        await supabase.from('users').upsert({ id: data.user?.id, email, full_name: fullName }, { onConflict: 'id' })
+        if (signUpError) {
+          const raw = (signUpError as any)?.message || ''
+          const friendly = raw.includes('already')
+            ? 'Este e-mail já está cadastrado.'
+            : raw
+              ? `Não foi possível criar a conta: ${raw}`
+              : 'Não foi possível criar a conta. Verifique os dados e tente novamente.'
+          setError(friendly)
+          console.error('Signup error:', signUpError)
+          return
+        }
+        if (!data.user?.id) {
+          setError('Não foi possível criar a conta. Tente novamente.')
+          console.error('Signup returned no user id', data)
+          return
+        }
+        const { error: upsertError } = await supabase.from('users').upsert({ id: data.user.id, email, full_name: fullName, phone: phone.replace(/\D/g, ''), cpf: cpf.replace(/\D/g, '') }, { onConflict: 'id' })
+        if (upsertError) {
+          console.error('Failed to save user profile after signup:', upsertError)
+          setError('Conta criada, mas não foi possível salvar seus dados no perfil. Entre em contato com o suporte.')
+          return
+        }
         let welcomeSent = false
         try {
           const res = await fetch('/api/auth/welcome', {

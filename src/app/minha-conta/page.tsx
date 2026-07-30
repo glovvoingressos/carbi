@@ -18,7 +18,7 @@ interface DashboardStats {
 
 export default function MinhaContaPage() {
   const router = useRouter()
-  const [user, setUser] = useState<{ email: string; fullName: string; avatarUrl: string } | null>(null)
+  const [user, setUser] = useState<{ email: string; fullName: string; avatarUrl: string; phone?: string } | null>(null)
   const [stats, setStats] = useState<{ label: string; value: string | number; icon: any }[]>([])
   const [dashboardStats, setDashboardStats] = useState<DashboardStats>({ totalListings: 0, totalViews: 0, activeListings: 0, unreadMessages: 0 })
   const [loading, setLoading] = useState(true)
@@ -30,8 +30,8 @@ export default function MinhaContaPage() {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return
 
-    const { data } = await supabase.from('users').select('full_name,avatar_url').eq('id', session.user.id).maybeSingle()
-    setUser({ email: session.user.email || '', fullName: data?.full_name || '', avatarUrl: data?.avatar_url || '' })
+    const { data } = await supabase.from('users').select('full_name,avatar_url,phone').eq('id', session.user.id).maybeSingle()
+    setUser({ email: session.user.email || '', fullName: data?.full_name || '', avatarUrl: data?.avatar_url || '', phone: data?.phone || '' })
   }, [])
 
   useEffect(() => {
@@ -44,8 +44,8 @@ export default function MinhaContaPage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) { router.replace('/entrar?redirect=/minha-conta'); return }
 
-      const { data } = await supabase.from('users').select('full_name,avatar_url').eq('id', session.user.id).maybeSingle()
-      setUser({ email: session.user.email || '', fullName: data?.full_name || '', avatarUrl: data?.avatar_url || '' })
+      const { data } = await supabase.from('users').select('full_name,avatar_url,phone').eq('id', session.user.id).maybeSingle()
+      setUser({ email: session.user.email || '', fullName: data?.full_name || '', avatarUrl: data?.avatar_url || '', phone: data?.phone || '' })
 
       // Fetch real stats
       const { count: listingsCount } = await supabase

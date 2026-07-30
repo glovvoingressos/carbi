@@ -21,11 +21,21 @@ export default function AuthCallbackPage() {
             const { error: e } = await supabase.auth.setSession({ access_token: at, refresh_token: rt })
             if (e) throw e
             const { data: { user } } = await supabase.auth.getUser()
-            if (user) {
-              await supabase.from('users').upsert({
-                id: user.id, email: user.email,
-                full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
-              }, { onConflict: 'id' })
+             if (user) {
+               try {
+                 const { error: profileError } = await supabase.from('users').upsert({
+                   id: user.id,
+                   email: user.email,
+                   full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
+                   phone: (user.user_metadata?.phone as string | undefined) || '',
+                   cpf: (user.user_metadata?.cpf as string | undefined) || '',
+                 }, { onConflict: 'id' })
+                 if (profileError) {
+                   console.error('Failed to save profile on email confirmation:', profileError)
+                 }
+               } catch (e) {
+                 console.error('Upsert profile on callback failed:', e)
+               }
               try {
                 await fetch('/api/auth/welcome', {
                   method: 'POST',
