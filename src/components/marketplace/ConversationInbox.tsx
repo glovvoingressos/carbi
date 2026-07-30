@@ -69,11 +69,11 @@ function MessageBubble({ message, isMine, showName }: { message: MessageItem; is
         )}
         <p className="text-sm leading-relaxed break-words">{message.message}</p>
         <div className={`flex items-center gap-1.5 mt-2 ${isMine ? 'justify-end' : 'justify-start'}`}>
-          <time className={`text-[10px] ${isMine ? 'text-white/50' : 'text-gray-400'}`}>
+          <time className={`text-[10px] ${isMine ? 'text-white/70' : 'text-gray-400'}`}>
             {formatTime(message.created_at)}
           </time>
           {isMine && (
-            <CheckCheck className="w-3.5 h-3.5 text-white/50" />
+            <CheckCheck className="w-3.5 h-3.5 text-white/70" />
           )}
         </div>
       </div>
