@@ -174,7 +174,6 @@ export function validateListingPayload(payload: ListingFormPayload): string[] {
 
   if (!payload.brand?.trim()) errors.push('Marca é obrigatória.')
   if (!payload.model?.trim()) errors.push('Modelo é obrigatório.')
-  if (!payload.version?.trim()) errors.push('Versão é obrigatória.')
   if (!payload.transmission?.trim()) errors.push('Câmbio é obrigatório.')
   if (!payload.fuel?.trim()) errors.push('Combustível é obrigatório.')
   if (!payload.color?.trim()) errors.push('Cor é obrigatória.')
