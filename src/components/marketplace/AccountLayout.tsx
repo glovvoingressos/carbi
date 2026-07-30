@@ -24,7 +24,7 @@ const ease = [0.23, 1, 0.32, 1] as const
 
 interface AccountLayoutProps {
   children: React.ReactNode
-  user: { email: string; fullName: string; avatarUrl: string }
+  user: { email: string; fullName: string; avatarUrl: string; phone?: string }
   stats?: { label: string; value: string | number; icon: any }[]
 }
 
@@ -171,6 +171,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
                 </div>
                 <h2 className="text-lg font-bold text-[#1A1A1A]">{user.fullName || 'Usuário'}</h2>
                 <p className="text-sm text-gray-500 mt-1">{user.email}</p>
+                {user.phone ? <p className="text-sm text-gray-500 mt-1">{user.phone}</p> : null}
               </motion.div>
 
               {/* Navigation */}
@@ -316,6 +317,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
                   <div>
                     <p className="text-sm font-semibold text-[#1A1A1A]">{user.fullName || 'Usuário'}</p>
                     <p className="text-xs text-gray-500">{user.email}</p>
+                    {user.phone ? <p className="text-xs text-gray-500">{user.phone}</p> : null}
                   </div>
                 </div>
               </div>
