@@ -680,7 +680,7 @@ export default function ListingForm() {
     if (!form.brand || !form.model || !form.yearModel) return
     if (titleTouched && form.title.trim().length >= 8) return
 
-    const versionSuffix = form.version && form.version !== form.model ? ` ${form.version}` : ''
+    const versionSuffix = form.version && !form.model.includes(form.version) ? ` ${form.version}` : ''
     const nextTitle = `${form.brand} ${form.model} ${form.yearModel}${versionSuffix}`.trim()
     if (!nextTitle) return
 
