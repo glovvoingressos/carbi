@@ -12,6 +12,8 @@ const formatPhone = (v: string) => {
     : d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2')
 }
 
+const formatCPF = (v: string) => v.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+
 type ToastFn = (type: 'success' | 'error', message: string) => void
 
 /* ─── Avatar Section ─── */
@@ -105,8 +107,8 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
 }
 
 /* ─── Personal Info ─── */
-function PersonalInfo({ fullName, email, phone, onNameChange, onPhoneChange }: {
-  fullName: string; email: string; phone: string
+function PersonalInfo({ fullName, email, phone, cpf, onNameChange, onPhoneChange }: {
+  fullName: string; email: string; phone: string; cpf: string
   onNameChange: (v: string) => void; onPhoneChange: (v: string) => void
 }) {
   return (
@@ -137,6 +139,19 @@ function PersonalInfo({ fullName, email, phone, onNameChange, onPhoneChange }: {
           <div className="relative">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input value={email} disabled className="w-full h-12 pl-11 pr-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-gray-500 cursor-not-allowed" />
+          </div>
+        </div>
+        <div>
+          <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">CPF</label>
+          <div className="relative">
+            <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input 
+              value={formatCPF(cpf)} 
+              disabled 
+              placeholder="000.000.000-00" 
+              maxLength={14} 
+              className="w-full h-12 pl-11 pr-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-gray-500 cursor-not-allowed" 
+            />
           </div>
         </div>
         <div>
@@ -357,6 +372,7 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
+  const [cpf, setCpf] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -377,12 +393,12 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
     return () => unsub?.()
   }, [supabaseReady])
 
-  useEffect(() => {
+   useEffect(() => {
     if (!userId || !supabaseReady) return
     const load = async () => {
       try {
         const { data, error } = await getSupabaseBrowserClient()
-          .from('users').select('id,email,full_name,avatar_url,phone')
+          .from('users').select('id,email,full_name,avatar_url,phone,cpf')
           .eq('id', userId).maybeSingle()
         if (error) {
           console.error('Error loading user profile:', error)
@@ -392,6 +408,7 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
           setFullName(data.full_name || '')
           setAvatarUrl(data.avatar_url || '')
           setPhone(data.phone || '')
+          setCpf(data.cpf || '')
         }
       } catch (e) {
         console.error('Failed to load profile:', e)
@@ -419,12 +436,15 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
       }
 
       // Prepare update data - only send non-null values
-      const updateData: { full_name?: string | null; phone?: string | null } = {}
+      const updateData: { full_name?: string | null; phone?: string | null; cpf?: string | null } = {}
       if (fullName.trim()) {
         updateData.full_name = fullName.trim()
       }
       if (phone.replace(/\D/g, '')) {
         updateData.phone = phone.replace(/\D/g, '')
+      }
+      if (cpf.replace(/\D/g, '')) {
+        updateData.cpf = cpf.replace(/\D/g, '')
       }
 
       console.log('Updating profile with:', { userId, updateData })
@@ -484,7 +504,7 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
       <AvatarSection avatarUrl={avatarUrl} fullName={fullName} email={email} userId={userId} onAvatarChange={setAvatarUrl} uploading={uploading} onUploadingChange={setUploading} />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PersonalInfo fullName={fullName} email={email} phone={phone} onNameChange={setFullName} onPhoneChange={setPhone} />
+        <PersonalInfo fullName={fullName} email={email} phone={phone} cpf={cpf} onNameChange={setFullName} onPhoneChange={setPhone} />
         <SecuritySection userId={userId} toast={showToast} />
       </div>
 
