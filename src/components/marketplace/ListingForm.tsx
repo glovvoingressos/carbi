@@ -225,7 +225,6 @@ export default function ListingForm() {
   const [success, setSuccess] = useState<string | null>(null)
   const [validationDetails, setValidationDetails] = useState<string[]>([])
   const [titleTouched, setTitleTouched] = useState(false)
-  const [isGeneratingDesc, setIsGeneratingDesc] = useState(false)
 
   const resolveCatalogModelName = (brandName: string, rawModelName: string): string => {
     const normalizedRaw = normalize(rawModelName)
@@ -791,25 +790,6 @@ export default function ListingForm() {
     setListingSubStep((prev) => Math.min(4, prev + 1))
   }
 
-  const generateAIDescription = async (carData: { brand: string; model: string; year: number; yearModel: number; color: string; fuel: string; engine: string; horsepower: string; transmission: string; bodyType: string }) => {
-    setIsGeneratingDesc(true)
-    try {
-      const response = await fetch('/api/marketplace/generate-description', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ carData }),
-      })
-      const data = await response.json()
-      if (data.description) {
-        handleInput('description', data.description)
-      }
-    } catch (err) {
-      console.error('Error generating description:', err)
-    } finally {
-      setIsGeneratingDesc(false)
-    }
-  }
-
   const handleSubmit = async () => {
     const validation = validateStep(3)
     if (validation) {
@@ -1038,24 +1018,11 @@ export default function ListingForm() {
                    handleInput('horsepower', data.horsepower)
                    handleInput('transmission', data.transmission)
                    handleInput('bodyType', data.bodyType)
-                   handleInput('plateFinal', data.plate)
-                   if (data.version) {
-                     handleInput('version', data.version)
-                   }
-                   // Generate AI description
-                   generateAIDescription({
-                     brand: data.brand,
-                     model: data.model,
-                     year: data.year,
-                     yearModel: data.yearModel,
-                     color: data.color,
-                     fuel: data.fuel,
-                     engine: data.engine,
-                     horsepower: data.horsepower,
-                     transmission: data.transmission,
-                     bodyType: data.bodyType,
-                   })
-                 }} />
+                    handleInput('plateFinal', data.plate)
+                    if (data.version) {
+                      handleInput('version', data.version)
+                    }
+                  }} />
                 <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
                   Continuar <ArrowRight className="w-4 h-4" />
                 </button>
@@ -1245,17 +1212,7 @@ export default function ListingForm() {
               </div>
               <div>
                 <label htmlFor="listing-description" className="sr-only">Descrição do veículo</label>
-                <div className="relative">
-                  <textarea id="listing-description" className="fingen-flow-input min-h-[180px] sm:min-h-[200px] py-3 resize-none leading-relaxed pr-10" placeholder={isGeneratingDesc ? "Gerando descrição com IA..." : "Descrição do veículo... destaque pontos fortes, revisões e opcionais."} value={form.description} onChange={(e) => handleInput('description', e.target.value)} aria-label="Descrição do veículo" disabled={isGeneratingDesc} />
-                  {isGeneratingDesc && (
-                    <div className="absolute right-3 top-3">
-                      <Loader2 className="w-4 h-4 animate-spin text-[#767676]" />
-                    </div>
-                  )}
-                </div>
-                {isGeneratingDesc && (
-                  <p className="text-xs text-[#767676] mt-1">IA está gerando uma descrição otimizada para SEO...</p>
-                )}
+                <textarea id="listing-description" className="fingen-flow-input min-h-[180px] sm:min-h-[200px] py-3 resize-none leading-relaxed" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} aria-label="Descrição do veículo" />
               </div>
               <div>
                 <label htmlFor="listing-optionals" className="sr-only">Opcionais extras</label>
