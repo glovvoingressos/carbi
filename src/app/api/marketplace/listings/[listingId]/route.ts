@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
-import { sendListingDeletedEmail } from '@/lib/email'
+import { sendListingDeletedEmail, sendListingStatusChangedEmail } from '@/lib/email'
 
 type ListingPatchPayload = {
   title?: string
@@ -149,6 +149,30 @@ export async function PATCH(
           force: true,
         })
       }
+    }
+
+    if (typeof updates.status === 'string') {
+      ;(async () => {
+        try {
+          const { data: userProfile } = await supabase
+            .from('users')
+            .select('email, full_name')
+            .eq('id', auth.userId)
+            .maybeSingle()
+
+          if (userProfile?.email) {
+            await sendListingStatusChangedEmail({
+              userEmail: userProfile.email,
+              userName: userProfile.full_name || 'Anunciante',
+              vehicleTitle: data.title || 'Veículo',
+              newStatus: updates.status as 'active' | 'sold' | 'paused' | 'archived',
+              listingSlug: data.slug || listingId,
+            })
+          }
+        } catch (emailErr) {
+          console.error('Falha ao enviar e-mail de mudança de status:', emailErr)
+        }
+      })()
     }
 
     return NextResponse.json(data)

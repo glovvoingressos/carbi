@@ -3,6 +3,7 @@ import { Resend } from 'resend'
 const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key')
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
+const LOGO_URL = `${SITE_URL}/logo.svg`
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Carbi <onboarding@resend.dev>'
 
 // Função utilitária para formatar valores em Real (BRL)
@@ -40,7 +41,10 @@ export async function sendNewMessageEmail(params: NewMessageEmailParams) {
       subject: `Você recebeu uma nova mensagem sobre o ${vehicleTitle}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 20px;">
-          <h2 style="color: #2563eb;">Nova Mensagem no CarDecision</h2>
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
+          </div>
+          <h2 style="color: #2563eb; text-align: center;">Nova Mensagem no CarDecision</h2>
           <p>Olá, <strong>${recipientName || 'Cliente'}</strong>!</p>
           <p>O usuário <strong>${senderName || 'Alguém'}</strong> enviou uma mensagem a respeito do veículo <strong>${vehicleTitle}</strong>:</p>
           
@@ -99,7 +103,10 @@ export async function sendNewOfferEmail(params: NewOfferEmailParams) {
       subject: `Nova proposta de ${formatBRL(offerAmount)} para o seu ${vehicleTitle}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 20px;">
-          <h2 style="color: #10b981;">Você recebeu uma Proposta!</h2>
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
+          </div>
+          <h2 style="color: #10b981; text-align: center;">Você recebeu uma Proposta!</h2>
           <p>Olá, <strong>${sellerName || 'Vendedor'}</strong>!</p>
           <p>O comprador <strong>${buyerName || 'Interessado'}</strong> fez uma proposta para o seu veículo <strong>${vehicleTitle}</strong>.</p>
           
@@ -186,7 +193,10 @@ export async function sendOfferStatusUpdateEmail(params: OfferStatusUpdateEmailP
       subject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 20px;">
-          <h2 style="color: ${statusColor};">${statusTitle}</h2>
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
+          </div>
+          <h2 style="color: ${statusColor}; text-align: center;">${statusTitle}</h2>
           <p>Olá, <strong>${recipientName || 'Usuário'}</strong>!</p>
           <p>${statusDescription}</p>
 
@@ -259,7 +269,10 @@ export async function sendListingCreatedEmail(params: ListingCreatedEmailParams)
       subject: `Seu anúncio do ${vehicleTitle} está no ar! 🚀`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 20px;">
-          <h2 style="color: #2563eb;">Parabéns! Seu anúncio está ativo</h2>
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
+          </div>
+          <h2 style="color: #2563eb; text-align: center;">Parabéns! Seu anúncio está ativo</h2>
           <p>Olá, <strong>${userName || 'Anunciante'}</strong>!</p>
           <p>Seu veículo <strong>${vehicleTitle}</strong> foi cadastrado com sucesso e já está disponível para compradores de todo o Brasil.</p>
           
@@ -341,7 +354,10 @@ export async function sendAdminNewListingEmail(params: AdminNewListingEmailParam
       subject: `Novo anúncio: ${vehicleTitle} — ${formatBRL(price)}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 20px;">
-          <h2 style="color: #7c3aed;">Novo anúncio no marketplace</h2>
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
+          </div>
+          <h2 style="color: #7c3aed; text-align: center;">Novo anúncio no marketplace</h2>
           <p>Um novo veículo foi anunciado na plataforma CarDecision.</p>
 
           <div style="background-color: #f5f3ff; border-left: 4px solid #7c3aed; padding: 16px; border-radius: 4px; margin: 24px 0;">
@@ -400,7 +416,10 @@ export async function sendListingDeletedEmail(params: ListingDeletedEmailParams)
       subject: `Seu anúncio do ${vehicleTitle} foi removido`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 20px;">
-          <h2 style="color: #4b5563;">Confirmação de Exclusão</h2>
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
+          </div>
+          <h2 style="color: #4b5563; text-align: center;">Confirmação de Exclusão</h2>
           <p>Olá, <strong>${userName || 'Anunciante'}</strong>!</p>
           <p>Confirmamos que o anúncio do veículo <strong>${vehicleTitle}</strong> foi removido do marketplace CarDecision.</p>
           
@@ -429,7 +448,101 @@ export async function sendListingDeletedEmail(params: ListingDeletedEmailParams)
   }
 }
 
-// 7. E-mail de Boas-vindas (Conta Criada)
+// 7. Notificação de Mudança de Status do Anúncio
+interface ListingStatusChangedEmailParams {
+  userEmail: string
+  userName: string
+  vehicleTitle: string
+  newStatus: 'active' | 'sold' | 'paused' | 'archived'
+  listingSlug: string
+}
+
+export async function sendListingStatusChangedEmail(params: ListingStatusChangedEmailParams) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY não configurada. Simulando envio de e-mail de mudança de status.')
+    return { success: true, warning: 'RESEND_API_KEY not configured' }
+  }
+
+  const { userEmail, userName, vehicleTitle, newStatus, listingSlug } = params
+
+  let subject = ''
+  let title = ''
+  let description = ''
+  let statusColor = '#6b7280'
+  let buttonText = 'Ver Anúncio'
+  let buttonLink = `${SITE_URL}/anuncios/${listingSlug}`
+
+  if (newStatus === 'active') {
+    subject = `Seu anúncio do ${vehicleTitle} está ativo!`
+    title = 'Anúncio Ativo'
+    statusColor = '#10b981'
+    description = 'Seu anúncio está visível e disponível para compradores.'
+  } else if (newStatus === 'sold') {
+    subject = `Parabéns! Seu ${vehicleTitle} foi vendido!`
+    title = 'Anúncio Vendido'
+    statusColor = '#2563eb'
+    description = 'Parabéns pela venda! Seu anúncio foi marcado como vendido.'
+    buttonText = 'Ver Anúncio'
+  } else if (newStatus === 'paused') {
+    subject = `Seu anúncio do ${vehicleTitle} foi pausado`
+    title = 'Anúncio Pausado'
+    statusColor = '#f59e0b'
+    description = 'Seu anúncio foi pausado e não está mais visível para compradores.'
+    buttonText = 'Reativar Anúncio'
+  } else if (newStatus === 'archived') {
+    subject = `Seu anúncio do ${vehicleTitle} foi arquivado`
+    title = 'Anúncio Arquivado'
+    statusColor = '#6b7280'
+    description = 'Seu anúncio foi arquivado e não está mais visível.'
+    buttonText = 'Ver Anúncio'
+  }
+
+  try {
+    const data = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: userEmail,
+      subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
+          </div>
+          <h2 style="color: ${statusColor}; text-align: center;">${title}</h2>
+          <p>Olá, <strong>${userName || 'Anunciante'}</strong>!</p>
+          <p>${description}</p>
+          
+          <div style="background-color: #f9fafb; border-left: 4px solid ${statusColor}; padding: 16px; border-radius: 4px; margin: 24px 0;">
+            <p style="margin: 0; font-size: 16px; font-weight: bold; color: #1f2937;">
+              ${vehicleTitle}
+            </p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #6b7280;">
+              Status: ${newStatus === 'active' ? 'Ativo' : newStatus === 'sold' ? 'Vendido' : newStatus === 'paused' ? 'Pausado' : 'Arquivado'}
+            </p>
+          </div>
+
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="${buttonLink}" style="background-color: ${statusColor}; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+              ${buttonText}
+            </a>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
+          <p style="font-size: 12px; color: #6b7280; text-align: center;">
+            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Por favor, não responda a este e-mail.
+          </p>
+        </div>
+      `,
+    })
+
+    return { success: true, data }
+  } catch (error) {
+    console.error('Falha ao enviar e-mail de mudança de status:', error)
+    return { success: false, error }
+  }
+}
+
+// 8. E-mail de Boas-vindas (Conta Criada)
 interface WelcomeEmailParams {
   userEmail: string
   userName: string
@@ -450,7 +563,10 @@ export async function sendWelcomeEmail(params: WelcomeEmailParams) {
       subject: 'Bem-vindo à Carbi! 🚗',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 20px;">
-          <h2 style="color: #2563eb;">Bem-vindo à Carbi!</h2>
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
+          </div>
+          <h2 style="color: #2563eb; text-align: center;">Bem-vindo à Carbi!</h2>
           <p>Olá, <strong>${userName || 'Parceiro'}</strong>!</p>
           <p>Sua conta foi criada com sucesso. Agora você pode anunciar seus carros e encontrar os melhores seminovos do Brasil.</p>
 
