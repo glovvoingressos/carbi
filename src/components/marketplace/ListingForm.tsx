@@ -883,7 +883,8 @@ export default function ListingForm() {
         throw new Error(body.error || 'Falha ao criar anúncio.')
       }
 
-      const created = (await createResponse.json()) as { id: string; slug: string }
+      const created = (await createResponse.json()) as { id: string; slug: string; emailStatus?: unknown }
+      console.log('[DEBUG-EMAIL] POST listing response emailStatus:', created.emailStatus)
 
       const uploaded: Array<{ storage_path: string; public_url: string; sort_order: number; is_primary: boolean }> = []
 

@@ -154,23 +154,35 @@ export async function POST(req: NextRequest) {
     }
 
     // Processamento síncrono para enviar confirmação de anúncio criado por e-mail
+    const emailStatus: Record<string, unknown> = {
+      resendKeyConfigured: Boolean(process.env.RESEND_API_KEY),
+      listingSlug: data.slug,
+    }
+
     try {
-        const { data: userProfile } = await supabase
+        const { data: userProfile, error: userProfileError } = await supabase
           .from('users')
           .select('email, full_name')
           .eq('id', auth.userId)
           .single()
 
+        emailStatus.userProfileError = userProfileError?.message || null
+        emailStatus.usersTableEmailFound = Boolean(userProfile?.email)
+
         let userEmail = userProfile?.email || ''
         let userName = userProfile?.full_name || 'Anunciante'
 
         if (!userEmail) {
-          const { data: authUser } = await supabase.auth.getUser(auth.accessToken)
+          const { data: authUser, error: authUserError } = await supabase.auth.getUser(auth.accessToken)
+          emailStatus.authUserError = authUserError?.message || null
           userEmail = authUser?.user?.email || ''
           if (!userName && authUser?.user?.user_metadata?.full_name) {
             userName = authUser.user.user_metadata.full_name
           }
         }
+
+        emailStatus.userEmail = userEmail
+        emailStatus.userName = userName
 
         console.log('[DEBUG-EMAIL] Attempting to send listing created email', {
           userId: auth.userId,
@@ -190,11 +202,13 @@ export async function POST(req: NextRequest) {
             listingSlug: data.slug
           })
           console.log('[DEBUG-EMAIL] listing created email result', createdResult)
+          emailStatus.userEmailSent = createdResult
         } else {
           console.warn('[DEBUG-EMAIL] listing created email skipped: userEmail is empty', {
             userId: auth.userId,
             userProfile,
           })
+          emailStatus.userEmailSkipped = 'userEmail is empty'
         }
 
         const adminResult = await sendAdminNewListingEmail({
@@ -210,8 +224,10 @@ export async function POST(req: NextRequest) {
           listingSlug: data.slug
         })
         console.log('[email] admin new listing email result', adminResult)
+        emailStatus.adminEmailSent = adminResult
     } catch (emailErr) {
         console.error('[email] listing created email failed', emailErr)
+        emailStatus.error = emailErr instanceof Error ? emailErr.message : String(emailErr)
     }
 
     if (payload.vin) {
@@ -232,7 +248,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ...data, vehicle_id: vehicle.id }, { status: 201 })
+    return NextResponse.json({ ...data, vehicle_id: vehicle.id, emailStatus }, { status: 201 })
   } catch (error) {
     console.error('POST /api/marketplace/listings failed', error)
     return NextResponse.json({ error: 'Falha ao criar anúncio.' }, { status: 500 })
