@@ -65,7 +65,7 @@ function MessageBubble({ message, isMine, showName }: { message: MessageItem; is
         }`}
       >
         {!isMine && showName && (
-          <p className="text-[11px] font-semibold text-gray-500 mb-1.5">{message.sender_name}</p>
+          <p className="text-[11px] font-semibold text-gray-500! mb-1.5">{message.sender_name}</p>
         )}
         <p className={`text-sm leading-relaxed break-words ${isMine ? 'text-white!' : 'text-[#1A1A1A]!'}`}>{message.message}</p>
         <div className={`flex items-center gap-1.5 mt-2 ${isMine ? 'justify-end' : 'justify-start'}`}>
@@ -285,17 +285,17 @@ export default function ConversationInbox() {
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
-                <p className={`text-sm font-bold truncate ${selectedId === c.id ? 'text-white' : 'text-[#1A1A1A]'}`}>
+                <p className={`text-sm font-bold truncate ${selectedId === c.id ? 'text-white!' : 'text-[#1A1A1A]!'}`}>
                   {c.vehicle_listings_public.title}
                 </p>
                 {c.is_unread && selectedId !== c.id && (
                   <span className="w-3 h-3 rounded-full bg-[#D4F576] shrink-0" />
                 )}
               </div>
-              <p className={`text-xs mt-0.5 ${selectedId === c.id ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p className={`text-xs mt-0.5 ${selectedId === c.id ? 'text-gray-400!' : 'text-gray-500!'}`}>
                 {formatBRL(Number(c.vehicle_listings_public.price))} · {c.vehicle_listings_public.city}/{c.vehicle_listings_public.state}
               </p>
-              <p className={`text-xs mt-1.5 truncate ${selectedId === c.id ? 'text-gray-400' : 'text-gray-400'}`}>
+              <p className="text-xs mt-1.5 truncate text-gray-400!">
                 {c.last_message_preview || 'Conversa iniciada'}
               </p>
             </div>
@@ -306,8 +306,8 @@ export default function ConversationInbox() {
             <div className="w-20 h-20 rounded-2xl bg-[#F8F9FA] flex items-center justify-center mb-5">
               <MessageSquare className="w-10 h-10 text-gray-300" strokeWidth={1.5} />
             </div>
-            <p className="text-lg font-bold text-[#1A1A1A]">Nenhuma conversa</p>
-            <p className="text-sm text-gray-500 mt-2 max-w-[280px]">Conversas com vendedores aparecerão aqui.</p>
+            <p className="text-lg font-bold text-[#1A1A1A]!">Nenhuma conversa</p>
+            <p className="text-sm text-gray-500! mt-2 max-w-[280px]">Conversas com vendedores aparecerão aqui.</p>
           </div>
         )}
       </div>
@@ -323,8 +323,8 @@ export default function ConversationInbox() {
         </button>
         <ConversationThumb images={selectedConversation.vehicle_listings_public.images} title={selectedConversation.vehicle_listings_public.title} className="w-12 h-12 rounded-2xl" />
         <div className="flex-1 min-w-0">
-          <p className="text-base font-bold text-[#1A1A1A] truncate">{selectedConversation.vehicle_listings_public.title}</p>
-          <p className="text-sm text-gray-500 truncate mt-0.5">
+          <p className="text-base font-bold text-[#1A1A1A]! truncate">{selectedConversation.vehicle_listings_public.title}</p>
+          <p className="text-sm text-gray-500! truncate mt-0.5">
             {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} · {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
           </p>
         </div>
@@ -344,7 +344,7 @@ export default function ConversationInbox() {
         {loadingMessages && messages.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16">
             <Loader2 className="w-8 h-8 animate-spin text-gray-300" />
-            <p className="text-sm text-gray-400 mt-4">Carregando mensagens...</p>
+            <p className="text-sm text-gray-400! mt-4">Carregando mensagens...</p>
           </div>
         )}
         <div className="grid gap-4">
@@ -377,7 +377,7 @@ export default function ConversationInbox() {
         <MessageSquare className="w-12 h-12 text-gray-300" strokeWidth={1.5} />
       </div>
       <h2 className="text-xl font-bold text-[#1A1A1A]">Selecione uma conversa</h2>
-      <p className="text-sm text-gray-500 mt-3 max-w-[300px]">O histórico de mensagens aparecerá aqui em tempo real.</p>
+      <p className="text-sm text-gray-500! mt-3 max-w-[300px]">O histórico de mensagens aparecerá aqui em tempo real.</p>
     </div>
   )
 
@@ -386,7 +386,7 @@ export default function ConversationInbox() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">Mensagens</h1>
-        <p className="text-sm text-gray-500 mt-1">{conversations.length} conversa{conversations.length !== 1 ? 's' : ''}</p>
+        <p className="text-sm text-gray-500! mt-1">{conversations.length} conversa{conversations.length !== 1 ? 's' : ''}</p>
       </div>
 
       <div className="min-h-[500px] lg:h-[calc(100vh-280px)]">
