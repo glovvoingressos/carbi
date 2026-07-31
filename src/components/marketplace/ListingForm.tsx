@@ -27,19 +27,26 @@ import { brandsAreEquivalent } from '@/lib/brand-normalization'
 
 const DRAFT_KEY = 'carbi_listing_draft_v1'
 
-// Format price input: 123456 -> 1.234,56
+// Improved price input formatting
 const formatPriceInput = (value: string): string => {
   const numbers = value.replace(/\D/g, '')
   if (!numbers) return ''
-  const num = parseInt(numbers, 10)
-  return num.toLocaleString('pt-BR')
+  
+  // Convert cents to string with decimal
+  const cents = parseInt(numbers, 10)
+  const formatted = (cents / 100).toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+  
+  return formatted
 }
 
-// Parse formatted price: 1.234,56 -> 1234.56 (number)
+// Parse formatted price: 1.234,56 -> 1234.56 (number as string)
 const parsePriceInput = (value: string): string => {
-  const cleaned = value.replace(/\./g, '').replace(',', '.')
-  const num = parseFloat(cleaned)
-  if (isNaN(num) || num < 0) return ''
+  const cleaned = value.replace(/\D/g, '')
+  if (!cleaned) return ''
+  const num = parseInt(cleaned, 10) / 100
   return String(num)
 }
 

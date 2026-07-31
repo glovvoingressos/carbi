@@ -153,9 +153,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Processamento assíncrono para enviar confirmação de anúncio criado por e-mail
-    ;(async () => {
-      try {
+    // Processamento síncrono para enviar confirmação de anúncio criado por e-mail
+    try {
         const { data: userProfile } = await supabase
           .from('users')
           .select('email, full_name')
@@ -173,7 +172,7 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        console.log('[email] listing created email attempt', {
+        console.log('[DEBUG-EMAIL] Attempting to send listing created email', {
           userId: auth.userId,
           userEmail,
           userName,
@@ -182,6 +181,7 @@ export async function POST(req: NextRequest) {
         })
 
         if (userEmail) {
+          console.log('[DEBUG-EMAIL] Calling sendListingCreatedEmail', { userEmail })
           const createdResult = await sendListingCreatedEmail({
             userEmail,
             userName,
@@ -189,9 +189,9 @@ export async function POST(req: NextRequest) {
             price: payload.price,
             listingSlug: data.slug
           })
-          console.log('[email] listing created email result', createdResult)
+          console.log('[DEBUG-EMAIL] listing created email result', createdResult)
         } else {
-          console.warn('[email] listing created email skipped: userEmail is empty', {
+          console.warn('[DEBUG-EMAIL] listing created email skipped: userEmail is empty', {
             userId: auth.userId,
             userProfile,
           })
@@ -210,10 +210,9 @@ export async function POST(req: NextRequest) {
           listingSlug: data.slug
         })
         console.log('[email] admin new listing email result', adminResult)
-      } catch (emailErr) {
+    } catch (emailErr) {
         console.error('[email] listing created email failed', emailErr)
-      }
-    })()
+    }
 
     if (payload.vin) {
       const sync = await runAutoDevSync({
