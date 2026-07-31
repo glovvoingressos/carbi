@@ -4461,8 +4461,8 @@ p {
 .conversation-bubble.is-mine {
   border-color: transparent;
   border-radius: 20px 20px 6px 20px;
-  background: var(--ink);
-  color: #FFFDF3;
+  background: #1A1A1A;
+  color: #ffffff;
 }
 
 .conversation-bubble p {
@@ -4475,17 +4475,17 @@ p {
 .conversation-bubble time {
   display: block;
   margin-top: 5px;
-  color: #8A95A8;
+  color: #9CA3AF;
   font-size: 10px;
   font-weight: 700;
 }
 
 .conversation-bubble.is-mine time {
-  color: rgba(255,253,243,.7);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .conversation-bubble.is-mine p {
-  color: #FFFDF3;
+  color: #ffffff;
 }
 
 .conversation-bubble:not(.is-mine) p {
