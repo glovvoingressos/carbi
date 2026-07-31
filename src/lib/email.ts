@@ -2,6 +2,19 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key')
 
+type ResendSendResult = {
+  data: { id: string } | null
+  error: { message: string; statusCode: number | null; name: string } | null
+}
+
+function toSendResult(response: ResendSendResult & { headers?: Record<string, string> | null }) {
+  if (response?.error) {
+    console.error('Resend retornou erro:', JSON.stringify(response.error))
+    return { success: false, error: response.error }
+  }
+  return { success: true, data: response?.data ?? null }
+}
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 const LOGO_URL = `${SITE_URL}/logo.svg`
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Carbi <onboarding@resend.dev>'
@@ -67,7 +80,7 @@ export async function sendNewMessageEmail(params: NewMessageEmailParams) {
       `,
     })
 
-    return { success: true, data }
+    return toSendResult(data)
   } catch (error) {
     console.error('Falha ao enviar o e-mail via Resend:', error)
     return { success: false, error }
@@ -135,7 +148,7 @@ export async function sendNewOfferEmail(params: NewOfferEmailParams) {
       `,
     })
 
-    return { success: true, data }
+    return toSendResult(data)
   } catch (error) {
     console.error('Falha ao enviar e-mail de nova proposta:', error)
     return { success: false, error }
@@ -236,7 +249,7 @@ export async function sendOfferStatusUpdateEmail(params: OfferStatusUpdateEmailP
       `,
     })
 
-    return { success: true, data }
+    return toSendResult(data)
   } catch (error) {
     console.error('Falha ao enviar e-mail de atualização de proposta:', error)
     return { success: false, error }
@@ -309,7 +322,7 @@ export async function sendListingCreatedEmail(params: ListingCreatedEmailParams)
       `,
     })
 
-    return { success: true, data }
+    return toSendResult(data)
   } catch (error) {
     console.error('Falha ao enviar e-mail de anúncio ativo:', error)
     return { success: false, error }
@@ -387,7 +400,7 @@ export async function sendAdminNewListingEmail(params: AdminNewListingEmailParam
       `,
     })
 
-    return { success: true, data }
+    return toSendResult(data)
   } catch (error) {
     console.error('Falha ao enviar e-mail de novo anúncio para o admin:', error)
     return { success: false, error }
@@ -441,7 +454,7 @@ export async function sendListingDeletedEmail(params: ListingDeletedEmailParams)
       `,
     })
 
-    return { success: true, data }
+    return toSendResult(data)
   } catch (error) {
     console.error('Falha ao enviar e-mail de exclusão de anúncio:', error)
     return { success: false, error }
@@ -535,7 +548,7 @@ export async function sendListingStatusChangedEmail(params: ListingStatusChanged
       `,
     })
 
-    return { success: true, data }
+    return toSendResult(data)
   } catch (error) {
     console.error('Falha ao enviar e-mail de mudança de status:', error)
     return { success: false, error }
@@ -603,7 +616,7 @@ export async function sendWelcomeEmail(params: WelcomeEmailParams) {
       `,
     })
 
-    return { success: true, data }
+    return toSendResult(data)
   } catch (error) {
     console.error('Falha ao enviar e-mail de boas-vindas:', error)
     return { success: false, error }
