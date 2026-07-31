@@ -67,7 +67,7 @@ function MessageBubble({ message, isMine, showName }: { message: MessageItem; is
         {!isMine && showName && (
           <p className="text-[11px] font-semibold text-gray-500 mb-1.5">{message.sender_name}</p>
         )}
-        <p className="text-sm leading-relaxed break-words">{message.message}</p>
+        <p className={`text-sm leading-relaxed break-words ${isMine ? 'text-white' : 'text-[#1A1A1A]'}`}>{message.message}</p>
         <div className={`flex items-center gap-1.5 mt-2 ${isMine ? 'justify-end' : 'justify-start'}`}>
           <time className={`text-[10px] ${isMine ? 'text-white/70' : 'text-gray-400'}`}>
             {formatTime(message.created_at)}
