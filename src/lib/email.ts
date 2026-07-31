@@ -17,7 +17,7 @@ function toSendResult(response: ResendSendResult & { headers?: Record<string, st
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 const LOGO_URL = `${SITE_URL}/logo.svg`
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Carbi <onboarding@resend.dev>'
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Carbi <noreply@carbi.com.br>'
 
 // Função utilitária para formatar valores em Real (BRL)
 function formatBRL(value: number): string {
