@@ -22,27 +22,16 @@ const ease = [0.23, 1, 0.32, 1] as const
 // Price formatting helpers
 const formatPriceDisplay = (value: number | string): string => {
   const num = typeof value === 'string'
-    ? parseFloat(value.replace(/\./g, '').replace(',', '.'))
+    ? parseFloat(value.replace(/[^\d,.]/g, '').replace(/\./g, '').replace(',', '.'))
     : value
   if (isNaN(num) || num <= 0) return ''
-  return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return Math.round(num).toLocaleString('pt-BR')
 }
 
 const parsePriceInput = (input: string): number => {
-  // If input is empty, return 0
-  if (!input) return 0
-  
-  // Clean string: remove all characters except digits, dots and commas
-  const cleaned = input.replace(/[^0-9,.]/g, '')
-  
-  // If it's a simple number string without decimals, parse it directly
-  if (!cleaned.includes(',') && !cleaned.includes('.')) {
-    return parseFloat(cleaned) || 0
-  }
-
-  // Handle Brazilian formatting: 1.234,56
-  const normalized = cleaned.replace(/\./g, '').replace(',', '.')
-  return parseFloat(normalized) || 0
+  const cleaned = input.replace(/\D/g, '')
+  if (!cleaned) return 0
+  return parseInt(cleaned, 10)
 }
 
 // ── StatusBadge ────────────────────────────────────────
