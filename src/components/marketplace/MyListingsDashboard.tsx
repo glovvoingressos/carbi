@@ -21,15 +21,18 @@ const ease = [0.23, 1, 0.32, 1] as const
 
 // Price formatting helpers
 const formatPriceDisplay = (value: number | string): string => {
-  const num = typeof value === 'string' ? parseFloat(value.replace(/[^\d]/g, '')) : value
-  if (isNaN(num) || num === 0) return ''
+  const num = typeof value === 'string'
+    ? parseFloat(value.replace(/\./g, '').replace(',', '.'))
+    : value
+  if (isNaN(num) || num <= 0) return ''
   return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 const parsePriceInput = (input: string): number => {
-  const cleaned = input.replace(/[^\d]/g, '')
-  if (!cleaned) return 0
-  return parseInt(cleaned, 10)
+  const cleaned = input.replace(/\./g, '').replace(',', '.')
+  const num = parseFloat(cleaned)
+  if (isNaN(num) || num < 0) return 0
+  return num
 }
 
 // ── StatusBadge ────────────────────────────────────────
