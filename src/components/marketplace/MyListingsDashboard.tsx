@@ -29,10 +29,20 @@ const formatPriceDisplay = (value: number | string): string => {
 }
 
 const parsePriceInput = (input: string): number => {
-  const cleaned = input.replace(/\./g, '').replace(',', '.')
-  const num = parseFloat(cleaned)
-  if (isNaN(num) || num < 0) return 0
-  return num
+  // If input is empty, return 0
+  if (!input) return 0
+  
+  // Clean string: remove all characters except digits, dots and commas
+  const cleaned = input.replace(/[^0-9,.]/g, '')
+  
+  // If it's a simple number string without decimals, parse it directly
+  if (!cleaned.includes(',') && !cleaned.includes('.')) {
+    return parseFloat(cleaned) || 0
+  }
+
+  // Handle Brazilian formatting: 1.234,56
+  const normalized = cleaned.replace(/\./g, '').replace(',', '.')
+  return parseFloat(normalized) || 0
 }
 
 // ── StatusBadge ────────────────────────────────────────
