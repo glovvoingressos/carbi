@@ -162,7 +162,7 @@ export async function GET(req: NextRequest) {
 
     let query = supabase
       .from('offers')
-      .select('*, buyer:buyer_user_id(id, email), seller:seller_user_id(id, email)')
+      .select('*')
       .order('created_at', { ascending: false })
 
     if (listingId) {

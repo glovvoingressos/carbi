@@ -23,7 +23,7 @@ export async function GET(
 
     const { data: offer, error } = await supabase
       .from('offers')
-      .select('*, buyer:buyer_user_id(id, email), seller:seller_user_id(id, email)')
+      .select('*')
       .eq('id', offerId)
       .single()
 
