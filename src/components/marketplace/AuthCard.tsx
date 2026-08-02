@@ -139,7 +139,10 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
       if (mode === 'login') {
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
         if (signInError) { setError('E-mail ou senha incorretos.'); return }
-        await supabase.from('users').upsert({ id: (await supabase.auth.getUser()).data.user!.id, email, full_name: fullName || null }, { onConflict: 'id' })
+        const user = (await supabase.auth.getUser()).data.user
+        if (user?.id) {
+          await supabase.from('users').upsert({ id: user.id, email, full_name: fullName || null }, { onConflict: 'id' }).catch(() => {})
+        }
         onAuthenticated?.()
         if (redirectTo) router.push(redirectTo)
       } else if (mode === 'signup') {
@@ -166,11 +169,13 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
           console.error('Signup returned no user id', data)
           return
         }
-        const { error: upsertError } = await supabase.from('users').upsert({ id: data.user.id, email, full_name: fullName, phone: phone.replace(/\D/g, ''), cpf: cpf.replace(/\D/g, '') }, { onConflict: 'id' })
-        if (upsertError) {
-          console.error('Failed to save user profile after signup:', upsertError)
-          setError('Conta criada, mas não foi possível salvar seus dados no perfil. Entre em contato com o suporte.')
-          return
+        if (data.session) {
+          const { error: upsertError } = await supabase.from('users').upsert({ id: data.user.id, email, full_name: fullName, phone: phone.replace(/\D/g, ''), cpf: cpf.replace(/\D/g, '') }, { onConflict: 'id' })
+          if (upsertError) {
+            console.error('Failed to save user profile after signup:', upsertError)
+            setError('Conta criada, mas não foi possível salvar seus dados no perfil. Entre em contato com o suporte.')
+            return
+          }
         }
         let welcomeSent = false
         try {
