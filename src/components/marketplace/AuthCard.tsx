@@ -194,11 +194,15 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         } catch (e) { console.error('Welcome email fetch failed:', e) }
         if (!data.session) {
           try {
-            await fetch('/api/auth/confirm-email', {
+            const confirmRes = await fetch('/api/auth/confirm-email', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ userId: data.user.id, email, name: fullName }),
             })
+            if (!confirmRes.ok) {
+              const errText = await confirmRes.text().catch(() => '')
+              console.error('Confirmation email endpoint failed:', confirmRes.status, errText)
+            }
           } catch (e) { console.error('Fallback confirmation email failed:', e) }
         }
         setMessage(data.session ? 'Conta criada com sucesso!' : 'Conta criada! Confirme seu e-mail para continuar. Verifique também a pasta de spam.')
