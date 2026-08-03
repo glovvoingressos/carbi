@@ -146,13 +146,15 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         onAuthenticated?.()
         if (redirectTo) router.push(redirectTo)
       } else if (mode === 'signup') {
+        const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'}/auth/callback`
         const { data, error: signUpError } = await supabase.auth.signUp({
           email, password,
           options: {
             data: { full_name: fullName, cpf: cpf.replace(/\D/g, ''), phone: phone.replace(/\D/g, '') },
-            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
+            emailRedirectTo: redirectUrl,
           },
         })
+        console.debug('[AuthCard signup]', { email, hasError: !!signUpError, session: !!data?.session, userId: data?.user?.id })
         if (signUpError) {
           const raw = (signUpError as any)?.message || ''
           const friendly = raw.includes('already')
@@ -194,7 +196,8 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         if (data.session && onAuthenticated) onAuthenticated()
         if (data.session && redirectTo) router.push(redirectTo)
       } else if (mode === 'forgot') {
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/reset-password` : undefined })
+        const resetRedirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'}/auth/reset-password`
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: resetRedirectUrl })
         if (resetError) { setError(resetError.message); return }
         setMessage('Link enviado! Verifique sua caixa de entrada e a pasta de spam.')
       }
