@@ -18,11 +18,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Admin client not configured' }, { status: 500 })
     }
 
+    // 'magiclink' funciona para usuários já criados (mesmo não confirmados) e
+    // não exige a senha, ao contrário de type: 'signup'.
     const { data, error } = await supabase.auth.admin.generateLink({
-      type: 'signup',
+      type: 'magiclink',
       email,
       options: {
-        email_redirect_to: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'}/auth/callback`,
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'}/auth/callback`,
       },
     })
 
