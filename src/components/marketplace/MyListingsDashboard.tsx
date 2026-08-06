@@ -570,7 +570,7 @@ export default function MyListingsDashboard() {
               <p className="mt-2" style={{ color: 'rgba(255,255,255,0.85)' }}>{listings.length} anúncio{listings.length !== 1 ? 's' : ''} encontrado{listings.length !== 1 ? 's' : ''}</p>
             </div>
             <button
-              onClick={() => router.push('/anunciar')}
+              onClick={() => router.push('/anunciar-carro')}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-colors"
               style={{ backgroundColor: '#D4F576', color: '#1A1A1A' }}
             >
@@ -633,7 +633,7 @@ export default function MyListingsDashboard() {
               <p className="text-lg font-bold text-[#1A1A1A]">Nenhum anúncio</p>
               <p className="text-sm text-gray-500 mt-2 mb-6">Crie seu primeiro anúncio para começar a vender.</p>
               <button
-                onClick={() => router.push('/anunciar')}
+                onClick={() => router.push('/anunciar-carro')}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1A1A] text-[#D4F576] rounded-xl text-sm font-bold hover:bg-[#2D2D2D] transition-colors"
               >
                 <Plus className="w-4 h-4" /> Criar anúncio
