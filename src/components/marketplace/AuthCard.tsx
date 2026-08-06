@@ -157,11 +157,13 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         console.debug('[AuthCard signup]', { email, hasError: !!signUpError, session: !!data?.session, userId: data?.user?.id })
         if (signUpError) {
           const raw = (signUpError as any)?.message || ''
-          const friendly = raw.includes('already')
-            ? 'Este e-mail já está cadastrado.'
-            : raw
-              ? `Não foi possível criar a conta: ${raw}`
-              : 'Não foi possível criar a conta. Verifique os dados e tente novamente.'
+          const friendly = raw.includes('rate limit') || raw.includes('rate_limit')
+            ? 'Você excedeu o limite de envio de e-mails. Aguarde alguns minutos e tente novamente.'
+            : raw.includes('already')
+              ? 'Este e-mail já está cadastrado.'
+              : raw
+                ? `Não foi possível criar a conta: ${raw}`
+                : 'Não foi possível criar a conta. Verifique os dados e tente novamente.'
           setError(friendly)
           console.error('Signup error:', signUpError)
           return
