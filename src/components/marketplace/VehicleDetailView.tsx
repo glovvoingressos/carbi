@@ -26,6 +26,7 @@ import { trackEvent } from '@/lib/analytics'
 import ListingImageGallery from './ListingImageGallery'
 import ChatStarter from './ChatStarter'
 import OfferHistory from './OfferHistory'
+import FipeHistoryChart from './FipeHistoryChart'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import MarketplaceListingImage from './MarketplaceListingImage'
 import ConfirmModal from '@/components/animations/ConfirmModal'
@@ -261,6 +262,16 @@ export default function VehicleDetailView({
               </div>
             )}
           </section>
+        )}
+
+        {/* FIPE History Chart */}
+        {fipePrice && (
+          <FipeHistoryChart
+            brand={listing.brand}
+            model={listing.model}
+            version={listing.version}
+            year={listing.year_model}
+          />
         )}
 
         {/* Details */}

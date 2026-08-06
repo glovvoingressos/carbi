@@ -333,3 +333,59 @@ export async function getFipeHistory(
 
   return history.filter((h): h is { year: number; price: string; priceNum: number } => h !== null)
 }
+
+export async function getFipeMonthlyHistory(
+  brandName: string,
+  modelName: string,
+  year: number | string,
+  versionName?: string,
+  monthsCount = 5
+): Promise<{ month: string; price: string; priceNum: number }[]> {
+  const targetYear = typeof year === 'number' ? year : parseInt(year, 10)
+  if (!targetYear) return []
+
+  const resolved = await resolveBrandAndModel(brandName, modelName, 'cars', versionName)
+  if (!resolved) return []
+
+  const versions = await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, targetYear)
+  if (versions.length === 0) return []
+
+  let selected = versions[0]
+  if (versionName) {
+    const nv = normalize(versionName)
+    const match = versions.find(v => normalize(v.name).includes(nv)) ||
+                  versions.find(v => nv.includes(normalize(v.name)))
+    if (match) selected = match
+  }
+
+  const refs = await getFipeReferences()
+  const recentRefs = refs.slice(0, monthsCount)
+
+  const results = await Promise.allSettled(
+    recentRefs.map(async (ref) => {
+      const url = `${BASE_URL}/cars/brands/${resolved.brand.code}/models/${resolved.model.code}/years/${selected.code}?reference=${ref.code}`
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (FIPE_API_TOKEN) headers['X-Subscription-Token'] = FIPE_API_TOKEN
+
+      const res = await fetch(url, {
+        headers,
+        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(8000),
+      })
+      if (!res.ok) return null
+
+      const data = await res.json()
+      if (!data?.price) return null
+
+      const priceNum = parseFloat(data.price.replace(/[^\d,]/g, '').replace(',', '.'))
+      return { month: ref.name, price: data.price, priceNum: isNaN(priceNum) ? 0 : priceNum }
+    })
+  )
+
+  return results
+    .filter((r): r is PromiseFulfilledResult<{ month: string; price: string; priceNum: number }> =>
+      r.status === 'fulfilled' && r.value !== null
+    )
+    .map(r => r.value)
+    .reverse()
+}
