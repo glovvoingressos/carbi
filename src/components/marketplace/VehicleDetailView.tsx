@@ -92,7 +92,6 @@ export default function VehicleDetailView({
   const [pageUrl, setPageUrl] = useState('')
   const [copied, setCopied] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
-  const [viewCount, setViewCount] = useState(listing.view_count || 0)
   const isSeller = sessionUserId === listing.user_id
 
   useEffect(() => {
@@ -105,11 +104,6 @@ export default function VehicleDetailView({
         setAccessToken(session.access_token)
       }
     })
-
-    // Track view (non-blocking)
-    fetch(`/api/marketplace/listings/${listing.id}/views`, { method: 'POST' })
-      .then(() => setViewCount((v) => v + 1))
-      .catch(() => {})
 
     // GA event: view_item
     trackEvent('view_item', {
@@ -233,15 +227,6 @@ export default function VehicleDetailView({
             <div className="fingen-detail-location">
               <MapPin size={14} />
               {listing.city} / {listing.state}
-            </div>
-
-            {/* View count */}
-            <div className="fingen-detail-view-count">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-              {viewCount.toLocaleString('pt-BR')} visualizações
             </div>
           </section>
 
