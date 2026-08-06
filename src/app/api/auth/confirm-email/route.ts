@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
     const fromEmail = process.env.RESEND_FROM_EMAIL || 'Carbi <noreply@carbi.com.br>'
 
-    await resend.emails.send({
+    const { data: emailData, error: emailError } = await resend.emails.send({
       from: fromEmail,
       to: email,
       subject: 'Confirme seu e-mail — Carbi',
@@ -75,7 +75,12 @@ export async function POST(request: NextRequest) {
       `,
     })
 
-    return NextResponse.json({ ok: true, confirmationLink })
+    if (emailError) {
+      console.error('Confirm-email route: Resend send failed:', JSON.stringify(emailError))
+      return NextResponse.json({ error: 'Falha ao enviar o e-mail de confirmação' }, { status: 502 })
+    }
+
+    return NextResponse.json({ ok: true, confirmationLink, emailId: emailData?.id ?? null })
   } catch (e) {
     console.error('Confirm-email route error:', e)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })

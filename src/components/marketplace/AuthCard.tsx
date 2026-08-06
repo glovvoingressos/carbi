@@ -171,6 +171,11 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
           console.error('Signup returned no user id', data)
           return
         }
+        if (!data.user.identities?.length) {
+          setError('Este e-mail já está cadastrado. Entre na sua conta para continuar.')
+          console.info('[AuthCard signup] email já cadastrado (anti-enumeração): nenhum e-mail de confirmação é enviado.')
+          return
+        }
         if (data.session) {
           const { error: upsertError } = await supabase.from('users').upsert({ id: data.user.id, email, full_name: fullName, phone: phone.replace(/\D/g, ''), cpf: cpf.replace(/\D/g, '') }, { onConflict: 'id' })
           if (upsertError) {
