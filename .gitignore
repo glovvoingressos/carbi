@@ -27,7 +27,12 @@ npm-debug.log*
 .cursor/
 .gemini/
 .impeccable/
+.mimocode/
 .opencode/
+.qwen/
+
+# supabase local CLI state
+supabase/.temp/
 
 # backup files
 *.bak
