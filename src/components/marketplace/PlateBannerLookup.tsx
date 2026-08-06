@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Loader2, AlertCircle, Check, TrendingUp, Car } from 'lucide-react'
+import { Search, Loader2, AlertCircle, Check, Car } from 'lucide-react'
 import { lookupPlateClient, savePlateLookup } from '@/lib/integrations/placaapi/client'
 import { formatBRL } from '@/data/cars'
 
