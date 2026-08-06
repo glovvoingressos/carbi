@@ -15,6 +15,7 @@ import { GridPattern } from '@/components/ui/grid-pattern'
 import { cn } from '@/lib/utils'
 import { GlareCard } from '@/components/ui/glare-card'
 import BrandLogo from '@/components/brand/BrandLogo'
+import PlateBannerLookup from '@/components/marketplace/PlateBannerLookup'
 
 export const dynamic = 'force-dynamic'
 
@@ -204,14 +205,17 @@ export default async function HomePage() {
 
         {/* Free Promo Banner */}
         <section className="fingen-banner fingen-promo-banner">
-          <div className="fingen-banner-content fingen-promo-content">
-            <div className="fingen-banner-text">
-              <strong>Anuncie grátis por tempo limitado</strong>
-              <span>Publique seu carro sem custo e alcance milhares de compradores.</span>
+          <div className="fingen-banner-content fingen-promo-content fingen-promo-column">
+            <div className="fingen-promo-top">
+              <div className="fingen-banner-text">
+                <strong>Anuncie grátis por tempo limitado</strong>
+                <span>Publique seu carro sem custo e alcance milhares de compradores.</span>
+              </div>
+              <Link href="/anunciar-carro/fluxo" className="fingen-banner-btn fingen-promo-btn">
+                Começar agora
+              </Link>
             </div>
-            <Link href="/anunciar-carro" className="fingen-banner-btn fingen-promo-btn">
-              Começar agora
-            </Link>
+            <PlateBannerLookup />
           </div>
         </section>
 
