@@ -149,7 +149,11 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
           await supabase.from('users').upsert(syncData, { onConflict: 'id' }).catch(() => {})
         }
         onAuthenticated?.()
-        if (redirectTo) router.push(redirectTo)
+        if (redirectTo) {
+          router.push(redirectTo)
+        } else if (!onAuthenticated) {
+          router.push('/minha-conta')
+        }
       } else if (mode === 'signup') {
         const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'}/auth/callback`
         const { data, error: signUpError } = await supabase.auth.signUp({
