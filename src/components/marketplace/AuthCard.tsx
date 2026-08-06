@@ -141,7 +141,12 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         if (signInError) { setError('E-mail ou senha incorretos.'); return }
         const user = (await supabase.auth.getUser()).data.user
         if (user?.id) {
-          await supabase.from('users').upsert({ id: user.id, email, full_name: fullName || null }, { onConflict: 'id' }).catch(() => {})
+          const meta = user.user_metadata || {}
+          const syncData: Record<string, string> = { id: user.id, email: user.email || email }
+          if (meta.full_name) syncData.full_name = meta.full_name
+          if (meta.phone) syncData.phone = meta.phone
+          if (meta.cpf) syncData.cpf = meta.cpf
+          await supabase.from('users').upsert(syncData, { onConflict: 'id' }).catch(() => {})
         }
         onAuthenticated?.()
         if (redirectTo) router.push(redirectTo)
