@@ -64,7 +64,7 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
       <div className="fingen-detail-dark-header">
         <h3 style={{ color: '#FFFFFF' }}>Histórico FIPE</h3>
         {data.length > 0 ? (
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>últimos {data.length} meses</span>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>últimos {data.length} registros</span>
         ) : null}
       </div>
 
@@ -134,7 +134,7 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
             color: 'rgba(255,255,255,0.55)',
           }}>
             <TrendingDown size={14} />
-            Variação de {formatBRL(minPrice)} a {formatBRL(maxPrice)} nos últimos {data.length} meses
+            Variação de {formatBRL(minPrice)} a {formatBRL(maxPrice)}
           </div>
         </div>
       ) : (
