@@ -8,7 +8,8 @@ import Link from 'next/link'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import { trackEvent } from '@/lib/analytics'
-import AuthCard from '@/components/marketplace/AuthCard'
+import { lookupPlateClient, readPlateLookup } from '@/lib/integrations/placaapi/client'
+import type { PlacaApiResponse } from '@/lib/integrations/placaapi/types'
 import PlateInput from '@/components/marketplace/PlateInput'
 import {
   LISTING_ALLOWED_TYPES,
@@ -125,6 +126,35 @@ const INITIAL_STATE: FormState = {
 
 }
 
+const ACCOUNT_INITIAL = { name: '', phone: '', cpf: '', email: '', password: '', confirmPassword: '' }
+
+function formatCPF(v: string) {
+  const d = v.replace(/\D/g, '').slice(0, 11)
+  return d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+}
+
+function formatPhone(v: string) {
+  const d = v.replace(/\D/g, '').slice(0, 11)
+  return d.length <= 10
+    ? d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2')
+    : d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2')
+}
+
+function isValidCPF(cpf: string) {
+  const d = cpf.replace(/\D/g, '')
+  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false
+  let s = 0
+  for (let i = 0; i < 9; i++) s += parseInt(d[i]) * (10 - i)
+  let r = (s * 10) % 11
+  if (r === 10) r = 0
+  if (r !== parseInt(d[9])) return false
+  s = 0
+  for (let i = 0; i < 10; i++) s += parseInt(d[i]) * (11 - i)
+  r = (s * 10) % 11
+  if (r === 10) r = 0
+  return r === parseInt(d[10])
+}
+
 const EMPTY_TECHNICAL: TechnicalSnapshot = {
   engine: 'Não informado',
   horsepower: 'Não informado',
@@ -223,6 +253,8 @@ export default function ListingForm() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [account, setAccount] = useState(ACCOUNT_INITIAL)
+  const [accountEmailExists, setAccountEmailExists] = useState(false)
   const [validationDetails, setValidationDetails] = useState<string[]>([])
   const [titleTouched, setTitleTouched] = useState(false)
 
@@ -273,6 +305,48 @@ export default function ListingForm() {
       }
     } catch {
       // ignore malformed draft
+    }
+  }, [])
+
+  useEffect(() => {
+    const plate = new URLSearchParams(window.location.search).get('placa')
+    if (!plate) return
+
+    const applyData = (data: PlacaApiResponse) => {
+      setForm((prev) => ({
+        ...prev,
+        brand: data.marca,
+        model: data.modelo,
+        version: data.versao || prev.version,
+        year: data.anoFabricacao ? String(data.anoFabricacao) : prev.year,
+        yearModel: (data.anoModelo || data.anoFabricacao) ? String(data.anoModelo || data.anoFabricacao) : prev.yearModel,
+        color: data.cor,
+        fuel: data.combustivel || prev.fuel,
+        engine: data.cilindradas || prev.engine,
+        horsepower: data.potencia || prev.horsepower,
+        transmission: data.cambio || 'Automático',
+        bodyType: data.tipoVeiculo || prev.bodyType,
+        plateFinal: data.placa || plate,
+      }))
+      setListingSubStep(2)
+    }
+
+    try {
+      localStorage.removeItem(DRAFT_KEY)
+      const cached = readPlateLookup()
+      if (cached) {
+        applyData(cached)
+        return
+      }
+      void lookupPlateClient(plate)
+        .then((data) => {
+          if (data?.marca) applyData(data)
+        })
+        .catch(() => {
+          // ignore lookup failure; user can fill the form manually
+        })
+    } catch {
+      // ignore malformed cache
     }
   }, [])
 
@@ -791,6 +865,21 @@ export default function ListingForm() {
     setListingSubStep((prev) => Math.min(4, prev + 1))
   }
 
+  const validateAccount = (): string | null => {
+    if (account.name.trim().length < 3) return 'Informe seu nome completo.'
+    if (account.phone.replace(/\D/g, '').length < 10) return 'Informe um telefone válido.'
+    if (!isValidCPF(account.cpf)) return 'Informe um CPF válido.'
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(account.email.trim())) return 'Informe um e-mail válido.'
+    if (
+      account.password.length < 8 ||
+      !/[A-Z]/.test(account.password) ||
+      !/\d/.test(account.password) ||
+      !/[^A-Za-z0-9]/.test(account.password)
+    ) return 'A senha deve ter 8+ caracteres, com letra maiúscula, número e símbolo.'
+    if (account.password !== account.confirmPassword) return 'As senhas não coincidem.'
+    return null
+  }
+
   const handleSubmit = async () => {
     const validation = validateStep(3)
     if (validation) {
@@ -805,6 +894,41 @@ export default function ListingForm() {
     setValidationDetails([])
 
     try {
+      if (!isAuthenticated) {
+        const accountError = validateAccount()
+        if (accountError) { setError(accountError); return }
+        const signupRes = await fetch('/api/auth/signup-publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: account.email.trim().toLowerCase(),
+            password: account.password,
+            full_name: account.name.trim(),
+            phone: account.phone.replace(/\D/g, ''),
+            cpf: account.cpf.replace(/\D/g, ''),
+          }),
+        })
+        if (signupRes.status === 409) {
+          setAccountEmailExists(true)
+          setError('Este e-mail já está cadastrado. Faça login para publicar seu anúncio.')
+          return
+        }
+        if (!signupRes.ok) {
+          const body = await signupRes.json().catch(() => ({}))
+          setError(body?.error || 'Não foi possível criar sua conta.')
+          return
+        }
+        const supabaseLocal = getSupabaseBrowserClient()
+        const { error: signInError } = await supabaseLocal.auth.signInWithPassword({
+          email: account.email.trim().toLowerCase(),
+          password: account.password,
+        })
+        if (signInError) {
+          setError('Conta criada, mas não foi possível entrar automaticamente. Faça login para publicar.')
+          return
+        }
+      }
+
       if (!supabaseReady) {
         setError('Supabase não configurado no ambiente. Não é possível publicar o anúncio.')
         return
@@ -953,19 +1077,16 @@ export default function ListingForm() {
     }
   }
 
+  const handleAccountInput = (field: keyof typeof ACCOUNT_INITIAL, value: string) => {
+    setAccount((prev) => ({ ...prev, [field]: value }))
+    if (field === 'email') setAccountEmailExists(false)
+  }
+
   if (!sessionReady) {
     return (
       <div className="listing-form-ref fingen-flow-form fingen-flow-form-card p-8 text-center">
         <Loader2 className="mx-auto h-5 w-5 animate-spin text-[#1A1A1A]" />
         <p className="mt-2 text-sm text-[#525252]">Carregando sessão...</p>
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="listing-form-ref fingen-flow-form">
-        <AuthCard onAuthenticated={() => setIsAuthenticated(true)} />
       </div>
     )
   }
@@ -1362,6 +1483,97 @@ export default function ListingForm() {
               </svg>
               <span>Contato protegido via chat seguro da plataforma.</span>
             </div>
+
+            {!isAuthenticated ? (
+              <div className="fingen-flow-substep-card p-4 sm:p-6 space-y-4 mt-10">
+                <div className="space-y-1">
+                  <p className="fingen-flow-field-label text-base">Crie sua conta para publicar</p>
+                  <p className="text-[13px] text-[#767676]">Seus dados do anúncio são guardados e a publicação é imediata.</p>
+                </div>
+
+                {accountEmailExists ? (
+                  <div className="rounded-xl p-4 bg-[#FEF2F2] border border-[#FECACA] space-y-3">
+                    <p className="text-sm text-[#B91C1C] font-medium">
+                      Este e-mail já está cadastrado. Entre na sua conta para publicar.
+                    </p>
+                    <Link
+                      href="/entrar?redirect=/anunciar-carro/fluxo"
+                      className="inline-flex items-center gap-2 rounded-xl bg-[#1A1A1A] text-white text-sm font-semibold px-5 py-2.5 hover:bg-[#2D2D2D]"
+                    >
+                      Entrar na minha conta
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-name">Nome completo</label>
+                      <input
+                        id="account-name"
+                        className="fingen-flow-input mt-1"
+                        placeholder="Seu nome completo"
+                        value={account.name}
+                        onChange={(e) => handleAccountInput('name', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-phone">Telefone</label>
+                      <input
+                        id="account-phone"
+                        className="fingen-flow-input mt-1"
+                        placeholder="(00) 00000-0000"
+                        inputMode="tel"
+                        value={account.phone}
+                        onChange={(e) => handleAccountInput('phone', formatPhone(e.target.value))}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-cpf">CPF</label>
+                      <input
+                        id="account-cpf"
+                        className="fingen-flow-input mt-1"
+                        placeholder="000.000.000-00"
+                        maxLength={14}
+                        value={account.cpf}
+                        onChange={(e) => handleAccountInput('cpf', formatCPF(e.target.value))}
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-email">E-mail</label>
+                      <input
+                        id="account-email"
+                        type="email"
+                        className="fingen-flow-input mt-1"
+                        placeholder="voce@email.com"
+                        value={account.email}
+                        onChange={(e) => handleAccountInput('email', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-password">Senha</label>
+                      <input
+                        id="account-password"
+                        type="password"
+                        className="fingen-flow-input mt-1"
+                        placeholder="Crie uma senha"
+                        value={account.password}
+                        onChange={(e) => handleAccountInput('password', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-confirm">Confirmar senha</label>
+                      <input
+                        id="account-confirm"
+                        type="password"
+                        className="fingen-flow-input mt-1"
+                        placeholder="Repita a senha"
+                        value={account.confirmPassword}
+                        onChange={(e) => handleAccountInput('confirmPassword', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : null}
           </div>
         )}
 
@@ -1418,7 +1630,7 @@ export default function ListingForm() {
                     Publicando...
                   </>
                 ) : currentStep === 3 ? (
-                  'Publicar anúncio'
+                  !isAuthenticated ? 'Criar conta e publicar' : 'Publicar anúncio'
                 ) : (
                   <>
                     Próxima etapa
@@ -1444,7 +1656,7 @@ export default function ListingForm() {
                   Publicando...
                 </>
               ) : (
-                'Publicar anúncio'
+                !isAuthenticated ? 'Criar conta e publicar' : 'Publicar anúncio'
               )}
             </button>
           </div>
