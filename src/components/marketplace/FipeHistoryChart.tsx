@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getFipeMonthlyHistory } from '@/lib/fipe-api'
-import { Loader2, TrendingDown, TrendingUp } from 'lucide-react'
+import { Loader2, TrendingDown } from 'lucide-react'
 import { formatBRL } from '@/data/cars'
 
 interface Props {
@@ -28,7 +27,11 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
     let cancelled = false
     ;(async () => {
       try {
-        const result = await getFipeMonthlyHistory(brand, model, year, version || undefined)
+        const params = new URLSearchParams({ brand, model, year: String(year) })
+        if (version) params.set('version', version)
+        const res = await fetch(`/api/fipe/history?${params}`)
+        if (!res.ok) throw new Error('API error')
+        const result: DataPoint[] = await res.json()
         if (!cancelled) {
           setData(result)
           if (result.length === 0) setError(true)
@@ -90,7 +93,6 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
                   background: 'rgba(255,255,255,0.05)',
                   borderRadius: 6,
                   overflow: 'hidden',
-                  position: 'relative',
                 }}>
                   <div
                     className="fipe-chart-bar"
@@ -104,6 +106,7 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
                       justifyContent: 'flex-end',
                       paddingRight: 10,
                       opacity: isLatest ? 1 : 0.85,
+                      animationDelay: `${i * 0.1}s`,
                     }}
                   >
                     <span style={{
@@ -121,7 +124,7 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
 
           <div style={{
             marginTop: 12,
-            padding: '8px 12px',
+            padding: '10px 12px',
             background: 'rgba(255,255,255,0.04)',
             borderRadius: 8,
             display: 'flex',
