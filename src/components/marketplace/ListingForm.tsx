@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState, type DragEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
 import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2, Check } from 'lucide-react'
@@ -246,6 +246,7 @@ export default function ListingForm() {
   const [fipeResult, setFipeResult] = useState<FipeResult | null>(null)
   const [catalogCars, setCatalogCars] = useState<CatalogCar[]>([])
   const [technical, setTechnical] = useState<TechnicalSnapshot>(EMPTY_TECHNICAL)
+  const skipFipeClearOnMount = useRef(true)
 
   const [sessionReady, setSessionReady] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -383,22 +384,29 @@ export default function ListingForm() {
   }, [supabaseReady])
 
   useEffect(() => {
+    if (skipFipeClearOnMount.current) return
     if (!selectedBrandCode) {
       clearVehicleDependentFields('brand')
     }
   }, [selectedBrandCode])
 
   useEffect(() => {
+    if (skipFipeClearOnMount.current) return
     if (!selectedModelCode) {
       clearVehicleDependentFields('model')
     }
   }, [selectedModelCode])
 
   useEffect(() => {
+    if (skipFipeClearOnMount.current) return
     if (!selectedYear) {
       clearVehicleDependentFields('year')
     }
   }, [selectedYear])
+
+  useEffect(() => {
+    skipFipeClearOnMount.current = false
+  }, [])
 
   useEffect(() => {
     const loadBrands = async () => {
