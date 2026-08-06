@@ -363,7 +363,7 @@ export default function ConversationInbox() {
         <div className="flex items-center gap-3 p-2.5 bg-[#F8F9FA] border border-gray-200 rounded-2xl focus-within:border-[#1A1A1A] focus-within:ring-2 focus:ring-[#1A1A1A]/10 transition-all">
           <input type="text" value={messageText} onChange={(e) => setMessageText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage() } }}
-            placeholder="Digite sua mensagem..." className="flex-1 px-4 py-3 bg-transparent text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none" aria-label="Mensagem" />
+            placeholder="Olá! Tenho interesse no seu veículo. Ele ainda está disponível?" className="flex-1 px-4 py-3 bg-transparent text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none" aria-label="Mensagem" />
           <button type="button" disabled={sending || !messageText.trim()} onClick={() => void sendMessage()}
             className="p-3 bg-[#1A1A1A] text-[#D4F576] rounded-xl disabled:opacity-40 hover:bg-[#2D2D2D] transition-colors" aria-label="Enviar">
             {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" strokeWidth={1.75} />}

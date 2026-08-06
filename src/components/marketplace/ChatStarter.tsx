@@ -44,9 +44,6 @@ export default function ChatStarter({
           Authorization: `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          firstMessage: 'Olá! Tenho interesse no seu veículo. Ele ainda está disponível?',
-        }),
       })
 
       const payload = await response.json()
