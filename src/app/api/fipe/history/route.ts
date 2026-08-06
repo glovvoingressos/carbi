@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getFipeHistory } from '@/lib/fipe-api'
+import { getFipeMonthlyHistory, getFipeHistory } from '@/lib/fipe-api'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -17,8 +17,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'year deve ser um número' }, { status: 400 })
   }
 
+  const baseModel = model.split(' ')[0]
+
   try {
-    const baseModel = model.split(' ')[0]
+    const monthly = await getFipeMonthlyHistory(brand, baseModel, yearNum, version || undefined, 5)
+    if (monthly.length >= 2) {
+      return NextResponse.json(monthly)
+    }
+
     const yearly = await getFipeHistory(brand, baseModel, 6, version || undefined)
     return NextResponse.json(yearly.map(d => ({ month: String(d.year), price: d.price, priceNum: d.priceNum })))
   } catch (error) {

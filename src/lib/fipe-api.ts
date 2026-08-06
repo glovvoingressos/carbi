@@ -63,8 +63,8 @@ export function normalize(str: string): string {
 /**
  * Base fetcher for Parallelum v2
  */
-async function fetchFipe<T>(endpoint: string, useReference = true, type = 'cars'): Promise<T> {
-  const ref = useReference ? await getLatestReference() : null
+async function fetchFipe<T>(endpoint: string, useReference = true, type = 'cars', referenceOverride?: string): Promise<T> {
+  const ref = referenceOverride || (useReference ? await getLatestReference() : null)
   const query = ref ? `?reference=${ref}` : ''
   const url = endpoint.startsWith('/references') 
     ? `${BASE_URL}${endpoint}${query}`
@@ -359,33 +359,16 @@ export async function getFipeMonthlyHistory(
   }
 
   const refs = await getFipeReferences()
-  const recentRefs = refs.slice(0, monthsCount)
+  const recentRefs = refs.slice(0, monthsCount).reverse()
 
-  const results = await Promise.allSettled(
-    recentRefs.map(async (ref) => {
-      const url = `${BASE_URL}/cars/brands/${resolved.brand.code}/models/${resolved.model.code}/years/${selected.code}?reference=${ref.code}`
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-      if (FIPE_API_TOKEN) headers['X-Subscription-Token'] = FIPE_API_TOKEN
-
-      const res = await fetch(url, {
-        headers,
-        next: { revalidate: 3600 },
-        signal: AbortSignal.timeout(8000),
-      })
-      if (!res.ok) return null
-
-      const data = await res.json()
-      if (!data?.price) return null
-
+  const results: { month: string; price: string; priceNum: number }[] = []
+  for (const ref of recentRefs) {
+    const data = await fetchFipe<any>(`/brands/${resolved.brand.code}/models/${resolved.model.code}/years/${selected.code}`, false, 'cars', ref.code)
+    if (data?.price) {
       const priceNum = parseFloat(data.price.replace(/[^\d,]/g, '').replace(',', '.'))
-      return { month: ref.name, price: data.price, priceNum: isNaN(priceNum) ? 0 : priceNum }
-    })
-  )
+      results.push({ month: ref.name, price: data.price, priceNum: isNaN(priceNum) ? 0 : priceNum })
+    }
+  }
 
   return results
-    .filter((r): r is PromiseFulfilledResult<{ month: string; price: string; priceNum: number }> =>
-      r.status === 'fulfilled' && r.value !== null
-    )
-    .map(r => r.value)
-    .reverse()
 }
