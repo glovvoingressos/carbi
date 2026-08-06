@@ -246,7 +246,7 @@ export default function VehicleDetailView({
         {fipePrice && (
           <section className="fingen-detail-card-dark">
             <div className="fingen-detail-dark-header">
-              <h3>Comparativo FIPE</h3>
+              <h3 style={{ color: '#FFFFFF' }}>Comparativo FIPE</h3>
               <span className={`fingen-detail-dark-badge ${comparison.status === 'below' ? 'success' : ''}`}>
                 {fipeStatus}
               </span>
@@ -271,6 +271,7 @@ export default function VehicleDetailView({
             model={listing.model}
             version={listing.version}
             year={listing.year_model}
+            currentFipePrice={fipePrice}
           />
         )}
 
