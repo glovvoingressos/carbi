@@ -18,9 +18,12 @@ Implemented dedicated truck marketplace routes and query adapter.
 ## Verification
 - `npx tsc --noEmit`: PASS
 - `npm run build`: PASS; truck routes appear in output.
-- `node --experimental-strip-types scripts/test-truck-filters.mjs`: PASS.
+- `node --experimental-strip-types scripts/test-truck-filters.mjs`: PASS, including truck-preserving reset and SSR/query serialization.
+- `npx tsc --noEmit`: PASS.
+- `npm run build`: PASS; truck routes generated.
 - `node --experimental-strip-types scripts/test-truck-mapping.mjs`: existing script remains blocked by direct Node execution of TypeScript path aliases (`@/lib/...`).
 
 ## Concerns
-- The database schema used by the paginated query does not expose `cabin_type`, `pbt`, `cmt`, `truck_category`, or `chassis` as columns. Those fields are conditionally rendered when present on the public listing object, but are not added to the paginated SQL select to avoid runtime query errors. A schema migration/view update is needed for full persistence/query support.
+- The database schema does not consistently expose structured truck columns. The paginated and direct-table paths attempt a separate `structured_data` read and safely ignore schema errors, while normalization falls back to fields already returned by the view/table. A schema/view update is still needed for guaranteed persistence of every extra field.
+- Build emits an existing Supabase range warning for a page beyond the available result set and existing SWC WASM fallback warnings.
 - Build emits existing warnings that the native Next SWC binary is unavailable and WASM fallback is used.

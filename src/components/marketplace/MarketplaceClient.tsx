@@ -11,6 +11,7 @@ import ListingCard from '@/components/marketplace/ListingCard'
 import { ListingPublic } from '@/lib/marketplace'
 import { ListingSort, ListingsPageInput } from '@/lib/marketplace-server'
 import { getFilteredListings, getModelsByBrands } from '@/app/carros-a-venda/actions'
+import { clearTruckListingFilters, serializeTruckListingFilters } from '@/lib/truck-filters'
 
 interface MarketplaceClientProps {
   initialListings: ListingPublic[]
@@ -254,7 +255,7 @@ export default function MarketplaceClient({
 
   const clearFilters = () => {
     setQ('')
-    setSelectedVehicleType('')
+    setSelectedVehicleType(defaultFilters?.vehicle_type === 'truck' ? 'truck' : '')
     setSelectedBrands([])
     setSelectedModels([])
     setSelectedFuels([])
@@ -283,7 +284,7 @@ export default function MarketplaceClient({
 
   const activeChips = useMemo(() => {
     const chips: Array<{ label: string; onRemove: () => void }> = []
-    if (selectedVehicleType) chips.push({ label: 'Carro', onRemove: () => setSelectedVehicleType('') })
+    if (selectedVehicleType) chips.push({ label: selectedVehicleType === 'truck' ? 'Caminhão' : 'Carro', onRemove: () => setSelectedVehicleType(defaultFilters?.vehicle_type === 'truck' ? 'truck' : '') })
     selectedBrands.forEach(b => chips.push({ label: b, onRemove: () => toggleItem(selectedBrands, b, setSelectedBrands) }))
     selectedModels.forEach(m => chips.push({ label: m, onRemove: () => toggleItem(selectedModels, m, setSelectedModels) }))
     selectedFuels.forEach(f => chips.push({ label: f, onRemove: () => toggleItem(selectedFuels, f, setSelectedFuels) }))

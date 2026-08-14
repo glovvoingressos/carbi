@@ -28,6 +28,13 @@ type ListingQueryInput = {
   limit?: number
   single?: boolean
   vehicle_type?: string
+  city?: string | string[]
+  state?: string
+  transmission?: string | string[]
+  truckType?: string | string[]
+  axles?: number | number[]
+  loadCapacityMin?: number
+  loadCapacityMax?: number
 }
 
 export type ListingSort =
@@ -362,13 +369,31 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
   if (input.model) tableQuery = tableQuery.ilike('model', `%${input.model}%`)
   tableQuery = applyTextSearch(tableQuery, input.q)
   if (input.yearModel) tableQuery = tableQuery.eq('year_model', input.yearModel)
-  if (input.excludeId) tableQuery = tableQuery.neq('id', input.excludeId)
+   if (input.excludeId) tableQuery = tableQuery.neq('id', input.excludeId)
+   if (input.vehicle_type) tableQuery = tableQuery.eq('vehicle_type', input.vehicle_type)
+   if (input.city) tableQuery = Array.isArray(input.city) ? tableQuery.in('city', input.city) : tableQuery.ilike('city', input.city)
+   if (input.state) tableQuery = tableQuery.ilike('state', input.state)
+   if (input.transmission) tableQuery = Array.isArray(input.transmission) ? tableQuery.in('transmission', input.transmission) : tableQuery.ilike('transmission', `%${input.transmission}%`)
+   if (input.truckType) tableQuery = Array.isArray(input.truckType) ? tableQuery.in('truck_type', input.truckType) : tableQuery.ilike('truck_type', `%${input.truckType}%`)
+   if (input.axles) tableQuery = Array.isArray(input.axles) ? tableQuery.in('axles', input.axles) : tableQuery.eq('axles', input.axles)
+   if (typeof input.loadCapacityMin === 'number') tableQuery = tableQuery.gte('load_capacity', input.loadCapacityMin)
+   if (typeof input.loadCapacityMax === 'number') tableQuery = tableQuery.lte('load_capacity', input.loadCapacityMax)
 
-  const { data: tableData, error: tableError } = await (input.single ? tableQuery.maybeSingle() : tableQuery)
+   const { data: tableData, error: tableError } = await (input.single ? tableQuery.maybeSingle() : tableQuery)
+
   if (tableError || !tableData) return []
 
-  const rows = Array.isArray(tableData) ? (tableData as ListingRow[]) : [tableData as ListingRow]
-  return rows.map(normalizeTableRow)
+   let rows = Array.isArray(tableData) ? (tableData as ListingRow[]) : [tableData as ListingRow]
+   try {
+     const optionalResult = await supabase.from('vehicle_listings').select('id, structured_data').in('id', rows.map(row => row.id))
+     if (!optionalResult.error && Array.isArray(optionalResult.data)) {
+       const optionalById = new Map(optionalResult.data.map(row => [row.id, row.structured_data]))
+       rows = rows.map(row => ({ ...row, structured_data: optionalById.get(row.id) || null }))
+     }
+   } catch {
+   }
+   return rows.map(normalizeTableRow)
+
 }
 
 export async function queryPublicListings(input: ListingQueryInput): Promise<ListingPublic[]> {
@@ -577,13 +602,22 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
     }
   }
 
-  const dataWithImages = (data as ListingRow[]).map(row => ({
-    ...row,
-    vehicle_type: (row as any).vehicle_type || 'car',
-    images: imagesByListing.get(row.id) || [],
-  }))
+   let dataWithImages: ListingRow[] = (data as ListingRow[]).map(row => ({
+     ...row,
+     vehicle_type: (row as any).vehicle_type || 'car',
+     images: imagesByListing.get(row.id) || [],
+   }))
+   try {
+     const structuredResult = await supabase.from('vehicle_listings').select('id, structured_data').in('id', listingIds)
+     if (!structuredResult.error && Array.isArray(structuredResult.data)) {
+       const structuredById = new Map(structuredResult.data.map(row => [row.id, row.structured_data]))
+       dataWithImages = dataWithImages.map(row => ({ ...row, structured_data: structuredById.get(row.id) || null }))
+     }
+   } catch {
+   }
 
-  const normalized = dataWithImages.map(normalizeTableRow)
+   const normalized = dataWithImages.map(normalizeTableRow)
+
   const items = await enrichListingSignals(normalized)
   return { items, total: count || 0, page, pageSize }
 }
