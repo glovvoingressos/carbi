@@ -5,8 +5,8 @@ Data: 2026-08-14
 ## Correções
 
 - `supabase/migrations/20260814_truck_listing_fields.sql`: adicionadas, com `add column if not exists`, as colunas `vehicle_type`, `truck_type`, `load_capacity`, `axles`, `truck_body_type`, `cabin_type`, `pbt`, `cmt`, `truck_category`, `chassis` e `structured_data`. A view `vehicle_listings_public` não foi recriada porque não há definição local segura nesta migration; a decisão foi documentada no SQL.
-- O PATCH de anúncios agora registra internamente erros de atualização/exclusão e retorna mensagens genéricas, sem expor `error.message` do Supabase.
-- Ajustes lint mínimos nos componentes tocados, incluindo ordem de declarações e impureza de `Date.now`.
+- PATCH e DELETE de anúncios registram internamente erros de atualização, exclusão e remoção de imagens e retornam mensagens genéricas, sem expor mensagens do Supabase.
+- Ajustes lint mínimos nos componentes tocados, incluindo adiamento cancelável de sincronizações de estado em efeitos, ordem de declarações e impureza de `Date.now`.
 
 ## Validação
 
@@ -24,12 +24,13 @@ Comando: `npx eslint 'src/components/marketplace/MyListingsDashboard.tsx' 'src/c
 
 Pendências existentes nos arquivos tocados:
 
-- `src/components/marketplace/MyListingsDashboard.tsx`: 3 erros `react-hooks/set-state-in-effect` em efeitos que carregam/autopreenchem estado; warnings de dependências de hooks e `<img>`.
+- Resultado: 0 erros e 9 warnings.
+- `src/components/marketplace/MyListingsDashboard.tsx`: warnings de dependências de hooks e `<img>`.
 - `src/components/marketplace/VehicleDetailView.tsx`: warnings de dependências de hook e `<img>`.
 - `src/app/anunciar-caminhao/page.tsx`: warning de `<img>`.
 - Os demais arquivos direcionados não apresentaram pendências no lint.
 
-Essas pendências foram mantidas sem refatoração unrelated ao bloqueio truck.
+Os warnings restantes não fazem parte dos dois findings solicitados e foram mantidos sem refatoração unrelated.
 
 ## Supabase
 

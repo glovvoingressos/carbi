@@ -473,7 +473,10 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
 
   // Auth
   useEffect(() => {
-    if (!supabaseReady) { setSessionReady(true); return }
+    if (!supabaseReady) {
+      const timer = setTimeout(() => setSessionReady(true), 0)
+      return () => clearTimeout(timer)
+    }
     let unsub: (() => void) | null = null
     const boot = async () => { const sb = getSupabaseBrowserClient(); const { data } = await sb.auth.getSession(); setIsAuthenticated(!!data.session); setSessionReady(true); const { data: d } = sb.auth.onAuthStateChange((_e: string, s: { access_token?: string } | null) => setIsAuthenticated(!!s)); unsub = () => d.subscription.unsubscribe() }
     void boot(); return () => { unsub?.() }
@@ -485,14 +488,22 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
      catch (err) { setGlobalError(err instanceof Error ? err.message : 'Falha ao carregar.') } finally { setLoadingListings(false) }
   }, [supabaseReady, vehicleType])
 
-  useEffect(() => { if (isAuthenticated) void loadListings(true) }, [isAuthenticated, loadListings])
+  useEffect(() => {
+    if (!isAuthenticated) return
+    const timer = setTimeout(() => { void loadListings(true) }, 0)
+    return () => clearTimeout(timer)
+  }, [isAuthenticated, loadListings])
 
   // Sync form
   useEffect(() => {
-    if (!selected) return; localImages.forEach((img) => { if (!img.isExisting) URL.revokeObjectURL(img.previewUrl) })
-     setFormData({ title: selected.title, description: selected.description, vehicle_type: selected.vehicle_type, price: selected.price, vin: selected.vin || '', status: selected.status, mileage: selected.mileage, brand: selected.brand, model: selected.model, version: selected.version, year: selected.year, year_model: selected.year_model, transmission: selected.transmission, fuel: selected.fuel, color: selected.color, body_type: selected.body_type, city: selected.city, state: selected.state, optional_items: selected.optional_items || [], engine: selected.engine, horsepower: selected.horsepower, doors: selected.doors, plate_final: selected.plate_final, truck_type: selected.truck_type, load_capacity: selected.load_capacity, axles: selected.axles, truck_body_type: selected.truck_body_type, structured_data: selected.structured_data || null })
-    setLocalImages((selected.images || []).map((img) => ({ id: img.id, previewUrl: img.public_url, isExisting: true, originalImage: img, is_primary: img.is_primary, sort_order: img.sort_order })).sort((a, b) => a.sort_order - b.sort_order))
-    setIsDirty(false); setSaveStatus('idle'); setErrors({})
+    if (!selected) return
+    localImages.forEach((img) => { if (!img.isExisting) URL.revokeObjectURL(img.previewUrl) })
+    const timer = setTimeout(() => {
+      setFormData({ title: selected.title, description: selected.description, vehicle_type: selected.vehicle_type, price: selected.price, vin: selected.vin || '', status: selected.status, mileage: selected.mileage, brand: selected.brand, model: selected.model, version: selected.version, year: selected.year, year_model: selected.year_model, transmission: selected.transmission, fuel: selected.fuel, color: selected.color, body_type: selected.body_type, city: selected.city, state: selected.state, optional_items: selected.optional_items || [], engine: selected.engine, horsepower: selected.horsepower, doors: selected.doors, plate_final: selected.plate_final, truck_type: selected.truck_type, load_capacity: selected.load_capacity, axles: selected.axles, truck_body_type: selected.truck_body_type, structured_data: selected.structured_data || null })
+      setLocalImages((selected.images || []).map((img) => ({ id: img.id, previewUrl: img.public_url, isExisting: true, originalImage: img, is_primary: img.is_primary, sort_order: img.sort_order })).sort((a, b) => a.sort_order - b.sort_order))
+      setIsDirty(false); setSaveStatus('idle'); setErrors({})
+    }, 0)
+    return () => clearTimeout(timer)
   }, [selected?.id])
 
   useEffect(() => { localImgRef.current = localImages }, [localImages])

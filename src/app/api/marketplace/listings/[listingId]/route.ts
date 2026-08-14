@@ -297,7 +297,8 @@ export async function DELETE(
     if (storagePaths.length > 0) {
       const { error: storageError } = await supabase.storage.from('vehicle-listings').remove(storagePaths)
       if (storageError) {
-        return NextResponse.json({ error: storageError.message }, { status: 500 })
+        console.error('Falha ao remover imagens do anúncio', { listingId, storageError: storageError.message })
+        return NextResponse.json({ error: 'Falha ao excluir as imagens do anúncio.' }, { status: 500 })
       }
     }
 
