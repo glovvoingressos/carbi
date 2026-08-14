@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import { mapTruckPayload, normalizeTruckData } from '../src/lib/trucks.ts'
 import { mapPlacaApiResponse } from '../src/lib/integrations/placaapi/types.ts'
 import { buildListingRollbackPayload, normalizeTruckPayload, resolveTruckPatch, validateListingPayload } from '../src/lib/marketplace.ts'
+import { fetchPublicTruckListingsPage } from '../src/lib/marketplace-server.ts'
 
 const payload = {
   marca: 'Mercedes-Benz',
@@ -74,5 +75,9 @@ assert.equal(missing.chassis, null)
 const placaMapped = mapPlacaApiResponse({ placa: 'ABC1D23', marca: 'Volvo', modelo: 'FH 540', ano: '2022', cor: 'Branco', extra: { vin: '9BV1ABC1234567890', campo_especifico: 'preservar' }, dados: { tipo_veiculo: 'Caminhão' } }, 'ABC1D23')
 assert.equal(placaMapped.chassi, '9BV1ABC1234567890')
 assert.equal(placaMapped.structured_data.campo_especifico, 'preservar')
+
+const truckAdapterSource = fetchPublicTruckListingsPage.toString()
+assert.match(truckAdapterSource, /vehicle_type/)
+assert.match(truckAdapterSource, /truck/)
 
 console.log('truck mapping tests passed')

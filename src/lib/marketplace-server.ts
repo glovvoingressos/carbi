@@ -51,6 +51,10 @@ export type ListingsPageInput = {
   yearMax?: number
   mileageMin?: number
   mileageMax?: number
+  truckType?: string | string[]
+  axles?: number | number[]
+  loadCapacityMin?: number
+  loadCapacityMax?: number
   optionalItems?: string[]
   sort?: ListingSort
   page?: number
@@ -450,8 +454,14 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
       slug,
       published_at,
       created_at,
-      updated_at
-    `, { count: 'exact' })
+       updated_at,
+       vehicle_type,
+       truck_type,
+       load_capacity,
+       axles,
+       truck_body_type
+     `, { count: 'exact' })
+
     .eq('status', 'active')
     .range(from, to)
 
@@ -507,6 +517,16 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
 
   if (typeof input.mileageMin === 'number') query = query.gte('mileage', input.mileageMin)
   if (typeof input.mileageMax === 'number') query = query.lte('mileage', input.mileageMax)
+  if (input.truckType) {
+    if (Array.isArray(input.truckType)) query = query.in('truck_type', input.truckType)
+    else query = query.ilike('truck_type', `%${input.truckType}%`)
+  }
+  if (input.axles) {
+    if (Array.isArray(input.axles)) query = query.in('axles', input.axles)
+    else query = query.eq('axles', input.axles)
+  }
+  if (typeof input.loadCapacityMin === 'number') query = query.gte('load_capacity', input.loadCapacityMin)
+  if (typeof input.loadCapacityMax === 'number') query = query.lte('load_capacity', input.loadCapacityMax)
 
   if (input.optionalItems && input.optionalItems.length > 0) {
     query = query.contains('optional_items', input.optionalItems)
@@ -545,6 +565,17 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
   const normalized = dataWithImages.map(normalizeTableRow)
   const items = await enrichListingSignals(normalized)
   return { items, total: count || 0, page, pageSize }
+}
+
+export type TruckListingFilters = ListingsPageInput & {
+  truckType?: string | string[]
+  axles?: number | number[]
+  loadCapacityMin?: number
+  loadCapacityMax?: number
+}
+
+export async function fetchPublicTruckListingsPage(input: TruckListingFilters = {}) {
+  return fetchPublicListingsPage({ ...input, vehicle_type: 'truck' })
 }
 
 export async function getMarketplaceDiscoverySections() {

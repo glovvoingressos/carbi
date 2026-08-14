@@ -133,6 +133,15 @@ export default function VehicleDetailView({
     { icon: null, label: 'Cor', value: listing.color },
     { icon: null, label: 'Carroceria', value: listing.body_type || 'Não informado' },
     { icon: null, label: 'Motor', value: listing.engine || enrichment?.powertrain?.engine || 'Não informado' },
+    ...(listing.vehicle_type === 'truck' ? [
+      { icon: null, label: 'Categoria', value: listing.truck_category || listing.truck_type || 'Não informado' },
+      { icon: null, label: 'Carroceria/Cabine', value: [listing.truck_body_type, listing.cabin_type].filter(Boolean).join(' · ') || 'Não informado' },
+      { icon: null, label: 'Eixos', value: listing.axles != null ? String(listing.axles) : 'Não informado' },
+      { icon: null, label: 'Capacidade de carga', value: listing.load_capacity != null ? `${listing.load_capacity.toLocaleString('pt-BR')} kg` : 'Não informado' },
+      { icon: null, label: 'PBT', value: listing.pbt != null ? `${listing.pbt.toLocaleString('pt-BR')} kg` : 'Não informado' },
+      { icon: null, label: 'CMT', value: listing.cmt != null ? `${listing.cmt.toLocaleString('pt-BR')} kg` : 'Não informado' },
+      { icon: null, label: 'FIPE', value: listing.fipe_price != null ? 'Disponível' : 'Indisponível' },
+    ] : []),
   ]
 
   const sellerName = sellerInfo?.name || 'Vendedor particular'
