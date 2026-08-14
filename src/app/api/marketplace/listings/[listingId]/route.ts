@@ -3,6 +3,8 @@ import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingDeletedEmail, sendListingStatusChangedEmail } from '@/lib/email'
+import { normalizeTruckPayload } from '@/lib/marketplace'
+import type { TruckCategory } from '@/lib/trucks'
 
 type ListingPatchPayload = {
   title?: string
@@ -27,6 +29,16 @@ type ListingPatchPayload = {
   horsepower?: number
   plate_final?: string
   doors?: number
+  vehicle_type?: 'car' | 'truck'
+  truck_type?: string | null
+  load_capacity?: number | null
+  axles?: number | null
+  truck_body_type?: string | null
+  cabin_type?: string | null
+  pbt?: number | null
+  cmt?: number | null
+  truck_category?: TruckCategory | null
+  structured_data?: Record<string, unknown>
 }
 
 export async function PATCH(
@@ -47,6 +59,7 @@ export async function PATCH(
     const body = (await req.json()) as ListingPatchPayload
 
     const updates: Record<string, unknown> = {}
+    Object.assign(updates, normalizeTruckPayload(body))
     
     // Basic fields with validation
     if (typeof body.title === 'string') {

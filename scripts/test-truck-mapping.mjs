@@ -106,4 +106,14 @@ assert.equal(nestedCommonMapped.cor, 'Azul')
 assert.equal(nestedCommonMapped.tipoVeiculo, 'Cavalo mecânico')
 assert.equal(nestedCommonMapped.categoria, 'Cavalo mecânico')
 
+const marketplaceSource = await (await import('node:fs/promises')).readFile(new URL('../src/lib/marketplace.ts', import.meta.url), 'utf8')
+const postSource = await (await import('node:fs/promises')).readFile(new URL('../src/app/api/marketplace/listings/route.ts', import.meta.url), 'utf8')
+const patchSource = await (await import('node:fs/promises')).readFile(new URL('../src/app/api/marketplace/listings/[listingId]/route.ts', import.meta.url), 'utf8')
+
+assert.match(marketplaceSource, /export function normalizeTruckPayload/)
+assert.match(marketplaceSource, /vehicle_type === 'truck'/)
+assert.match(postSource, /normalizeTruckPayload\(payload\)/)
+assert.match(patchSource, /normalizeTruckPayload\(body\)/)
+assert.match(marketplaceSource, /structured_data/)
+
 console.log('truck mapping tests passed')

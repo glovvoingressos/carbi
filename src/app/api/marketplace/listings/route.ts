@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
-import { ListingFormPayload, validateListingPayload } from '@/lib/marketplace'
+import { ListingFormPayload, normalizeTruckPayload, validateListingPayload } from '@/lib/marketplace'
 import { queryPublicListings } from '@/lib/marketplace-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingCreatedEmail, sendAdminNewListingEmail } from '@/lib/email'
@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
       .trim()
     const resolvedTitle = payload.title?.trim() || generatedTitle
     const resolvedBodyType = payload.body_type?.trim() || 'Não informado'
+    const truckPayload = normalizeTruckPayload(payload)
 
     // Limite de anúncios grátis
     const { count: activeCount, error: countError } = await supabase
@@ -139,6 +140,7 @@ export async function POST(req: NextRequest) {
       fipe_reference_month: payload.fipe_reference_month || null,
       fipe_price: payload.fipe_price || null,
       structured_data: payload.structured_data || {},
+      ...truckPayload,
       status: 'active',
     }
 

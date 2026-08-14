@@ -180,8 +180,42 @@ export function getFipeComparison(
   return { diffValue, diffPercent, status }
 }
 
+export function normalizeTruckPayload(payload: Partial<ListingFormPayload>): Record<string, unknown> {
+  if (payload.vehicle_type !== 'truck') return {}
+
+  const truckFields = ['truck_type', 'load_capacity', 'axles', 'truck_body_type'] as const
+  const dedicatedFields = ['cabin_type', 'pbt', 'cmt', 'truck_category'] as const
+  const normalized: Record<string, unknown> = { vehicle_type: 'truck' }
+
+  for (const field of [...truckFields, ...dedicatedFields]) {
+    if (field in payload) normalized[field] = payload[field] ?? null
+  }
+
+  if ('structured_data' in payload || dedicatedFields.some((field) => field in payload)) {
+    normalized.structured_data = {
+      ...(payload.structured_data || {}),
+      ...Object.fromEntries(dedicatedFields.filter((field) => field in payload).map((field) => [field, payload[field] ?? null])),
+    }
+  }
+
+  return normalized
+}
+
 export function validateListingPayload(payload: ListingFormPayload): string[] {
   const errors: string[] = []
+
+  if (!['car', 'truck'].includes(payload.vehicle_type)) errors.push('Tipo de veículo inválido.')
+  if (payload.vehicle_type === 'truck') {
+    const numericTruckFields: Array<[string, number | null | undefined]> = [
+      ['load_capacity', payload.load_capacity],
+      ['axles', payload.axles],
+      ['pbt', payload.pbt],
+      ['cmt', payload.cmt],
+    ]
+    for (const [field, value] of numericTruckFields) {
+      if (value != null && (!Number.isFinite(value) || value < 0)) errors.push(`${field} inválido.`)
+    }
+  }
 
   if (!payload.brand?.trim()) errors.push('Marca é obrigatória.')
   if (!payload.model?.trim()) errors.push('Modelo é obrigatório.')
