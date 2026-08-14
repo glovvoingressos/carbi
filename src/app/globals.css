@@ -11654,3 +11654,533 @@ p {
 }
 
 /* Removed revenda styles */
+
+/* ==================== Buyer Agent: Procure Meu Carro ==================== */
+.buyer-hero {
+  position: relative;
+  overflow: hidden;
+  background: #1A1A1A;
+  color: #fff;
+  padding: 48px 20px 56px;
+  border-radius: 24px;
+}
+.buyer-hero::before {
+  content: '';
+  position: absolute;
+  inset: -40% -10% auto;
+  background:
+    radial-gradient(60% 90% at 50% -20%, rgba(212, 245, 118, 0.16), transparent 70%);
+  pointer-events: none;
+}
+.buyer-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #D4F576;
+  margin-bottom: 18px;
+}
+.buyer-hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: #fff;
+  margin: 0 0 14px;
+  text-wrap: balance;
+}
+.buyer-hero-desc {
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 46ch;
+  margin: 0 0 26px;
+}
+.buyer-hero-form {
+  display: flex;
+  gap: 10px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 6px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  max-width: 640px;
+}
+.buyer-hero-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 13px 14px;
+  font-size: 15px;
+  color: #1A1A1A;
+  outline: none;
+  border-radius: 12px;
+}
+.buyer-hero-input::placeholder {
+  color: #857C6B;
+}
+.buyer-hero-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #1A1A1A;
+  color: #D4F576;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0 22px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+}
+.buyer-hero-submit:hover {
+  background: #2d2d2d;
+}
+.buyer-hero-submit:active {
+  transform: scale(0.98);
+}
+.buyer-hero-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.buyer-hero-example {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 16px;
+}
+.buyer-hero-example strong {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+}
+
+@media (max-width: 560px) {
+  .buyer-hero-form {
+    flex-direction: column;
+    border-radius: 16px;
+    padding: 8px;
+  }
+  .buyer-hero-submit {
+    width: 100%;
+    justify-content: center;
+    padding: 14px;
+  }
+}
+
+.buyer-card {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 18px;
+  padding: 24px;
+}
+.buyer-card h2 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px;
+}
+.buyer-card-sub {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0 0 18px;
+}
+
+.buyer-criteria-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 4px 0 20px;
+}
+.buyer-criteria-item {
+  background: #F5F5F5;
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+.buyer-criteria-item-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: 4px;
+}
+.buyer-criteria-item-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.buyer-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 20px;
+}
+.buyer-chip {
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1A1A1A;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.buyer-chip:hover {
+  border-color: #1A1A1A;
+}
+.buyer-chip-active {
+  background: #1A1A1A;
+  color: #fff;
+  border-color: #1A1A1A;
+}
+.buyer-chip-active:hover {
+  background: #2d2d2d;
+  color: #fff;
+}
+
+.buyer-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.buyer-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.buyer-field input,
+.buyer-field select {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  color: #1A1A1A;
+  background: #fff;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.buyer-field input:focus,
+.buyer-field select:focus {
+  border-color: #1A1A1A;
+  box-shadow: 0 0 0 3px rgba(212, 245, 118, 0.4);
+}
+
+.buyer-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+.buyer-btn-dark {
+  background: #1A1A1A;
+  color: #fff;
+}
+.buyer-btn-dark:hover {
+  background: #2d2d2d;
+}
+.buyer-btn-light {
+  background: #fff;
+  color: #1A1A1A;
+  border: 1.5px solid rgba(0, 0, 0, 0.14);
+}
+.buyer-btn-light:hover {
+  background: #F5F5F5;
+}
+.buyer-btn-chartreuse {
+  background: #D4F576;
+  color: #1A1A1A;
+}
+.buyer-btn-chartreuse:hover {
+  background: #C8E64E;
+}
+.buyer-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.buyer-result-card {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 18px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.buyer-result-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+.buyer-result-media {
+  aspect-ratio: 16 / 10;
+  background: #eee;
+  overflow: hidden;
+}
+.buyer-result-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.buyer-result-body {
+  padding: 18px;
+}
+.buyer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+.buyer-badge-exato {
+  background: #D4F576;
+  color: #1A1A1A;
+}
+.buyer-badge-proximo {
+  background: #C9B8FF;
+  color: #2A1E6B;
+}
+.buyer-badge-possivel {
+  background: #EDEBE6;
+  color: #4A443A;
+}
+.buyer-result-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #1A1A1A;
+  letter-spacing: -0.02em;
+  margin: 10px 0 2px;
+}
+.buyer-result-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1A1A1A;
+  margin: 6px 0 10px;
+}
+.buyer-result-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+}
+.buyer-result-spec {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.buyer-result-explain {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  background: #F5F5F5;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 12px 0 14px;
+}
+.buyer-result-explain::before {
+  content: '•';
+  color: #D4F576;
+  font-weight: 900;
+  margin-right: 6px;
+}
+.buyer-ver-carro {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #1A1A1A;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+.buyer-ver-carro:hover {
+  background: #2d2d2d;
+}
+
+.buyer-empty {
+  background: #1A1A1A;
+  color: #fff;
+  border-radius: 22px;
+  padding: 40px 24px;
+  text-align: center;
+}
+.buyer-empty-icon {
+  margin-bottom: 14px;
+}
+.buyer-empty h3 {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+}
+.buyer-empty p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 44ch;
+  margin: 0 auto 26px;
+}
+
+.buyer-save-panel {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 18px;
+  padding: 24px;
+  margin-top: 28px;
+}
+.buyer-save-row {
+  display: flex;
+  gap: 10px;
+}
+.buyer-save-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  font-size: 15px;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  outline: none;
+}
+.buyer-save-row input:focus {
+  border-color: #1A1A1A;
+  box-shadow: 0 0 0 3px rgba(212, 245, 118, 0.4);
+}
+
+.buyer-procurando {
+  background: #1A1A1A;
+  color: #fff;
+  border-radius: 18px;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+}
+.buyer-procurando-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #D4F576;
+  margin-bottom: 8px;
+}
+.buyer-procurando-line {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.buyer-summaries {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.buyer-summary-card {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 18px;
+  padding: 20px;
+}
+.buyer-summary-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1A1A1A;
+  letter-spacing: -0.01em;
+}
+.buyer-summary-sub {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 4px 0 14px;
+}
+
+.buyer-followup {
+  background: #FFFBEA;
+  border: 1px solid rgba(212, 245, 118, 0.5);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin: 6px 0 20px;
+}
+.buyer-followup p {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin: 0 0 12px;
+}
+
+.buyer-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 48px 20px;
+  color: var(--color-text-secondary);
+}
+.buyer-spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #1A1A1A;
+  animation: buyer-spin 0.8s linear infinite;
+}
+@keyframes buyer-spin {
+  to { transform: rotate(360deg); }
+}
+
+.buyer-error {
+  background: #FFF1F0;
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  color: #B91C1C;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 14px;
+  margin: 12px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buyer-spinner {
+    animation: none;
+  }
+  .buyer-hero-submit:active {
+    transform: none;
+  }
+}
+
+.buyer-title {
+  font-family: var(--font-heading);
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  margin: 0 0 10px;
+  color: #1A1A1A;
+  text-wrap: balance;
+}
+.buyer-lead {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  max-width: 50ch;
+  margin: 0 auto 28px;
+}

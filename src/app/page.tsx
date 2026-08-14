@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils'
 import { GlareCard } from '@/components/ui/glare-card'
 import BrandLogo from '@/components/brand/BrandLogo'
 import PlateBannerLookup from '@/components/marketplace/PlateBannerLookup'
+import BuyerAgentBanner from '@/components/buyer/BuyerAgentBanner'
 
 export const dynamic = 'force-dynamic'
 
@@ -240,6 +241,13 @@ export default async function HomePage() {
                 <p>{fetchError ? 'Carregando anúncios...' : 'Nenhum anúncio ainda'}</p>
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Buyer Agent - Procure Meu Carro */}
+        <section className="fingen-section">
+          <div className="mx-auto w-full max-w-6xl">
+            <BuyerAgentBanner />
           </div>
         </section>
 

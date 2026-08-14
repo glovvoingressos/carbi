@@ -16,6 +16,7 @@ const navItems = [
   { href: '/minha-conta/anuncios', label: 'Anúncios', icon: Car, description: 'Gerenciar veículos' },
   { href: '/minha-conta/conversas', label: 'Mensagens', icon: MessageCircle, description: 'Chat com compradores' },
   { href: '/minha-conta/favoritos', label: 'Favoritos', icon: Heart, description: 'Veículos salvos' },
+  { href: '/minha-conta/buscas', label: 'Minhas buscas', icon: Search, description: 'Procure Meu Carro' },
   { href: '/minha-conta/notificacoes', label: 'Alertas', icon: Bell, description: 'Notificações' },
   { href: '/minha-conta/configuracoes', label: 'Configurações', icon: Settings, description: 'Conta e preferências' },
 ]
