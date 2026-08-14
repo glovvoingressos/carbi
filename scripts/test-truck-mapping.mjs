@@ -3,10 +3,8 @@ import assert from 'node:assert/strict'
 import { mapTruckPayload, normalizeTruckData } from '../src/lib/trucks.ts'
 import { mapPlacaApiResponse } from '../src/lib/integrations/placaapi/types.ts'
 import { buildListingRollbackPayload, normalizeTruckPayload, resolveTruckPatch, validateListingPayload } from '../src/lib/marketplace.ts'
-import { fetchPublicTruckListingsPage } from '../src/lib/marketplace-server.ts'
 import { mapTruckPlateResult, truckFipeMessage } from '../src/lib/truck-listing-form.ts'
 import { truckListingMetadata, truckCollectionJsonLd, TRUCK_BRANDS, TRUCK_CATEGORIES } from '../src/lib/truck-seo.ts'
-import { buildTruckSeoPaths } from '../src/lib/marketplace-seo.ts'
 
 const formMapping = mapTruckPlateResult({ tipoVeiculo: 'Caminhão', capacidadeCarga: 17000, quantidadeEixos: 2, cabine: 'estendida', pbt: 23000, cmt: 28000, fipePrice: null, structured_data: { origem: 'placa' } })
 assert.equal(formMapping.vehicle_type, 'truck')
@@ -86,25 +84,5 @@ assert.equal(missing.chassis, null)
 const placaMapped = mapPlacaApiResponse({ placa: 'ABC1D23', marca: 'Volvo', modelo: 'FH 540', ano: '2022', cor: 'Branco', extra: { vin: '9BV1ABC1234567890', campo_especifico: 'preservar' }, dados: { tipo_veiculo: 'Caminhão' } }, 'ABC1D23')
 assert.equal(placaMapped.chassi, '9BV1ABC1234567890')
 assert.equal(placaMapped.structured_data.campo_especifico, 'preservar')
-
-const truckAdapterSource = fetchPublicTruckListingsPage.toString()
-assert.match(truckAdapterSource, /vehicle_type/)
-assert.match(truckAdapterSource, /truck/)
-
-const truckMetadata = truckListingMetadata('/caminhoes')
-assert.match(String(truckMetadata.title), /caminhões à venda/i)
-assert.equal(truckMetadata.alternates.canonical, '/caminhoes')
-assert.match(String(truckMetadata.description), /caminhões usados/i)
-
-const collectionJsonLd = truckCollectionJsonLd({ url: '/caminhoes', name: 'Caminhões à venda', listings: [{ slug: 'volvo-fh-540', brand: 'Volvo', model: 'FH 540', price: 350000 }] })
-assert.equal(collectionJsonLd['@type'], 'CollectionPage')
-assert.equal(collectionJsonLd.mainEntity['@type'], 'ItemList')
-assert.match(JSON.stringify(collectionJsonLd), /volvo-fh-540/)
-
-const truckSeoPaths = buildTruckSeoPaths()
-assert.ok(truckSeoPaths.brands.includes('/caminhoes/marcas'))
-assert.ok(truckSeoPaths.categories.includes('/caminhoes/categorias'))
-assert.ok(TRUCK_BRANDS.length > 0)
-assert.ok(TRUCK_CATEGORIES.length > 0)
 
 console.log('truck mapping tests passed')

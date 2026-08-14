@@ -43,6 +43,11 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  useEffect(() => {
+    const closeMenu = window.setTimeout(() => setOpen(false), 0)
+    return () => window.clearTimeout(closeMenu)
+  }, [pathname])
+
   const fetchUnreadCount = async (token: string) => {
     try {
       const res = await fetch('/api/notifications', { headers: { Authorization: `Bearer ${token}` } })

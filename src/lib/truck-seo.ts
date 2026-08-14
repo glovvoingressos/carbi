@@ -8,6 +8,15 @@ export const TRUCK_CATEGORIES = [
   { slug: 'toco', name: 'Caminhões toco' },
 ]
 
+export function truckBrandSlug(brand: string) {
+  return brand.toLowerCase().replace(/[^a-z0-9]+/gi, '-')
+}
+
+export function canonicalTruckBrand(value: string) {
+  const normalized = value.trim().toLowerCase()
+  return TRUCK_BRANDS.find((brand) => truckBrandSlug(brand) === normalized || brand.toLowerCase() === normalized) || value
+}
+
 export function truckListingMetadata(path = '/caminhoes'): Metadata {
   return {
     title: 'Caminhões à venda | Carbi',
@@ -19,6 +28,10 @@ export function truckListingMetadata(path = '/caminhoes'): Metadata {
 }
 
 type TruckCollectionListing = { slug: string; brand: string; model: string; price?: number | null }
+
+export function serializeJsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c')
+}
 
 export function truckCollectionJsonLd({ url, name, listings }: { url: string; name: string; listings: TruckCollectionListing[] }) {
   return {
