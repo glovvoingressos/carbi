@@ -207,6 +207,13 @@ export function normalizeTruckPayload(payload: Partial<ListingFormPayload>): Rec
   return normalized
 }
 
+export function buildListingRollbackPayload(
+  previousListing: Record<string, unknown>,
+  appliedUpdates: Record<string, unknown>,
+): Record<string, unknown> {
+  return Object.fromEntries(Object.keys(appliedUpdates).map((field) => [field, previousListing[field]]))
+}
+
 export function resolveTruckPatch(
   payload: Partial<ListingFormPayload>,
   currentVehicleType: 'car' | 'truck',

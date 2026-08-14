@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import { mapTruckPayload, normalizeTruckData } from '../src/lib/trucks.ts'
 import { mapPlacaApiResponse } from '../src/lib/integrations/placaapi/types.ts'
-import { normalizeTruckPayload, resolveTruckPatch, validateListingPayload } from '../src/lib/marketplace.ts'
+import { buildListingRollbackPayload, normalizeTruckPayload, resolveTruckPatch, validateListingPayload } from '../src/lib/marketplace.ts'
 
 const payload = {
   marca: 'Mercedes-Benz',
@@ -53,6 +53,10 @@ assert.deepEqual(resolveTruckPatch({ load_capacity: 18000, vehicle_type: 'truck'
 })
 assert.equal(resolveTruckPatch({ vehicle_type: 'truck' }, 'car').error, 'Não é permitido alterar o tipo do veículo.')
 assert.equal(resolveTruckPatch({ load_capacity: -1, vehicle_type: 'truck' }, 'truck').error, 'load_capacity inválido.')
+assert.deepEqual(buildListingRollbackPayload(
+  { price: 100000, mileage: 12000, structured_data: { old: true } },
+  { price: 110000, mileage: 13000, structured_data: { old: false } },
+), { price: 100000, mileage: 12000, structured_data: { old: true } })
 
 assert.equal(normalizeTruckData({ tipoVeiculo: 'bi-truck' }).truck_category, 'bitruck')
 assert.equal(normalizeTruckData({ tipoVeiculo: 'cavalo mecânico' }).truck_category, 'cavalo_mecanico')

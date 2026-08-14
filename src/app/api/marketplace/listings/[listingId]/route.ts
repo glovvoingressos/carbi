@@ -3,7 +3,7 @@ import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingDeletedEmail, sendListingStatusChangedEmail } from '@/lib/email'
-import { normalizeTruckPayload, resolveTruckPatch } from '@/lib/marketplace'
+import { buildListingRollbackPayload, resolveTruckPatch } from '@/lib/marketplace'
 import type { TruckCategory } from '@/lib/trucks'
 
 type ListingPatchPayload = {
@@ -124,7 +124,7 @@ export async function PATCH(
     // Fetch current state to check for changes
     const { data: listing, error: listingError } = await supabase
       .from('vehicle_listings')
-      .select('id, user_id, vehicle_id, vehicle_type, status, published_at')
+      .select('*')
       .eq('id', listingId)
       .single()
 
@@ -183,7 +183,24 @@ export async function PATCH(
           .eq('id', listing.vehicle_id)
 
         if (vehicleUpdateError) {
-          return NextResponse.json({ error: 'Falha ao sincronizar o veículo relacionado.', details: vehicleUpdateError.message }, { status: 500 })
+          const rollbackPayload = buildListingRollbackPayload(listing as Record<string, unknown>, updates)
+          const { error: rollbackError } = await supabase
+            .from('vehicle_listings')
+            .update(rollbackPayload)
+            .eq('id', listingId)
+
+          if (rollbackError) {
+            console.error('Falha ao reverter anúncio após erro de sincronização', {
+              listingId,
+              rollbackError: rollbackError.message,
+            })
+          }
+
+          console.error('Falha ao sincronizar veículo relacionado', {
+            listingId,
+            vehicleUpdateError: vehicleUpdateError.message,
+          })
+          return NextResponse.json({ error: 'Falha ao sincronizar o veículo relacionado.' }, { status: 500 })
         }
       }
 
