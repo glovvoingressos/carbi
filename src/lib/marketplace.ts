@@ -207,6 +207,24 @@ export function normalizeTruckPayload(payload: Partial<ListingFormPayload>): Rec
   return normalized
 }
 
+export function resolveTruckPatch(
+  payload: Partial<ListingFormPayload>,
+  currentVehicleType: 'car' | 'truck',
+): { updates: Record<string, unknown>; error: string | null } {
+  if (payload.vehicle_type && payload.vehicle_type !== currentVehicleType) {
+    return { updates: {}, error: 'Não é permitido alterar o tipo do veículo.' }
+  }
+
+  const effectiveType = payload.vehicle_type || currentVehicleType
+  if (effectiveType !== 'truck') return { updates: {}, error: null }
+
+  const updates = normalizeTruckPayload({ ...payload, vehicle_type: 'truck' })
+  const truckPayload = { ...payload, vehicle_type: 'truck' } as ListingFormPayload
+  const errors = validateListingPayload(truckPayload)
+  const truckErrors = errors.filter((error) => /^(load_capacity|axles|pbt|cmt) inválido\.$/.test(error))
+  return { updates, error: truckErrors[0] || null }
+}
+
 export function validateListingPayload(payload: ListingFormPayload): string[] {
   const errors: string[] = []
 

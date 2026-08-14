@@ -3,7 +3,7 @@ import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingDeletedEmail, sendListingStatusChangedEmail } from '@/lib/email'
-import { normalizeTruckPayload } from '@/lib/marketplace'
+import { normalizeTruckPayload, resolveTruckPatch } from '@/lib/marketplace'
 import type { TruckCategory } from '@/lib/trucks'
 
 type ListingPatchPayload = {
@@ -59,7 +59,6 @@ export async function PATCH(
     const body = (await req.json()) as ListingPatchPayload
 
     const updates: Record<string, unknown> = {}
-    Object.assign(updates, normalizeTruckPayload(body))
     
     // Basic fields with validation
     if (typeof body.title === 'string') {
@@ -125,7 +124,7 @@ export async function PATCH(
     // Fetch current state to check for changes
     const { data: listing, error: listingError } = await supabase
       .from('vehicle_listings')
-      .select('id, user_id, vehicle_id, status, published_at')
+      .select('id, user_id, vehicle_id, vehicle_type, status, published_at')
       .eq('id', listingId)
       .single()
 
@@ -136,6 +135,10 @@ export async function PATCH(
     if (listing.user_id !== auth.userId) {
       return NextResponse.json({ error: 'Sem permissão para editar este anúncio.' }, { status: 403 })
     }
+
+    const truckPatch = resolveTruckPatch(body, listing.vehicle_type)
+    if (truckPatch.error) return NextResponse.json({ error: truckPatch.error }, { status: 400 })
+    Object.assign(updates, truckPatch.updates)
 
     // Handle status transition for published_at
     if (typeof body.status === 'string') {
@@ -174,7 +177,14 @@ export async function PATCH(
       }
       if ('structured_data' in updates) vehicleUpdates.technical_data = updates.structured_data
       if (Object.keys(vehicleUpdates).length > 0) {
-        await supabase.from('vehicles').update(vehicleUpdates).eq('id', listing.vehicle_id)
+        const { error: vehicleUpdateError } = await supabase
+          .from('vehicles')
+          .update(vehicleUpdates)
+          .eq('id', listing.vehicle_id)
+
+        if (vehicleUpdateError) {
+          return NextResponse.json({ error: 'Falha ao sincronizar o veículo relacionado.', details: vehicleUpdateError.message }, { status: 500 })
+        }
       }
 
       if (typeof updates.vin === 'string' && updates.vin.length === 17) {
