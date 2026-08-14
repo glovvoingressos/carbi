@@ -89,4 +89,21 @@ assert.equal(placaMapped.cmt, 60000)
 assert.equal(placaMapped.categoria, 'Caminhão')
 assert.equal(placaMapped.structured_data.campo_especifico, 'preservar')
 
+const nestedCommonMapped = mapPlacaApiResponse({
+  extra: {
+    marca: 'Scania',
+    modelo: 'R 450',
+    cor: 'Azul',
+  },
+  dados: {
+    tipo_veiculo: 'Cavalo mecânico',
+  },
+}, 'DEF4G56')
+
+assert.equal(nestedCommonMapped.marca, 'Scania')
+assert.equal(nestedCommonMapped.modelo, 'R 450')
+assert.equal(nestedCommonMapped.cor, 'Azul')
+assert.equal(nestedCommonMapped.tipoVeiculo, 'Cavalo mecânico')
+assert.equal(nestedCommonMapped.categoria, 'Cavalo mecânico')
+
 console.log('truck mapping tests passed')

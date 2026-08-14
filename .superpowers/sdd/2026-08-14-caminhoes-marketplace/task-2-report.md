@@ -1,16 +1,15 @@
 # Task 2 Report
 
-Status: implemented
+Status: implemented and review fixes applied
 
 ## Scope
 
-Extended the plate API response mapper with common vehicle fields and truck-specific fields sourced from top-level, `extra`, and `dados` aliases. Unknown nested truck fields are retained in `structured_data`. Request URL, normalization, errors, FIPE fallback, cache, timeout, and client endpoint behavior were left unchanged.
+Extended the plate API response mapper with common vehicle fields and truck-specific fields sourced from top-level, `extra`, and `dados` aliases. Common aliases for `marca`, `modelo`, and `cor` are resolved from nested objects. When `categoria` is absent, it falls back to `tipo_veiculo`/`tipoVeiculo`. Unknown nested truck fields are retained in `structured_data`. Request URL, normalization, errors, FIPE fallback, cache, timeout, and client endpoint behavior were left unchanged.
 
 ## Verification
 
 - `node scripts/test-truck-mapping.mjs` — passed (Node emitted the repository's existing module-type warning).
 - `npx tsc --noEmit` — passed.
-- `npm run lint` — failed on pre-existing `react-hooks/static-components` errors in `src/components/marketplace/AuthCard.tsx`; also reported existing `<img>` warnings. No Task 2 files were reported.
 
 ## Commit
 
