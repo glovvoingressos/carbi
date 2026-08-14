@@ -22,6 +22,15 @@ interface PlateInputProps {
     version: string
     fipePrice?: number | null
     fipeReference?: string | null
+    truck_type?: string | null
+    load_capacity?: number | null
+    axles?: number | null
+    truck_body_type?: string | null
+    cabin_type?: string | null
+    pbt?: number | null
+    cmt?: number | null
+    truck_category?: string | null
+    structured_data?: Record<string, unknown>
   }) => void
 }
 
@@ -74,9 +83,16 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
         bodyType: data.tipoVeiculo || 'Hatch',
         plate: data.placa || plate,
         version: data.versao || '',
-        fipePrice: data.fipe_price || null,
-        fipeReference: data.fipe_reference_month || null,
-      })
+         fipePrice: data.fipe_price || null,
+         fipeReference: data.fipe_reference_month || null,
+         load_capacity: data.capacidadeCarga,
+         axles: data.numeroEixos,
+         cabin_type: data.tipoCabine,
+         pbt: data.pbt,
+         cmt: data.cmt,
+         truck_category: data.categoria,
+         structured_data: data.structured_data,
+       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao consultar placa. Verifique os dados e tente novamente.')
     } finally { setLoading(false) }

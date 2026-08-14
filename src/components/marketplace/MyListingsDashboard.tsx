@@ -436,7 +436,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
 }
 
 // ── Main Dashboard ─────────────────────────────────────
-export default function MyListingsDashboard() {
+export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'car' | 'truck' } = {}) {
   const router = useRouter()
   const supabaseReady = isSupabaseBrowserConfigured()
   const [sessionReady, setSessionReady] = useState(false)
@@ -474,7 +474,7 @@ export default function MyListingsDashboard() {
 
   const loadListings = useCallback(async (selectFirst = false) => {
     if (!supabaseReady) return; setLoadingListings(true); setGlobalError(null)
-    try { const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); if (!session?.access_token) { setGlobalError('Faça login.'); return }; const res = await fetch('/api/marketplace/my-listings', { headers: authH(session.access_token) }); const p = await res.json().catch(() => []); if (!res.ok) throw new Error(p.error || 'Falha ao carregar.'); const list = Array.isArray(p) ? (p as DashboardListing[]) : []; setListings(list); if (selectFirst && list.length > 0) setSelectedId(list[0].id) }
+    try { const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); if (!session?.access_token) { setGlobalError('Faça login.'); return }; const res = await fetch('/api/marketplace/my-listings', { headers: authH(session.access_token) }); const p = await res.json().catch(() => []); if (!res.ok) throw new Error(p.error || 'Falha ao carregar.'); const list = Array.isArray(p) ? (p as (DashboardListing & { vehicle_type?: string })[]) : []; const filteredList = vehicleType ? list.filter((item) => item.vehicle_type === vehicleType) : list; setListings(filteredList); if (selectFirst && filteredList.length > 0) setSelectedId(filteredList[0].id) }
     catch (err) { setGlobalError(err instanceof Error ? err.message : 'Falha ao carregar.') } finally { setLoadingListings(false) }
   }, [supabaseReady])
 

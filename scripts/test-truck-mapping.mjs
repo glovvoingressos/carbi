@@ -4,6 +4,15 @@ import { mapTruckPayload, normalizeTruckData } from '../src/lib/trucks.ts'
 import { mapPlacaApiResponse } from '../src/lib/integrations/placaapi/types.ts'
 import { buildListingRollbackPayload, normalizeTruckPayload, resolveTruckPatch, validateListingPayload } from '../src/lib/marketplace.ts'
 import { fetchPublicTruckListingsPage } from '../src/lib/marketplace-server.ts'
+import { mapTruckPlateResult, truckFipeMessage } from '../src/lib/truck-listing-form.ts'
+
+const formMapping = mapTruckPlateResult({ tipoVeiculo: 'Caminhão', capacidadeCarga: 17000, quantidadeEixos: 2, cabine: 'estendida', pbt: 23000, cmt: 28000, fipePrice: null, structured_data: { origem: 'placa' } })
+assert.equal(formMapping.vehicle_type, 'truck')
+assert.equal(formMapping.load_capacity, '17000')
+assert.equal(formMapping.axles, '2')
+assert.equal(formMapping.cabin_type, 'estendida')
+assert.equal(formMapping.structured_data.origem, 'placa')
+assert.equal(truckFipeMessage(formMapping.fipeAvailable), 'FIPE não disponível')
 
 const payload = {
   marca: 'Mercedes-Benz',

@@ -50,7 +50,7 @@ interface UploadImageItem {
 }
 
 interface FormState {
-  vehicle_type: 'car'
+  vehicle_type: 'car' | 'truck'
   title: string
   brand: string
   model: string
@@ -72,6 +72,14 @@ interface FormState {
   plateFinal: string
   doors: string
   vin: string
+  truck_type: string
+  load_capacity: string
+  axles: string
+  truck_body_type: string
+  cabin_type: string
+  pbt: string
+  cmt: string
+  truck_category: string
 }
 
 interface CatalogCar {
@@ -123,6 +131,14 @@ const INITIAL_STATE: FormState = {
   plateFinal: '',
   doors: '',
   vin: '',
+  truck_type: '',
+  load_capacity: '',
+  axles: '',
+  truck_body_type: '',
+  cabin_type: '',
+  pbt: '',
+  cmt: '',
+  truck_category: '',
 
 }
 
@@ -227,12 +243,12 @@ function authHeader(token: string) {
   }
 }
 
-export default function ListingForm() {
+export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'car' | 'truck' }) {
   const supabaseReady = isSupabaseBrowserConfigured()
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [listingSubStep, setListingSubStep] = useState(1)
-  const [form, setForm] = useState<FormState>(INITIAL_STATE)
+  const [form, setForm] = useState<FormState>({ ...INITIAL_STATE, vehicle_type: vehicleType })
   const [images, setImages] = useState<UploadImageItem[]>([])
 
   const [brands, setBrands] = useState<FipeItem[]>([])
@@ -995,6 +1011,16 @@ export default function ListingForm() {
           plate_final: form.plateFinal,
           doors: form.doors ? Number(form.doors) : null,
           vin: form.vin ? form.vin.trim().toUpperCase() : null,
+          ...(form.vehicle_type === 'truck' ? {
+            truck_type: form.truck_type || null,
+            load_capacity: form.load_capacity ? parseBrazilianInt(form.load_capacity) : null,
+            axles: form.axles ? parseBrazilianInt(form.axles) : null,
+            truck_body_type: form.truck_body_type || null,
+            cabin_type: form.cabin_type || null,
+            pbt: form.pbt ? parseBrazilianInt(form.pbt) : null,
+            cmt: form.cmt ? parseBrazilianInt(form.cmt) : null,
+            truck_category: form.truck_category || null,
+          } : {}),
           fipe_brand_code: selectedBrandCode || null,
           fipe_model_code: selectedModelCode || null,
           fipe_year_code: selectedVersionCode || null,
@@ -1139,7 +1165,7 @@ export default function ListingForm() {
               <div className="fingen-flow-substep-card p-3 sm:p-5 space-y-3 sm:space-y-4 animate-fade-in">
                 <p className="fingen-flow-field-label">Placa do veículo</p>
                 <p className="text-[13px] text-[#767676]">Digite a placa para preencher marca, modelo e dados automaticamente.</p>
-<PlateInput onPlateFound={(data: { brand: string; model: string; year: number; yearModel: number; color: string; fuel: string; engine: string; horsepower: string; transmission: string; bodyType: string; plate: string; version: string; fipePrice?: number | null; fipeReference?: string | null }) => {
+<PlateInput onPlateFound={(data: { brand: string; model: string; year: number; yearModel: number; color: string; fuel: string; engine: string; horsepower: string; transmission: string; bodyType: string; plate: string; version: string; fipePrice?: number | null;     fipeReference?: string | null; load_capacity?: number | null; axles?: number | null; cabin_type?: string | null; pbt?: number | null; cmt?: number | null; truck_category?: string | null; structured_data?: Record<string, unknown> }) => {
                    handleInput('brand', data.brand)
                    handleInput('model', data.model)
                    handleInput('year', String(data.year))
@@ -1150,8 +1176,16 @@ export default function ListingForm() {
                    handleInput('horsepower', data.horsepower)
                    handleInput('transmission', data.transmission)
                    handleInput('bodyType', data.bodyType)
-                    handleInput('plateFinal', data.plate)
-                    if (data.version) {
+                     handleInput('plateFinal', data.plate)
+                     if (form.vehicle_type === 'truck') {
+                       handleInput('load_capacity', data.load_capacity == null ? '' : String(data.load_capacity))
+                       handleInput('axles', data.axles == null ? '' : String(data.axles))
+                       handleInput('cabin_type', data.cabin_type || '')
+                       handleInput('pbt', data.pbt == null ? '' : String(data.pbt))
+                       handleInput('cmt', data.cmt == null ? '' : String(data.cmt))
+                       handleInput('truck_category', data.truck_category || '')
+                     }
+                     if (data.version) {
                       handleInput('version', data.version)
                     }
                   }} />
@@ -1232,7 +1266,19 @@ export default function ListingForm() {
               </p>
             </div>
             
-            <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
+             {form.vehicle_type === 'truck' && (
+               <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1 rounded-2xl border border-[#D4F576]/40 bg-[#D4F576]/10 p-4">
+                 <p className="sm:col-span-2 text-sm font-semibold text-[#1A1A1A]">Dados do caminhão</p>
+                 {([['truck_type', 'Tipo de caminhão'], ['load_capacity', 'Capacidade de carga (kg)'], ['axles', 'Eixos'], ['truck_body_type', 'Carroceria'], ['cabin_type', 'Cabine'], ['pbt', 'PBT (kg)'], ['cmt', 'CMT (kg)'], ['truck_category', 'Categoria']] as const).map(([field, label]) => (
+                   <input key={field} className="fingen-flow-input" placeholder={label} value={form[field]} onChange={(e) => handleInput(field, e.target.value)} aria-label={label} />
+                 ))}
+                 {!fipeResult && <p className="sm:col-span-2 text-xs font-medium text-amber-700">FIPE não disponível</p>}
+                 <p className="sm:col-span-2 text-xs text-[#767676]">Você pode preencher manualmente os dados que não vierem na consulta da placa.</p>
+               </div>
+             )}
++
++             <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
+
               <div>
                 <label htmlFor="listing-price" className="sr-only">Preço pedido</label>
                 <input
