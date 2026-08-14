@@ -41,10 +41,15 @@ export interface ListingFormPayload {
   fipe_price?: number | null
   structured_data?: Record<string, unknown>
   // Truck-specific fields
-  truck_type?: string
+  truck_type?: string | null
   load_capacity?: number | null
   axles?: number | null
-  truck_body_type?: string
+  truck_body_type?: string | null
+  cabin_type?: string | null
+  pbt?: number | null
+  cmt?: number | null
+  truck_category?: string | null
+  chassis?: string | null
 }
 
 export interface ListingPublic {
@@ -108,6 +113,11 @@ export interface ListingPublic {
   load_capacity?: number | null
   axles?: number | null
   truck_body_type?: string | null
+  cabin_type?: string | null
+  pbt?: number | null
+  cmt?: number | null
+  truck_category?: string | null
+  chassis?: string | null
   // Negotiation settings
   accepts_offers?: boolean
   negotiable?: 'open' | 'low' | 'firm'
