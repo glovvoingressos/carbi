@@ -1,4 +1,4 @@
-import { FipeResult } from '@/lib/fipe-api'
+import type { FipeResult } from '@/lib/fipe-api'
 import type { TruckCategory } from '@/lib/trucks'
 
 export const LISTING_MAX_IMAGES = 10
@@ -185,17 +185,23 @@ export function normalizeTruckPayload(payload: Partial<ListingFormPayload>): Rec
 
   const truckFields = ['truck_type', 'load_capacity', 'axles', 'truck_body_type'] as const
   const dedicatedFields = ['cabin_type', 'pbt', 'cmt', 'truck_category'] as const
+  const structuredFields = ['chassis'] as const
   const normalized: Record<string, unknown> = { vehicle_type: 'truck' }
 
-  for (const field of [...truckFields, ...dedicatedFields]) {
+  for (const field of truckFields) {
     if (field in payload) normalized[field] = payload[field] ?? null
   }
 
-  if ('structured_data' in payload || dedicatedFields.some((field) => field in payload)) {
+  const additionalFields = [...dedicatedFields, ...structuredFields]
+  if ('structured_data' in payload || additionalFields.some((field) => field in payload)) {
     normalized.structured_data = {
       ...(payload.structured_data || {}),
-      ...Object.fromEntries(dedicatedFields.filter((field) => field in payload).map((field) => [field, payload[field] ?? null])),
+      ...Object.fromEntries(additionalFields.filter((field) => field in payload).map((field) => [field, payload[field] ?? null])),
     }
+  }
+
+  for (const field of dedicatedFields) {
+    if (field in payload) normalized[field] = payload[field] ?? null
   }
 
   return normalized

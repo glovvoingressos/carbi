@@ -83,23 +83,42 @@ export async function PATCH(
     }
 
     // Additional fields
-    if (typeof body.mileage === 'number') updates.mileage = body.mileage
+    if (typeof body.mileage === 'number') {
+      if (!Number.isInteger(body.mileage) || body.mileage < 0) return NextResponse.json({ error: 'Quilometragem inválida.' }, { status: 400 })
+      updates.mileage = body.mileage
+    }
     if (typeof body.brand === 'string') updates.brand = body.brand
     if (typeof body.model === 'string') updates.model = body.model
     if (typeof body.version === 'string') updates.version = body.version
-    if (typeof body.year === 'number') updates.year = body.year
-    if (typeof body.year_model === 'number') updates.year_model = body.year_model
+    if (typeof body.year === 'number') {
+      if (!Number.isInteger(body.year) || body.year < 1950 || body.year > 2100) return NextResponse.json({ error: 'Ano inválido.' }, { status: 400 })
+      updates.year = body.year
+    }
+    if (typeof body.year_model === 'number') {
+      if (!Number.isInteger(body.year_model) || body.year_model < 1950 || body.year_model > 2100) return NextResponse.json({ error: 'Ano/modelo inválido.' }, { status: 400 })
+      updates.year_model = body.year_model
+    }
     if (typeof body.transmission === 'string') updates.transmission = body.transmission
     if (typeof body.fuel === 'string') updates.fuel = body.fuel
     if (typeof body.color === 'string') updates.color = body.color
     if (typeof body.body_type === 'string') updates.body_type = body.body_type
     if (typeof body.city === 'string') updates.city = body.city
-    if (typeof body.state === 'string') updates.state = body.state.substring(0, 2)
+    if (typeof body.state === 'string') {
+      const state = body.state.trim().toUpperCase()
+      if (!/^[A-Z]{2}$/.test(state)) return NextResponse.json({ error: 'Estado deve conter 2 letras.' }, { status: 400 })
+      updates.state = state
+    }
     if (Array.isArray(body.optional_items)) updates.optional_items = body.optional_items
     if (typeof body.engine === 'string') updates.engine = body.engine
-    if (typeof body.horsepower === 'number') updates.horsepower = body.horsepower
+    if (typeof body.horsepower === 'number') {
+      if (!Number.isInteger(body.horsepower) || body.horsepower < 0) return NextResponse.json({ error: 'Potência inválida.' }, { status: 400 })
+      updates.horsepower = body.horsepower
+    }
     if (typeof body.plate_final === 'string') updates.plate_final = body.plate_final.substring(0, 1)
-    if (typeof body.doors === 'number') updates.doors = body.doors
+    if (typeof body.doors === 'number') {
+      if (!Number.isInteger(body.doors) || body.doors < 1 || body.doors > 20) return NextResponse.json({ error: 'Portas inválidas.' }, { status: 400 })
+      updates.doors = body.doors
+    }
 
     const supabase = getSupabaseServerClient(auth.accessToken)
     
@@ -147,11 +166,16 @@ export async function PATCH(
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    if (typeof updates.vin !== 'undefined' && listing.vehicle_id) {
-      await supabase
-        .from('vehicles')
-        .update({ vin: updates.vin as string | null })
-        .eq('id', listing.vehicle_id)
+    if (listing.vehicle_id) {
+      const vehicleUpdates: Record<string, unknown> = {}
+      const vehicleFields = ['brand', 'model', 'version', 'year', 'year_model', 'transmission', 'fuel', 'color', 'body_type', 'engine', 'horsepower', 'doors', 'mileage', 'vin']
+      for (const field of vehicleFields) {
+        if (field in updates) vehicleUpdates[field] = updates[field]
+      }
+      if ('structured_data' in updates) vehicleUpdates.technical_data = updates.structured_data
+      if (Object.keys(vehicleUpdates).length > 0) {
+        await supabase.from('vehicles').update(vehicleUpdates).eq('id', listing.vehicle_id)
+      }
 
       if (typeof updates.vin === 'string' && updates.vin.length === 17) {
         await runAutoDevSync({

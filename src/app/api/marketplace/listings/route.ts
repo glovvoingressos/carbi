@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
       fipe_year_code: payload.fipe_year_code || null,
       fipe_reference_month: payload.fipe_reference_month || null,
       fipe_price: payload.fipe_price || null,
-      technical_data: payload.structured_data || {},
+      technical_data: (truckPayload.structured_data as Record<string, unknown> | undefined) || payload.structured_data || {},
     }
 
     const { data: vehicle, error: vehicleError } = await supabase
