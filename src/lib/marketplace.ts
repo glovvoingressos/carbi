@@ -1,4 +1,5 @@
 import { FipeResult } from '@/lib/fipe-api'
+import type { TruckCategory } from '@/lib/trucks'
 
 export const LISTING_MAX_IMAGES = 10
 export const LISTING_MAX_IMAGE_SIZE_MB = 10
@@ -48,7 +49,7 @@ export interface ListingFormPayload {
   cabin_type?: string | null
   pbt?: number | null
   cmt?: number | null
-  truck_category?: string | null
+  truck_category?: TruckCategory | null
   chassis?: string | null
 }
 
@@ -116,7 +117,7 @@ export interface ListingPublic {
   cabin_type?: string | null
   pbt?: number | null
   cmt?: number | null
-  truck_category?: string | null
+  truck_category?: TruckCategory | null
   chassis?: string | null
   // Negotiation settings
   accepts_offers?: boolean

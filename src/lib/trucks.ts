@@ -40,6 +40,37 @@ function normalizeCategory(value: unknown): TruckCategory | null {
   return null
 }
 
+export function mapTruckPayload(input: Record<string, unknown>): {
+  brand: string | null
+  model: string | null
+  yearManufacture: number | null
+  yearModel: number | null
+  truck: {
+    category: TruckCategory | null
+    axles: number | null
+    loadCapacity: number | null
+    pbt: number | null
+    cmt: number | null
+    structuredData: Record<string, unknown>
+  }
+} {
+  const truck = normalizeTruckData(input)
+  return {
+    brand: nullableString(first(input, ['brand', 'marca'])),
+    model: nullableString(first(input, ['model', 'modelo'])),
+    yearManufacture: nullableNumber(first(input, ['yearManufacture', 'anoFabricacao'])),
+    yearModel: nullableNumber(first(input, ['yearModel', 'anoModelo'])),
+    truck: {
+      category: truck.truck_category,
+      axles: truck.axles,
+      loadCapacity: truck.load_capacity,
+      pbt: truck.pbt,
+      cmt: truck.cmt,
+      structuredData: truck.structured_data,
+    },
+  }
+}
+
 export function normalizeTruckData(input: Record<string, unknown>): TruckData {
   const knownKeys = new Set([
     'truck_type', 'truckType', 'tipoVeiculo', 'tipo', 'load_capacity', 'loadCapacity', 'capacidadeCarga',
