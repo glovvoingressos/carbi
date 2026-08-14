@@ -166,7 +166,8 @@ export async function PATCH(
       .single()
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('Falha ao atualizar anúncio', { listingId, error: error.message })
+      return NextResponse.json({ error: 'Falha ao atualizar o anúncio.' }, { status: 500 })
     }
 
     if (listing.vehicle_id) {
@@ -302,7 +303,8 @@ export async function DELETE(
 
     const { error } = await supabase.from('vehicle_listings').delete().eq('id', listingId)
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('Falha ao excluir anúncio', { listingId, error: error.message })
+      return NextResponse.json({ error: 'Falha ao excluir o anúncio.' }, { status: 500 })
     }
 
     // Processamento assíncrono para enviar notificação de exclusão de anúncio por e-mail

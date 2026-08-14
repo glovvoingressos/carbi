@@ -43,7 +43,6 @@ interface VehicleDetailViewProps {
     totalListings: number
   } | null
   relatedListings: ListingPublic[]
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   enrichment?: any
   comparison: {
     status: 'below' | 'near' | 'above' | 'unknown'
@@ -96,8 +95,8 @@ export default function VehicleDetailView({
   const isSeller = sessionUserId === listing.user_id
 
   useEffect(() => {
-    setPageUrl(window.location.href)
-    if (!isSupabaseBrowserConfigured()) return
+    const timer = window.setTimeout(() => setPageUrl(window.location.href), 0)
+    if (!isSupabaseBrowserConfigured()) return () => window.clearTimeout(timer)
     const supabase = getSupabaseBrowserClient()
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: { access_token?: string; user?: { id?: string } } | null } }) => {
       if (session?.access_token) {
@@ -115,6 +114,7 @@ export default function VehicleDetailView({
       price: Number(listing.price),
       currency: 'BRL',
     })
+    return () => window.clearTimeout(timer)
   }, [listing.id])
 
   const listingImages = useMemo(() => listing.images?.map((img) => img.url).filter(Boolean) || [], [listing.images])
@@ -146,7 +146,7 @@ export default function VehicleDetailView({
 
   const sellerName = sellerInfo?.name || 'Vendedor particular'
   const sellerFirstName = firstName(sellerInfo?.name)
-  const sellerYears = Math.max(0, new Date().getFullYear() - new Date(sellerInfo?.memberSince || Date.now()).getFullYear())
+  const sellerYears = Math.max(0, new Date().getFullYear() - new Date(sellerInfo?.memberSince || '2000-01-01').getFullYear())
   const publicPath = pageUrl ? pageUrl.replace(/^https?:\/\//, '') : `carbi.com.br/anuncios/${listing.slug}`
 
   const handleShare = async () => {
