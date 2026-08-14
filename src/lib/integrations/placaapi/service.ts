@@ -1,4 +1,4 @@
-import type { PlacaApiResponse, PlacaLookupResult } from './types'
+import { mapPlacaApiResponse, type PlacaApiResponse, type PlacaLookupResult } from './types'
 import { getFipePrice } from '@/lib/fipe-api'
 
 const PLACA_API_BASE = 'https://wdapi2.com.br/consulta'
@@ -18,30 +18,7 @@ export async function lookupPlate(plate: string): Promise<PlacaLookupResult> {
       return { success: false, error: data.message }
     }
 
-    // Map API response to our format
-    const extra = data.extra || {}
-    const vehicleData: PlacaApiResponse = {
-      placa: data.placa || cleanPlate,
-      chassi: data.chassi || '',
-      renavam: '',
-      marca: data.marca || '',
-      modelo: data.modelo || '',
-      versao: data.VERSAO || '',
-      anoFabricacao: parseInt(extra.ano_fabricacao || data.ano) || 0,
-      anoModelo: parseInt(extra.ano_modelo || data.anoModelo) || 0,
-      cor: data.cor || '',
-      combustivel: extra.combustivel || '',
-      cilindradas: extra.cilindradas || '',
-      potencia: extra.potencia || extra.hp || '',
-      cambio: extra.caixa_cambio || '',
-      tipoVeiculo: extra.tipo_veiculo || '',
-      situacao: data.situacao || '',
-      uf: data.uf || extra.uf || '',
-      municipio: data.municipio || extra.municipio || '',
-      cpfCnpjProprietario: '',
-      nomeProprietario: '',
-      dataAtualizacao: data.data || '',
-    }
+    const vehicleData: PlacaApiResponse = mapPlacaApiResponse(data, cleanPlate)
 
     // Extract FIPE data - pick the best match (highest score)
     const fipeEntries = data.fipe?.dados
