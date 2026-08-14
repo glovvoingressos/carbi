@@ -556,16 +556,6 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
 
   if (typeof input.mileageMin === 'number') query = query.gte('mileage', input.mileageMin)
   if (typeof input.mileageMax === 'number') query = query.lte('mileage', input.mileageMax)
-  if (input.truckType) {
-    if (Array.isArray(input.truckType)) query = query.in('truck_type', input.truckType)
-    else query = query.ilike('truck_type', `%${input.truckType}%`)
-  }
-  if (input.axles) {
-    if (Array.isArray(input.axles)) query = query.in('axles', input.axles)
-    else query = query.eq('axles', input.axles)
-  }
-  if (typeof input.loadCapacityMin === 'number') query = query.gte('load_capacity', input.loadCapacityMin)
-  if (typeof input.loadCapacityMax === 'number') query = query.lte('load_capacity', input.loadCapacityMax)
 
   if (input.optionalItems && input.optionalItems.length > 0) {
     query = query.contains('optional_items', input.optionalItems)
