@@ -12,6 +12,21 @@ export function clearTruckListingFilters(): TruckListingFilters {
   return { vehicle_type: 'truck' }
 }
 
+export function applyTruckQueryFilters(query: any, input: TruckListingFilters): any {
+  let result = query
+  if (input.vehicle_type) result = result.eq('vehicle_type', input.vehicle_type)
+  if (input.truckType) result = Array.isArray(input.truckType) ? result.in('truck_type', input.truckType) : result.ilike('truck_type', `%${input.truckType}%`)
+  if (input.axles != null) result = Array.isArray(input.axles) ? result.in('axles', input.axles) : result.eq('axles', input.axles)
+  if (input.loadCapacityMin != null) result = result.gte('load_capacity', input.loadCapacityMin)
+  if (input.loadCapacityMax != null) result = result.lte('load_capacity', input.loadCapacityMax)
+  if (input.city) result = Array.isArray(input.city) ? result.in('city', input.city) : result.ilike('city', input.city)
+  if (input.state) result = result.eq('state', input.state)
+  if (input.transmission) result = Array.isArray(input.transmission) ? result.in('transmission', input.transmission) : result.ilike('transmission', `%${input.transmission}%`)
+  if (input.mileageMin != null) result = result.gte('mileage', input.mileageMin)
+  if (input.mileageMax != null) result = result.lte('mileage', input.mileageMax)
+  return result
+}
+
 export function serializeTruckListingFilters(input: TruckListingFilters): URLSearchParams {
   const params = new URLSearchParams()
   params.set('vehicle_type', 'truck')

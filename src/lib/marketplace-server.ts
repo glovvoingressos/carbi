@@ -3,6 +3,7 @@ import { ListingPublic } from '@/lib/marketplace'
 import { getFipePrice } from '@/lib/fipe-api'
 import { parseFipePriceToNumber } from '@/lib/marketplace'
 import { classifyVehicleCategory, classifyByFuelType } from '@/lib/vehicle-category'
+import { applyTruckQueryFilters } from '@/lib/truck-filters'
 
 type ListingImageRow = {
   id: string
@@ -286,16 +287,26 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
   if (input.brand) viewQuery = viewQuery.ilike('brand', `%${input.brand}%`)
   if (input.model) viewQuery = viewQuery.ilike('model', `%${input.model}%`)
   viewQuery = applyTextSearch(viewQuery, input.q)
-  if (input.yearModel) viewQuery = viewQuery.eq('year_model', input.yearModel)
+   if (input.yearModel) viewQuery = viewQuery.eq('year_model', input.yearModel)
    if (input.excludeId) viewQuery = viewQuery.neq('id', input.excludeId)
-   if (input.vehicle_type) viewQuery = viewQuery.eq('vehicle_type', input.vehicle_type)
+   viewQuery = applyTruckQueryFilters(viewQuery, input)
 
+   const { data: viewData, error: viewError } = await (input.single ? viewQuery.maybeSingle() : viewQuery)
+   if (!viewError) {
+     if (!viewData) return []
+     const rows = Array.isArray(viewData) ? (viewData as ListingRow[]) : [viewData as ListingRow]
+     try {
+       const ids = rows.map(row => row.id)
+       const extras = await supabase.from('vehicle_listings_public').select('id, structured_data, cabin_type, pbt, cmt, truck_category, chassis').in('id', ids)
+       if (!extras.error && Array.isArray(extras.data)) {
+         const byId = new Map(extras.data.map(row => [row.id, row]))
+         return rows.map(row => normalizeTableRow({ ...row, ...(byId.get(row.id) || {}) }))
+       }
+     } catch {
+     }
+     return rows.map(normalizeTableRow)
+   }
 
-  const { data: viewData, error: viewError } = await (input.single ? viewQuery.maybeSingle() : viewQuery)
-  if (!viewError) {
-    if (!viewData) return []
-    return Array.isArray(viewData) ? (viewData as ListingPublic[]) : [viewData as ListingPublic]
-  }
 
   if (!isMissingRelationError(viewError.message)) {
     return []
