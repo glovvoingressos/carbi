@@ -140,7 +140,14 @@ export default function MarketplaceClient({
     getSearchNumber('year_min', typeof defaultFilters?.yearMin === 'number' ? defaultFilters.yearMin : 1990),
     getSearchNumber('year_max', typeof defaultFilters?.yearMax === 'number' ? defaultFilters.yearMax : new Date().getFullYear() + 1),
   ])
+  const [mileageMin, setMileageMin] = useState<number>(getSearchNumber('mileage_min', typeof defaultFilters?.mileageMin === 'number' ? defaultFilters.mileageMin : 0))
   const [mileageMax, setMileageMax] = useState<number>(getSearchNumber('mileage_max', typeof defaultFilters?.mileageMax === 'number' ? defaultFilters.mileageMax : 300000))
+  const [selectedTruckTypes, setSelectedTruckTypes] = useState<string[]>(getSearchArray('truck_type', defaultFilters?.truckType))
+  const [selectedAxles, setSelectedAxles] = useState<number[]>(getSearchArray('axles', defaultFilters?.axles).map(Number).filter(Number.isFinite))
+  const [loadCapacityMin, setLoadCapacityMin] = useState<number>(getSearchNumber('load_capacity_min', typeof defaultFilters?.loadCapacityMin === 'number' ? defaultFilters.loadCapacityMin : 0))
+  const [loadCapacityMax, setLoadCapacityMax] = useState<number>(getSearchNumber('load_capacity_max', typeof defaultFilters?.loadCapacityMax === 'number' ? defaultFilters.loadCapacityMax : 100000))
+  const [selectedCities, setSelectedCities] = useState<string[]>(getSearchArray('city', defaultFilters?.city))
+  const [selectedState, setSelectedState] = useState<string>(searchParams.get('state') || defaultFilters?.state || '')
   const [selectedFuels, setSelectedFuels] = useState<string[]>(getSearchArray('fuel', defaultFilters?.fuel))
   const [selectedTransmissions, setSelectedTransmissions] = useState<string[]>(getSearchArray('transmission', defaultFilters?.transmission))
   const [selectedColors, setSelectedColors] = useState<string[]>(getSearchArray('color', defaultFilters?.color))
@@ -164,8 +171,16 @@ export default function MarketplaceClient({
       priceMax: priceRange[1] < 1000000 ? priceRange[1] : undefined,
       yearMin: yearRange[0] > 1990 ? yearRange[0] : undefined,
       yearMax: yearRange[1] < (new Date().getFullYear() + 1) ? yearRange[1] : undefined,
-      mileageMax: mileageMax < 300000 ? mileageMax : undefined,
-      sort,
+       mileageMin: mileageMin > 0 ? mileageMin : undefined,
+       mileageMax: mileageMax < 300000 ? mileageMax : undefined,
+       truckType: selectedTruckTypes.length > 0 ? selectedTruckTypes : undefined,
+       axles: selectedAxles.length > 0 ? selectedAxles : undefined,
+       loadCapacityMin: loadCapacityMin > 0 ? loadCapacityMin : undefined,
+       loadCapacityMax: loadCapacityMax < 100000 ? loadCapacityMax : undefined,
+       city: selectedCities.length > 0 ? selectedCities : undefined,
+       state: selectedState || undefined,
+       sort,
+
       page: currentPage,
       pageSize: 24,
       ...overrides
@@ -184,7 +199,15 @@ export default function MarketplaceClient({
     if (input.priceMax) params.set('price_max', input.priceMax.toString())
     if (input.yearMin) params.set('year_min', input.yearMin.toString())
     if (input.yearMax) params.set('year_max', input.yearMax.toString())
-    if (input.mileageMax) params.set('mileage_max', input.mileageMax.toString())
+     if (input.mileageMin) params.set('mileage_min', input.mileageMin.toString())
+     if (input.mileageMax) params.set('mileage_max', input.mileageMax.toString())
+     if (Array.isArray(input.truckType)) input.truckType.forEach(value => params.append('truck_type', value))
+     if (Array.isArray(input.axles)) input.axles.forEach(value => params.append('axles', value.toString()))
+     if (input.loadCapacityMin) params.set('load_capacity_min', input.loadCapacityMin.toString())
+     if (input.loadCapacityMax) params.set('load_capacity_max', input.loadCapacityMax.toString())
+     if (Array.isArray(input.city)) input.city.forEach(value => params.append('city', value))
+     if (input.state) params.set('state', input.state)
+
     if (input.sort !== 'recent') params.set('ordem', input.sort!)
     if (input.page && input.page > 1) params.set('pagina', input.page.toString())
 
@@ -195,7 +218,7 @@ export default function MarketplaceClient({
     setTotal(result.total)
     setTotalPages(Math.max(1, Math.ceil(result.total / result.pageSize)))
     setIsSearching(false)
-  }, [q, selectedBrands, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, priceRange, yearRange, mileageMax, sort, currentPage, router, pathname, selectedVehicleType, selectedModels])
+  }, [q, selectedBrands, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, priceRange, yearRange, mileageMin, mileageMax, selectedTruckTypes, selectedAxles, loadCapacityMin, loadCapacityMax, selectedCities, selectedState, sort, currentPage, router, pathname, selectedVehicleType, selectedModels])
 
   useEffect(() => {
     if (!didRunInitialTextSearch.current) {
@@ -206,7 +229,7 @@ export default function MarketplaceClient({
       if (!isSearching) updateResults({ page: 1 })
     }, 250)
     return () => clearTimeout(timer)
-  }, [q, priceRange, yearRange, mileageMax, sort])
+  }, [q, priceRange, yearRange, mileageMin, mileageMax, loadCapacityMin, loadCapacityMax, sort])
 
   useEffect(() => {
     if (!didRunInitialFilterSearch.current) {
@@ -214,7 +237,7 @@ export default function MarketplaceClient({
       return
     }
     updateResults({ page: 1 })
-  }, [selectedBrands, selectedModels, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, selectedVehicleType])
+  }, [selectedBrands, selectedModels, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, selectedVehicleType, selectedTruckTypes, selectedAxles, selectedCities, selectedState])
 
   useEffect(() => {
     async function loadModels() {
@@ -241,7 +264,14 @@ export default function MarketplaceClient({
     setSelectedOptionals([])
     setPriceRange([0, 1000000])
     setYearRange([1990, new Date().getFullYear() + 1])
+    setMileageMin(0)
     setMileageMax(300000)
+    setSelectedTruckTypes([])
+    setSelectedAxles([])
+    setLoadCapacityMin(0)
+    setLoadCapacityMax(100000)
+    setSelectedCities([])
+    setSelectedState('')
     setSort('recent')
     setCurrentPage(1)
   }
@@ -275,7 +305,30 @@ export default function MarketplaceClient({
         </div>
       </FilterSection>
 
-      <FilterSection title="Preço">
+       {selectedVehicleType === 'truck' && (
+         <>
+           <FilterSection title="Tipo de caminhão">
+             <div className="flex flex-wrap gap-1.5">
+               {['Truck', 'Toco', 'Bitruck', 'Cavalo mecânico'].map(type => <ToggleButton key={type} active={selectedTruckTypes.includes(type)} onClick={() => toggleItem(selectedTruckTypes, type, setSelectedTruckTypes)}>{type}</ToggleButton>)}
+             </div>
+           </FilterSection>
+           <FilterSection title="Eixos">
+             <div className="flex flex-wrap gap-1.5">
+               {[2, 3, 4, 5].map(axle => <ToggleButton key={axle} active={selectedAxles.includes(axle)} onClick={() => setSelectedAxles(selectedAxles.includes(axle) ? selectedAxles.filter(value => value !== axle) : [...selectedAxles, axle])}>{axle}</ToggleButton>)}
+             </div>
+           </FilterSection>
+           <FilterSection title="Capacidade de carga (kg)">
+             <div className="cbi-grid2"><input type="number" value={loadCapacityMin || ''} onChange={e => setLoadCapacityMin(Number(e.target.value) || 0)} placeholder="Mínimo" className="cbi-field" aria-label="Capacidade mínima" /><input type="number" value={loadCapacityMax === 100000 ? '' : loadCapacityMax} onChange={e => setLoadCapacityMax(Number(e.target.value) || 100000)} placeholder="Máximo" className="cbi-field" aria-label="Capacidade máxima" /></div>
+           </FilterSection>
+           <FilterSection title="Localização">
+             <input value={selectedCities[0] || ''} onChange={e => setSelectedCities(e.target.value ? [e.target.value] : [])} placeholder="Cidade" className="cbi-field mb-2" aria-label="Cidade" />
+             <input value={selectedState} onChange={e => setSelectedState(e.target.value.toUpperCase())} placeholder="Estado (UF)" maxLength={2} className="cbi-field" aria-label="Estado" />
+           </FilterSection>
+         </>
+       )}
+
+       <FilterSection title="Preço">
+
         <div className="cbi-grid2">
           <input
             type="number"

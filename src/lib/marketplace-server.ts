@@ -13,6 +13,8 @@ type ListingImageRow = {
 
 type ListingRow = Omit<ListingPublic, 'images' | 'category'> & {
   images?: ListingImageRow[] | null
+  structured_data?: Record<string, unknown> | null
+  technical_data?: Record<string, unknown> | null
 }
 
 type ListingQueryInput = {
@@ -25,6 +27,7 @@ type ListingQueryInput = {
   excludeId?: string
   limit?: number
   single?: boolean
+  vehicle_type?: string
 }
 
 export type ListingSort =
@@ -105,12 +108,25 @@ function applyTextSearch<T>(query: T, inputQuery?: string): T {
 }
 
 function normalizeTableRow(row: ListingRow): ListingPublic {
+  const structured = row.structured_data || row.technical_data || {}
+  const normalizedTruck = row.vehicle_type === 'truck' ? {
+    truck_type: row.truck_type || (structured.truck_type as string | undefined) || null,
+    load_capacity: row.load_capacity ?? (structured.load_capacity as number | undefined) ?? null,
+    axles: row.axles ?? (structured.axles as number | undefined) ?? null,
+    truck_body_type: row.truck_body_type || (structured.truck_body_type as string | undefined) || null,
+    cabin_type: row.cabin_type || (structured.cabin_type as string | undefined) || null,
+    pbt: row.pbt ?? (structured.pbt as number | undefined) ?? null,
+    cmt: row.cmt ?? (structured.cmt as number | undefined) ?? null,
+    truck_category: row.truck_category || (structured.truck_category as ListingPublic['truck_category']) || null,
+    chassis: row.chassis || (structured.chassis as string | undefined) || null,
+  } : {}
   const category = classifyVehicleCategory(row.body_type, row.brand, row.model) 
     || classifyByFuelType(row.fuel)
     || null
   
   return {
     ...row,
+    ...normalizedTruck,
     category,
     images: (row.images || []).map((image) => ({
       id: image.id,
@@ -264,7 +280,9 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
   if (input.model) viewQuery = viewQuery.ilike('model', `%${input.model}%`)
   viewQuery = applyTextSearch(viewQuery, input.q)
   if (input.yearModel) viewQuery = viewQuery.eq('year_model', input.yearModel)
-  if (input.excludeId) viewQuery = viewQuery.neq('id', input.excludeId)
+   if (input.excludeId) viewQuery = viewQuery.neq('id', input.excludeId)
+   if (input.vehicle_type) viewQuery = viewQuery.eq('vehicle_type', input.vehicle_type)
+
 
   const { data: viewData, error: viewError } = await (input.single ? viewQuery.maybeSingle() : viewQuery)
   if (!viewError) {
@@ -372,6 +390,7 @@ export async function getRelatedListings(params: {
   model: string
   yearModel?: number
   excludeId?: string
+  vehicle_type?: string
   limit?: number
 }): Promise<ListingPublic[]> {
   if (!isSupabaseConfigured()) return []
@@ -380,6 +399,7 @@ export async function getRelatedListings(params: {
     model: params.model,
     yearModel: params.yearModel,
     excludeId: params.excludeId,
+    vehicle_type: params.vehicle_type,
     limit: params.limit || 6,
   })
 }
@@ -460,7 +480,8 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
        load_capacity,
        axles,
        truck_body_type
-     `, { count: 'exact' })
+      `, { count: 'exact' })
+
 
     .eq('status', 'active')
     .range(from, to)
