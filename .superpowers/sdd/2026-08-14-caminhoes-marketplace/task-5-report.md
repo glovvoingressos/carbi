@@ -1,23 +1,20 @@
 # Task 5 report
 
 ## Status
-Implemented dedicated truck listing creation and account filtering flows.
+Corrections from review implemented.
 
-## Changes
-- Added `/anunciar-caminhao` using the shared `ListingForm` with `vehicleType="truck"`.
-- Added truck fields: `truck_type`, `load_capacity`, `axles`, `truck_body_type`, `cabin_type`, `pbt`, `cmt`, and `truck_category`.
-- Extended plate lookup callback mapping for truck-specific API fields and structured data.
-- Added non-blocking `FIPE não disponível` state for truck forms.
-- Added `/minha-conta/caminhoes` as a filtered adapter over the existing dashboard.
-- Added pure truck form mapping helpers and assertions to `scripts/test-truck-mapping.mjs`.
+## Corrections
+- Dashboard truck editing now loads and displays `vehicle_type`, `truck_type`, `load_capacity`, `axles`, `truck_body_type`, and `structured_data`; PATCH payload preserves these fields.
+- Truck publishing treats FIPE as optional, displays `FIPE não disponível`, and sends `fipe_price: null` when absent. Car FIPE completeness behavior remains unchanged.
+- Plate autofill now forwards truck type, body type, capacity, axles, PBT/CMT, category, and structured data.
+- Added pure functional runner `scripts/test-truck-form.mjs` and npm script `test:truck:form`; it uses Node's native TypeScript stripping and no `@/` aliases.
 
 ## Verification
+- `node --experimental-strip-types scripts/test-truck-form.mjs`: PASS (`truck form tests passed`).
 - `npx tsc --noEmit`: PASS.
-- `npm run lint`: FAILS on pre-existing `AuthCard.tsx` static-components errors; only existing lint targets are configured.
-- `npm run build`: compilation completed, then Next.js TypeScript worker exited with `invalid type: unit value, expected usize` while using the WASM SWC fallback.
-- `node scripts/test-truck-mapping.mjs`: BLOCKED by existing direct-Node alias resolution failure (`@/lib` cannot be resolved). The new helper assertions are included before the existing import-dependent assertions.
+- Directed lint: remaining failures are pre-existing React Compiler/static-effect findings in the large shared `ListingForm.tsx` and `MyListingsDashboard.tsx`; no new lint error was introduced by the truck-specific pure helper, routes, or PlateInput changes. The existing `AuthCard.tsx` errors were not modified.
+- Full build: previously compiled successfully but failed in the environment's Next WASM TypeScript worker (`invalid type: unit value, expected usize`) because the native SWC binary is unavailable.
 
 ## Concerns
-- The requested direct Node test command requires an alias-aware TypeScript runtime or script setup; this repository currently has neither `tsx` nor Node alias resolution.
-- The build environment is missing the native `@next/swc-darwin-arm64` binary and falls back to WASM, where the worker fails after successful compilation.
-- Existing unrelated working-tree changes were not modified or staged.
+- The repository's ESLint configuration reports legacy shared-component issues when linting the files touched by this task; resolving those would be unrelated broad refactoring.
+- Next build remains environment-blocked by missing `@next/swc-darwin-arm64` and the WASM worker failure.

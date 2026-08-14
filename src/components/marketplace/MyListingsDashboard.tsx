@@ -12,7 +12,7 @@ import MarketplaceListingImage from './MarketplaceListingImage'
 import PlateInput from './PlateInput'
 
 interface DashboardImage { id: string; public_url: string; storage_path: string; sort_order: number; is_primary: boolean }
-interface DashboardListing { id: string; slug: string; title: string; description: string; brand: string; model: string; version: string | null; year: number; year_model: number; vin?: string | null; mileage: number; price: number; city: string; state: string; status: string; transmission: string; fuel: string; color: string; body_type: string; optional_items: string[]; engine: string | null; horsepower: number | null; doors: number | null; plate_final: string | null; images: DashboardImage[] | null; view_count?: number }
+interface DashboardListing { id: string; slug: string; title: string; description: string; vehicle_type?: 'car' | 'truck'; brand: string; model: string; version: string | null; year: number; year_model: number; vin?: string | null; mileage: number; price: number; city: string; state: string; status: string; transmission: string; fuel: string; color: string; body_type: string; optional_items: string[]; engine: string | null; horsepower: number | null; doors: number | null; plate_final: string | null; truck_type?: string | null; load_capacity?: number | null; axles?: number | null; truck_body_type?: string | null; structured_data?: Record<string, unknown> | null; images: DashboardImage[] | null; view_count?: number }
 interface UploadImageItem { id: string; file?: File; previewUrl: string; isExisting: boolean; originalImage?: DashboardImage; is_primary: boolean; sort_order: number }
 
 const authH = (t: string) => ({ Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' })
@@ -400,8 +400,15 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
             <input className={`${ic('plate_final')} text-center font-bold uppercase`} maxLength={1} value={formData.plate_final || ''} onChange={(e) => update('plate_final', e.target.value.toUpperCase())} />
           </div>
         </div>
-        <div className="mt-4">
-          <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">VIN / Chassi (opcional)</label>
+         {formData.vehicle_type === 'truck' && (
+           <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4 rounded-xl bg-[#D4F576]/20 p-4">
+             {([['truck_type', 'Tipo de caminhão'], ['load_capacity', 'Capacidade (kg)'], ['axles', 'Eixos'], ['truck_body_type', 'Carroceria']] as const).map(([field, label]) => (
+               <div key={field}><label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">{label}</label><input type={field === 'load_capacity' || field === 'axles' ? 'number' : 'text'} className={ic(field)} value={formData[field] ?? ''} onChange={(e) => update(field, field === 'load_capacity' || field === 'axles' ? parseBrazilianInt(e.target.value) : e.target.value)} /></div>
+             ))}
+           </div>
+         )}
+         <div className="mt-4">
+           <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">VIN / Chassi (opcional)</label>
           <input className={`${ic('vin')} uppercase font-mono`} value={formData.vin || ''} maxLength={17} placeholder="Número do chassi (17 caracteres)" onChange={(e) => update('vin', e.target.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, ''))} />
         </div>
       </div>
@@ -473,17 +480,17 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
   }, [supabaseReady])
 
   const loadListings = useCallback(async (selectFirst = false) => {
-    if (!supabaseReady) return; setLoadingListings(true); setGlobalError(null)
-    try { const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); if (!session?.access_token) { setGlobalError('Faça login.'); return }; const res = await fetch('/api/marketplace/my-listings', { headers: authH(session.access_token) }); const p = await res.json().catch(() => []); if (!res.ok) throw new Error(p.error || 'Falha ao carregar.'); const list = Array.isArray(p) ? (p as (DashboardListing & { vehicle_type?: string })[]) : []; const filteredList = vehicleType ? list.filter((item) => item.vehicle_type === vehicleType) : list; setListings(filteredList); if (selectFirst && filteredList.length > 0) setSelectedId(filteredList[0].id) }
-    catch (err) { setGlobalError(err instanceof Error ? err.message : 'Falha ao carregar.') } finally { setLoadingListings(false) }
-  }, [supabaseReady])
+     if (!supabaseReady) return; setLoadingListings(true); setGlobalError(null)
+     try { const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); if (!session?.access_token) { setGlobalError('Faça login.'); return }; const res = await fetch('/api/marketplace/my-listings', { headers: authH(session.access_token) }); const p = await res.json().catch(() => []); if (!res.ok) throw new Error(p.error || 'Falha ao carregar.'); const list = Array.isArray(p) ? (p as (DashboardListing & { vehicle_type?: string })[]) : []; const filteredList = vehicleType ? list.filter((item) => item.vehicle_type === vehicleType) : list; setListings(filteredList); if (selectFirst && filteredList.length > 0) setSelectedId(filteredList[0].id) }
+     catch (err) { setGlobalError(err instanceof Error ? err.message : 'Falha ao carregar.') } finally { setLoadingListings(false) }
+  }, [supabaseReady, vehicleType])
 
   useEffect(() => { if (isAuthenticated) void loadListings(true) }, [isAuthenticated, loadListings])
 
   // Sync form
   useEffect(() => {
     if (!selected) return; localImages.forEach((img) => { if (!img.isExisting) URL.revokeObjectURL(img.previewUrl) })
-    setFormData({ title: selected.title, description: selected.description, price: selected.price, vin: selected.vin || '', status: selected.status, mileage: selected.mileage, brand: selected.brand, model: selected.model, version: selected.version, year: selected.year, year_model: selected.year_model, transmission: selected.transmission, fuel: selected.fuel, color: selected.color, body_type: selected.body_type, city: selected.city, state: selected.state, optional_items: selected.optional_items || [], engine: selected.engine, horsepower: selected.horsepower, doors: selected.doors, plate_final: selected.plate_final })
+     setFormData({ title: selected.title, description: selected.description, vehicle_type: selected.vehicle_type, price: selected.price, vin: selected.vin || '', status: selected.status, mileage: selected.mileage, brand: selected.brand, model: selected.model, version: selected.version, year: selected.year, year_model: selected.year_model, transmission: selected.transmission, fuel: selected.fuel, color: selected.color, body_type: selected.body_type, city: selected.city, state: selected.state, optional_items: selected.optional_items || [], engine: selected.engine, horsepower: selected.horsepower, doors: selected.doors, plate_final: selected.plate_final, truck_type: selected.truck_type, load_capacity: selected.load_capacity, axles: selected.axles, truck_body_type: selected.truck_body_type, structured_data: selected.structured_data || null })
     setLocalImages((selected.images || []).map((img) => ({ id: img.id, previewUrl: img.public_url, isExisting: true, originalImage: img, is_primary: img.is_primary, sort_order: img.sort_order })).sort((a, b) => a.sort_order - b.sort_order))
     setIsDirty(false); setSaveStatus('idle'); setErrors({})
   }, [selected?.id])

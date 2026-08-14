@@ -49,6 +49,32 @@ interface UploadImageItem {
   previewUrl: string
 }
 
+type PlateFormData = {
+  brand: string
+  model: string
+  year: number
+  yearModel: number
+  color: string
+  fuel: string
+  engine: string
+  horsepower: string
+  transmission: string
+  bodyType: string
+  plate: string
+  version: string
+  fipePrice?: number | null
+  fipeReference?: string | null
+  truck_type?: string | null
+  truck_body_type?: string | null
+  load_capacity?: number | null
+  axles?: number | null
+  cabin_type?: string | null
+  pbt?: number | null
+  cmt?: number | null
+  truck_category?: string | null
+  structured_data?: Record<string, unknown>
+}
+
 interface FormState {
   vehicle_type: 'car' | 'truck'
   title: string
@@ -80,6 +106,7 @@ interface FormState {
   pbt: string
   cmt: string
   truck_category: string
+  structured_data: Record<string, unknown>
 }
 
 interface CatalogCar {
@@ -139,6 +166,7 @@ const INITIAL_STATE: FormState = {
   pbt: '',
   cmt: '',
   truck_category: '',
+  structured_data: {},
 
 }
 
@@ -752,7 +780,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const recommendedItems = [
     { label: 'Descrição', complete: form.description.trim().length >= 20 },
     { label: 'Opcionais', complete: normalizeOptionalItems(form.optionalItems).length > 0 },
-    { label: 'FIPE consultada', complete: Boolean(fipeResult?.price) },
+     { label: 'FIPE consultada', complete: form.vehicle_type === 'truck' || Boolean(fipeResult?.price) },
     { label: 'Categoria', complete: Boolean(resolvedBodyTypeValue.trim()) },
     { label: 'Motor', complete: Boolean(form.engine.trim() || technical.engine !== 'Não informado') },
     { label: 'Potência', complete: Boolean(form.horsepower.trim() || technical.horsepower !== 'Não informado') },
@@ -1026,9 +1054,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
           fipe_year_code: selectedVersionCode || null,
           ...fipeSnapshot,
 
-          structured_data: {
-            source: 'web_form',
-          },
+            structured_data: {
+             ...form.structured_data,
+             source: 'web_form',
+           },
         }),
       })
 
@@ -1165,7 +1194,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               <div className="fingen-flow-substep-card p-3 sm:p-5 space-y-3 sm:space-y-4 animate-fade-in">
                 <p className="fingen-flow-field-label">Placa do veículo</p>
                 <p className="text-[13px] text-[#767676]">Digite a placa para preencher marca, modelo e dados automaticamente.</p>
-<PlateInput onPlateFound={(data: { brand: string; model: string; year: number; yearModel: number; color: string; fuel: string; engine: string; horsepower: string; transmission: string; bodyType: string; plate: string; version: string; fipePrice?: number | null;     fipeReference?: string | null; load_capacity?: number | null; axles?: number | null; cabin_type?: string | null; pbt?: number | null; cmt?: number | null; truck_category?: string | null; structured_data?: Record<string, unknown> }) => {
+                 <PlateInput onPlateFound={(data: PlateFormData) => {
                    handleInput('brand', data.brand)
                    handleInput('model', data.model)
                    handleInput('year', String(data.year))
@@ -1178,12 +1207,15 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                    handleInput('bodyType', data.bodyType)
                      handleInput('plateFinal', data.plate)
                      if (form.vehicle_type === 'truck') {
+                       handleInput('truck_type', data.truck_type || '')
+                       handleInput('truck_body_type', data.truck_body_type || '')
                        handleInput('load_capacity', data.load_capacity == null ? '' : String(data.load_capacity))
                        handleInput('axles', data.axles == null ? '' : String(data.axles))
                        handleInput('cabin_type', data.cabin_type || '')
                        handleInput('pbt', data.pbt == null ? '' : String(data.pbt))
                        handleInput('cmt', data.cmt == null ? '' : String(data.cmt))
                        handleInput('truck_category', data.truck_category || '')
+                       setForm((prev) => ({ ...prev, structured_data: { ...prev.structured_data, ...(data.structured_data || {}) } }))
                      }
                      if (data.version) {
                       handleInput('version', data.version)

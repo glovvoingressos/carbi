@@ -85,6 +85,8 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
         version: data.versao || '',
          fipePrice: data.fipe_price || null,
          fipeReference: data.fipe_reference_month || null,
+         truck_type: data.tipoVeiculo,
+         truck_body_type: data.structured_data.truck_body_type as string | null,
          load_capacity: data.capacidadeCarga,
          axles: data.numeroEixos,
          cabin_type: data.tipoCabine,
