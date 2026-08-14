@@ -9,7 +9,9 @@ Implemented dedicated truck marketplace routes and query adapter.
 - Added `/caminhoes`, `/caminhoes/marca/[brand]`, and `/caminhoes/anuncio/[slug]`.
 - Reused `MarketplaceClient` and `VehicleDetailView`; truck detail fields render conditionally.
 - Added `src/lib/truck-seo.ts`.
-- Added pure truck query builder `applyTruckQueryFilters`, used by both the public view and direct-table paths.
+- Added pure truck query builder `applyTruckQueryFilters`, used by public view pagination and direct-table paths.
+- Removed duplicated truck columns from the direct-table select.
+- Added explicit car regression coverage proving no `vehicle_type` filter is injected when absent.
 - Added functional coverage for the view branch filter operations in `scripts/test-truck-filters.mjs` without regex or HTTP mocks.
 - Added truck filter state/UI/query parameters for type, axles, capacity, mileage, transmission, city, and state.
 - Dedicated related listings now enforce `vehicle_type: 'truck'`.

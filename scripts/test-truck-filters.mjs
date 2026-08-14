@@ -31,4 +31,11 @@ assert.deepEqual(calls, [
   ['gte', 'load_capacity', 10000], ['lte', 'load_capacity', 20000], ['in', 'city', ['São Paulo']],
   ['eq', 'state', 'SP'], ['in', 'transmission', ['Manual']], ['gte', 'mileage', 100], ['lte', 'mileage', 90000],
 ])
+const carCalls = []
+const carQuery = ['eq', 'in', 'ilike', 'gte', 'lte'].reduce((builder, method) => {
+  builder[method] = (...args) => { carCalls.push([method, ...args]); return builder }
+  return builder
+}, {})
+applyTruckQueryFilters(carQuery, { vehicle_type: undefined, transmission: 'Automatic' })
+assert.deepEqual(carCalls, [['ilike', 'transmission', '%Automatic%']])
 console.log('truck filter tests passed')

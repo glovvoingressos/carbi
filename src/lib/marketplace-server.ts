@@ -350,14 +350,11 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
       created_at,
       updated_at,
       price_updated_at,
-      truck_type,
-      load_capacity,
-      axles,
-      truck_body_type,
-      truck_type,
-      load_capacity,
-      axles,
-      truck_body_type,
+       truck_type,
+       load_capacity,
+       axles,
+       truck_body_type,
+
       accepts_offers,
       negotiable,
       accepts_counter,
@@ -524,11 +521,8 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
 
   query = applyTextSearch(query, input.q)
   
-  if (input.vehicle_type) {
-    if (Array.isArray(input.vehicle_type)) query = query.in('vehicle_type', input.vehicle_type)
-    else query = query.eq('vehicle_type', input.vehicle_type)
-  }
-  
+  query = applyTruckQueryFilters(query, input)
+
   if (input.brand) {
     if (Array.isArray(input.brand)) query = query.in('brand', input.brand)
     else query = query.ilike('brand', input.brand)
@@ -539,21 +533,9 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
     else query = query.ilike('model', `%${input.model}%`)
   }
   
-  if (input.city) {
-    if (Array.isArray(input.city)) query = query.in('city', input.city)
-    else query = query.ilike('city', input.city)
-  }
-  
-  if (input.state) query = query.ilike('state', input.state)
-  
   if (input.bodyType) {
     if (Array.isArray(input.bodyType)) query = query.in('body_type', input.bodyType)
     else query = query.ilike('body_type', `%${input.bodyType}%`)
-  }
-  
-  if (input.transmission) {
-    if (Array.isArray(input.transmission)) query = query.in('transmission', input.transmission)
-    else query = query.ilike('transmission', `%${input.transmission}%`)
   }
   
   if (input.fuel) {
