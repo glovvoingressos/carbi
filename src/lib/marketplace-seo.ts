@@ -366,6 +366,13 @@ export const MARKETPLACE_SEO_PRESETS: MarketplaceSeoPreset[] = [
 
 export const MARKETPLACE_SEO_SLUGS = MARKETPLACE_SEO_PRESETS.map((preset) => preset.slug)
 
+export function buildTruckSeoPaths() {
+  return {
+    brands: ['/caminhoes/marcas', ...['Mercedes-Benz', 'Volvo', 'Scania', 'Volkswagen', 'Ford', 'Iveco'].map((brand) => `/caminhoes/marca/${brand.toLowerCase().replace(/[^a-z0-9]+/gi, '-')}`)],
+    categories: ['/caminhoes/categorias', ...['truck', 'bitruck', 'cavalo-mecanico', 'toco'].map((category) => `/caminhoes?truck_type=${category}`)],
+  }
+}
+
 export type CityEntry = {
   name: string
   slug: string

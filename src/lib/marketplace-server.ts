@@ -587,7 +587,7 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
 
    let dataWithImages: ListingRow[] = (data as ListingRow[]).map(row => ({
      ...row,
-     vehicle_type: (row as any).vehicle_type || 'car',
+      vehicle_type: (row as any).vehicle_type || null,
      images: imagesByListing.get(row.id) || [],
    }))
    try {

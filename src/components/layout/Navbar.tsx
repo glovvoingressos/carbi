@@ -10,6 +10,7 @@ import Logo from '@/components/ui/Logo'
 
 const LINKS = [
   { href: '/carros-a-venda', label: 'Comprar' },
+  { href: '/caminhoes', label: 'Caminhões' },
   { href: '/anunciar-carro', label: 'Vender' },
   { href: '/marcas', label: 'Marcas' },
   { href: '/qual-carro', label: 'Qual carro?' },
@@ -42,10 +43,13 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Close mobile menu on route change
-  useEffect(() => {
-    setOpen(false)
-  }, [pathname])
+  const fetchUnreadCount = async (token: string) => {
+    try {
+      const res = await fetch('/api/notifications', { headers: { Authorization: `Bearer ${token}` } })
+      const d = await res.json()
+      setUnreadCount(d.unreadCount || 0)
+    } catch {}
+  }
 
   // Auth state
   useEffect(() => {
@@ -66,14 +70,6 @@ export default function Navbar() {
     })
     return () => data.subscription.unsubscribe()
   }, [])
-
-  const fetchUnreadCount = async (token: string) => {
-    try {
-      const res = await fetch('/api/notifications', { headers: { Authorization: `Bearer ${token}` } })
-      const d = await res.json()
-      setUnreadCount(d.unreadCount || 0)
-    } catch {}
-  }
 
   const isActive = (href: string) => pathname === href || (href !== '/' && pathname.startsWith(href))
 

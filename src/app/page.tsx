@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Search, TrendingUp, Plus, BarChart3, ChevronRight, ArrowRight, Heart, MapPin, Fuel, Gauge, Calendar, MessageCircle, Car, CheckCircle2, Star, Tag } from 'lucide-react'
+import { Search, TrendingUp, Plus, BarChart3, ChevronRight, ArrowRight, Heart, MapPin, Fuel, Gauge, Calendar, MessageCircle, Car, Truck as TruckIcon, CheckCircle2, Star, Tag } from 'lucide-react'
 import { getLatestPublicListings, getMonthlyViews } from '@/lib/marketplace-server'
 import { formatBRL, cars } from '@/data/cars'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
@@ -200,6 +200,10 @@ export default async function HomePage() {
             <Link href="/anunciar-carro" className="hero-creative-btn hero-creative-btn-white">
               <Plus size={18} />
               <span>Anunciar grátis</span>
+            </Link>
+            <Link href="/caminhoes" className="hero-creative-btn hero-creative-btn-white">
+              <TruckIcon size={18} />
+              <span>Comprar caminhões</span>
             </Link>
           </div>
         </section>

@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
-import { fetchPublicListingsPage } from '@/lib/marketplace-server'
-import { MARKETPLACE_SEO_SLUGS, MAJOR_CITIES } from '@/lib/marketplace-seo'
+import { fetchPublicListingsPage, fetchPublicTruckListingsPage } from '@/lib/marketplace-server'
+import { MARKETPLACE_SEO_SLUGS, MAJOR_CITIES, buildTruckSeoPaths } from '@/lib/marketplace-seo'
 import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import { slugifyBrand } from '@/lib/brand-utils'
 
@@ -9,6 +9,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 const CORE_PAGES: Array<{ path: string; priority: number; freq: 'daily' | 'weekly' | 'monthly' }> = [
   { path: '/', priority: 1.0, freq: 'daily' },
   { path: '/carros-a-venda', priority: 1.0, freq: 'daily' },
+  { path: '/caminhoes', priority: 1.0, freq: 'daily' },
+  { path: '/caminhoes/marcas', priority: 0.85, freq: 'weekly' },
+  { path: '/caminhoes/categorias', priority: 0.85, freq: 'weekly' },
   { path: '/anunciar-carro', priority: 0.95, freq: 'weekly' },
   { path: '/anunciar-carro-bh', priority: 0.85, freq: 'weekly' },
   { path: '/anunciar-seminovo', priority: 0.95, freq: 'weekly' },
@@ -33,10 +36,11 @@ const CATEGORY_INTENTS = [
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [cars, listingsPage1, listingsPage2] = await Promise.all([
+  const [cars, listingsPage1, listingsPage2, truckListingsPage] = await Promise.all([
     getAllCars().catch(() => []),
     fetchPublicListingsPage({ page: 1, pageSize: 48, sort: 'recent' }).catch(() => ({ items: [] })),
     fetchPublicListingsPage({ page: 2, pageSize: 48, sort: 'recent' }).catch(() => ({ items: [] })),
+    fetchPublicTruckListingsPage({ page: 1, pageSize: 48, sort: 'recent' }).catch(() => ({ items: [] })),
   ])
 
   const uniqueBrands = Array.from(new Set(cars.map((car) => slugifyBrand(car.brand)))).filter(Boolean)
@@ -106,6 +110,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
+  for (const path of buildTruckSeoPaths().brands.slice(1).concat(buildTruckSeoPaths().categories.slice(1))) {
+    entries.push({ url: `${SITE_URL}${path}`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 })
+  }
+
   for (const brand of uniqueBrands) {
     entries.push({
       url: `${SITE_URL}/vender/${brand}`,
@@ -122,6 +130,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
+    })
+  }
+
+  for (const listing of truckListingsPage.items) {
+    entries.push({
+      url: `${SITE_URL}/caminhoes/anuncio/${listing.slug}`,
+      lastModified: new Date(listing.updated_at || listing.published_at || listing.created_at),
+      changeFrequency: 'daily',
+      priority: 0.9,
     })
   }
 
