@@ -208,6 +208,22 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* Truck Discovery Banner */}
+        <section className="fingen-banner fingen-truck-banner">
+          <div className="fingen-banner-content">
+            <div className="fingen-banner-icon fingen-truck-banner-icon">
+              <TruckIcon size={20} strokeWidth={2} />
+            </div>
+            <div className="fingen-banner-text">
+              <strong>Caminhões também estão no Carbi</strong>
+              <span>Encontre caminhões usados, compare ofertas e anuncie o seu.</span>
+            </div>
+            <Link href="/caminhoes" className="fingen-banner-btn">
+              Ver caminhões <ArrowRight size={14} />
+            </Link>
+          </div>
+        </section>
+
         {/* Free Promo Banner */}
         <section className="fingen-banner fingen-promo-banner">
           <div className="fingen-banner-content fingen-promo-content fingen-promo-column">
@@ -245,6 +261,18 @@ export default async function HomePage() {
                 <p>{fetchError ? 'Carregando anúncios...' : 'Nenhum anúncio ainda'}</p>
               </div>
             )}
+          </div>
+        </section>
+
+        <section className="fingen-section fingen-truck-quick-link">
+          <div className="fingen-truck-quick-link-inner">
+            <div>
+              <span className="fingen-truck-quick-label">Para quem move o Brasil</span>
+              <h2>Caminhões à venda, do seu jeito.</h2>
+            </div>
+            <Link href="/caminhoes" className="fingen-section-link">
+              Explorar categoria <ArrowRight size={14} />
+            </Link>
           </div>
         </section>
 

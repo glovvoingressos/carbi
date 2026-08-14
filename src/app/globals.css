@@ -6722,6 +6722,74 @@ p {
   gap: 4px;
 }
 
+/* Truck Discovery Banner */
+.fingen-truck-banner .fingen-banner-content {
+  background: #FFFFFF;
+  border: 1px solid rgba(26, 26, 26, 0.1);
+}
+
+.fingen-truck-banner-icon {
+  background: #1A1A1A;
+  color: #D4F576;
+}
+
+.fingen-truck-banner .fingen-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fingen-truck-quick-link {
+  padding-top: 0;
+  padding-bottom: 32px;
+}
+
+.fingen-truck-quick-link-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 0;
+  border-top: 1px solid rgba(26, 26, 26, 0.12);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.12);
+}
+
+.fingen-truck-quick-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #5A47D1;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.fingen-truck-quick-link h2 {
+  margin: 0;
+  color: #1A1A1A;
+  font-family: var(--font-heading);
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+@media (max-width: 560px) {
+  .fingen-truck-banner .fingen-banner-content {
+    align-items: flex-start;
+  }
+
+  .fingen-truck-banner .fingen-banner-btn {
+    align-self: center;
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .fingen-truck-quick-link-inner {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+}
+
 /* Free Traffic Banner */
 .fingen-banner {
   margin: 0 -20px 32px;
