@@ -4,10 +4,12 @@ import { getFipePrice } from '@/lib/fipe-api'
 import { parseFipePriceToNumber } from '@/lib/marketplace'
 import { classifyVehicleCategory, classifyByFuelType } from '@/lib/vehicle-category'
 import { applyTruckQueryFilters } from '@/lib/truck-filters'
+import { normalizeListingImages } from '@/lib/listing-images'
 
 type ListingImageRow = {
   id: string
-  public_url: string
+  public_url?: string | null
+  url?: string | null
   sort_order: number
   is_primary: boolean
 }
@@ -136,12 +138,7 @@ function normalizeTableRow(row: ListingRow): ListingPublic {
     ...row,
     ...normalizedTruck,
     category,
-    images: (row.images || []).map((image) => ({
-      id: image.id,
-      url: image.public_url,
-      sort_order: image.sort_order,
-      is_primary: image.is_primary,
-    })),
+    images: normalizeListingImages(row.images),
   } as ListingPublic
 }
 
