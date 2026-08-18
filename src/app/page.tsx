@@ -1,22 +1,17 @@
 import type { Metadata } from 'next'
+import type { CSSProperties } from 'react'
 import Link from 'next/link'
-import { Search, TrendingUp, Plus, BarChart3, ChevronRight, ArrowRight, Heart, MapPin, Fuel, Gauge, Calendar, MessageCircle, Car, Truck as TruckIcon, CheckCircle2, Star, Tag } from 'lucide-react'
-import { getLatestPublicListings, getMonthlyViews } from '@/lib/marketplace-server'
+import {
+  Search, ArrowRight, ChevronRight, Star, TrendingUp,
+  MapPin, MessageCircle, Plus, Zap, BadgeCheck,
+} from 'lucide-react'
+import { getLatestPublicListings } from '@/lib/marketplace-server'
 import { formatBRL, cars } from '@/data/cars'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
-import { TextRotate } from '@/components/ui/text-rotate'
-import KineticText from '@/components/ui/KineticText'
-import AnimatedStats from '@/components/ui/AnimatedStats'
-import AnimatedBarChart from '@/components/ui/AnimatedBarChart'
 import ModelComparison from '@/components/home/ModelComparison'
-import TestimonialsCarousel from '@/components/ui/TestimonialsCarousel'
-import Logo from '@/components/ui/Logo'
-import { GridPattern } from '@/components/ui/grid-pattern'
-import { cn } from '@/lib/utils'
-import { GlareCard } from '@/components/ui/glare-card'
-import BrandLogo from '@/components/brand/BrandLogo'
+import RankingsBanner from '@/components/home/RankingsBanner'
+import HomeCounters from '@/components/home/HomeCounters'
 import PlateBannerLookup from '@/components/marketplace/PlateBannerLookup'
-import BuyerAgentBanner from '@/components/buyer/BuyerAgentBanner'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,67 +35,9 @@ export const metadata: Metadata = {
 
 type Listing = Awaited<ReturnType<typeof getLatestPublicListings>>[number]
 
-function brandInitials(brand: string) {
-  return brand
-    .split(/\s|-/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase()
-}
-
 function fipePercent(listing: Listing) {
   if (typeof listing.fipe_difference_percent !== 'number') return null
   return Math.round(listing.fipe_difference_percent)
-}
-
-function CarCard({ listing, index }: { listing: Listing; index: number }) {
-  const fipe = fipePercent(listing)
-  const isBelowFipe = fipe !== null && fipe <= -3
-  const imageUrls = listing.images?.map((img) => img.url) || []
-
-  return (
-    <GlareCard className="fingen-car-card" style={{ animationDelay: `${index * 0.1}s` }}>
-      <Link
-        href={`/anuncios/${listing.slug}`}
-        className="fingen-car-card-link"
-      >
-        <div className="fingen-car-card-image">
-          <MarketplaceListingImage
-            brand={listing.brand}
-            model={listing.model}
-            year={listing.year_model}
-            imageUrls={imageUrls}
-            alt={`${listing.brand} ${listing.model} ${listing.year_model}`}
-            className="h-full w-full object-cover"
-            priority={index < 4}
-          />
-          {isBelowFipe && (
-            <div className="fingen-car-card-badge">
-              <TrendingUp size={10} />
-              {Math.abs(fipe!)}% abaixo FIPE
-            </div>
-          )}
-          <button className="fingen-car-card-fav" aria-label="Favoritar">
-            <Heart size={16} />
-          </button>
-        </div>
-        <div className="fingen-car-card-body">
-          <div className="fingen-car-card-brand">{listing.brand}</div>
-          <div className="fingen-car-card-title">
-            {listing.model} {listing.year_model}
-          </div>
-          <div className="fingen-car-card-price">{formatBRL(Number(listing.price))}</div>
-          <div className="fingen-car-card-specs">
-            <span><Gauge size={12} /> {listing.mileage?.toLocaleString('pt-BR')} km</span>
-            <span><Calendar size={12} /> {listing.year_model}</span>
-            <span><MapPin size={12} /> {listing.city}</span>
-          </div>
-        </div>
-      </Link>
-    </GlareCard>
-  )
 }
 
 export default async function HomePage() {
@@ -108,15 +45,15 @@ export default async function HomePage() {
   let fetchError = false
 
   try {
-    listings = await getLatestPublicListings(16)
+    listings = await getLatestPublicListings(100)
   } catch {
     fetchError = true
   }
 
-  const recentListings = listings.slice(0, 8)
+  const recentListings = listings
   const topBrands = [...new Set(listings.map((l) => l.brand))].slice(0, 6)
+  const cities = [...new Set(listings.map((l) => l.city))].filter(Boolean).slice(0, 6)
 
-  // Comparison cars — pick popular models from catalog
   const mapCar = (c: typeof cars[0]) => ({
     brand: c.brand,
     model: c.model,
@@ -133,302 +70,402 @@ export default async function HomePage() {
   const comparisonCars = cars.filter((c) => c.isPopular).slice(0, 2).map(mapCar)
   const allComparisonCars = cars.map(mapCar)
 
+  const categories = [
+    { label: 'SUVs', filter: 'SUV', img: '/categories/suv.jpg', badge: 'Mais procurados' },
+    { label: 'Elétricos', filter: 'Elétrico', img: '/categories/eletrico.jpg', badge: 'Zero emissão' },
+    { label: 'Picapes', filter: 'Pickup', img: '/categories/pickup.jpg', badge: 'Robustez total' },
+    { label: 'Esportivos', filter: 'Esportivo', img: '/categories/esportivo.jpg', badge: 'Pura performance' },
+  ]
+
+  const pills = [
+    { label: 'Todos os estilos', href: '/carros-a-venda', active: true, lime: false },
+    { label: 'SUV', href: '/carros-a-venda?body_type=SUV', active: false, lime: false },
+    { label: 'Sedan', href: '/carros-a-venda?body_type=sedan', active: false, lime: false },
+    { label: 'Hatch', href: '/carros-a-venda?body_type=hatch', active: false, lime: false },
+    { label: 'Pickup', href: '/carros-a-venda?body_type=pickup', active: false, lime: false },
+    { label: 'Elétrico', href: '/carros-a-venda?body_type=elétrico', active: false, lime: false },
+    { label: 'Até R$ 80 mil', href: '/carros-a-venda?price_max=80000', active: false, lime: true },
+  ]
+
+  const budgetOptions = [
+    { label: 'Qualquer orçamento', value: '' },
+    { label: 'Até R$ 50 mil', value: '50000' },
+    { label: 'Até R$ 80 mil', value: '80000' },
+    { label: 'Até R$ 120 mil', value: '120000' },
+    { label: 'Até R$ 200 mil', value: '200000' },
+  ]
+
   return (
-    <div className="fingen-page">
-      <main className="fingen-main">
-        {/* Hero Section - Creative Agency Style */}
-        <section className="hero-creative">
-          {/* Grid Pattern Background */}
-          <div className="hero-creative-grid-wrapper">
-            <GridPattern
-              width={30}
-              height={30}
-              x={-1}
-              y={-1}
-              squares={[
-                [4, 4],
-                [5, 1],
-                [8, 2],
-                [5, 3],
-                [5, 5],
-                [10, 10],
-                [12, 15],
-                [15, 10],
-                [10, 15],
-              ]}
-              className={cn(
-                "[mask-image:radial-gradient(80%_50%_at_center,white,transparent)]",
-                "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12",
-                "hero-creative-grid"
-              )}
-            />
-          </div>
+    <div className="cb-page">
+      {/* ═══ HERO ═══ */}
+      <section className="cb-hero">
+        <div className="cb-wrap">
+          <div className="cb-hero-grid">
+            <div className="cb-hero-copy">
+              <p className="cb-eyebrow">Marketplace de veículos · Brasil</p>
+              <h1 className="cb-hero-title">
+                Encontre o carro <u>certo</u>, sem complicação.
+              </h1>
+              <p className="cb-hero-lead">
+                Anuncie grátis, compare com a FIPE e negocie direto com o vendedor.
+                Dados reais, chat interno e as melhores ofertas de seminovos do país.
+              </p>
 
-          {/* Subtitle */}
-          <div className="hero-creative-eyebrow">Compre, compare e anuncie carros</div>
-
-          {/* Main Title */}
-          <h1 className="hero-creative-title">
-            Encontre o carro{' '}
-            <span className="hero-creative-highlight">
-              <TextRotate
-                texts={["perfeito", "ideal", "dos sonhos", "certo", "novo"]}
-                mainClassName="hero-creative-highlight-text"
-                staggerFrom="last"
-                initial={{ y: "100%", opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: "-120%", opacity: 0 }}
-                staggerDuration={0.025}
-                splitLevelClassName="overflow-hidden pb-1"
-                transition={{ type: "spring", damping: 30, stiffness: 400 }}
-                rotationInterval={3000}
-              />
-            </span>
-          </h1>
-
-          {/* Description */}
-          <p className="hero-creative-desc">
-            Seminovos com FIPE verificado, dados detalhados e as melhores ofertas do mercado.
-          </p>
-
-          {/* CTA */}
-          <div className="hero-creative-cta">
-            <Link href="/carros-a-venda" className="hero-creative-btn">
-              <Search size={18} />
-              <span>Explorar carros</span>
-            </Link>
-            <Link href="/anunciar-carro" className="hero-creative-btn hero-creative-btn-white">
-              <Plus size={18} />
-              <span>Anunciar grátis</span>
-            </Link>
-            <Link href="/caminhoes" className="hero-creative-btn hero-creative-btn-white">
-              <TruckIcon size={18} />
-              <span>Comprar caminhões</span>
-            </Link>
-          </div>
-        </section>
-
-        {/* Truck Discovery Banner */}
-        <section className="fingen-banner fingen-truck-banner">
-          <div className="fingen-banner-content">
-            <div className="fingen-banner-icon fingen-truck-banner-icon">
-              <TruckIcon size={20} strokeWidth={2} />
-            </div>
-            <div className="fingen-banner-text">
-              <strong>Caminhões também estão no Carbi</strong>
-              <span>Encontre caminhões usados, compare ofertas e anuncie o seu.</span>
-            </div>
-            <Link href="/caminhoes" className="fingen-banner-btn">
-              Ver caminhões <ArrowRight size={14} />
-            </Link>
-          </div>
-        </section>
-
-        {/* Free Promo Banner */}
-        <section className="fingen-banner fingen-promo-banner">
-          <div className="fingen-banner-content fingen-promo-content fingen-promo-column">
-            <div className="fingen-promo-top">
-              <div className="fingen-banner-text">
-                <strong>Anuncie grátis por tempo limitado</strong>
-                <span>Publique seu carro sem custo e alcance milhares de compradores.</span>
+              <div className="cb-hero-cta-row">
+                <Link href="/carros-a-venda" className="cb-btn cb-btn-lime cb-btn-arrow">
+                  Ver estoque completo
+                  <ArrowRight size={18} />
+                </Link>
+                <Link href="/anunciar-carro" className="cb-btn cb-btn-ghost cb-btn-arrow">
+                  <Plus size={18} />
+                  Anunciar grátis
+                </Link>
               </div>
-              <Link href="/anunciar-carro/fluxo" className="fingen-banner-btn fingen-promo-btn">
-                Começar agora
-              </Link>
-            </div>
-            <PlateBannerLookup />
-          </div>
-        </section>
 
-        {/* Recent Listings - Card Grid */}
-        <section className="fingen-section">
-          <div className="fingen-section-header">
-            <div>
-              <div className="fingen-section-label">Últimos anúncios</div>
-              <h2 className="fingen-section-title">Adicionados recentemente</h2>
+              <div className="cb-hero-avatars">
+                <div className="cb-avatar-stack">
+                  {['/categories/suv.jpg', '/categories/sedan.jpg', '/categories/hatch.jpg'].map((src) => (
+                    <img key={src} src={src} alt="" className="cb-avatar" loading="lazy" />
+                  ))}
+                  <div className="cb-avatar-more">+8</div>
+                </div>
+                <p>
+                  <strong>32 mil+</strong> compradores ativos todo mês
+                </p>
+              </div>
+
+              <form className="cb-search" action="/carros-a-venda" method="get">
+                <div className="cb-search-field">
+                  <label htmlFor="cb-loc">Localização</label>
+                  <select id="cb-loc" name="q">
+                    <option value="">Brasil inteiro</option>
+                    {cities.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="cb-search-divider" aria-hidden="true" />
+                <div className="cb-search-field">
+                  <label htmlFor="cb-type">Tipo de veículo</label>
+                  <select id="cb-type" name="body_type">
+                    <option value="">Todos os tipos</option>
+                    <option value="SUV">SUV</option>
+                    <option value="sedan">Sedan</option>
+                    <option value="hatch">Hatch</option>
+                    <option value="pickup">Pickup</option>
+                    <option value="elétrico">Elétrico</option>
+                  </select>
+                </div>
+                <div className="cb-search-divider" aria-hidden="true" />
+                <div className="cb-search-field">
+                  <label htmlFor="cb-budget">Orçamento</label>
+                  <select id="cb-budget" name="price_max">
+                    {budgetOptions.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <button type="submit" className="cb-search-go" aria-label="Buscar carros">
+                  <Search size={22} />
+                </button>
+              </form>
             </div>
-            <Link href="/carros-a-venda" className="fingen-section-link">
-              Ver todos <ChevronRight size={14} />
+
+            <div className="cb-hero-visual">
+              <img
+                src="/images/hero-11-1920.jpg"
+                alt="Carro em destaque na Carbi"
+                width={960}
+                height={816}
+                fetchPriority="high"
+              />
+              <div className="cb-float-card cb-float-rating">
+                <div className="cb-float-icon">
+                  <Star size={18} fill="currentColor" />
+                </div>
+                <div>
+                  <strong>4.9</strong>
+                  <span>avaliação média<br />dos usuários</span>
+                </div>
+              </div>
+              <div className="cb-float-card cb-float-verified">
+                <div className="cb-float-icon">
+                  <BadgeCheck size={20} />
+                </div>
+                <div>
+                  <strong>Verificado</strong>
+                  <span>vendedor com<br />identidade confirmada</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <HomeCounters cityCount={cities.length} />
+        </div>
+      </section>
+
+      {/* ═══ CATEGORY PILLS ═══ */}
+      <section className="cb-pills" aria-label="Categorias">
+        {pills.map((pill) => (
+          <Link
+            key={pill.label}
+            href={pill.href}
+            className={`cb-pill${pill.active ? ' cb-pill-active' : ''}${pill.lime ? ' cb-pill-lime' : ''}`}
+          >
+            {pill.label}
+          </Link>
+        ))}
+        <Link href="/carros-a-venda" className="cb-pill cb-pill-arrow" aria-label="Ver todos os carros">
+          <ArrowRight size={20} />
+        </Link>
+      </section>
+
+      {/* ═══ PLATE LOOKUP ═══ */}
+      <section className="cb-section-pad cb-promo-before-listings">
+        <div className="cb-wrap">
+          <PlateBannerLookup />
+        </div>
+      </section>
+
+      {/* ═══ LISTINGS TABLE ═══ */}
+      <section className="cb-section-pad">
+        <div className="cb-wrap">
+          <div className="cb-head">
+            <div>
+              <p className="cb-eyebrow">Estoque selecionado</p>
+              <h2>Os anúncios mais procurados desta semana</h2>
+            </div>
+            <Link href="/carros-a-venda" className="cb-head-link">
+              Ver todos os carros
+              <ChevronRight size={16} />
             </Link>
           </div>
-          <div className="fingen-cars-grid">
+
+          <div className="cb-listing-cards">
             {recentListings.length > 0 ? (
-              recentListings.map((listing, index) => (
-                <CarCard key={listing.id} listing={listing} index={index} />
-              ))
+              recentListings.map((listing) => {
+                const fipe = fipePercent(listing)
+                const imageUrls = listing.images?.map((img) => img.url) || []
+                return (
+                  <Link key={listing.id} href={`/anuncios/${listing.slug}`} className="cb-listing-card">
+                    <div className="cb-listing-card-image">
+                      <MarketplaceListingImage
+                        brand={listing.brand}
+                        model={listing.model}
+                        year={listing.year_model}
+                        imageUrls={imageUrls}
+                        alt={`${listing.brand} ${listing.model} ${listing.year_model}`}
+                      />
+                      <span className="cb-listing-card-heart" aria-hidden="true">♡</span>
+                    </div>
+                    <div className="cb-listing-card-body">
+                      <div className="cb-listing-card-title">{listing.brand} {listing.model}</div>
+                      <div className="cb-listing-card-meta">
+                        {listing.year_model} · {listing.mileage?.toLocaleString('pt-BR')} km
+                      </div>
+                      <div className="cb-listing-card-location">
+                        <MapPin size={14} />
+                        <span>{listing.city}</span>
+                      </div>
+                      <div className="cb-listing-card-footer">
+                        <div>
+                          <div className="cb-listing-card-price">{formatBRL(Number(listing.price))}</div>
+                          {fipe !== null ? (
+                            <div className={`cb-fipe-compare ${fipe <= 0 ? 'is-below' : 'is-above'}`}>
+                              <div className="cb-fipe-label">
+                                <TrendingUp size={12} />
+                                <span>{Math.abs(fipe)}% {fipe <= 0 ? 'abaixo' : 'acima'} da FIPE</span>
+                              </div>
+                              <div className="cb-fipe-track" aria-hidden="true">
+                                <span style={{ '--cb-fipe-progress': `${Math.min(Math.max(Math.abs(fipe), 8), 100)}%` } as CSSProperties} />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="cb-fipe-unavailable">FIPE indisponível</div>
+                          )}
+                        </div>
+                        <span className="cb-listing-card-arrow"><ArrowRight size={17} /></span>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })
             ) : (
-              <div className="fingen-empty">
-                <p>{fetchError ? 'Carregando anúncios...' : 'Nenhum anúncio ainda'}</p>
+              <div className="cb-listing-empty">
+                {fetchError ? 'Carregando anúncios...' : 'Nenhum anúncio ainda'}
               </div>
             )}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="fingen-section fingen-truck-quick-link">
-          <div className="fingen-truck-quick-link-inner">
+      {/* ═══ EXPLORE GRID ═══ */}
+      <section className="cb-section-pad">
+        <div className="cb-wrap">
+          <div className="cb-head">
             <div>
-              <span className="fingen-truck-quick-label">Para quem move o Brasil</span>
-              <h2>Caminhões à venda, do seu jeito.</h2>
-            </div>
-            <Link href="/caminhoes" className="fingen-section-link">
-              Explorar categoria <ArrowRight size={14} />
-            </Link>
-          </div>
-        </section>
-
-        {/* Buyer Agent - Procure Meu Carro */}
-        <section className="fingen-section">
-          <div className="mx-auto w-full max-w-6xl">
-            <BuyerAgentBanner />
-          </div>
-        </section>
-
-        {/* Free Traffic Banner */}
-        <section className="fingen-banner">
-          <div className="fingen-banner-content">
-            <div className="fingen-banner-icon">
-              <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor"/>
-                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <div className="fingen-banner-text">
-              <strong>Tráfego pago grátis</strong>
-              <span>Seus anúncios são divulgados no Google e Meta Ads sem custo</span>
-            </div>
-            <Link href="/trafego-pago-gratis" className="fingen-banner-btn">
-              Saiba mais
-            </Link>
-          </div>
-        </section>
-
-        {/* Como Funciona - Steps */}
-        <section className="fingen-section fingen-how-it-works">
-          <div className="fingen-section-header">
-            <div>
-              <div className="fingen-section-label">Como funciona</div>
-              <h2 className="fingen-section-title">Do jeito mais simples</h2>
+              <p className="cb-eyebrow">Explore</p>
+              <h2>Encontre o seu estilo</h2>
             </div>
           </div>
-          <div className="fingen-steps-grid">
-            <div className="fingen-step-card">
-              <div className="fingen-step-number">01</div>
-              <div className="fingen-step-icon">
-                <Search size={22} />
-              </div>
-              <h3>Busque o carro ideal</h3>
-              <p>Filtre por marca, preço, ano e cidade. Compare com a FIPE e veja o histórico real do veículo.</p>
-            </div>
-            <div className="fingen-step-card">
-              <div className="fingen-step-number">02</div>
-              <div className="fingen-step-icon">
-                <MessageCircle size={22} />
-              </div>
-              <h3>Fale direto com o vendedor</h3>
-              <p>Chat interno, sem intermediários. Tire dúvidas, combine visita e negocie com segurança.</p>
-            </div>
-            <div className="fingen-step-card">
-              <div className="fingen-step-number">03</div>
-              <div className="fingen-step-icon">
-                <CheckCircle2 size={22} />
-              </div>
-              <h3>Fechou o negócio</h3>
-              <p>Dados verificados, preço justo, zero surpresas. O carro certo, no preço certo.</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Categorias por Estilo */}
-        <section className="fingen-section">
-          <div className="fingen-section-header">
-            <div>
-              <div className="fingen-section-label">Explore por tipo</div>
-              <h2 className="fingen-section-title">Encontre o estilo certo</h2>
-            </div>
-          </div>
-          <div className="fingen-categories-scroll">
-            {[
-              { label: 'SUV', filter: 'SUV', img: '/categories/suv.jpg' },
-              { label: 'Sedan', filter: 'Sedan', img: '/categories/sedan.jpg' },
-              { label: 'Hatch', filter: 'Hatch', img: '/categories/hatch.jpg' },
-              { label: 'Pickup', filter: 'Pickup', img: '/categories/pickup.jpg' },
-              { label: 'Esportivo', filter: 'Esportivo', img: '/categories/esportivo.jpg' },
-              { label: 'Elétrico', filter: 'Elétrico', img: '/categories/eletrico.jpg' },
-            ].map((cat) => (
+          <div className="cb-explore-grid">
+            {categories.map((cat) => (
               <Link
                 key={cat.label}
-                href={`/carros-a-venda?body=${encodeURIComponent(cat.filter)}`}
-                className="fingen-category-card"
+                href={`/carros-a-venda?body_type=${encodeURIComponent(cat.filter)}`}
+                className="cb-explore-card"
               >
-                <img src={cat.img} alt={cat.label} className="fingen-category-img" loading="lazy" />
-                <span className="fingen-category-label">{cat.label}</span>
+                <img src={cat.img} alt={cat.label} loading="lazy" />
+                <div className="cb-explore-overlay" aria-hidden="true" />
+                <div className="cb-explore-body">
+                  <span className="cb-explore-badge">{cat.badge}</span>
+                  <div className="cb-explore-title">
+                    {cat.label}
+                    <span className="cb-explore-arrow">
+                      <ArrowRight size={18} />
+                    </span>
+                  </div>
+                  <div className="cb-explore-count">Ver ofertas disponíveis</div>
+                </div>
               </Link>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Depoimentos */}
-        <section className="fingen-section">
-          <div className="fingen-section-header">
-            <div>
-              <div className="fingen-section-label">Depoimentos</div>
-              <h2 className="fingen-section-title">Quem já comprou, recomenda</h2>
+      {/* ═══ HOW IT WORKS ═══ */}
+      <section className="cb-section-pad">
+        <div className="cb-wrap cb-process-grid">
+          <div>
+            <p className="cb-eyebrow">Como funciona</p>
+            <h2 style={{ fontFamily: 'var(--cb-head)', fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1, margin: '0 0 12px' }}>
+              Do jeito mais simples
+            </h2>
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--cb-ink-soft)', margin: '0 0 24px', maxWidth: '46ch' }}>
+              Do primeiro filtro ao contrato, todo o processo pensado para você economizar tempo e dinheiro.
+            </p>
+
+            <div className="cb-process-step">
+              <div className="cb-step-num">01</div>
+              <div className="cb-step-body">
+                <h3>Busque o carro ideal</h3>
+                <p>Filtre por marca, preço, ano e cidade. Compare com a FIPE e veja os dados reais de cada veículo.</p>
+              </div>
+            </div>
+            <div className="cb-process-step">
+              <div className="cb-step-num">02</div>
+              <div className="cb-step-body">
+                <h3>Fale direto com o vendedor</h3>
+                <p>Chat interno, sem intermediários. Tire dúvidas, combine visita e negocie com segurança.</p>
+              </div>
+            </div>
+            <div className="cb-process-step">
+              <div className="cb-step-num">03</div>
+              <div className="cb-step-body">
+                <h3>Fechou o negócio</h3>
+                <p>Dados verificados, preço justo, zero surpresas. O carro certo, no preço certo.</p>
+              </div>
             </div>
           </div>
-          <TestimonialsCarousel />
-        </section>
 
-        {/* Model Comparison */}
-        <ModelComparison cars={comparisonCars} allCars={allComparisonCars} />
-
-        {/* Brands */}
-        <section className="fingen-section">
-          <div className="fingen-section-header">
-            <div>
-              <div className="fingen-section-label">Marcas</div>
-              <h2 className="fingen-section-title">Comece pela marca</h2>
+          <div className="cb-process-visual">
+            <img src="/images/porsche-hero.jpg" alt="Consultoria Carbi" loading="lazy" />
+            <div className="cb-process-badge">
+              <MessageCircle size={22} />
+              <div>
+                <strong>Consultoria antes da compra</strong>
+                <span>Fale com um especialista em 15 min</span>
+              </div>
             </div>
-            <Link href="/marcas" className="fingen-section-link">
-              Ver todas <ChevronRight size={14} />
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ BUILD / SOLUTIONS ═══ */}
+      <section className="cb-section-pad">
+        <div className="cb-wrap">
+          <div className="cb-build-grid">
+            <Link href="/anunciar-carro" className="cb-build-card cb-build-card-dark">
+              <div>
+                <div className="cb-build-card-tag">Para vender</div>
+                <h3>Anuncie grátis em 2 minutos</h3>
+                <p>Seu anúncio com fotos, FIPE verificada e alcance de milhares de compradores.</p>
+              </div>
+              <span className="cb-build-cta">
+                Anunciar meu carro <ArrowRight size={16} />
+              </span>
+            </Link>
+            <Link href="/qual-carro" className="cb-build-card cb-build-card-lime">
+              <div>
+                <div className="cb-build-card-tag">Para comparar</div>
+                <h3>Compare com a FIPE</h3>
+                <p>Saiba se o preço está justo antes de fechar negócio.</p>
+              </div>
+              <span className="cb-build-cta">
+                Comparar agora <ArrowRight size={16} />
+              </span>
+            </Link>
+            <Link href="/trafego-pago-gratis" className="cb-build-card cb-build-card-light">
+              <div>
+                <div className="cb-build-card-tag">Para vender</div>
+                <h3>Tráfego pago grátis</h3>
+                <p>Divulgamos seus anúncios no Google e Meta Ads sem custo.</p>
+              </div>
+              <span className="cb-build-cta">
+                Saiba mais <ArrowRight size={16} />
+              </span>
             </Link>
           </div>
-          <div className="fingen-brands-scroll">
-            {topBrands.map((brand) => {
-              const count = listings.filter((l) => l.brand === brand).length
-              return (
-                <Link
-                  key={brand}
-                  href={`/carros-a-venda?brand=${encodeURIComponent(brand)}`}
-                  className="fingen-brand-chip"
-                >
-                  <div className="fingen-brand-logo-wrap">
-                    <BrandLogo brandName={brand} domain={`${brand.toLowerCase().replace(/\s+/g, '')}.com.br`} className="w-full h-full object-contain" />
-                  </div>
-                  <div className="fingen-brand-info">
-                    <div className="fingen-brand-name">{brand}</div>
-                    <div className="fingen-brand-count">{count} anúncio{count === 1 ? '' : 's'}</div>
-                  </div>
+        </div>
+      </section>
+
+      {/* ═══ RANKINGS BANNER ═══ */}
+      <RankingsBanner />
+
+      {/* ═══ MODEL COMPARISON ═══ */}
+      <ModelComparison cars={comparisonCars} allCars={allComparisonCars} />
+
+      {/* ═══ BRAND MARQUEE ═══ */}
+      <section className="cb-marquee" aria-label="Marcas disponíveis">
+        <div className="cb-marquee-track">
+          {[...topBrands, ...topBrands].map((brand, i) => (
+            <Link key={`${brand}-${i}`} href={`/carros-a-venda?brand=${encodeURIComponent(brand)}`} className="cb-marquee-item">
+              <Zap size={18} fill="currentColor" />
+              {brand}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ FINAL CTA ═══ */}
+      <section className="cb-final-cta">
+        <div className="cb-wrap">
+          <div className="cb-cta-block">
+            <div>
+              <div className="cb-cta-eyebrow">Carbi</div>
+              <h2>Pronto para encontrar o carro certo?</h2>
+              <p>
+                Anuncie grátis, compare preços com a FIPE e negocie direto com o vendedor.
+                Sem complicação, do jeito que deveria ser.
+              </p>
+              <div className="cb-hero-cta-row" style={{ marginBottom: 0 }}>
+                <Link href="/carros-a-venda" className="cb-btn cb-btn-dark cb-btn-arrow">
+                  Explorar carros
+                  <ArrowRight size={18} />
                 </Link>
-              )
-            })}
-          </div>
-        </section>
-
-        {/* Final CTA */}
-        <section className="fingen-final-cta">
-          <div className="fingen-final-cta-card">
-            <div className="fingen-final-cta-icon">
-              <Plus size={24} />
+                <Link href="/anunciar-carro" className="cb-btn cb-btn-ghost cb-btn-arrow">
+                  <Plus size={18} />
+                  Anunciar grátis
+                </Link>
+              </div>
             </div>
-            <h3>Pronto para anunciar?</h3>
-            <p>Cadastre seu carro grátis e comece a receber contatos hoje.</p>
-            <Link href="/anunciar-carro" className="fingen-final-cta-btn">
-              Começar agora
-              <ArrowRight size={16} />
-            </Link>
+            <div className="cb-cta-big">
+              <strong>4.9</strong>
+              <span>avaliação média dos usuários</span>
+            </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
     </div>
   )
 }
