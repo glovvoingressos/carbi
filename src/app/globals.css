@@ -12377,15 +12377,15 @@ p {
 }
 .cb-float-card strong {
   font-family: var(--cb-head);
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1;
 }
 .cb-float-card span {
-  font-size: 11.5px;
+  font-size: 10.5px;
   color: var(--cb-ink-faint);
-  line-height: 1.25;
+  line-height: 1.2;
 }
 .cb-float-icon {
   width: 36px;
@@ -13778,10 +13778,10 @@ p {
     border-radius: 999px !important;
   }
   .cb-float-card strong {
-    font-size: 18px !important;
+    font-size: 15px !important;
   }
   .cb-float-card span {
-    font-size: 10px !important;
+    font-size: 9.5px !important;
   }
   .cb-float-icon {
     width: 30px !important;
