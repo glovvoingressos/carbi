@@ -181,20 +181,20 @@ export default async function HomePage() {
               />
               <div className="cb-float-card cb-float-rating">
                 <div className="cb-float-icon">
-                  <Star size={18} fill="currentColor" />
+                  <Star size={16} fill="currentColor" />
                 </div>
-                <div>
+                <div className="cb-float-text">
                   <strong>4.9</strong>
-                  <span>avaliação média<br />dos usuários</span>
+                  <span>Avaliação média</span>
                 </div>
               </div>
               <div className="cb-float-card cb-float-verified">
                 <div className="cb-float-icon">
-                  <BadgeCheck size={20} />
+                  <BadgeCheck size={18} />
                 </div>
-                <div>
+                <div className="cb-float-text">
                   <strong>Verificado</strong>
-                  <span>vendedor com<br />identidade confirmada</span>
+                  <span>Vendedor confirmado</span>
                 </div>
               </div>
             </div>

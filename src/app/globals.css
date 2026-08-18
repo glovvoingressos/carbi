@@ -12363,33 +12363,42 @@ p {
 }
 .cb-float-card {
   position: absolute;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 999px;
-  padding: 10px 18px 10px 12px;
+  padding: 8px 16px 8px 10px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  gap: 8px;
+  white-space: nowrap;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   animation: cb-float 5s ease-in-out infinite;
+}
+.cb-float-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
 }
 .cb-float-card strong {
   font-family: var(--cb-head);
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 800;
-  letter-spacing: -0.02em;
   line-height: 1;
+  color: var(--cb-ink);
 }
 .cb-float-card span {
-  font-size: 10.5px;
-  color: var(--cb-ink-faint);
-  line-height: 1.2;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cb-ink-soft);
+  line-height: 1;
+  white-space: nowrap;
 }
 .cb-float-icon {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -13222,7 +13231,7 @@ p {
   .cb-listing-cards { grid-template-columns: 1fr; gap: 12px; }
   .cb-listing-card {
     display: grid;
-    grid-template-columns: 222px minmax(0, 1fr);
+    grid-template-columns: 140px minmax(0, 1fr);
     min-height: 172px;
   }
   .cb-listing-card-image {
@@ -13762,29 +13771,5 @@ p {
 @media (max-width: 380px) {
   .cb-listing-card {
     grid-template-columns: 120px minmax(0, 1fr) !important;
-    min-height: 140px !important;
-  }
-  .cb-listing-card-body {
-    padding: 12px 14px !important;
-  }
-  .cb-listing-card-title {
-    font-size: 14px !important;
-  }
-  .cb-listing-card-price {
-    font-size: 15px !important;
-  }
-  .cb-float-card {
-    padding: 8px 14px 8px 10px !important;
-    border-radius: 999px !important;
-  }
-  .cb-float-card strong {
-    font-size: 15px !important;
-  }
-  .cb-float-card span {
-    font-size: 9.5px !important;
-  }
-  .cb-float-icon {
-    width: 30px !important;
-    height: 30px !important;
   }
 }
