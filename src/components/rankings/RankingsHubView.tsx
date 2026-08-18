@@ -276,21 +276,25 @@ export default function RankingsHubView({
           )}
 
           {/* State Links */}
-          <div className="mt-16 text-center">
-            <h3 className="font-[var(--cb-head)] text-xl font-bold mb-4">
+          <div className="mt-16 pt-8 border-t border-gray-200 text-center">
+            <div className="cb-eyebrow mb-2">Filtro por Região</div>
+            <h3 className="font-[var(--cb-head)] text-xl font-bold mb-5">
               Rankings por Estado
             </h3>
-            <div className="flex gap-3 flex-wrap justify-center">
-              {stateList.map((st) => (
-                <Link
-                  key={st.slug}
-                  href={`/carros-mais-vendidos/${st.slug}`}
-                  className="cb-pill text-xs"
-                >
-                  <MapPin size={14} />
-                  {st.name}
-                </Link>
-              ))}
+            <div className="flex gap-2.5 flex-wrap justify-center">
+              {stateList.map((st) => {
+                const isActiveState = stateName && stateName.toLowerCase() === st.name.toLowerCase()
+                return (
+                  <Link
+                    key={st.slug}
+                    href={`/carros-mais-vendidos/${st.slug}`}
+                    className={`cb-pill text-xs px-4 py-2.5 transition-all ${isActiveState ? 'cb-pill-active font-bold' : ''}`}
+                  >
+                    <MapPin size={13} className={isActiveState ? 'text-[var(--cb-lime)]' : 'text-gray-400'} />
+                    {st.name}
+                  </Link>
+                )
+              })}
             </div>
           </div>
         </div>
