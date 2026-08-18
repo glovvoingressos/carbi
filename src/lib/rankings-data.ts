@@ -22,7 +22,7 @@ export async function getMonthlyRankings(
 export async function getModelRankingDetail(
   period = 'julho-2026',
   slug: string
-): Promise<{ brand: string; model: string; newItem?: RankingModelItem; usedItem?: RankingModelItem } | null> {
+): Promise<{ item: RankingModelItem; brand: string; modelName: string; newItem?: RankingModelItem; usedItem?: RankingModelItem } | null> {
   const normSlug = slug.toLowerCase()
   const newItem = JULY_2026_NEW_RANKINGS.find((r) => r.slug.toLowerCase() === normSlug)
   const usedItem = JULY_2026_USED_RANKINGS.find((r) => r.slug.toLowerCase() === normSlug)
@@ -31,8 +31,9 @@ export async function getModelRankingDetail(
   if (!item) return null
 
   return {
+    item,
     brand: item.brand,
-    model: item.model,
+    modelName: item.model,
     newItem,
     usedItem,
   }

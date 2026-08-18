@@ -12,6 +12,7 @@ describe('rankings-data', () => {
     const detail = await getModelRankingDetail('julho-2026', 'volkswagen-polo')
     expect(detail).not.toBeNull()
     expect(detail?.brand).toBe('Volkswagen')
+    expect(detail?.modelName).toBe('Polo')
   })
 
   it('returns state rankings for state slug', async () => {
