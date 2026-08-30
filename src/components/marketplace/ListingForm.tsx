@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
-import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2, Check } from 'lucide-react'
+import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2, Check, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
@@ -25,6 +25,8 @@ import {
 import { formatBRL } from '@/data/cars'
 import { enrichVehicle } from '@/lib/vehicle-enrichment'
 import { brandsAreEquivalent } from '@/lib/brand-normalization'
+import { parseDescription } from '@/lib/format-description'
+import DescriptionAiControls from './DescriptionAiControls'
 
 const DRAFT_KEY = 'carbi_listing_draft_v1'
 
@@ -1424,6 +1426,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                 <label htmlFor="listing-description" className="sr-only">Descrição do veículo</label>
                 <textarea id="listing-description" className="fingen-flow-input min-h-[180px] sm:min-h-[200px] py-3 resize-none leading-relaxed" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} aria-label="Descrição do veículo" />
               </div>
+              <DescriptionAiControls
+                value={form.description}
+                onApply={(next) => handleInput('description', next)}
+              />
               <div>
                 <label htmlFor="listing-optionals" className="sr-only">Opcionais extras</label>
                 <input id="listing-optionals" className="fingen-flow-input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} aria-label="Opcionais extras" />
@@ -1530,7 +1536,18 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               {form.description.trim() && (
                 <div className="mt-6">
                   <span className="text-sm text-[#999] block mb-2">Descrição</span>
-                  <p className="text-sm text-[#333] leading-relaxed">{form.description}</p>
+                  <div className="text-sm text-[#333] leading-relaxed">
+                    {parseDescription(form.description).map((paragraph, index) => (
+                      <p key={index} className="mb-2 last:mb-0">
+                        {paragraph.lines.map((line, lineIndex) => (
+                          <span key={lineIndex}>
+                            {line}
+                            {lineIndex < paragraph.lines.length - 1 ? <br /> : null}
+                          </span>
+                        ))}
+                      </p>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

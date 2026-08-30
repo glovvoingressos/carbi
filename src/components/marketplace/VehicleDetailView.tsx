@@ -31,6 +31,7 @@ import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/sup
 import MarketplaceListingImage from './MarketplaceListingImage'
 import ConfirmModal from '@/components/animations/ConfirmModal'
 import Tooltip from '@/components/animations/Tooltip'
+import { parseDescription } from '@/lib/format-description'
 
 interface VehicleDetailViewProps {
   listing: ListingPublic
@@ -49,6 +50,7 @@ interface VehicleDetailViewProps {
     diffPercent: number | null
     diffValue?: number | null
   }
+  currentFipePrice?: number | null
 }
 
 function formatDate(value: string | null | undefined) {
@@ -85,6 +87,7 @@ export default function VehicleDetailView({
   relatedListings,
   enrichment,
   comparison,
+  currentFipePrice,
 }: VehicleDetailViewProps) {
   const [isFavorite, setIsFavorite] = useState(false)
   const [sessionUserId, setSessionUserId] = useState<string | null>(null)
@@ -118,7 +121,7 @@ export default function VehicleDetailView({
   }, [listing.id])
 
   const listingImages = useMemo(() => listing.images?.map((img) => img.url).filter(Boolean) || [], [listing.images])
-  const fipePrice = listing.fipe_price ? Number(listing.fipe_price) : null
+  const fipePrice = currentFipePrice ?? (listing.fipe_price ? Number(listing.fipe_price) : null)
   const price = Number(listing.price)
   const diffValue = fipePrice ? price - fipePrice : null
   const diffPercent = fipePrice ? (diffValue! / fipePrice) * 100 : null
@@ -316,7 +319,18 @@ export default function VehicleDetailView({
         {listing.description && (
           <section className="fingen-detail-card fingen-detail-card--full">
             <h3 className="fingen-detail-card-title">Descrição</h3>
-            <p className="fingen-detail-description">{listing.description}</p>
+            <div className="fingen-detail-description">
+              {parseDescription(listing.description).map((paragraph, index) => (
+                <p key={index} className="fingen-detail-description-paragraph">
+                  {paragraph.lines.map((line, lineIndex) => (
+                    <span key={lineIndex}>
+                      {line}
+                      {lineIndex < paragraph.lines.length - 1 ? <br /> : null}
+                    </span>
+                  ))}
+                </p>
+              ))}
+            </div>
           </section>
         )}
 

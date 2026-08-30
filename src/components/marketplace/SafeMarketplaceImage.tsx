@@ -41,7 +41,7 @@ type SafeMarketplaceImageProps = {
 export default function SafeMarketplaceImage({
   sources,
   alt,
-  className = 'h-full w-full object-cover',
+  className,
   containerClassName = 'h-full w-full',
   priority = false,
   loadingLabel = 'Carregando foto',
@@ -109,7 +109,7 @@ export default function SafeMarketplaceImage({
         <img
           src={resolvedSrc}
           alt={alt}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${status === 'ready' ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 w-full h-full transition-opacity duration-300 ${className ?? 'object-cover'} ${status === 'ready' ? 'opacity-100' : 'opacity-0'}`}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
           style={{ transform: 'scale(1.02)' }}
