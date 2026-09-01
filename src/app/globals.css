@@ -13609,7 +13609,8 @@ p {
   .cb-listings-grid { grid-template-columns: 1fr; }
   .cb-table-photo { display: none; }
   .cb-process-grid { grid-template-columns: 1fr; gap: 48px; }
-  .cb-process-visual { order: -1; }
+  .cb-process-visual { order: -1; max-width: 100%; }
+  .cb-process-visual img { aspect-ratio: 1 / 0.9; }
   .cb-build-grid { grid-template-columns: 1fr; }
   .cb-cta-block { grid-template-columns: 1fr; gap: 32px; }
   .cb-cta-big { text-align: left; }
