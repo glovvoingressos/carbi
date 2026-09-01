@@ -18,8 +18,8 @@ export default function Footer() {
             <Link href="/carros-a-venda">Todos os anúncios</Link>
             <Link href="/carros/mais-baratos">Mais baratos</Link>
             <Link href="/carros/suv">SUVs</Link>
-            <Link href="/carros/automatico">Automáticos</Link>
-            <Link href="/carros/eletrico">Elétricos</Link>
+            <Link href="/carros/automaticos">Automáticos</Link>
+            <Link href="/carros/eletricos">Elétricos</Link>
           </div>
           <div className="ref-footer-col">
             <h5>Vender</h5>
@@ -36,10 +36,10 @@ export default function Footer() {
           </div>
           <div className="ref-footer-col">
             <h5>Empresa</h5>
-            <Link href="/">Sobre o Carbi</Link>
-            <Link href="/">Contato</Link>
-            <Link href="/">Termos</Link>
-            <Link href="/">Privacidade</Link>
+            <Link href="/sobre">Sobre o Carbi</Link>
+            <Link href="/contato">Contato</Link>
+            <Link href="/termos">Termos</Link>
+            <Link href="/privacidade">Privacidade</Link>
           </div>
         </div>
       </div>
