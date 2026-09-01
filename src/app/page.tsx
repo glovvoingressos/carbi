@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import {
-  Search, ArrowRight, ChevronRight, Star, TrendingUp,
-  MapPin, MessageCircle, Plus, Zap, BadgeCheck,
+  Search, ArrowRight, ChevronRight, TrendingUp,
+  MapPin, Plus, Zap,
 } from 'lucide-react'
 import { getLatestPublicListings } from '@/lib/marketplace-server'
 import { formatBRL, cars } from '@/data/cars'
@@ -102,7 +102,6 @@ export default async function HomePage() {
         <div className="cb-wrap">
           <div className="cb-hero-grid">
             <div className="cb-hero-copy">
-              <p className="cb-eyebrow">Marketplace de veículos · Brasil</p>
               <h1 className="cb-hero-title">
                 Encontre o carro <u>certo</u>, sem complicação.
               </h1>
@@ -133,70 +132,16 @@ export default async function HomePage() {
                   <strong>32 mil+</strong> compradores ativos todo mês
                 </p>
               </div>
-
-              <form className="cb-search" action="/carros-a-venda" method="get">
-                <div className="cb-search-field">
-                  <label htmlFor="cb-loc">Localização</label>
-                  <select id="cb-loc" name="q">
-                    <option value="">Brasil inteiro</option>
-                    {cities.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="cb-search-divider" aria-hidden="true" />
-                <div className="cb-search-field">
-                  <label htmlFor="cb-type">Tipo de veículo</label>
-                  <select id="cb-type" name="body_type">
-                    <option value="">Todos os tipos</option>
-                    <option value="SUV">SUV</option>
-                    <option value="sedan">Sedan</option>
-                    <option value="hatch">Hatch</option>
-                    <option value="pickup">Pickup</option>
-                    <option value="elétrico">Elétrico</option>
-                  </select>
-                </div>
-                <div className="cb-search-divider" aria-hidden="true" />
-                <div className="cb-search-field">
-                  <label htmlFor="cb-budget">Orçamento</label>
-                  <select id="cb-budget" name="price_max">
-                    {budgetOptions.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <button type="submit" className="cb-search-go" aria-label="Buscar carros">
-                  <Search size={22} />
-                </button>
-              </form>
             </div>
 
             <div className="cb-hero-visual">
               <img
-                src="/images/hero-11-1920.jpg"
-                alt="Carro em destaque na Carbi"
+                src="/images/Porsche 911 GT3 RS | Speed Art Motion Blur Photography.jpg"
+                alt="Porsche 911 GT3 RS em destaque na Carbi"
                 width={960}
                 height={816}
                 fetchPriority="high"
               />
-              <div className="cb-float-card cb-float-rating">
-                <div className="cb-float-icon">
-                  <Star size={16} fill="currentColor" />
-                </div>
-                <div className="cb-float-text">
-                  <strong>4.9</strong>
-                  <span>Avaliação média</span>
-                </div>
-              </div>
-              <div className="cb-float-card cb-float-verified">
-                <div className="cb-float-icon">
-                  <BadgeCheck size={18} />
-                </div>
-                <div className="cb-float-text">
-                  <strong>Verificado</strong>
-                  <span>Vendedor confirmado</span>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -369,14 +314,7 @@ export default async function HomePage() {
           </div>
 
           <div className="cb-process-visual">
-            <img src="/images/porsche-hero.jpg" alt="Consultoria Carbi" loading="lazy" />
-            <div className="cb-process-badge">
-              <MessageCircle size={22} />
-              <div>
-                <strong>Consultoria antes da compra</strong>
-                <span>Fale com um especialista em 15 min</span>
-              </div>
-            </div>
+            <img src="/images/ChatGPT Image 31 de ago. de 2026, 22_12_52-2.png" alt="Chat interno Carbi" loading="lazy" />
           </div>
         </div>
       </section>
