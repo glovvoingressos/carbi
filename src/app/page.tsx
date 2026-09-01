@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import {
   Search, ArrowRight, ChevronRight, TrendingUp, TrendingDown,
@@ -12,6 +11,7 @@ import ModelComparison from '@/components/home/ModelComparison'
 import RankingsBanner from '@/components/home/RankingsBanner'
 import HomeCounters from '@/components/home/HomeCounters'
 import PlateBannerLookup from '@/components/marketplace/PlateBannerLookup'
+import ExploreCarousel from '@/components/home/ExploreCarousel'
 
 export const dynamic = 'force-dynamic'
 
@@ -75,6 +75,12 @@ export default async function HomePage() {
     { label: 'Elétricos', filter: 'Elétrico', img: '/categories/eletrico.jpg', badge: 'Zero emissão' },
     { label: 'Picapes', filter: 'Pickup', img: '/categories/pickup.jpg', badge: 'Robustez total' },
     { label: 'Esportivos', filter: 'Esportivo', img: '/categories/esportivo.jpg', badge: 'Pura performance' },
+    { label: 'Sedans', filter: 'sedan', img: '/categories/sedan.jpg', badge: 'Conforto e espaço' },
+    { label: 'Hatches', filter: 'hatch', img: '/categories/hatch.jpg', badge: 'Ágeis na cidade' },
+    { label: 'Híbridos', filter: 'híbrido', img: '/categories/hibrido.jpg', badge: 'Eficiência total' },
+    { label: 'Executivos', filter: 'executivo', img: '/categories/executivo.jpg', badge: 'Requisitados' },
+    { label: 'Acessíveis', filter: 'acessível', img: '/categories/acessivel.jpg', badge: 'Até R$ 60 mil' },
+    { label: 'Luxo', filter: 'luxo', img: '/categories/luxo.jpg', badge: 'Alto padrão' },
   ]
 
   const pills = [
@@ -277,37 +283,17 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ═══ EXPLORE GRID ═══ */}
-      <section className="cb-section-pad">
+      {/* ═══ EXPLORE BY STYLE ═══ */}
+      <section className="cb-section-pad cb-explore-section">
         <div className="cb-wrap">
-          <div className="cb-head">
+          <div className="cb-explore-head">
             <div>
-              <p className="cb-eyebrow">Explore</p>
+              <p className="cb-eyebrow">Explore por estilo</p>
               <h2>Encontre o seu estilo</h2>
             </div>
           </div>
-          <div className="cb-explore-grid">
-            {categories.map((cat) => (
-              <Link
-                key={cat.label}
-                href={`/carros-a-venda?body_type=${encodeURIComponent(cat.filter)}`}
-                className="cb-explore-card"
-              >
-                <img src={cat.img} alt={cat.label} loading="lazy" />
-                <div className="cb-explore-overlay" aria-hidden="true" />
-                <div className="cb-explore-body">
-                  <span className="cb-explore-badge">{cat.badge}</span>
-                  <div className="cb-explore-title">
-                    {cat.label}
-                    <span className="cb-explore-arrow">
-                      <ArrowRight size={18} />
-                    </span>
-                  </div>
-                  <div className="cb-explore-count">Ver ofertas disponíveis</div>
-                </div>
-              </Link>
-            ))}
-          </div>
+
+          <ExploreCarousel categories={categories} />
         </div>
       </section>
 
