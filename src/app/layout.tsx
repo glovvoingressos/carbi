@@ -1,23 +1,28 @@
 import type { Metadata } from 'next'
-import { Poppins, Manrope, Geist } from 'next/font/google'
+import { Urbanist } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
 import { OrganizationSchema, WebSiteSchema } from '@/components/seo/JSONLD'
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics'
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'})
-
-const fontHeading = Manrope({
+const fontSans = Urbanist({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['300', '500', '600', '700', '800'],
+  variable: '--font-sans',
+  display: 'swap',
+})
+
+const fontHeading = Urbanist({
+  subsets: ['latin'],
+  weight: ['500', '600', '700', '800'],
   variable: '--font-heading',
   display: 'swap',
 })
 
-const fontMono = Poppins({
+const fontMono = Urbanist({
   subsets: ['latin'],
-  weight: ['300', '400', '500'],
+  weight: ['500', '600'],
   variable: '--font-mono',
   display: 'swap',
 })
@@ -75,8 +80,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR" className={cn(fontHeading.variable, fontMono.variable, "font-sans", geist.variable)}>
-      <body className={geist.className}>
+    <html lang="pt-BR" className={cn(fontHeading.variable, fontMono.variable, fontSans.variable, "font-sans")}>
+      <body className={fontSans.className}>
         <GoogleAnalytics />
         <WebSiteSchema />
         <OrganizationSchema />

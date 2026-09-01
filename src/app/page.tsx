@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import {
-  Search, ArrowRight, ChevronRight, TrendingUp,
-  MapPin, Plus, Zap,
+  Search, ArrowRight, ChevronRight, TrendingUp, TrendingDown,
+  MapPin, Plus, Zap, Gauge, Calendar as CalendarIcon, Settings2,
 } from 'lucide-react'
 import { getLatestPublicListings } from '@/lib/marketplace-server'
 import { formatBRL, cars } from '@/data/cars'
@@ -201,36 +201,69 @@ export default async function HomePage() {
                         imageUrls={imageUrls}
                         alt={`${listing.brand} ${listing.model} ${listing.year_model}`}
                       />
-                      <span className="cb-listing-card-heart" aria-hidden="true">♡</span>
+                      <div className="cb-listing-card-topbar">
+                        <span
+                          className="cb-listing-fav"
+                          aria-label="Favoritar"
+                          role="img"
+                        >
+                          ♡
+                        </span>
+                      </div>
                     </div>
                     <div className="cb-listing-card-body">
-                      <div className="cb-listing-card-title">{listing.brand} {listing.model}</div>
-                      <div className="cb-listing-card-meta">
-                        {listing.year_model} · {listing.mileage?.toLocaleString('pt-BR')} km
-                      </div>
-                      <div className="cb-listing-card-location">
-                        <MapPin size={14} />
-                        <span>{listing.city}</span>
-                      </div>
-                      <div className="cb-listing-card-footer">
-                        <div>
-                          <div className="cb-listing-card-price">{formatBRL(Number(listing.price))}</div>
-                          {fipe !== null ? (
-                            <div className={`cb-fipe-compare ${fipe <= 0 ? 'is-below' : 'is-above'}`}>
-                              <div className="cb-fipe-label">
-                                <TrendingUp size={12} />
-                                <span>{Math.abs(fipe)}% {fipe <= 0 ? 'abaixo' : 'acima'} da FIPE</span>
-                              </div>
-                              <div className="cb-fipe-track" aria-hidden="true">
-                                <span style={{ '--cb-fipe-progress': `${Math.min(Math.max(Math.abs(fipe), 8), 100)}%` } as CSSProperties} />
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="cb-fipe-unavailable">FIPE indisponível</div>
-                          )}
+                      <div className="cb-listing-card-head">
+                        <div className="cb-listing-card-title">
+                          <span className="cb-listing-card-brand">{listing.brand}</span>
+                          <span className="cb-listing-card-model">{listing.model}</span>
                         </div>
-                        <span className="cb-listing-card-arrow"><ArrowRight size={17} /></span>
+                        {listing.version ? (
+                          <span className="cb-listing-card-version">{listing.version}</span>
+                        ) : null}
                       </div>
+
+                      <div className="cb-listing-card-specs">
+                        <div className="cb-listing-spec">
+                          <CalendarIcon size={13} />
+                          <span className="cb-listing-spec-label">Ano</span>
+                          <span className="cb-listing-spec-value">{listing.year_model}</span>
+                        </div>
+                        <div className="cb-listing-spec">
+                          <Gauge size={13} />
+                          <span className="cb-listing-spec-label">KM</span>
+                          <span className="cb-listing-spec-value">
+                            {listing.mileage ? `${(listing.mileage / 1000).toFixed(listing.mileage % 1000 === 0 ? 0 : 1)}k` : '0'}
+                          </span>
+                        </div>
+                        {listing.transmission ? (
+                          <div className="cb-listing-spec">
+                            <Settings2 size={13} />
+                            <span className="cb-listing-spec-label">Câmbio</span>
+                            <span className="cb-listing-spec-value">{listing.transmission}</span>
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <div className="cb-listing-card-footer">
+                        <strong className="cb-listing-card-price-main">{formatBRL(Number(listing.price))}</strong>
+                        {fipe !== null ? (
+                          <span className={`cb-listing-fipe-inline ${fipe <= 0 ? 'is-good' : 'is-bad'}`}>
+                            {fipe <= 0 ? <TrendingDown size={10} /> : <TrendingUp size={10} />}
+                            {Math.abs(fipe)}% {fipe <= 0 ? 'abaixo da FIPE' : 'acima da FIPE'}
+                          </span>
+                        ) : null}
+                        <span className="cb-listing-card-arrow" aria-hidden="true">
+                          <ArrowRight size={14} />
+                        </span>
+                      </div>
+                      {listing.city ? (
+                        <span className="cb-listing-card-location">
+                          <MapPin size={11} />
+                          <span className="cb-listing-card-location-text">
+                            {listing.city}{listing.state ? `, ${listing.state}` : ''}
+                          </span>
+                        </span>
+                      ) : null}
                     </div>
                   </Link>
                 )
