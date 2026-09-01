@@ -149,11 +149,8 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
           await supabase.from('users').upsert(syncData, { onConflict: 'id' }).catch(() => {})
         }
         onAuthenticated?.()
-        if (redirectTo) {
-          router.push(redirectTo)
-        } else if (!onAuthenticated) {
-          router.push('/minha-conta')
-        }
+        router.replace(redirectTo || '/minha-conta')
+        router.refresh()
       } else if (mode === 'signup') {
         const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'}/auth/callback`
         const { data, error: signUpError } = await supabase.auth.signUp({
@@ -209,8 +206,11 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
           }
         } catch (e) { console.error('Welcome email fetch failed:', e) }
         setMessage(data.session ? 'Conta criada com sucesso!' : 'Conta criada! Confirme seu e-mail para continuar. Verifique também a pasta de spam.')
-        if (data.session && onAuthenticated) onAuthenticated()
-        if (data.session && redirectTo) router.push(redirectTo)
+        if (data.session) {
+          onAuthenticated?.()
+          router.replace(redirectTo || '/minha-conta')
+          router.refresh()
+        }
       } else if (mode === 'forgot') {
         const resetRedirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'}/auth/reset-password`
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: resetRedirectUrl })

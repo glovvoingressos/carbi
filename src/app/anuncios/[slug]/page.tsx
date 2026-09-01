@@ -3,7 +3,8 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { TrendingDown, TrendingUp, Calendar, MessageCircle } from 'lucide-react'
 import { formatBRL } from '@/data/cars'
-import { getFipeComparison } from '@/lib/marketplace'
+import { getFipeComparison, parseFipePriceToNumber } from '@/lib/marketplace'
+import { getFipePrice } from '@/lib/fipe-api'
 import { getListingVehicleId, getPublicListingBySlug, getRelatedListings, getSellerInfo } from '@/lib/marketplace-server'
 import { getVehicleEnrichmentForPublic } from '@/lib/vehicle-enrichment-server'
 import VehicleDetailView from '@/components/marketplace/VehicleDetailView'
@@ -51,7 +52,11 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
     limit: 6,
   })
 
-  const comparison = getFipeComparison(Number(listing.price), listing.fipe_price)
+  const currentFipeResult = await getFipePrice(listing.brand, listing.model, listing.year_model, listing.version || undefined)
+  const currentFipePrice = currentFipeResult?.price
+    ? parseFipePriceToNumber(currentFipeResult.price) || null
+    : listing.fipe_price ? Number(listing.fipe_price) : null
+  const comparison = getFipeComparison(Number(listing.price), currentFipePrice)
   const listingVehicleId = listing.vehicle_id || await getListingVehicleId(listing.id)
   const enrichmentData = listingVehicleId ? await getVehicleEnrichmentForPublic(listingVehicleId) : null
   const enrichment = enrichmentData?.enrichment || null
@@ -83,6 +88,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
           relatedListings={related}
           enrichment={enrichment || undefined}
           comparison={comparison}
+          currentFipePrice={currentFipePrice}
         />
       </div>
     </main>

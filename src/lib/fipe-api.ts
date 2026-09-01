@@ -200,7 +200,100 @@ export async function getFipeVersionsByYear(brandCode: string, modelCode: string
  * Resolvers for auto-hydration (used by [brand]/[model]/page.tsx)
  */
 
-export async function resolveBrandAndModel(brandName: string, modelName: string, type = 'cars', versionName?: string) {
+export interface ResolvedModel {
+  brand: FipeItem
+  model: FipeItem
+}
+
+async function getCandidateModels(
+  brand: FipeItem,
+  models: FipeItem[],
+  modelName: string,
+  versionName?: string
+): Promise<FipeItem[]> {
+  const normalizedFipeBrand = normalize(brand.name)
+  const nModel = normalize(modelName).replace(normalizedFipeBrand, '').trim() // Remove brand from model name to avoid token conflict
+  const nVersion = versionName ? normalize(versionName) : ''
+
+  const mTokens = nModel.split(' ').filter(t => t.length >= 1)
+  const vTokens = nVersion.split(' ').filter(t => t.length >= 2)
+
+  const seen = new Set<string>()
+  const candidates: FipeItem[] = []
+  const tryAdd = (m: FipeItem) => {
+    if (m && !seen.has(m.code)) {
+      seen.add(m.code)
+      candidates.push(m)
+    }
+  }
+
+  // 1. Strict Word Match (Model + Version)
+  if (vTokens.length > 0) {
+    for (const m of models) {
+      const mn = normalize(m.name)
+      if (mTokens.every(t => mn.includes(t)) && vTokens.every(t => mn.includes(t))) tryAdd(m)
+    }
+  }
+
+  // 2. Partial Token Match (At least half of version tokens)
+  if (candidates.length === 0 && vTokens.length > 1) {
+    for (const m of models) {
+      const mn = normalize(m.name)
+      if (!mTokens.every(t => mn.includes(t))) continue
+      const matchCount = vTokens.filter(t => mn.includes(t)).length
+      if (matchCount >= Math.ceil(vTokens.length / 2)) tryAdd(m)
+    }
+  }
+
+  // 3. Exact Model Match
+  if (candidates.length === 0) {
+    for (const m of models) {
+      if (normalize(m.name) === nModel) tryAdd(m)
+    }
+  }
+
+  // 4. Word boundary match for model name
+  if (candidates.length === 0) {
+    const regex = new RegExp(`\\b${nModel}\\b`, 'i')
+    for (const m of models) {
+      if (regex.test(normalize(m.name))) tryAdd(m)
+    }
+  }
+
+  // 5. Token match for model (ignore version)
+  if (candidates.length === 0 && mTokens.length > 0) {
+    for (const m of models) {
+      const mn = normalize(m.name)
+      if (mTokens.every(t => mn.includes(t))) tryAdd(m)
+    }
+  }
+
+  // 6. Last resort: just find something that includes the first two tokens of the model
+  if (candidates.length === 0 && mTokens.length >= 2) {
+    for (const m of models) {
+      const mn = normalize(m.name)
+      if (mn.includes(mTokens[0]) && mn.includes(mTokens[1])) tryAdd(m)
+    }
+  }
+
+  return candidates
+}
+
+async function countRealYears(brandCode: string, modelCode: string): Promise<number> {
+  try {
+    const years = await getFipeYears(brandCode, modelCode)
+    return years.filter(y => !y.name.startsWith('32000')).length
+  } catch {
+    return 0
+  }
+}
+
+export async function resolveBrandAndModel(
+  brandName: string,
+  modelName: string,
+  type = 'cars',
+  versionName?: string
+): Promise<ResolvedModel | null> {
   const brands = await getFipeBrands(type)
   const nBrand = normalize(brandName)
   const brand = brands.find(b => normalize(b.name) === nBrand) || 
@@ -209,62 +302,54 @@ export async function resolveBrandAndModel(brandName: string, modelName: string,
   if (!brand) return null
 
   const models = await getFipeModels(brand.code, type)
-  const normalizedFipeBrand = normalize(brand.name)
-  const nModel = normalize(modelName).replace(normalizedFipeBrand, '').trim() // Remove brand from model name to avoid token conflict
-  const nVersion = versionName ? normalize(versionName) : ''
-  
-  const mTokens = nModel.split(' ').filter(t => t.length >= 1)
-  const vTokens = nVersion.split(' ').filter(t => t.length >= 2)
-  
-  let model: FipeItem | undefined
+  const candidates = await getCandidateModels(brand, models, modelName, versionName)
+  if (candidates.length === 0) return null
 
-  // 1. Strict Word Match (Model + Version)
-  if (vTokens.length > 0) {
-    model = models.find(m => {
-      const mn = normalize(m.name)
-      return mTokens.every(t => mn.includes(t)) && vTokens.every(t => mn.includes(t))
-    })
-  }
-
-  // 2. Partial Token Match (At least half of version tokens)
-  if (!model && vTokens.length > 1) {
-    model = models.find(m => {
-      const mn = normalize(m.name)
-      if (!mTokens.every(t => mn.includes(t))) return false
-      const matchCount = vTokens.filter(t => mn.includes(t)).length
-      return matchCount >= Math.ceil(vTokens.length / 2)
-    })
+  // When the version alone is ambiguous (e.g. "EXL" matching several trims),
+  // prefer the trim with the most available model years.
+  let best = candidates[0]
+  if (candidates.length > 1) {
+    let bestCount = -1
+    for (const candidate of candidates) {
+      const count = await countRealYears(brand.code, candidate.code)
+      if (count > bestCount) {
+        bestCount = count
+        best = candidate
+      }
+    }
   }
 
-  // 3. Exact Model Match
-  if (!model) {
-    model = models.find(m => normalize(m.name) === nModel)
-  }
-  
-  // 4. Word boundary match for model name
-  if (!model) {
-    const regex = new RegExp(`\\b${nModel}\\b`, 'i')
-    model = models.find(m => regex.test(normalize(m.name)))
-  }
-  
-  // 5. Token match for model (ignore version)
-  if (!model && mTokens.length > 0) {
-    model = models.find(m => {
-      const mn = normalize(m.name)
-      return mTokens.every(t => mn.includes(t))
-    })
+  return { brand, model: best }
+}
+
+export async function resolveBrandAndModelByYear(
+  brandName: string,
+  modelName: string,
+  year: number | string,
+  versionName?: string,
+  type = 'cars'
+): Promise<ResolvedModel | null> {
+  const targetYear = typeof year === 'number' ? year : parseInt(String(year), 10)
+  if (!targetYear) return null
+
+  const brands = await getFipeBrands(type)
+  const nBrand = normalize(brandName)
+  const brand = brands.find(b => normalize(b.name) === nBrand) || 
+                brands.find(b => normalize(b.name).includes(nBrand) || nBrand.includes(normalize(b.name)))
+  if (!brand) return null
+
+  const models = await getFipeModels(brand.code, type)
+  const candidates = await getCandidateModels(brand, models, modelName, versionName)
+  if (candidates.length === 0) return null
+
+  // Prefer the first candidate that actually has a version for the target year,
+  // so a short/ambiguous version never resolves to a wrong trim.
+  for (const candidate of candidates) {
+    const versions = await getFipeVersionsByYear(brand.code, candidate.code, targetYear)
+    if (versions.length > 0) return { brand, model: candidate }
   }
 
-  // 6. Last resort: just find something that includes the first two tokens of the model
-  if (!model && mTokens.length >= 2) {
-    model = models.find(m => {
-      const mn = normalize(m.name)
-      return mn.includes(mTokens[0]) && mn.includes(mTokens[1])
-    })
-  }
-  
-  if (!model) return null
-  return { brand, model }
+  return { brand, model: candidates[0] }
 }
 
 export async function getFipeYearsByModelName(brandName: string, modelName: string, limit = 6, _versionName?: string): Promise<number[]> {
@@ -283,7 +368,7 @@ export async function getFipePrice(
   const targetYear = typeof year === 'number' ? year : parseInt(year, 10)
   if (!targetYear) return null
 
-  const resolved = await resolveBrandAndModel(brandName, modelName, 'cars', versionName)
+  const resolved = await resolveBrandAndModelByYear(brandName, modelName, targetYear, versionName, 'cars')
   if (!resolved) return null
 
   const versions = await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, targetYear)
@@ -344,7 +429,7 @@ export async function getFipeMonthlyHistory(
   const targetYear = typeof year === 'number' ? year : parseInt(year, 10)
   if (!targetYear) return []
 
-  const resolved = await resolveBrandAndModel(brandName, modelName, 'cars', versionName)
+  const resolved = await resolveBrandAndModelByYear(brandName, modelName, targetYear, versionName, 'cars')
   if (!resolved) return []
 
   const versions = await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, targetYear)
