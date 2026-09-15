@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
     .from('support_conversations')
     .select(CONVERSATION_FIELDS, { count: 'exact' })
     .order('last_message_at', { ascending: false })
+    .order('id', { ascending: false })
     .range(from, to)
 
   if (error) return unavailable()

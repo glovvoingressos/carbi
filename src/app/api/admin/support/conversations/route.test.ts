@@ -61,6 +61,51 @@ describe('/api/admin/support/conversations', () => {
     expect(conversations.order).toHaveBeenCalledWith('last_message_at', { ascending: false })
   })
 
+  it('keeps conversations with tied activity timestamps stable across page boundaries', async () => {
+    const tiedTimestamp = '2026-09-15T12:00:00.000Z'
+    const firstPage = query({
+      data: [
+        { id: 'conversation-04', last_message_at: tiedTimestamp },
+        { id: 'conversation-03', last_message_at: tiedTimestamp },
+      ],
+      error: null,
+      count: 4,
+    })
+    const secondPage = query({
+      data: [
+        { id: 'conversation-02', last_message_at: tiedTimestamp },
+        { id: 'conversation-01', last_message_at: tiedTimestamp },
+      ],
+      error: null,
+      count: 4,
+    })
+    getSupabaseAdminClient.mockReturnValue({
+      from: vi.fn().mockReturnValueOnce(firstPage).mockReturnValueOnce(secondPage),
+    })
+
+    const firstResponse = await listConversations(new Request('https://carbi.com.br/api/admin/support/conversations?page=1&limit=2', {
+      headers: { authorization: 'Bearer admin-session' },
+    }) as never)
+    const secondResponse = await listConversations(new Request('https://carbi.com.br/api/admin/support/conversations?page=2&limit=2', {
+      headers: { authorization: 'Bearer admin-session' },
+    }) as never)
+
+    await expect(firstResponse.json()).resolves.toMatchObject({
+      conversations: [{ id: 'conversation-04' }, { id: 'conversation-03' }],
+      pagination: { page: 1, limit: 2, total: 4 },
+    })
+    await expect(secondResponse.json()).resolves.toMatchObject({
+      conversations: [{ id: 'conversation-02' }, { id: 'conversation-01' }],
+      pagination: { page: 2, limit: 2, total: 4 },
+    })
+    expect(firstPage.range).toHaveBeenCalledWith(0, 1)
+    expect(secondPage.range).toHaveBeenCalledWith(2, 3)
+    expect(firstPage.order).toHaveBeenNthCalledWith(1, 'last_message_at', { ascending: false })
+    expect(firstPage.order).toHaveBeenNthCalledWith(2, 'id', { ascending: false })
+    expect(secondPage.order).toHaveBeenNthCalledWith(1, 'last_message_at', { ascending: false })
+    expect(secondPage.order).toHaveBeenNthCalledWith(2, 'id', { ascending: false })
+  })
+
   it('returns unauthorized for a missing bearer session', async () => {
     requireSupportAdmin.mockRejectedValue(new SupportAdminAuthorizationError())
 
