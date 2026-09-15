@@ -4,6 +4,7 @@ const { checkSupportRateLimit, createConversationMessage, listVisitorConversatio
   checkSupportRateLimit: vi.fn(() => true), createConversationMessage: vi.fn(), listVisitorConversation: vi.fn(),
 }))
 const { getOrCreateVisitorToken } = vi.hoisted(() => ({ getOrCreateVisitorToken: vi.fn() }))
+const { sendSupportAdminNotification } = vi.hoisted(() => ({ sendSupportAdminNotification: vi.fn() }))
 
 vi.mock('../../../../lib/support-service', () => ({
   checkSupportRateLimit, createConversationMessage, listVisitorConversation,
@@ -12,6 +13,7 @@ vi.mock('../../../../lib/support-service', () => ({
 vi.mock('../../../../lib/support-security', () => ({
   VISITOR_TOKEN_COOKIE: 'carbi_support_visitor', getOrCreateVisitorToken,
 }))
+vi.mock('../../../../lib/support-email', () => ({ sendSupportAdminNotification }))
 
 import { GET, POST } from './route'
 
@@ -30,6 +32,21 @@ describe('/api/support/conversations', () => {
     await expect(response.json()).resolves.toEqual({ conversation: { id: 'conversation-1', status: 'open' } })
     expect(createConversationMessage).toHaveBeenCalledWith({ name: 'Ana', email: undefined, message: 'Olá' }, 'visitor-token')
     expect(response.cookies.get('carbi_support_visitor')).toMatchObject({ value: 'visitor-token', httpOnly: true, secure: true, sameSite: 'lax' })
+  })
+
+  it('keeps the created conversation when its admin notification cannot be sent', async () => {
+    getOrCreateVisitorToken.mockReturnValue({ token: 'visitor-token', setCookie: false })
+    createConversationMessage.mockResolvedValue({ id: 'conversation-1', status: 'open' })
+    sendSupportAdminNotification.mockResolvedValue({ success: false, warning: 'Support notification could not be sent' })
+
+    const response = await POST(new Request('https://carbi.com.br/api/support/conversations', {
+      method: 'POST', body: JSON.stringify({ name: 'Ana', email: 'ana@example.com', message: 'Olá' }), headers: { 'content-type': 'application/json' },
+    }) as never)
+
+    expect(response.status).toBe(201)
+    expect(sendSupportAdminNotification).toHaveBeenCalledWith({
+      conversationId: 'conversation-1', name: 'Ana', email: 'ana@example.com', message: 'Olá',
+    })
   })
 
   it('returns no conversation when a visitor has no cookie', async () => {

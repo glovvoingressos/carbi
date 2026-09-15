@@ -8,6 +8,7 @@ import {
   SupportServiceError,
 } from '../../../../lib/support-service'
 import { getOrCreateVisitorToken, VISITOR_TOKEN_COOKIE } from '../../../../lib/support-security'
+import { sendSupportAdminNotification } from '../../../../lib/support-email'
 import { validateSupportMessage } from '../../../../lib/support-validation'
 
 export const dynamic = 'force-dynamic'
@@ -36,6 +37,14 @@ export async function POST(request: NextRequest) {
 
   try {
     const conversation = await createConversationMessage(validation.value, token)
+    try {
+      await sendSupportAdminNotification({
+        conversationId: conversation.id,
+        ...validation.value,
+      })
+    } catch {
+      console.error('[support] admin notification failed after conversation persistence')
+    }
     const response = NextResponse.json({ conversation: toPublicConversation(conversation) }, { status: 201 })
     if (setCookie) response.cookies.set(VISITOR_TOKEN_COOKIE, token, getVisitorCookieOptions())
     return response
