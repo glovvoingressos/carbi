@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'motion/react'
 import { MessageCircle, X, Send, ShieldCheck, LogIn, Loader2 } from 'lucide-react'
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
@@ -26,7 +27,7 @@ export default function SupportWidget() {
       setUserEmail(session?.user?.email ?? null)
     }
     check()
-    const { data } = supabase.auth.onAuthStateChange((_e, updated) => {
+    const { data } = supabase.auth.onAuthStateChange((_e: AuthChangeEvent, updated: Session | null) => {
       setIsAuth(!!updated)
       setUserEmail(updated?.user?.email ?? null)
     })
