@@ -61,13 +61,16 @@ describe('support message validation', () => {
       ok: false,
       error: 'Email must be valid.',
     })
-    expect(isValidSupportEmail(`${'a'.repeat(246)}@example.com`)).toBe(false)
+    expect(isValidSupportEmail(`${'a'.repeat(242)}@example.com`)).toBe(true)
+    expect(isValidSupportEmail(`${'a'.repeat(243)}@example.com`)).toBe(false)
   })
 
-  it('rejects a non-empty honeypot field', () => {
-    expect(validateSupportMessage({ message: 'Olá', honeypot: 'bot' })).toEqual({
-      ok: false,
-      error: 'Invalid support message.',
-    })
+  it('rejects a non-empty honeypot field, including non-string values', () => {
+    for (const honeypot of ['bot', true, 1, { filled: true }]) {
+      expect(validateSupportMessage({ message: 'Olá', honeypot })).toEqual({
+        ok: false,
+        error: 'Invalid support message.',
+      })
+    }
   })
 })

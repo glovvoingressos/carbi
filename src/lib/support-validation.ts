@@ -33,11 +33,12 @@ export function isValidSupportEmail(email: string): boolean {
 export function validateSupportMessage(
   input: SupportMessageInput,
 ): SupportMessageValidation {
-  const honeypot = typeof input.honeypot === 'string'
-    ? normalizeSupportText(input.honeypot)
-    : ''
+  const rawHoneypot = input.honeypot
+  const honeypot = typeof rawHoneypot === 'string'
+    ? normalizeSupportText(rawHoneypot)
+    : rawHoneypot
 
-  if (honeypot) {
+  if (honeypot !== undefined && honeypot !== null && honeypot !== '') {
     return { ok: false, error: 'Invalid support message.' }
   }
 
