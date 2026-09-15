@@ -12904,6 +12904,19 @@ p {
 .cb-table-photo-badge svg { color: var(--color-pop); }
 
 /* ── Support widget ── */
+.cb-support-fab,
+.cb-support-panel {
+  --cb-bg: #FFFFFF;
+  --cb-bg-alt: #F5F5F5;
+  --cb-surface: #FFFFFF;
+  --cb-ink: #212121;
+  --cb-ink-soft: #3A3A3A;
+  --cb-ink-faint: #6F6F6F;
+  --cb-accent: #EAFC5F;
+  --cb-line: rgba(33, 33, 33, 0.1);
+  --cb-head: Arial, Helvetica, sans-serif;
+}
+
 .cb-support-fab {
   position: fixed;
   right: 20px;
@@ -12912,8 +12925,8 @@ p {
   min-width: 56px;
   height: 56px;
   padding: 0 18px;
-  border-radius: 50%;
-  border: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(33, 33, 33, 0.12);
   background: var(--cb-ink);
   color: #fff;
   display: inline-flex;
@@ -12966,6 +12979,7 @@ p {
   flex-direction: column;
   overflow: hidden;
   transform-origin: bottom right;
+  isolation: isolate;
 }
 .cb-support-head {
   display: flex;
@@ -13036,7 +13050,7 @@ p {
   gap: 12px;
   padding: 18px;
   overflow-y: auto;
-  background: var(--cb-bg);
+  background: var(--cb-bg-alt);
 }
 .cb-support-bubble {
   background: var(--cb-surface);
