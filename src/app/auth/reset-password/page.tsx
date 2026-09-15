@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
+import { getAuthCode } from '@/lib/auth-redirect'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -17,6 +18,16 @@ export default function ResetPasswordPage() {
     const supabase = getSupabaseBrowserClient()
     ;(async () => {
       try {
+        const code = getAuthCode(window.location.search)
+        if (code) {
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+          if (exchangeError) throw exchangeError
+          window.history.replaceState({}, document.title, window.location.pathname)
+          setSessionReady(true)
+          setLoading(false)
+          return
+        }
+
         const hash = window.location.hash
         if (hash) {
           const p = new URLSearchParams(hash.substring(1))
@@ -25,6 +36,7 @@ export default function ResetPasswordPage() {
           if (at && rt) {
             const { error: e } = await supabase.auth.setSession({ access_token: at, refresh_token: rt })
             if (e) throw e
+            window.history.replaceState({}, document.title, window.location.pathname)
             setSessionReady(true)
             setLoading(false)
             return
