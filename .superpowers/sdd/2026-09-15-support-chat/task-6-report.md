@@ -29,3 +29,11 @@
 ## Dependency note
 
 `npm install` reported 16 existing audit findings (4 moderate, 11 high, 1 critical). Dependency remediation is outside Task 6.
+
+## Review follow-up — polling, errors, and CSS scope
+
+- The conversation lifecycle now combines the requested open state with Motion's `useIsPresent()` state. This clears the poll interval and aborts its request as soon as the widget starts its `AnimatePresence` exit, instead of waiting for the visual exit animation to complete.
+- Load and send failures now use separate state. A successful polling GET clears only a prior loading error and cannot dismiss a failed send alert.
+- Restored the unrelated global `.btn-icon` radius to its original `50%`; the remaining stylesheet changes are support-widget styles only.
+- Added failing-first component regressions for immediate polling cleanup during widget exit and for preserving a send error across a successful polling refresh.
+- Follow-up verification: `npx vitest run src/components/support/SupportConversation.test.tsx src/lib/support-validation.test.ts src/lib/support-security.test.ts src/lib/support-service.test.ts src/app/api/support/conversations/route.test.ts src/app/api/support/conversations/messages/route.test.ts` — 6 files, 36 tests passing; `npx tsc --noEmit` — passing; `git diff --check` — passing.

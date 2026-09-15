@@ -2,6 +2,7 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { Loader2, Send, ShieldCheck } from 'lucide-react'
+import { useIsPresent } from 'motion/react'
 
 type ConversationStatus = 'open' | 'waiting_visitor' | 'closed'
 
@@ -42,12 +43,15 @@ export default function SupportConversation({ isOpen }: { isOpen: boolean }) {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<SendStatus>('idle')
-  const [error, setError] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [sendError, setSendError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const messageRef = useRef<HTMLTextAreaElement | null>(null)
+  const isPresent = useIsPresent()
+  const isConversationActive = isOpen && isPresent
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isConversationActive) return
 
     const controller = new AbortController()
     let active = true
@@ -65,11 +69,11 @@ export default function SupportConversation({ isOpen }: { isOpen: boolean }) {
 
         if (active) {
           setConversation(normalizeConversation(data.conversation))
-          setError(null)
+          setLoadError(null)
         }
       } catch (requestError) {
         if (active && !isAbortError(requestError)) {
-          setError(readThrownError(requestError, 'Não foi possível carregar sua conversa agora.'))
+          setLoadError(readThrownError(requestError, 'Não foi possível carregar sua conversa agora.'))
         }
       } finally {
         inFlight = false
@@ -85,7 +89,7 @@ export default function SupportConversation({ isOpen }: { isOpen: boolean }) {
       window.clearInterval(interval)
       controller.abort()
     }
-  }, [isOpen])
+  }, [isConversationActive])
 
   useEffect(() => {
     if (!isOpen) return
@@ -98,7 +102,7 @@ export default function SupportConversation({ isOpen }: { isOpen: boolean }) {
     if (!text || status === 'sending') return
 
     setStatus('sending')
-    setError(null)
+    setSendError(null)
 
     const payload = { name: name.trim(), email: email.trim(), message: text }
     const isExistingConversation = Boolean(conversation)
@@ -143,7 +147,7 @@ export default function SupportConversation({ isOpen }: { isOpen: boolean }) {
       setStatus('sent')
     } catch (requestError) {
       setStatus('error')
-      setError(readThrownError(requestError, GENERIC_ERROR))
+      setSendError(readThrownError(requestError, GENERIC_ERROR))
     }
   }
 
@@ -218,7 +222,7 @@ export default function SupportConversation({ isOpen }: { isOpen: boolean }) {
           </button>
         </div>
         <p className="cb-support-live" role="status" aria-live="polite">{status === 'sent' ? 'Mensagem enviada. Nossa equipe responderá por aqui.' : ''}</p>
-        {error && <p className="cb-support-error" role="alert">{error}</p>}
+        {(sendError ?? loadError) && <p className="cb-support-error" role="alert">{sendError ?? loadError}</p>}
       </form>
     </div>
   )

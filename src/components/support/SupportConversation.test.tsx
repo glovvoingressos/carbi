@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import SupportConversation from './SupportConversation'
-import { getSupportWidgetTransition } from './SupportWidget'
+import SupportWidget, { getSupportWidgetTransition } from './SupportWidget'
 
 const conversation = {
   id: 'conversation-1',
@@ -117,6 +117,32 @@ describe('SupportConversation', () => {
     expect((screen.getByLabelText('Sua mensagem') as HTMLTextAreaElement).value).toBe('Minha mensagem')
   })
 
+  it('keeps a send error visible after a successful polling refresh', async () => {
+    vi.useFakeTimers()
+    const fetchMock = vi.mocked(fetch)
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse({ conversation: null }))
+      .mockResolvedValueOnce(jsonResponse({ error: 'Tente novamente em instantes.' }, 429))
+      .mockResolvedValueOnce(jsonResponse({ conversation: null }))
+
+    render(<SupportConversation isOpen />)
+
+    fireEvent.change(screen.getByLabelText('Sua mensagem'), { target: { value: 'Minha mensagem' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensagem' }))
+    await act(async () => {
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    expect(screen.getByRole('alert')).toBeTruthy()
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(4_000)
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(3)
+    expect(screen.getByRole('alert').textContent).toContain('Tente novamente em instantes.')
+  })
+
   it('renders the conversation history including an admin response', async () => {
     vi.mocked(fetch).mockResolvedValue(jsonResponse({ conversation }))
 
@@ -147,6 +173,28 @@ describe('SupportConversation', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1)
 
     unmount()
+  })
+
+  it('stops polling as soon as the widget begins its exit animation', async () => {
+    vi.useFakeTimers()
+    const fetchMock = vi.mocked(fetch)
+    fetchMock.mockResolvedValue(jsonResponse({ conversation: null }))
+
+    render(<SupportWidget />)
+
+    const trigger = screen.getByRole('button', { name: 'Precisa de ajuda?' })
+    fireEvent.click(trigger)
+    await act(async () => {
+      await Promise.resolve()
+    })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+
+    fireEvent.click(trigger)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(4_000)
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
   it('submits the draft when Enter is pressed without Shift', async () => {
