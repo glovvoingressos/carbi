@@ -42,9 +42,13 @@ export function getVisitorCookieOptions() {
 
 export function checkSupportRateLimit(ip: string, visitorToken: string): boolean {
   const now = Date.now()
-  const key = `${ip}:${visitorToken}`
-  const entry = rateLimitEntries.get(key)
+  const ipAllowed = consumeRateLimitBucket(`ip:${ip}`, now)
+  const tokenAllowed = consumeRateLimitBucket(`token:${visitorToken}`, now)
+  return ipAllowed && tokenAllowed
+}
 
+function consumeRateLimitBucket(key: string, now: number): boolean {
+  let entry = rateLimitEntries.get(key)
   if (!entry || entry.resetAt <= now) {
     if (rateLimitEntries.size >= 5_000) {
       for (const [entryKey, value] of rateLimitEntries) {
@@ -56,7 +60,8 @@ export function checkSupportRateLimit(ip: string, visitorToken: string): boolean
         rateLimitEntries.delete(oldestKey)
       }
     }
-    rateLimitEntries.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
+    entry = { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS }
+    rateLimitEntries.set(key, entry)
     return true
   }
 
@@ -95,7 +100,7 @@ export async function createConversationMessage(
   }
 
   await insertVisitorMessage(supabase, conversation.id, input)
-  await updateVisitorActivity(supabase, conversation.id)
+  await reconcileVisitorActivity(supabase, conversation.id)
   return { ...conversation, status: 'open' }
 }
 
@@ -139,7 +144,7 @@ export async function appendVisitorMessage(
   if (!conversation) throw new SupportServiceError('not_found')
 
   const message = await insertVisitorMessage(supabase, conversationId, input)
-  await updateVisitorActivity(supabase, conversationId)
+  await reconcileVisitorActivity(supabase, conversationId)
   return message
 }
 
@@ -172,13 +177,19 @@ async function insertVisitorMessage(
   return data as SupportMessage
 }
 
-async function updateVisitorActivity(
+async function reconcileVisitorActivity(
   supabase: ReturnType<typeof requireAdminClient>,
   conversationId: string,
 ) {
-  const { error } = await supabase
-    .from('support_conversations')
-    .update({ status: 'open', last_message_at: new Date().toISOString() })
-    .eq('id', conversationId)
-  if (error) throw unavailable()
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const { error } = await supabase
+      .from('support_conversations')
+      .update({ status: 'open', last_message_at: new Date().toISOString() })
+      .eq('id', conversationId)
+    if (!error) return
+  }
+
+  // The message insert already succeeded. Do not turn it into a retryable
+  // public error, which would make clients submit duplicate messages.
+  console.error('[support] persisted visitor message but activity reconciliation failed', { conversationId })
 }

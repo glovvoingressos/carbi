@@ -38,5 +38,5 @@ function readVisitorToken(request: NextRequest): string | undefined {
 }
 
 function clientIp(request: NextRequest): string {
-  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  return request.headers.get('x-real-ip')?.trim() || 'unknown'
 }

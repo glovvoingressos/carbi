@@ -13,19 +13,20 @@ vi.mock('./support-security', async (importOriginal) => ({
 
 import {
   appendVisitorMessage,
+  checkSupportRateLimit,
   createConversationMessage,
   listVisitorConversation,
 } from './support-service'
 
 type QueryResult = { data: unknown; error: unknown }
 
-function query(result: QueryResult) {
+function query(result: QueryResult, terminalUpdate = false) {
   const builder = {
     select: vi.fn(() => builder),
     eq: vi.fn(() => builder),
     order: vi.fn(async () => result),
     insert: vi.fn(() => builder),
-    update: vi.fn(() => builder),
+    update: vi.fn(() => terminalUpdate ? { eq: vi.fn(async () => result) } : builder),
     maybeSingle: vi.fn(async () => result),
     single: vi.fn(async () => result),
   }
@@ -107,5 +108,37 @@ describe('support service', () => {
     await expect(appendVisitorMessage('conversation-1', 'another-token', { message: 'Não deveria enviar' }))
       .rejects.toMatchObject({ code: 'not_found' })
     expect(ownedConversation.insert).not.toHaveBeenCalled()
+  })
+
+  it('enforces independent IP and visitor-token buckets', () => {
+    const ip = `ip-${Math.random()}`
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      expect(checkSupportRateLimit(ip, `rotating-token-${attempt}`)).toBe(true)
+    }
+    expect(checkSupportRateLimit(ip, 'rotating-token-final')).toBe(false)
+
+    const token = `token-${Math.random()}`
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      expect(checkSupportRateLimit(`rotating-ip-${attempt}`, token)).toBe(true)
+    }
+    expect(checkSupportRateLimit('rotating-ip-final', token)).toBe(false)
+  })
+
+  it('returns the persisted message when activity reconciliation is unavailable after retry', async () => {
+    const ownedConversation = query({ data: { id: 'conversation-1' }, error: null })
+    const insertedMessage = query({ data: { id: 'message-3', conversation_id: 'conversation-1', sender_type: 'visitor', body: 'Persistir' }, error: null })
+    const failedActivityUpdate = query({ data: null, error: { message: 'temporary database failure' } }, true)
+    const reconciledActivityUpdate = query({ data: null, error: { message: 'database still unavailable' } }, true)
+    const from = vi.fn()
+      .mockReturnValueOnce(ownedConversation)
+      .mockReturnValueOnce(insertedMessage)
+      .mockReturnValueOnce(failedActivityUpdate)
+      .mockReturnValueOnce(reconciledActivityUpdate)
+    getSupabaseAdminClient.mockReturnValue({ from })
+
+    await expect(appendVisitorMessage('conversation-1', 'raw-token', { message: 'Persistir' })).resolves.toMatchObject({
+      id: 'message-3', body: 'Persistir',
+    })
+    expect(from).toHaveBeenCalledTimes(4)
   })
 })

@@ -1,14 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { createConversationMessage, listVisitorConversation } = vi.hoisted(() => ({
-  createConversationMessage: vi.fn(), listVisitorConversation: vi.fn(),
+const { checkSupportRateLimit, createConversationMessage, listVisitorConversation } = vi.hoisted(() => ({
+  checkSupportRateLimit: vi.fn(() => true), createConversationMessage: vi.fn(), listVisitorConversation: vi.fn(),
 }))
 const { getOrCreateVisitorToken } = vi.hoisted(() => ({ getOrCreateVisitorToken: vi.fn() }))
 
 vi.mock('../../../../lib/support-service', () => ({
-  createConversationMessage, listVisitorConversation,
+  checkSupportRateLimit, createConversationMessage, listVisitorConversation,
   getVisitorCookieOptions: () => ({ httpOnly: true, secure: true, sameSite: 'lax', maxAge: 2_592_000, path: '/' }),
-  checkSupportRateLimit: () => true,
 }))
 vi.mock('../../../../lib/support-security', () => ({
   VISITOR_TOKEN_COOKIE: 'carbi_support_visitor', getOrCreateVisitorToken,
@@ -21,7 +20,7 @@ describe('/api/support/conversations', () => {
 
   it('creates a conversation anonymously and issues a secure visitor cookie', async () => {
     getOrCreateVisitorToken.mockReturnValue({ token: 'visitor-token', setCookie: true })
-    createConversationMessage.mockResolvedValue({ id: 'conversation-1', status: 'open' })
+    createConversationMessage.mockResolvedValue({ id: 'conversation-1', status: 'open', visitor_token_hash: 'must-not-leak' })
 
     const response = await POST(new Request('https://carbi.com.br/api/support/conversations', {
       method: 'POST', body: JSON.stringify({ name: 'Ana', message: 'Olá' }), headers: { 'content-type': 'application/json' },
@@ -57,5 +56,28 @@ describe('/api/support/conversations', () => {
 
     expect(response.status).toBe(400)
     expect(response.cookies.get('carbi_support_visitor')).toBeUndefined()
+  })
+
+  it('redacts the visitor token hash from the GET response', async () => {
+    getOrCreateVisitorToken.mockReturnValue({ token: 'visitor-token', setCookie: false })
+    listVisitorConversation.mockResolvedValue({ id: 'conversation-1', status: 'open', visitor_token_hash: 'must-not-leak', messages: [] })
+
+    const response = await GET(new Request('https://carbi.com.br/api/support/conversations', {
+      headers: { cookie: 'carbi_support_visitor=visitor-token' },
+    }) as never)
+
+    await expect(response.json()).resolves.toEqual({ conversation: { id: 'conversation-1', status: 'open', messages: [] } })
+  })
+
+  it('uses x-real-ip over an untrusted forwarded-for value for rate limiting', async () => {
+    getOrCreateVisitorToken.mockReturnValue({ token: 'visitor-token', setCookie: false })
+    createConversationMessage.mockResolvedValue({ id: 'conversation-1', status: 'open' })
+
+    await POST(new Request('https://carbi.com.br/api/support/conversations', {
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-real-ip': 'trusted-ip', 'x-forwarded-for': 'spoofed-ip' },
+      body: JSON.stringify({ message: 'Olá' }),
+    }) as never)
+
+    expect(checkSupportRateLimit).toHaveBeenCalledWith('trusted-ip', 'visitor-token')
   })
 })

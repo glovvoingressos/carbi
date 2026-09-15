@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const conversation = await listVisitorConversation(visitorToken)
-    return NextResponse.json({ conversation })
+    return NextResponse.json({ conversation: toPublicConversation(conversation) })
   } catch (error) {
     return serviceErrorResponse(error)
   }
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const conversation = await createConversationMessage(validation.value, token)
-    const response = NextResponse.json({ conversation }, { status: 201 })
+    const response = NextResponse.json({ conversation: toPublicConversation(conversation) }, { status: 201 })
     if (setCookie) response.cookies.set(VISITOR_TOKEN_COOKIE, token, getVisitorCookieOptions())
     return response
   } catch (error) {
@@ -51,7 +51,13 @@ function readVisitorToken(request: NextRequest): string | undefined {
 }
 
 function clientIp(request: NextRequest): string {
-  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  return request.headers.get('x-real-ip')?.trim() || 'unknown'
+}
+
+function toPublicConversation<T extends { visitor_token_hash?: unknown }>(conversation: T | null) {
+  if (!conversation) return null
+  const { visitor_token_hash: _visitorTokenHash, ...publicConversation } = conversation
+  return publicConversation
 }
 
 function serviceErrorResponse(error: unknown) {
