@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
+import { getSupabaseRecoveryClient } from '@/lib/supabase-browser'
 import { getAuthCode } from '@/lib/auth-redirect'
 
 export default function ResetPasswordPage() {
@@ -15,7 +15,7 @@ export default function ResetPasswordPage() {
   const [sessionReady, setSessionReady] = useState(false)
 
   useEffect(() => {
-    const supabase = getSupabaseBrowserClient()
+    const supabase = getSupabaseRecoveryClient()
     ;(async () => {
       try {
         const code = getAuthCode(window.location.search)
@@ -73,7 +73,7 @@ export default function ResetPasswordPage() {
 
     setLoading(true)
     try {
-      const supabase = getSupabaseBrowserClient()
+      const supabase = getSupabaseRecoveryClient()
       const { error: updateError } = await supabase.auth.updateUser({ password })
       if (updateError) throw updateError
       setMessage('Senha redefinida com sucesso!')

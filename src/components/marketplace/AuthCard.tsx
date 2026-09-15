@@ -8,7 +8,7 @@ import {
   User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight,
   Loader2, Check, AlertCircle, CreditCard,
 } from 'lucide-react'
-import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
+import { getSupabaseBrowserClient, getSupabaseRecoveryClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 
 interface Props {
   onAuthenticated?: () => void
@@ -213,7 +213,8 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         }
       } else if (mode === 'forgot') {
         const resetRedirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'}/auth/reset-password`
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: resetRedirectUrl })
+        const recoveryClient = getSupabaseRecoveryClient()
+        const { error: resetError } = await recoveryClient.auth.resetPasswordForEmail(email, { redirectTo: resetRedirectUrl })
         if (resetError) { setError(resetError.message); return }
         setMessage('Link enviado! Verifique sua caixa de entrada e a pasta de spam.')
       }
