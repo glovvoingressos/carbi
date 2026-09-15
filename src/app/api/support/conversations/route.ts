@@ -51,7 +51,8 @@ function readVisitorToken(request: NextRequest): string | undefined {
 }
 
 function clientIp(request: NextRequest): string {
-  return request.headers.get('x-real-ip')?.trim() || 'unknown'
+  const platformRequest = request as NextRequest & { ip?: string }
+  return platformRequest.ip?.trim() || 'unknown'
 }
 
 function toPublicConversation<T extends { visitor_token_hash?: unknown }>(conversation: T | null) {

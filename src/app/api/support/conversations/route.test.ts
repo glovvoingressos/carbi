@@ -69,15 +69,22 @@ describe('/api/support/conversations', () => {
     await expect(response.json()).resolves.toEqual({ conversation: { id: 'conversation-1', status: 'open', messages: [] } })
   })
 
-  it('uses x-real-ip over an untrusted forwarded-for value for rate limiting', async () => {
+  it('does not let attacker-controlled IP headers bypass the fallback IP bucket', async () => {
     getOrCreateVisitorToken.mockReturnValue({ token: 'visitor-token', setCookie: false })
     createConversationMessage.mockResolvedValue({ id: 'conversation-1', status: 'open' })
 
-    await POST(new Request('https://carbi.com.br/api/support/conversations', {
+    const firstResponse = await POST(new Request('https://carbi.com.br/api/support/conversations', {
       method: 'POST', headers: { 'content-type': 'application/json', 'x-real-ip': 'trusted-ip', 'x-forwarded-for': 'spoofed-ip' },
       body: JSON.stringify({ message: 'Olá' }),
     }) as never)
+    const secondResponse = await POST(new Request('https://carbi.com.br/api/support/conversations', {
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-real-ip': 'another-attacker-ip', 'x-forwarded-for': 'different-spoofed-ip' },
+      body: JSON.stringify({ message: 'Olá novamente' }),
+    }) as never)
 
-    expect(checkSupportRateLimit).toHaveBeenCalledWith('trusted-ip', 'visitor-token')
+    expect(firstResponse.status).toBe(201)
+    expect(secondResponse.status).toBe(201)
+    expect(checkSupportRateLimit).toHaveBeenNthCalledWith(1, 'unknown', 'visitor-token')
+    expect(checkSupportRateLimit).toHaveBeenNthCalledWith(2, 'unknown', 'visitor-token')
   })
 })
