@@ -4,8 +4,11 @@ import { notFound } from 'next/navigation'
 import { getModelRankingDetail } from '@/lib/rankings-data'
 import { formatBRL } from '@/data/cars'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { buildRankingStructuredData } from '@/lib/rankings-seo'
 
 export const dynamic = 'force-dynamic'
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 
 export async function generateMetadata({
   params,
@@ -36,25 +39,19 @@ export default async function ModelRankingDetailPage({
   const { item, newItem, usedItem } = detail
   const periodLabel = periodo === 'julho-2026' ? 'Julho / 2026' : periodo.replace('-', ' ')
 
-  const productSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: `${item.brand} ${item.model}`,
-    description: `Relatório de vendas e FIPE do ${item.brand} ${item.model} em ${periodLabel}.`,
-    offers: {
-      '@type': 'AggregateOffer',
-      priceCurrency: 'BRL',
-      lowPrice: item.startingPriceBrl,
-      highPrice: item.fipeAvgPriceBrl || item.startingPriceBrl,
-      offerCount: item.unitsSold,
-    },
-  }
+  const canonicalUrl = `${SITE_URL}/carros-mais-vendidos-brasil/${periodo}/${slug}`
+  const rankingSchema = buildRankingStructuredData({
+    canonicalUrl,
+    brand: item.brand,
+    model: item.model,
+    periodLabel,
+  })
 
   return (
     <div className="cb-page">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(rankingSchema) }}
       />
 
       <section className="cb-hero">

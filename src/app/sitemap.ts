@@ -3,6 +3,7 @@ import { fetchPublicListingsPage, fetchPublicTruckListingsPage } from '@/lib/mar
 import { MARKETPLACE_SEO_SLUGS, MAJOR_CITIES, buildTruckSeoPaths } from '@/lib/marketplace-seo'
 import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import { slugifyBrand } from '@/lib/brand-utils'
+import { getRankingSitemapPaths } from '@/lib/rankings-seo'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 
@@ -156,6 +157,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${SITE_URL}/categorias/${intent}`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
+      priority: 0.8,
+    })
+  }
+
+  for (const path of getRankingSitemapPaths()) {
+    entries.push({
+      url: `${SITE_URL}${path}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
       priority: 0.8,
     })
   }
