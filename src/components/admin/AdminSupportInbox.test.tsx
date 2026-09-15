@@ -63,7 +63,7 @@ function supportFetch({ conversations = [olderConversation, newestConversation],
 } = {}) {
   return vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input)
-    if (url === '/api/admin/support/conversations') {
+    if (url === '/api/admin/support/conversations?page=1&limit=100') {
       return jsonResponse({ conversations, pagination: { page: 1, limit: 100, total: conversations.length } })
     }
     if (url === `/api/admin/support/conversations/${newestConversation.id}` && init?.method === 'PATCH') {
@@ -99,6 +99,43 @@ describe('AdminSupportInbox', () => {
     const labels = screen.getAllByRole('button', { name: /ana|bruno/i }).map((item) => item.getAttribute('aria-label'))
 
     expect(labels).toEqual(['Abrir conversa de Ana', 'Abrir conversa de Bruno'])
+  })
+
+  it('loads every API page so older conversations remain searchable and openable', async () => {
+    const user = userEvent.setup()
+    const paginatedConversations = Array.from({ length: 101 }, (_, index) => ({
+      ...newestConversation,
+      id: `conversation-${index + 1}`,
+      visitor_name: index === 100 ? 'Visitante antigo' : `Visitante ${index + 1}`,
+      visitor_email: `visitante-${index + 1}@example.com`,
+      last_message_at: `2026-09-15T${String(12 - Math.floor(index / 10)).padStart(2, '0')}:${String(59 - (index % 10)).padStart(2, '0')}:00.000Z`,
+    }))
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input)
+      if (url === '/api/admin/support/conversations?page=1&limit=100') {
+        return jsonResponse({ conversations: paginatedConversations.slice(0, 100), pagination: { page: 1, limit: 100, total: 101 } })
+      }
+      if (url === '/api/admin/support/conversations?page=2&limit=100') {
+        return jsonResponse({ conversations: paginatedConversations.slice(100), pagination: { page: 2, limit: 100, total: 101 } })
+      }
+      const conversationId = url.match(/^\/api\/admin\/support\/conversations\/(conversation-\d+)$/)?.[1]
+      if (conversationId) {
+        const conversation = paginatedConversations.find((item) => item.id === conversationId)
+        return jsonResponse({ conversation: { ...conversation, messages: [{ ...message, id: `message-${conversationId}`, conversation_id: conversationId, sender_name: conversation?.visitor_name, body: `Histórico de ${conversation?.visitor_name}` }] } })
+      }
+      throw new Error(`Unexpected request: ${url}`)
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(<AdminSupportInbox />)
+
+    await screen.findByRole('button', { name: 'Abrir conversa de Visitante antigo' })
+    await user.type(screen.getByLabelText('Buscar conversas'), 'antigo')
+    await user.click(screen.getByRole('button', { name: 'Abrir conversa de Visitante antigo' }))
+
+    expect(await screen.findByText('Histórico de Visitante antigo')).toBeTruthy()
+    expect(fetchMock).toHaveBeenCalledWith('/api/admin/support/conversations?page=1&limit=100', expect.anything())
+    expect(fetchMock).toHaveBeenCalledWith('/api/admin/support/conversations?page=2&limit=100', expect.anything())
   })
 
   it('filters conversations by status and visitor details', async () => {
@@ -159,11 +196,11 @@ describe('AdminSupportInbox', () => {
 
     render(<AdminSupportInbox />)
     await act(async () => { await Promise.resolve(); await Promise.resolve() })
-    const initialListRequests = fetchMock.mock.calls.filter(([url]) => url === '/api/admin/support/conversations').length
+    const initialListRequests = fetchMock.mock.calls.filter(([url]) => url === '/api/admin/support/conversations?page=1&limit=100').length
 
     await act(async () => { await vi.advanceTimersByTimeAsync(4_000) })
 
-    expect(fetchMock.mock.calls.filter(([url]) => url === '/api/admin/support/conversations')).toHaveLength(initialListRequests + 1)
+    expect(fetchMock.mock.calls.filter(([url]) => url === '/api/admin/support/conversations?page=1&limit=100')).toHaveLength(initialListRequests + 1)
   })
 
   it('redirects visitors without a session to sign in', async () => {

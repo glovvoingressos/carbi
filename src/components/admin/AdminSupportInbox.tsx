@@ -30,6 +30,8 @@ type SupportConversation = {
 type SupportConversationDetail = SupportConversation & { messages: SupportMessage[] }
 
 const POLL_INTERVAL_MS = 4_000
+const INBOX_PAGE_SIZE = 100
+const MAX_INBOX_PAGES = 100
 
 export default function AdminSupportInbox() {
   const router = useRouter()
@@ -45,6 +47,7 @@ export default function AdminSupportInbox() {
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [paginationLimitReached, setPaginationLimitReached] = useState(false)
   const selectedIdRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -84,17 +87,33 @@ export default function AdminSupportInbox() {
   }, [])
 
   const fetchConversations = useCallback(async (accessToken: string) => {
-    const response = await fetch('/api/admin/support/conversations', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    const data = await readJson<{ conversations?: SupportConversation[]; error?: string }>(response)
-    if (response.status === 401) {
-      markUnauthorized()
-      return []
-    }
-    if (!response.ok) throw new Error(data.error || 'Não foi possível carregar as conversas.')
+    const allConversations: SupportConversation[] = []
+    let total = 0
+    let page = 1
 
-    const nextConversations = sortByRecentActivity(data.conversations ?? [])
+    while (page === 1 || (page <= MAX_INBOX_PAGES && allConversations.length < total)) {
+      const response = await fetch(`/api/admin/support/conversations?page=${page}&limit=${INBOX_PAGE_SIZE}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      const data = await readJson<ConversationListResponse>(response)
+      if (response.status === 401) {
+        markUnauthorized()
+        return []
+      }
+      if (!response.ok) throw new Error(data.error || 'Não foi possível carregar as conversas.')
+
+      const pageConversations = data.conversations ?? []
+      allConversations.push(...pageConversations)
+      const reportedTotal = data.pagination?.total
+      total = typeof reportedTotal === 'number' && Number.isSafeInteger(reportedTotal)
+        ? reportedTotal
+        : allConversations.length
+      if (pageConversations.length === 0 || allConversations.length >= total) break
+      page += 1
+    }
+
+    setPaginationLimitReached(allConversations.length < total)
+    const nextConversations = sortByRecentActivity(allConversations)
     setConversations(nextConversations)
     setSelectedId((current) => nextConversations.some((item) => item.id === current) ? current : nextConversations[0]?.id ?? null)
     return nextConversations
@@ -226,6 +245,7 @@ export default function AdminSupportInbox() {
       </header>
 
       {error && <p role="alert" className="rounded-xl border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#B91C1C]">{error}</p>}
+      {paginationLimitReached && <p role="status" className="rounded-xl border border-[#FCE7A9] bg-[#FFFBEB] px-4 py-3 text-sm font-semibold text-[#92400E]">O inbox carregou as primeiras 10.000 conversas. Conversas mais antigas não cabem em uma única sincronização.</p>}
 
       <section className="grid min-h-[620px] gap-5 lg:grid-cols-[360px_minmax(0,1fr)]">
         <aside className="flex min-h-[400px] flex-col overflow-hidden rounded-2xl border border-[#EAEAE8] bg-white shadow-sm">
@@ -278,6 +298,12 @@ export default function AdminSupportInbox() {
       </section>
     </main>
   )
+}
+
+type ConversationListResponse = {
+  conversations?: SupportConversation[]
+  pagination?: { total?: number }
+  error?: string
 }
 
 function ConversationPanel({ conversation, message, sending, onMessageChange, onSubmit, onStatusChange }: {
