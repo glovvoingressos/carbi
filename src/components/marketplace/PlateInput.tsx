@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { Search, Car, Check, AlertCircle, Loader2, TrendingUp, Sparkles } from 'lucide-react'
+import { Search, Car, Check, AlertCircle, Loader2, TrendingUp } from 'lucide-react'
 import { lookupPlateClient } from '@/lib/integrations/placaapi/client'
 import { formatBRL } from '@/data/cars'
 
@@ -101,19 +101,9 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-full bg-[#16855C]/10 flex items-center justify-center shrink-0">
-          <Sparkles className="w-3.5 h-3.5 text-[#16855C]" />
-        </div>
-        <div>
-          <h4 className="text-xs font-semibold text-[#1A1A1A]">Preencher pela placa</h4>
-          <p className="text-[11px] text-gray-400">Consulta FIPE e Denatran automática</p>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-gray-100 p-4">
-        <div className="flex items-center gap-2 mb-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200">
+    <div className="listing-flow-plate space-y-3">
+      <div className="listing-flow-plate-card bg-white rounded-2xl border border-gray-100 p-4">
+        <div className="flex items-start gap-2 mb-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200">
           <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
           <p className="text-[12px] text-amber-700">A placa é usada apenas para preencher os dados do veículo. Ela <strong>não será publicada</strong> no anúncio.</p>
         </div>

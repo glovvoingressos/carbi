@@ -7,6 +7,7 @@ import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2,
 import Link from 'next/link'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
+import { resolveSessionOrTimeout } from '@/lib/session-ready'
 import { trackEvent } from '@/lib/analytics'
 import { lookupPlateClient, readPlateLookup } from '@/lib/integrations/placaapi/client'
 import type { PlacaApiResponse } from '@/lib/integrations/placaapi/types'
@@ -117,6 +118,12 @@ interface FormState {
   truck_category: string
   structured_data: Record<string, unknown>
 }
+
+const LISTING_FLOW_STEPS = [
+  { id: 1, label: 'Veículo' },
+  { id: 2, label: 'Dados e fotos' },
+  { id: 3, label: 'Revisão e publicação' },
+] as const
 
 interface CatalogCar {
   brand: string
@@ -477,8 +484,11 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
     const boot = async () => {
       const supabase = getSupabaseBrowserClient()
-      const { data } = await supabase.auth.getSession()
-      setIsAuthenticated(!!data.session)
+      const result = await resolveSessionOrTimeout(async () => {
+        const { data } = await supabase.auth.getSession()
+        return data
+      }, 5000)
+      setIsAuthenticated(!!result?.session)
       setSessionReady(true)
 
       const { data: authData } = supabase.auth.onAuthStateChange((_event: string, session: { access_token?: string; user?: { id?: string } } | null) => {
@@ -810,20 +820,22 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       : 'Sem referência'
   const fipeComparisonStatusClass =
     !fipeResult || !hasAskingPrice
-      ? 'bg-white/10 text-white/70 border border-white/15'
+      ? 'is-pending'
       : comparison.status === 'below'
-      ? 'bg-[#D4F576]/20 text-[#D4F576] border border-[#D4F576]/30'
+      ? 'is-below'
       : comparison.status === 'above'
-      ? 'bg-[#FF6B52]/20 text-[#FF6B52] border border-[#FF6B52]/30'
-      : 'bg-[#D4F576]/15 text-[#D4F576] border border-[#D4F576]/25'
-  const fipeProgressWidth =
-    !fipeResult || !hasAskingPrice
-      ? '50%'
-      : comparison.status === 'below'
-      ? '34%'
-      : comparison.status === 'above'
-      ? '66%'
-      : '50%'
+      ? 'is-above'
+      : 'is-near'
+  const askingPriceAsFipePercent = useMemo(
+    () => fipeNumber && hasAskingPrice ? (priceNumber / fipeNumber) * 100 : null,
+    [fipeNumber, hasAskingPrice, priceNumber],
+  )
+  const askingPriceAsFipeLabel = askingPriceAsFipePercent === null
+    ? 'Informe o preço para comparar'
+    : `${askingPriceAsFipePercent.toFixed(0)}% da FIPE`
+  const fipeProgressWidth = askingPriceAsFipePercent === null
+    ? '0%'
+    : `${Math.min(Math.max(askingPriceAsFipePercent, 0), 150) / 1.5}%`
   const fipeDiffValueLabel =
     comparison.diffValue === null
       ? null
@@ -1230,25 +1242,35 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   return (
     <div className="listing-form-ref space-y-6 sm:space-y-8 pb-4 w-full max-w-none sm:max-w-3xl mx-auto">
-      <div className="space-y-3">
-        <div
-          className="tfp-progress-track"
-          role="progressbar"
-          aria-valuenow={currentStep}
-          aria-valuemin={1}
-          aria-valuemax={3}
-          aria-label={`Etapa ${currentStep} de 3`}
-        >
-          <div
-            className="tfp-progress-fill"
-            style={{ width: `${(currentStep / 3) * 100}%` }}
-          />
-        </div>
-        <p className="tfp-step-label">
-          {currentStep === 1 && 'Etapa 1 de 3: Selecione seu carro'}
-          {currentStep === 2 && 'Etapa 2 de 3: Preço, dados básicos e fotos'}
-          {currentStep === 3 && 'Etapa 3 de 3: Revisar e publicar'}
-        </p>
+      <div className="listing-flow-stepper" role="group" aria-label={`Etapa ${currentStep} de 3`}>
+        <ol className="listing-flow-stepper-list">
+          {LISTING_FLOW_STEPS.map((step, index) => {
+            const isComplete = currentStep > step.id
+            const isCurrent = currentStep === step.id
+
+            return (
+              <li
+                key={step.id}
+                className="listing-flow-stepper-item"
+                data-state={isComplete ? 'complete' : isCurrent ? 'current' : 'upcoming'}
+              >
+                <div className="listing-flow-stepper-line">
+                  <span className="listing-flow-stepper-dot" aria-current={isCurrent ? 'step' : undefined}>
+                    {isComplete ? <Check className="h-4 w-4" aria-hidden="true" /> : step.id}
+                  </span>
+                  {index < LISTING_FLOW_STEPS.length - 1 && (
+                    <span className="listing-flow-stepper-connector" aria-hidden="true" />
+                  )}
+                </div>
+                <div className="listing-flow-stepper-copy">
+                  <span className="listing-flow-stepper-number">Etapa {step.id}</span>
+                  <span className="listing-flow-stepper-label">{step.label}</span>
+                  {isComplete && <span className="listing-flow-stepper-status">Concluída</span>}
+                </div>
+              </li>
+            )
+          })}
+        </ol>
       </div>
 
       <div className="space-y-6">
@@ -1265,10 +1287,8 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
             {/* Sub-step 1: Plate Lookup */}
             {listingSubStep === 1 && (
-              <div className="fingen-flow-substep-card p-3 sm:p-5 space-y-3 sm:space-y-4 animate-fade-in">
-                <p className="fingen-flow-field-label">Placa do veículo</p>
-                <p className="text-[13px] text-[#767676]">Digite a placa para preencher marca, modelo e dados automaticamente.</p>
-                 <PlateInput onPlateFound={(data: PlateFormData) => {
+              <div className="fingen-flow-substep-card listing-flow-lookup-card space-y-4 animate-fade-in">
+                <PlateInput onPlateFound={(data: PlateFormData) => {
                    handleInput('brand', data.brand)
                    handleInput('model', data.model)
                    handleInput('year', String(data.year))
@@ -1280,6 +1300,19 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                    handleInput('transmission', data.transmission)
                    handleInput('bodyType', data.bodyType)
                      handleInput('plateFinal', data.plate)
+                     if (data.fipePrice && data.fipePrice > 0) {
+                       setFipeResult({
+                         price: formatBRL(data.fipePrice),
+                         brand: data.brand,
+                         model: data.model,
+                         modelYear: data.yearModel || data.year,
+                         fuel: data.fuel || '',
+                         codeFipe: `plate-${data.plate}`,
+                         referenceMonth: data.fipeReference || '',
+                         vehicleType: 1,
+                         fuelAcronym: '',
+                       })
+                     }
                      if (form.vehicle_type === 'truck') {
                        handleInput('truck_type', data.truck_type || '')
                        handleInput('truck_body_type', data.truck_body_type || '')
@@ -1427,65 +1460,53 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             </div>
 
             {fipeResult ? (
-              <div className="fingen-flow-fipe-comparison-dark rounded-[24px] p-5 max-[330px]:p-4" style={{ background: '#1A1A1A', color: '#FFFFFF' }}>
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="space-y-1">
-                    <p className="fingen-flow-fipe-dark-label max-[330px]:text-[11px]" style={{ color: '#D4F576' }}>
-                      Comparativo FIPE
-                    </p>
-                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <p className="fingen-flow-fipe-dark-value max-[330px]:text-[30px]" style={{ color: '#FFFFFF' }}>
-                        {fipeResult.price}
-                      </p>
-                      <span className="text-[14px] font-medium max-[330px]:text-[12px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                        Tabela FIPE
-                      </span>
-                    </div>
+              <motion.div
+                key={fipeResult.codeFipe}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                className="listing-flow-fipe-card"
+                role="status"
+                aria-live="polite"
+              >
+                <div className="listing-flow-fipe-card-header">
+                  <div>
+                    <p className="listing-flow-fipe-eyebrow">Referência FIPE</p>
+                    <p className="listing-flow-fipe-value">{fipeResult.price}</p>
                   </div>
-                  <span className={`rounded-full px-3 py-1.5 text-[11px] font-semibold tracking-wide ${fipeComparisonStatusClass}`}>
+                  <span className={`listing-flow-fipe-status ${fipeComparisonStatusClass}`}>
                     {fipeComparisonStatusLabel}
                   </span>
                 </div>
 
-                <div className="mt-5 grid gap-3">
-                  <div className="fingen-flow-fipe-dark-stat">
-                    <p className="fingen-flow-fipe-dark-stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>Preço anunciado</p>
-                    <p className="fingen-flow-fipe-dark-stat-value max-[330px]:text-[20px]" style={{ color: '#FFFFFF' }}>
-                      {hasAskingPrice ? formatBRL(priceNumber) : 'Informe abaixo'}
-                    </p>
+                <div className="listing-flow-fipe-summary">
+                  <div>
+                    <span>Seu preço</span>
+                    <strong>{hasAskingPrice ? formatBRL(priceNumber) : 'Informe abaixo'}</strong>
                   </div>
-
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="fingen-flow-fipe-dark-stat">
-                      <p className="fingen-flow-fipe-dark-stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>Diferença</p>
-                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[17px]" style={{ color: '#D4F576' }}>
-                        {fipeDiffValueLabel ?? 'Preencha o preço'}
-                      </p>
-                    </div>
-                    <div className="fingen-flow-fipe-dark-stat">
-                      <p className="fingen-flow-fipe-dark-stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>Percentual</p>
-                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[17px]" style={{ color: '#D4F576' }}>
-                        {fipeDiffPercentLabel ?? '—'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="fingen-flow-fipe-dark-track">
-                    <div className="flex items-center justify-between gap-4 text-[12px] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                      <span>Abaixo da FIPE</span>
-                      <span>Acima da FIPE</span>
-                    </div>
-                    <div className="mt-3 fingen-flow-fipe-progress-bar">
-                      <div className="fingen-flow-fipe-progress-fill" style={{ width: fipeProgressWidth }} />
-                    </div>
-                    <p className="mt-3 fingen-flow-fipe-dark-ref" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                      {fipeResult.referenceMonth
-                        ? `Referência ${fipeResult.referenceMonth} • Atualizado pela FIPE.`
-                        : 'Atualizado pela FIPE.'}
-                    </p>
+                  <div>
+                    <span>Percentual da FIPE</span>
+                    <strong className="listing-flow-fipe-percent">{askingPriceAsFipeLabel}</strong>
                   </div>
                 </div>
-              </div>
+
+                <div className="listing-flow-fipe-meter" aria-label={askingPriceAsFipeLabel}>
+                  <div className="listing-flow-fipe-meter-labels">
+                    <span>0%</span>
+                    <span>FIPE · 100%</span>
+                    <span>150%</span>
+                  </div>
+                  <div className="listing-flow-fipe-meter-track">
+                    <div className="listing-flow-fipe-meter-fill" style={{ width: fipeProgressWidth }} />
+                    <span className="listing-flow-fipe-meter-reference" aria-hidden="true" />
+                  </div>
+                </div>
+
+                <div className="listing-flow-fipe-footer">
+                  <span>{fipeDiffValueLabel ? `Diferença ${fipeDiffValueLabel}` : 'Digite o preço para ver a diferença'}</span>
+                  <span>{fipeDiffPercentLabel ? `${fipeDiffPercentLabel} da FIPE` : fipeResult.referenceMonth || 'Valor atualizado pela FIPE'}</span>
+                </div>
+              </motion.div>
             ) : null}
 
             <div className="fingen-flow-substep-card p-4 space-y-3">
