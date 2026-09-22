@@ -45,7 +45,6 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    url: '/',
     siteName: 'Carbi',
     title: 'Carbi | anunciar carros grátis e comprar seminovos',
     description: 'Marketplace para anunciar carros grátis, comparar preço com FIPE e negociar seminovos com chat interno seguro.',
@@ -54,12 +53,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Carbi | anunciar carros grátis e comprar seminovos',
     description: 'Marketplace para anunciar carros grátis, comparar preço com FIPE e negociar seminovos com chat interno seguro.',
-  },
-  alternates: {
-    canonical: '/',
-    languages: {
-      'pt-BR': '/',
-    },
   },
   robots: {
     index: true,

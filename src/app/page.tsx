@@ -16,7 +16,7 @@ import ExploreCarousel from '@/components/home/ExploreCarousel'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Carbi | anunciar carros grátis, seminovos à venda e FIPE',
+  title: 'Anunciar carros grátis e encontrar seminovos',
   description: 'Anuncie carros grátis, encontre seminovos à venda e compare preço com FIPE em uma plataforma com chat interno e dados reais.',
   keywords: ['anunciar carros grátis', 'seminovos à venda', 'carros à venda', 'anunciar carro', 'vender carro', 'comprar carro', 'tabela fipe'],
   alternates: { canonical: '/' },
@@ -52,7 +52,6 @@ export default async function HomePage() {
 
   const recentListings = listings
   const topBrands = [...new Set(listings.map((l) => l.brand))].slice(0, 6)
-  const cities = [...new Set(listings.map((l) => l.city))].filter(Boolean).slice(0, 6)
 
   const mapCar = (c: typeof cars[0]) => ({
     brand: c.brand,
@@ -141,7 +140,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <HomeCounters cityCount={cities.length} />
+          <HomeCounters />
         </div>
       </section>
 

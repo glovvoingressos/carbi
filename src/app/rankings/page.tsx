@@ -4,8 +4,23 @@ import ListingCard from '@/components/marketplace/ListingCard'
 import { fetchPublicListingsPage } from '@/lib/marketplace-server'
 import { profiles, priceRanges } from '@/data/cars'
 import { Filter, Sparkles } from 'lucide-react'
+import type { Metadata } from 'next'
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+
+export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
+  const params = await searchParams
+  const hasFilters = Object.values(params).some((value) =>
+    Array.isArray(value) ? value.some(Boolean) : Boolean(value?.trim()),
+  )
+
+  return {
+    title: 'Rankings de carros',
+    description: 'Compare rankings de carros anunciados com base em preço, economia e características do veículo.',
+    alternates: { canonical: '/rankings' },
+    ...(hasFilters ? { robots: { index: false, follow: true } } : {}),
+  }
+}
 
 function readValue(searchParams: Record<string, string | string[] | undefined>, key: string): string | undefined {
   const value = searchParams[key]

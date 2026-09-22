@@ -1,23 +1,18 @@
-import { fetchPublicListingsPage } from '@/lib/marketplace-server'
+import { getAllPublicSitemapListings } from '@/lib/sitemap-listings'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 
 export async function GET() {
-  const page1 = await fetchPublicListingsPage({ page: 1, pageSize: 48, sort: 'recent' }).catch(() => ({ items: [] }))
-  const page2 = await fetchPublicListingsPage({ page: 2, pageSize: 48, sort: 'recent' }).catch(() => ({ items: [] }))
+  const { cars, trucks } = await getAllPublicSitemapListings(true)
+  const listings = [
+    ...cars.map((listing) => ({ ...listing, path: `/anuncios/${listing.slug}` })),
+    ...trucks.map((listing) => ({ ...listing, path: `/caminhoes/anuncio/${listing.slug}` })),
+  ]
 
-  const allListings = [...page1.items, ...page2.items]
-  const seen = new Set<string>()
-  const unique = allListings.filter((l) => {
-    if (seen.has(l.slug)) return false
-    seen.add(l.slug)
-    return true
-  })
-
-  const urls = unique
+  const urls = listings
     .filter((l) => l.images && l.images.length > 0)
     .map((listing) => {
-      const images = listing.images || []
+      const images = [...listing.images]
       const imageTags = images
         .sort((a, b) => a.sort_order - b.sort_order)
         .slice(0, 5)
@@ -29,7 +24,7 @@ export async function GET() {
         .join('\n')
 
       return `  <url>
-    <loc>${SITE_URL}/anuncios/${listing.slug}</loc>
+    <loc>${escapeXml(`${SITE_URL}${listing.path}`)}</loc>
 ${imageTags}
   </url>`
     })

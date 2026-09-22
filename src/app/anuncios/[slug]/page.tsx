@@ -35,6 +35,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description: `Comprar carro ${listing.brand} ${listing.model} ${listing.year_model} em ${listing.city}/${listing.state}. Preço do anúncio e preço FIPE como referência.`,
       url: `/anuncios/${listing.slug}`,
       type: 'website',
+      ...(listing.images?.[0]?.url ? { images: [{ url: listing.images[0].url, alt: listing.title }] } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${listing.title} | Comprar carro com preço FIPE na Carbi`,
+      description: `Comprar carro ${listing.brand} ${listing.model} ${listing.year_model} em ${listing.city}/${listing.state}. Preço do anúncio e preço FIPE como referência.`,
+      ...(listing.images?.[0]?.url ? { images: [listing.images[0].url] } : {}),
     },
   }
 }

@@ -3,10 +3,11 @@ import Link from 'next/link'
 import { ArrowRight, Check, TrendingUp, Target, BarChart3, Users, Zap, Shield, ChevronRight } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Tráfego Pago Grátis | Carbi',
+  title: 'Tráfego pago grátis',
   description: 'Anuncie seu carro na Carbi e receba tráfego pago grátis no Google e Meta Ads. Seus anúncios chegam a milhares de compradores sem custo.',
+  alternates: { canonical: '/trafego-pago-gratis' },
   openGraph: {
-    title: 'Tráfego Pago Grátis | Carbi',
+    title: 'Tráfego pago grátis',
     description: 'Anuncie seu carro na Carbi e receba tráfego pago grátis no Google e Meta Ads.',
   },
 }

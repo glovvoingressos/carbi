@@ -3,9 +3,10 @@ import Link from 'next/link'
 import { CheckCircle2, DollarSign, Zap, ArrowRight, ShieldCheck, Star } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Melhor Carro para Aplicativo 2026 | Ranking carbi',
+  title: 'Melhor carro para aplicativo em 2026',
   description: 'Descubra qual o melhor carro para trabalhar na Uber e 99 em 2026. Ranking completo com economia por km, custo de manutenção e ROI.',
-  keywords: 'melhor carro aplicativo, carro mais economico uber, carro uber 2026, carro eletrico para trabaho, carbi ranking'
+  keywords: 'melhor carro aplicativo, carro mais economico uber, carro uber 2026, carro eletrico para trabaho, carbi ranking',
+  alternates: { canonical: '/melhor-carro-aplicativo' },
 }
 
 const ranking = [

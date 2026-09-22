@@ -3,8 +3,9 @@ import Link from 'next/link'
 import { ArrowRight, Clock, TrendingUp, Car, DollarSign, Shield, Fuel } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Blog | Carbi',
+  title: 'Blog',
   description: 'Dicas, comparativos e análises sobre o mercado de seminovos no Brasil. Decida com dados reais.',
+  alternates: { canonical: '/blog' },
 }
 
 const posts = [

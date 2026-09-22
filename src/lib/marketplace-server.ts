@@ -613,6 +613,70 @@ export async function fetchPublicTruckListingsPage(input: TruckListingFilters = 
   return fetchPublicListingsPage({ ...input, vehicle_type: 'truck' })
 }
 
+export type PublicSitemapListing = {
+  id: string
+  slug: string
+  updated_at: string | null
+  published_at: string | null
+  created_at: string
+  images: Array<{ url: string; sort_order: number }>
+}
+
+export async function fetchPublicSitemapListingsPage(
+  vehicleType: 'car' | 'truck',
+  page: number,
+  pageSize = 48,
+  includeImages = false,
+) {
+  const safePage = Math.max(1, Math.floor(page))
+  const safePageSize = Math.min(48, Math.max(1, Math.floor(pageSize)))
+  if (!isSupabaseConfigured()) {
+    return { items: [] as PublicSitemapListing[], total: 0, page: safePage, pageSize: safePageSize }
+  }
+
+  const supabase = getSupabaseServerClient()
+  const from = (safePage - 1) * safePageSize
+  const { data, error, count } = await supabase
+    .from('vehicle_listings')
+    .select('id, slug, updated_at, published_at, created_at', { count: 'exact' })
+    .eq('status', 'active')
+    .eq('vehicle_type', vehicleType)
+    .order('published_at', { ascending: false, nullsFirst: false })
+    .range(from, from + safePageSize - 1)
+
+  if (error) throw new Error(`Unable to load ${vehicleType} sitemap listings: ${error.message}`)
+
+  const listings = data || []
+  const ids = listings.map((listing) => listing.id)
+  const { data: imageRows, error: imageError } = includeImages && ids.length
+    ? await supabase
+      .from('vehicle_listing_images')
+      .select('listing_id, public_url, sort_order')
+      .in('listing_id', ids)
+      .order('sort_order', { ascending: true })
+    : { data: [], error: null }
+
+  if (imageError) throw new Error(`Unable to load sitemap images: ${imageError.message}`)
+
+  const imagesByListing = new Map<string, Array<{ url: string; sort_order: number }>>()
+  for (const image of imageRows || []) {
+    if (!image.public_url) continue
+    const listingImages = imagesByListing.get(image.listing_id) || []
+    listingImages.push({ url: image.public_url, sort_order: image.sort_order })
+    imagesByListing.set(image.listing_id, listingImages)
+  }
+
+  return {
+    items: listings.map((listing) => ({
+      ...listing,
+      images: imagesByListing.get(listing.id) || [],
+    })) as PublicSitemapListing[],
+    total: count || 0,
+    page: safePage,
+    pageSize: safePageSize,
+  }
+}
+
 export async function getMarketplaceDiscoverySections() {
   const base = await fetchPublicListingsPage({ page: 1, pageSize: 60, sort: 'recent' })
   const items = base.items

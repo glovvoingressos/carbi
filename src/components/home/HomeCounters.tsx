@@ -1,8 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
-import { useInView } from 'motion/react'
-import { Star } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface PlatformStats {
   active_listings: number
@@ -11,48 +9,16 @@ interface PlatformStats {
   new_listings_last_month: number
 }
 
-interface CounterProps {
-  value: number
-  suffix?: string
-  compact?: boolean
-}
-
-function AnimatedValue({ value, suffix = '', compact }: CounterProps) {
-  const [count, setCount] = useState(0)
-  const ref = useRef<HTMLSpanElement>(null)
-  const isInView = useInView(ref, { once: true })
-
-  useEffect(() => {
-    if (!isInView || value === 0) return
-    const duration = 1600
-    const start = performance.now()
-    const step = (now: number) => {
-      const p = Math.min((now - start) / duration, 1)
-      const eased = 1 - Math.pow(1 - p, 3)
-      setCount(Math.round(value * eased))
-      if (p < 1) requestAnimationFrame(step)
-    }
-    requestAnimationFrame(step)
-  }, [isInView, value])
-
-  const display = compact && count >= 1000
-    ? `${(count / 1000).toFixed(1).replace('.0', '')}k`
-    : count.toLocaleString('pt-BR')
-
-  return (
-    <span ref={ref}>
-      {display}
-      {suffix}
-    </span>
-  )
+function formatCompact(value: number) {
+  return value >= 1000
+    ? `${(value / 1000).toFixed(1).replace('.0', '')}k`
+    : value.toLocaleString('pt-BR')
 }
 
 export default function HomeCounters({
   initialStats,
-  cityCount = 0,
 }: {
   initialStats?: PlatformStats | null
-  cityCount?: number
 }) {
   const [stats, setStats] = useState<PlatformStats | null>(initialStats || null)
 
@@ -64,33 +30,23 @@ export default function HomeCounters({
       .catch(() => {})
   }, [stats])
 
+  const metrics = [
+    { label: 'Anúncios ativos', value: stats?.active_listings },
+    { label: 'Visualizações totais', value: stats?.total_views },
+  ].filter((metric): metric is { label: string; value: number } =>
+    typeof metric.value === 'number' && Number.isFinite(metric.value) && metric.value > 0,
+  )
+
+  if (metrics.length === 0) return null
+
   return (
     <div className="cb-stats">
-      <div className="cb-stat">
-        <div className="cb-stat-value">
-          <AnimatedValue value={stats?.active_listings || 0} suffix="+" compact />
+      {metrics.map(({ label, value }) => (
+        <div className="cb-stat" key={label}>
+          <div className="cb-stat-value">{formatCompact(value)}</div>
+          <div className="cb-stat-label">{label}</div>
         </div>
-        <div className="cb-stat-label">Anúncios ativos</div>
-      </div>
-      <div className="cb-stat">
-        <div className="cb-stat-value">
-          <AnimatedValue value={Math.max(stats?.total_views || 0, 30000)} suffix="+" compact />
-        </div>
-        <div className="cb-stat-label">Visualizações mensais</div>
-      </div>
-      <div className="cb-stat">
-        <div className="cb-stat-value">
-          <AnimatedValue value={cityCount} suffix="+" />
-        </div>
-        <div className="cb-stat-label">Cidades atendidas</div>
-      </div>
-      <div className="cb-stat cb-stat-rating">
-        <div className="cb-stat-value cb-stat-value-rating">
-          <span>4.9</span>
-          <Star size={14} fill="currentColor" />
-        </div>
-        <div className="cb-stat-label">Avaliação média</div>
-      </div>
+      ))}
     </div>
   )
 }

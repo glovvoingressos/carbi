@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-import { fetchPublicListingsPage, fetchPublicTruckListingsPage } from '@/lib/marketplace-server'
+import { getAllPublicSitemapListings } from '@/lib/sitemap-listings'
 import { MARKETPLACE_SEO_SLUGS, MAJOR_CITIES, buildTruckSeoPaths } from '@/lib/marketplace-seo'
 import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import { slugifyBrand } from '@/lib/brand-utils'
@@ -37,30 +37,19 @@ const CATEGORY_INTENTS = [
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [cars, listingsPage1, listingsPage2, truckListingsPage] = await Promise.all([
+  const [cars, publicListings] = await Promise.all([
     getAllCars().catch(() => []),
-    fetchPublicListingsPage({ page: 1, pageSize: 48, sort: 'recent' }).catch(() => ({ items: [] })),
-    fetchPublicListingsPage({ page: 2, pageSize: 48, sort: 'recent' }).catch(() => ({ items: [] })),
-    fetchPublicTruckListingsPage({ page: 1, pageSize: 48, sort: 'recent' }).catch(() => ({ items: [] })),
+    getAllPublicSitemapListings(),
   ])
 
   const uniqueBrands = Array.from(new Set(cars.map((car) => slugifyBrand(car.brand)))).filter(Boolean)
   const modelEntries = groupCarsByModel(cars)
-
-  const allListings = [...listingsPage1.items, ...listingsPage2.items]
-  const seenSlugs = new Set<string>()
-  const uniqueListings = allListings.filter((l) => {
-    if (seenSlugs.has(l.slug)) return false
-    seenSlugs.add(l.slug)
-    return true
-  })
 
   const entries: MetadataRoute.Sitemap = []
 
   for (const { path, priority, freq } of CORE_PAGES) {
     entries.push({
       url: `${SITE_URL}${path}`,
-      lastModified: new Date(),
       changeFrequency: freq,
       priority,
     })
@@ -69,7 +58,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const slug of MARKETPLACE_SEO_SLUGS) {
     entries.push({
       url: `${SITE_URL}/carros/${slug}`,
-      lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.85,
     })
@@ -78,7 +66,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const brand of uniqueBrands) {
     entries.push({
       url: `${SITE_URL}/carros/marca-${brand}`,
-      lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.8,
     })
@@ -87,7 +74,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const city of MAJOR_CITIES) {
     entries.push({
       url: `${SITE_URL}/carros/cidade-${city.slug}`,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.75,
     })
@@ -96,7 +82,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const year of YEAR_RANGE) {
     entries.push({
       url: `${SITE_URL}/carros/ano-${year}`,
-      lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.7,
     })
@@ -105,20 +90,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const brand of uniqueBrands) {
     entries.push({
       url: `${SITE_URL}/marcas/${brand}`,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
     })
   }
 
   for (const path of buildTruckSeoPaths().brands.slice(1).concat(buildTruckSeoPaths().categories.slice(1))) {
-    entries.push({ url: `${SITE_URL}${path}`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 })
+    entries.push({ url: `${SITE_URL}${path}`, changeFrequency: 'daily', priority: 0.8 })
   }
 
   for (const brand of uniqueBrands) {
     entries.push({
       url: `${SITE_URL}/vender/${brand}`,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.75,
     })
@@ -128,25 +111,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const brand = slugifyBrand(item.representative.brand)
     entries.push({
       url: `${SITE_URL}/${brand}/${item.modelSlug}`,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
     })
   }
 
-  for (const listing of truckListingsPage.items) {
+  for (const listing of publicListings.trucks) {
+    const lastModified = getValidLastModified(listing.updated_at, listing.published_at, listing.created_at)
     entries.push({
       url: `${SITE_URL}/caminhoes/anuncio/${listing.slug}`,
-      lastModified: new Date(listing.updated_at || listing.published_at || listing.created_at),
+      ...(lastModified ? { lastModified } : {}),
       changeFrequency: 'daily',
       priority: 0.9,
     })
   }
 
-  for (const listing of uniqueListings) {
+  for (const listing of publicListings.cars) {
+    const lastModified = getValidLastModified(listing.updated_at, listing.published_at, listing.created_at)
     entries.push({
       url: `${SITE_URL}/anuncios/${listing.slug}`,
-      lastModified: new Date(listing.updated_at || listing.published_at || listing.created_at),
+      ...(lastModified ? { lastModified } : {}),
       changeFrequency: 'daily',
       priority: 0.9,
     })
@@ -155,7 +139,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const intent of CATEGORY_INTENTS) {
     entries.push({
       url: `${SITE_URL}/categorias/${intent}`,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
     })
@@ -164,11 +147,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const path of getRankingSitemapPaths()) {
     entries.push({
       url: `${SITE_URL}${path}`,
-      lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     })
   }
 
   return entries
+}
+
+function getValidLastModified(...values: Array<string | null | undefined>): Date | undefined {
+  for (const value of values) {
+    if (!value) continue
+    const date = new Date(value)
+    if (Number.isFinite(date.getTime())) return date
+  }
+  return undefined
 }
