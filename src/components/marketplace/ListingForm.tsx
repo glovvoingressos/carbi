@@ -27,8 +27,14 @@ import { enrichVehicle } from '@/lib/vehicle-enrichment'
 import { brandsAreEquivalent } from '@/lib/brand-normalization'
 import { parseDescription } from '@/lib/format-description'
 import DescriptionAiControls from './DescriptionAiControls'
-
-const DRAFT_KEY = 'carbi_listing_draft_v1'
+import {
+  LISTING_DRAFT_KEY,
+  clearListingDraftImages,
+  loadListingDraftImages,
+  parseListingDraft,
+  saveListingDraftImages,
+  serializeListingDraft,
+} from '@/lib/listing-draft'
 
 // Format price input: 123456 -> 123.456 (reais)
 const formatPriceInput = (value: string): string => {
@@ -47,6 +53,7 @@ const parsePriceInput = (value: string): string => {
 }
 
 interface UploadImageItem {
+  id: string
   file: File
   previewUrl: string
 }
@@ -304,6 +311,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const [accountEmailExists, setAccountEmailExists] = useState(false)
   const [validationDetails, setValidationDetails] = useState<string[]>([])
   const [titleTouched, setTitleTouched] = useState(false)
+  const draftHydrated = useRef(false)
 
   const resolveCatalogModelName = (brandName: string, rawModelName: string): string => {
     const normalizedRaw = normalize(rawModelName)
@@ -344,15 +352,37 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   }
 
   useEffect(() => {
-    try {
-      const cached = localStorage.getItem(DRAFT_KEY)
-      if (cached) {
-        const parsed = JSON.parse(cached) as { form: FormState }
-        if (parsed.form) setForm({ ...INITIAL_STATE, ...parsed.form })
+    let cancelled = false
+    const restoreDraft = async () => {
+      let parsed: { form: FormState; currentStep: number; listingSubStep: number } | null = null
+      try {
+        parsed = parseListingDraft<FormState>(localStorage.getItem(LISTING_DRAFT_KEY))
+      } catch {
+        // Continue with an empty draft when browser storage is unavailable.
       }
-    } catch {
-      // ignore malformed draft
+      if (parsed && !cancelled) {
+        setForm({ ...INITIAL_STATE, ...parsed.form })
+        setCurrentStep(parsed.currentStep)
+        setListingSubStep(parsed.listingSubStep)
+      }
+
+      try {
+        const savedImages = await loadListingDraftImages()
+        if (cancelled) return
+        setImages(savedImages.map((image) => ({
+          id: image.id,
+          file: new File([image.blob], image.name, { type: image.type, lastModified: image.lastModified }),
+          previewUrl: URL.createObjectURL(image.blob),
+        })))
+      } catch {
+        // A browser without IndexedDB can still recover the text fields.
+      } finally {
+        if (!cancelled) draftHydrated.current = true
+      }
     }
+
+    void restoreDraft()
+    return () => { cancelled = true }
   }, [])
 
   useEffect(() => {
@@ -375,11 +405,23 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         bodyType: data.tipoVeiculo || prev.bodyType,
         plateFinal: data.placa || plate,
       }))
+      if (data.fipe_price && data.fipe_price > 0) {
+        setFipeResult({
+          price: formatBRL(data.fipe_price),
+          brand: data.marca,
+          model: data.modelo,
+          modelYear: data.anoModelo || data.anoFabricacao,
+          fuel: data.combustivel || '',
+          codeFipe: `plate-${data.placa || plate}`,
+          referenceMonth: data.fipe_reference_month || '',
+          vehicleType: 1,
+          fuelAcronym: '',
+        })
+      }
       setListingSubStep(2)
     }
 
     try {
-      localStorage.removeItem(DRAFT_KEY)
       const cached = readPlateLookup()
       if (cached) {
         applyData(cached)
@@ -398,8 +440,31 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   }, [])
 
   useEffect(() => {
-    localStorage.setItem(DRAFT_KEY, JSON.stringify({ form }))
-  }, [form])
+    if (!draftHydrated.current) return
+    const timeout = window.setTimeout(() => {
+      try {
+        localStorage.setItem(LISTING_DRAFT_KEY, serializeListingDraft({ form, currentStep, listingSubStep }))
+      } catch {
+        // Private browsing or a full storage quota should not block publishing.
+      }
+      void saveListingDraftImages(images.map((image) => ({
+        id: image.id,
+        name: image.file.name,
+        type: image.file.type,
+        lastModified: image.file.lastModified,
+        blob: image.file,
+      }))).catch(() => undefined)
+    }, 250)
+    return () => window.clearTimeout(timeout)
+  }, [form, currentStep, listingSubStep, images])
+
+  useEffect(() => {
+    if (!draftHydrated.current) return
+    const url = new URL(window.location.href)
+    url.searchParams.set('etapa', String(currentStep))
+    url.searchParams.set('subetapa', String(listingSubStep))
+    window.history.replaceState(window.history.state, '', url)
+  }, [currentStep, listingSubStep])
 
   useEffect(() => {
     if (!supabaseReady) {
@@ -455,6 +520,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   }, [])
 
   useEffect(() => {
+    if (currentStep < 2 && listingSubStep < 2) return
     const loadBrands = async () => {
       try {
         const response = await fetch('/api/fipe/brands')
@@ -467,9 +533,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     }
 
     void loadBrands()
-  }, [])
+  }, [currentStep, listingSubStep])
 
   useEffect(() => {
+    if (currentStep < 2) return
     const loadCatalogCars = async () => {
       try {
         const response = await fetch('/api/cars')
@@ -484,7 +551,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     }
 
     void loadCatalogCars()
-  }, [])
+  }, [currentStep])
 
   useEffect(() => {
     if (!selectedBrandCode) {
@@ -609,6 +676,9 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
           return
         }
         setFipeResult(data)
+      } catch {
+        setFipeResult(null)
+        setError('Não foi possível consultar a FIPE agora. Você pode continuar preenchendo manualmente.')
       } finally {
         setFipeLoading(false)
       }
@@ -828,6 +898,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       if (!LISTING_ALLOWED_TYPES.includes(file.type)) return
       if (file.size > LISTING_MAX_IMAGE_SIZE_MB * 1024 * 1024) return
       next.push({
+        id: `${file.name}-${file.lastModified}-${file.size}-${globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)}`,
         file,
         previewUrl: URL.createObjectURL(file),
       })
@@ -1123,7 +1194,8 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         throw imageError
       }
 
-      localStorage.removeItem(DRAFT_KEY)
+      localStorage.removeItem(LISTING_DRAFT_KEY)
+      await clearListingDraftImages()
       setSuccess('Carro anunciado com sucesso')
 
       trackEvent('create_listing', {
@@ -1149,7 +1221,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   if (!sessionReady) {
     return (
-      <div className="listing-form-ref fingen-flow-form fingen-flow-form-card p-8 text-center">
+      <div className="listing-form-ref fingen-flow-form fingen-flow-form-card p-8 text-center" role="status" aria-live="polite">
         <Loader2 className="mx-auto h-5 w-5 animate-spin text-[#1A1A1A]" />
         <p className="mt-2 text-sm text-[#525252]">Carregando sessão...</p>
       </div>
@@ -1183,7 +1255,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         {currentStep === 1 && (
           <div className="space-y-6">
             <div>
-              <h3 className="tfp-section-title">Selecione seu veículo</h3>
+              <h2 className="tfp-section-title">Selecione seu veículo</h2>
               <p className="tfp-section-sub">
                 Comece pela placa. Com ela puxamos todos os dados automaticamente.
               </p>
@@ -1237,46 +1309,46 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                   <span className="fingen-flow-badge-accent text-[10px]">Verifique</span>
                 </div>
                 <p className="text-[12px] text-[#767676]">Revise os dados abaixo. Altere o que precisar.</p>
-<div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                    <div>
-                     <label className="text-[10px] font-medium text-[#767676]">Marca</label>
-                     <input className="fingen-flow-input text-[12px] mt-1" value={form.brand} onChange={(e) => handleInput('brand', e.target.value)} />
+                     <label htmlFor="vehicle-brand" className="listing-flow-field-label">Marca</label>
+                     <input id="vehicle-brand" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.brand} onChange={(e) => handleInput('brand', e.target.value)} />
                    </div>
                    <div>
-                     <label className="text-[10px] font-medium text-[#767676]">Modelo</label>
-                     <input className="fingen-flow-input text-[12px] mt-1" value={form.model} onChange={(e) => handleInput('model', e.target.value)} />
+                     <label htmlFor="vehicle-model" className="listing-flow-field-label">Modelo</label>
+                     <input id="vehicle-model" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.model} onChange={(e) => handleInput('model', e.target.value)} />
                    </div>
                    <div>
-                     <label className="text-[10px] font-medium text-[#767676]">Versão</label>
-                     <input className="fingen-flow-input text-[12px] mt-1" value={form.version} onChange={(e) => handleInput('version', e.target.value)} placeholder="Ex: CROSSFOX" />
+                     <label htmlFor="vehicle-version" className="listing-flow-field-label">Versão</label>
+                     <input id="vehicle-version" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.version} onChange={(e) => handleInput('version', e.target.value)} placeholder="Ex: CROSSFOX" />
                    </div>
                    <div>
-                     <label className="text-[10px] font-medium text-[#767676]">Ano</label>
-                     <input className="fingen-flow-input text-[12px] mt-1" value={form.year} onChange={(e) => handleInput('year', e.target.value)} />
+                     <label htmlFor="vehicle-year" className="listing-flow-field-label">Ano de fabricação</label>
+                     <input id="vehicle-year" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.year} onChange={(e) => handleInput('year', e.target.value)} />
                    </div>
                    <div>
-                     <label className="text-[10px] font-medium text-[#767676]">Cor</label>
-                     <input className="fingen-flow-input text-[12px] mt-1" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
+                     <label htmlFor="vehicle-color" className="listing-flow-field-label">Cor</label>
+                     <input id="vehicle-color" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
                    </div>
                    <div>
-                     <label className="text-[10px] font-medium text-[#767676]">Combustível</label>
-                     <input className="fingen-flow-input text-[12px] mt-1" value={form.fuel} onChange={(e) => handleInput('fuel', e.target.value)} />
+                     <label htmlFor="vehicle-fuel" className="listing-flow-field-label">Combustível</label>
+                     <input id="vehicle-fuel" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.fuel} onChange={(e) => handleInput('fuel', e.target.value)} />
                    </div>
                    <div>
-                     <label className="text-[10px] font-medium text-[#767676]">Câmbio</label>
-                     <input className="fingen-flow-input text-[12px] mt-1" value={form.transmission} onChange={(e) => handleInput('transmission', e.target.value)} />
+                     <label htmlFor="vehicle-transmission" className="listing-flow-field-label">Câmbio</label>
+                     <input id="vehicle-transmission" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.transmission} onChange={(e) => handleInput('transmission', e.target.value)} />
                    </div>
                    <div>
-                     <label className="text-[10px] font-medium text-[#767676]">Motor</label>
-                     <input className="fingen-flow-input text-[12px] mt-1" value={form.engine} onChange={(e) => handleInput('engine', e.target.value)} placeholder="Ex: 2.0 Turbo" />
+                     <label htmlFor="vehicle-engine" className="listing-flow-field-label">Motor</label>
+                     <input id="vehicle-engine" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.engine} onChange={(e) => handleInput('engine', e.target.value)} placeholder="Ex: 2.0 Turbo" />
                    </div>
                    <div>
-                     <label className="text-[10px] font-medium text-[#767676]">Potência (cv)</label>
-                     <input className="fingen-flow-input text-[12px] mt-1" value={form.horsepower} onChange={(e) => handleInput('horsepower', e.target.value)} placeholder="Ex: 116" />
+                     <label htmlFor="vehicle-horsepower" className="listing-flow-field-label">Potência (cv)</label>
+                     <input id="vehicle-horsepower" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.horsepower} onChange={(e) => handleInput('horsepower', e.target.value)} placeholder="Ex: 116" />
                    </div>
                    <div>
-                     <label className="text-[10px] font-medium text-[#767676]">Placa</label>
-                     <input className="fingen-flow-input text-[12px] mt-1 uppercase" value={form.plateFinal} onChange={(e) => handleInput('plateFinal', e.target.value)} placeholder="ABC1D23" maxLength={7} />
+                     <label htmlFor="vehicle-plate-final" className="listing-flow-field-label">Placa</label>
+                     <input id="vehicle-plate-final" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1 uppercase" value={form.plateFinal} onChange={(e) => handleInput('plateFinal', e.target.value)} placeholder="ABC1D23" maxLength={7} />
                    </div>
                  </div>
                 <button type="button" onClick={() => { setCurrentStep(2); setListingSubStep(1); }} className="fingen-flow-btn-primary w-full mt-2">
@@ -1294,7 +1366,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         {currentStep === 2 && (
           <div className="space-y-8 animate-fade-in">
             <div>
-              <h3 className="tfp-section-title">Dados essenciais</h3>
+              <h2 className="tfp-section-title">Dados essenciais</h2>
               <p className="tfp-section-sub">
                 Só pedimos o necessário para publicar rápido. O restante pode ser completado depois.
               </p>
@@ -1310,8 +1382,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                  <p className="sm:col-span-2 text-xs text-[#767676]">Você pode preencher manualmente os dados que não vierem na consulta da placa.</p>
                </div>
              )}
-+
-+             <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
+            <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
 
               <div>
                 <label htmlFor="listing-price" className="sr-only">Preço pedido</label>
@@ -1718,7 +1789,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               <div />
             )}
 
-            {currentStep === 1 && listingSubStep === 1 ? (
+            {currentStep === 1 ? (
               <div />
             ) : (
               <button

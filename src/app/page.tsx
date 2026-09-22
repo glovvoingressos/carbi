@@ -83,16 +83,6 @@ export default async function HomePage() {
     { label: 'Luxo', filter: 'luxo', img: '/categories/luxo.jpg', badge: 'Alto padrão' },
   ]
 
-  const pills = [
-    { label: 'Todos os estilos', href: '/carros-a-venda', active: true, lime: false },
-    { label: 'SUV', href: '/carros-a-venda?body_type=SUV', active: false, lime: false },
-    { label: 'Sedan', href: '/carros-a-venda?body_type=sedan', active: false, lime: false },
-    { label: 'Hatch', href: '/carros-a-venda?body_type=hatch', active: false, lime: false },
-    { label: 'Pickup', href: '/carros-a-venda?body_type=pickup', active: false, lime: false },
-    { label: 'Elétrico', href: '/carros-a-venda?body_type=elétrico', active: false, lime: false },
-    { label: 'Até R$ 80 mil', href: '/carros-a-venda?price_max=80000', active: false, lime: true },
-  ]
-
   const budgetOptions = [
     { label: 'Qualquer orçamento', value: '' },
     { label: 'Até R$ 50 mil', value: '50000' },
@@ -153,22 +143,6 @@ export default async function HomePage() {
 
           <HomeCounters cityCount={cities.length} />
         </div>
-      </section>
-
-      {/* ═══ CATEGORY PILLS ═══ */}
-      <section className="cb-pills" aria-label="Categorias">
-        {pills.map((pill) => (
-          <Link
-            key={pill.label}
-            href={pill.href}
-            className={`cb-pill${pill.active ? ' cb-pill-active' : ''}${pill.lime ? ' cb-pill-lime' : ''}`}
-          >
-            {pill.label}
-          </Link>
-        ))}
-        <Link href="/carros-a-venda" className="cb-pill cb-pill-arrow" aria-label="Ver todos os carros">
-          <ArrowRight size={20} />
-        </Link>
       </section>
 
       {/* ═══ PLATE LOOKUP ═══ */}
@@ -298,7 +272,7 @@ export default async function HomePage() {
       </section>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <section className="cb-section-pad">
+      <section className="cb-section-pad cb-process-section">
         <div className="cb-wrap cb-process-grid">
           <div>
             <p className="cb-eyebrow">Como funciona</p>
@@ -339,7 +313,7 @@ export default async function HomePage() {
       </section>
 
       {/* ═══ BUILD / SOLUTIONS ═══ */}
-      <section className="cb-section-pad">
+      <section className="cb-section-pad cb-build-section">
         <div className="cb-wrap">
           <div className="cb-build-grid">
             <Link href="/anunciar-carro" className="cb-build-card cb-build-card-dark">

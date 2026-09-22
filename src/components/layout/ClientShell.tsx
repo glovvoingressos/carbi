@@ -36,6 +36,12 @@ export default function ClientShell({ children }: { children: React.ReactNode })
     }
   }, [pathname, observeElements])
 
+  const isListingFlow = pathname.startsWith('/anunciar-carro/fluxo') || pathname.startsWith('/anunciar-carro-bh/fluxo')
+
+  if (isListingFlow) {
+    return <main className="listing-flow-shell">{children}</main>
+  }
+
   return (
     <>
       <Navbar />

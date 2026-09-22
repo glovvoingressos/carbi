@@ -1,7 +1,7 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import SafeMarketplaceImage from './SafeMarketplaceImage'
 
 type ListingImageGalleryProps = {
@@ -18,13 +18,31 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
   )
   const [activeIndex, setActiveIndex] = useState(0)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
-
-  if (!gallery.length) return null
-
-  const safeIndex = Math.min(activeIndex, gallery.length - 1)
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const safeIndex = gallery.length ? Math.min(activeIndex, gallery.length - 1) : 0
 
   const goPrev = () => setActiveIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1))
   const goNext = () => setActiveIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1))
+
+  useEffect(() => {
+    if (!isLightboxOpen) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsLightboxOpen(false)
+    }
+    closeButtonRef.current?.focus()
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isLightboxOpen])
+
+  if (!gallery.length) return null
 
   return (
     <div className="ref-ad-gallery">
@@ -44,23 +62,30 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
       >
         {badgeLabel ? <div className="ref-ad-gallery-tag">{badgeLabel}</div> : null}
         {fipeBadgeLabel ? <div className="ref-ad-gallery-fipe-tag">{fipeBadgeLabel}</div> : null}
-        <div
-          className="flex h-full w-full transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(-${safeIndex * 100}%)` }}
+        <button
+          type="button"
+          className="ref-ad-gallery-zoom"
+          onClick={() => setIsLightboxOpen(true)}
+          aria-label={`Ampliar imagem ${safeIndex + 1}`}
         >
-          {gallery.map((image, index) => (
-            <div key={`${image}-${index}`} className="relative h-full w-full flex-shrink-0">
-              <SafeMarketplaceImage
-                sources={[image]}
-                alt={`${title} foto ${index + 1}`}
-                containerClassName="h-full w-full"
-                className="block h-full w-full object-cover object-center"
-                priority={index === 0}
-                loadingLabel={`Carregando foto ${index + 1}`}
-              />
-            </div>
-          ))}
-        </div>
+          <div
+            className="flex h-full w-full transition-transform duration-500 ease-out"
+            style={{ transform: `translateX(-${safeIndex * 100}%)` }}
+          >
+            {gallery.map((image, index) => (
+              <div key={`${image}-${index}`} className="relative h-full w-full flex-shrink-0">
+                <SafeMarketplaceImage
+                  sources={[image]}
+                  alt={`${title} foto ${index + 1}`}
+                  containerClassName="h-full w-full"
+                  className="block h-full w-full object-cover object-center"
+                  priority={index === 0}
+                  loadingLabel={`Carregando foto ${index + 1}`}
+                />
+              </div>
+            ))}
+          </div>
+        </button>
 
         {gallery.length > 1 ? (
           <>
@@ -85,6 +110,64 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
           </>
         ) : null}
       </div>
+
+      {isLightboxOpen ? (
+        <div
+          className="ref-ad-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Imagem ampliada de ${title}`}
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          <button
+            type="button"
+            className="ref-ad-lightbox-close"
+            onClick={() => setIsLightboxOpen(false)}
+            aria-label="Fechar imagem ampliada"
+            ref={closeButtonRef}
+          >
+            <X aria-hidden="true" />
+          </button>
+
+          <div className="ref-ad-lightbox-content" onClick={(event) => event.stopPropagation()}>
+            <SafeMarketplaceImage
+              sources={[gallery[safeIndex]]}
+              alt={`${title} foto ${safeIndex + 1} ampliada`}
+              containerClassName="ref-ad-lightbox-image"
+              className="block h-full w-full object-contain object-center"
+              priority
+              loadingLabel="Carregando imagem ampliada"
+            />
+          </div>
+
+          {gallery.length > 1 ? (
+            <>
+              <button
+                type="button"
+                className="ref-ad-lightbox-arrow ref-ad-lightbox-arrow-left"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  goPrev()
+                }}
+                aria-label="Imagem anterior"
+              >
+                <ChevronLeft aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="ref-ad-lightbox-arrow ref-ad-lightbox-arrow-right"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  goNext()
+                }}
+                aria-label="Próxima imagem"
+              >
+                <ChevronRight aria-hidden="true" />
+              </button>
+            </>
+          ) : null}
+        </div>
+      ) : null}
 
       {gallery.length > 1 ? (
         <div className="ref-ad-gallery-thumbs">

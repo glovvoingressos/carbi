@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Loader2, AlertCircle, Car, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react'
+import { Search, Loader2, AlertCircle, Car, ArrowRight, ShieldCheck } from 'lucide-react'
 import { lookupPlateClient, savePlateLookup } from '@/lib/integrations/placaapi/client'
 import { formatBRL } from '@/data/cars'
 
@@ -73,9 +73,8 @@ export default function PlateBannerLookup() {
   return (
     <div className={`cb-plate-premium ${step === 'preview' ? 'is-preview' : ''}`}>
       <div className="cb-plate-premium-copy">
-        <span className="cb-plate-premium-mark"><Sparkles size={18} /></span>
-        <span className="cb-plate-premium-kicker">Anúncio inteligente</span>
-        <h3>{step === 'preview' && found ? 'Seu carro está pronto para anunciar' : 'Anuncie seu carro sem preencher tudo'}</h3>
+        <span className="cb-plate-premium-kicker">Grátis por tempo limitado</span>
+        <h3>{step === 'preview' && found ? 'Seu carro está pronto para anunciar' : 'Anuncie seu carro em menos de 2 minutos.'}</h3>
         <p>{step === 'preview' && found ? 'Confira os dados encontrados e publique em poucos passos.' : 'Consulte pela placa e nós buscamos marca, modelo, ano e FIPE para você.'}</p>
         <div className="cb-plate-premium-trust"><ShieldCheck size={14} /> A placa não será publicada</div>
       </div>

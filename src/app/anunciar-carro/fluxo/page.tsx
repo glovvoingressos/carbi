@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ShieldCheck } from 'lucide-react'
 import ListingForm from '@/components/marketplace/ListingForm'
 
 export const metadata: Metadata = {
@@ -14,34 +14,21 @@ export const metadata: Metadata = {
 
 export default function AnunciarFluxoPage() {
   return (
-    <div className="fingen-page">
-      <main className="fingen-main">
-        {/* Hero - exact copy from tráfego pago */}
-        <section className="tfp-hero" style={{ padding: '60px 0 40px' }}>
-          <div className="tfp-hero-inner" style={{ maxWidth: '90%', gap: '48px' }}>
-            {/* Left side - Image + Text */}
-            <div className="tfp-hero-content">
-              <Link href="/carros-a-venda" className="tfp-btn-secondary">
-                <ArrowLeft size={16} />
-                Voltar
-              </Link>
-              <img src="/images/Midjourney 💅🏻.jpg" alt="Carro em movimento" className="w-full aspect-video sm:aspect-[21/9] object-cover rounded-2xl" />
-              <div>
-                <h1 className="tfp-hero-title">
-                  Monte seu anúncio
-                </h1>
-                <p className="tfp-hero-sub">
-                  Preencha os dados, adicione fotos e publique gratuitamente.
-                </p>
-              </div>
-            </div>
-
-            {/* Right side - Form */}
-            <div>
-              <ListingForm />
-            </div>
-          </div>
-        </section>
+    <div className="listing-flow-app">
+      <header className="listing-flow-header">
+        <Link href="/carros-a-venda" className="listing-flow-back">
+          <ArrowLeft size={18} aria-hidden="true" />
+          <span>Voltar</span>
+        </Link>
+        <div className="listing-flow-header-copy">
+          <p className="listing-flow-eyebrow">Carbi anúncios</p>
+          <h1>Monte seu anúncio</h1>
+        </div>
+        <div className="listing-flow-trust"><ShieldCheck size={16} aria-hidden="true" /> Seus dados protegidos</div>
+      </header>
+      <main className="listing-flow-main">
+        <p className="listing-flow-intro">Preencha os dados, adicione fotos e publique gratuitamente.</p>
+        <ListingForm />
       </main>
     </div>
   )

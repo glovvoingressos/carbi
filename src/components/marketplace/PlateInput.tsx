@@ -115,7 +115,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
       <div className="bg-white rounded-2xl border border-gray-100 p-4">
         <div className="flex items-center gap-2 mb-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200">
           <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-          <p className="text-[11px] text-amber-700">A placa é usada apenas para preencher os dados do veículo. Ela <strong>não será publicada</strong> no anúncio.</p>
+          <p className="text-[12px] text-amber-700">A placa é usada apenas para preencher os dados do veículo. Ela <strong>não será publicada</strong> no anúncio.</p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch gap-3">
@@ -124,7 +124,9 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
               <Car className="w-4 h-4 text-gray-400" />
               <span className="text-[10px] font-semibold text-gray-400">BR</span>
             </div>
+            <label htmlFor="listing-plate" className="sr-only">Placa do veículo</label>
             <input
+              id="listing-plate"
               type="text"
               value={plate}
               onChange={(e) => { setPlate(formatPlate(e.target.value)); setError(null); setSuccess(false); setVehicleData(null) }}
@@ -143,8 +145,8 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
             className="h-10 px-5 rounded-xl text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40 shrink-0"
             style={{ backgroundColor: '#16855C' }}
           >
-            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
-            Buscar
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" /> : <Search className="w-3.5 h-3.5" aria-hidden="true" />}
+            {loading ? 'Consultando…' : 'Buscar'}
           </button>
         </div>
 
@@ -154,6 +156,8 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
+              role="alert"
+              aria-live="assertive"
               className="overflow-hidden"
             >
               <div className="flex items-center gap-2 mt-3 p-2.5 rounded-lg bg-red-50 text-red-600 text-xs">
@@ -169,6 +173,8 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
+              role="status"
+              aria-live="polite"
             >
               <div className="mt-3 p-3 rounded-lg bg-emerald-50 space-y-2">
                 <div className="flex items-center justify-between">
@@ -206,4 +212,3 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
     </div>
   )
 }
-

@@ -14,32 +14,21 @@ export const metadata: Metadata = {
 
 export default function AnunciarFluxoPage() {
   return (
-    <div className="fingen-flow-page">
-      <main className="fingen-main">
-        <section className="fingen-flow-hero">
-          <div className="fingen-flow-hero-inner">
-            <div className="fingen-balance-header">
-              <span className="fingen-section-label">BH</span>
-              <Link href="/carros-a-venda" className="fingen-section-link">
-                <ArrowLeft size={14} /> Voltar
-              </Link>
-            </div>
-            <h1>
-              Monte seu anúncio em
-              <br />
-              <span className="fingen-hero-title-accent">poucos minutos.</span>
-            </h1>
-            <p>
-              Fluxo guiado com consulta FIPE, upload de fotos e revisão final — tudo com a identidade premium da Carbi.
-            </p>
-          </div>
-        </section>
-
-        <section className="fingen-flow-form-section">
-          <div className="fingen-flow-form-grid">
-            <ListingForm />
-          </div>
-        </section>
+    <div className="listing-flow-app">
+      <header className="listing-flow-header">
+        <Link href="/carros-a-venda" className="listing-flow-back">
+          <ArrowLeft size={18} aria-hidden="true" />
+          <span>Voltar</span>
+        </Link>
+        <div className="listing-flow-header-copy">
+          <p className="listing-flow-eyebrow">Carbi anúncios · BH</p>
+          <h1>Monte seu anúncio</h1>
+        </div>
+        <div className="listing-flow-trust">Fluxo guiado</div>
+      </header>
+      <main className="listing-flow-main">
+        <p className="listing-flow-intro">Consulta FIPE, fotos e revisão final em poucos minutos.</p>
+        <ListingForm />
       </main>
     </div>
   )
