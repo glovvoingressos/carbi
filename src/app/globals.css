@@ -12835,6 +12835,7 @@ p {
   gap: 24px;
   margin-bottom: 40px;
 }
+.cb-head .cb-eyebrow { font-size: 12px; }
 .cb-head h2 {
   font-family: var(--cb-head);
   font-size: clamp(28px, 4vw, 42px);
@@ -14759,8 +14760,10 @@ p {
 }
 
 @media (max-width: 760px) {
-  .cb-hero { padding-bottom: 24px; }
-  .cb-promo-before-listings { padding-top: 18px; padding-bottom: 36px; }
+  .cb-hero { padding-bottom: 16px; }
+  .cb-hero-avatars { margin-bottom: 16px; }
+  .cb-promo-before-listings { padding-top: 12px; padding-bottom: 36px; }
+  .cb-plate-premium { margin-top: 12px; }
   .cb-promo-before-listings + .cb-section-pad { padding-top: 36px; }
   .cb-process-section { padding-bottom: 30px; }
   .cb-build-section { padding-top: 30px; }
@@ -15064,10 +15067,10 @@ p {
 /* ── Top 10 mais vendidos ── */
 .cb-top10-card {
   position: relative;
-  background: var(--cb-surface);
+  background: linear-gradient(145deg, #f4f8ed 0%, #edf4e8 100%);
   border-radius: var(--cb-radius);
   padding: clamp(28px, 4vw, 40px);
-  border: 1px solid var(--cb-line);
+  border: 1px solid #dce8d5;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.05);
 }
 .cb-top10-head {

@@ -128,14 +128,6 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        <motion.span
-          className="cmp-label"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.4, delay: 0.05 }}
-        >
-          <Sparkles size={12} /> COMPARATIVO
-        </motion.span>
         <h2 className="cmp-title">
           Qual carro <span className="cmp-title-accent">combina com você</span>?
         </h2>

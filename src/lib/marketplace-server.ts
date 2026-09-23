@@ -181,9 +181,12 @@ function buildBadges(listing: ListingPublic, history: ListingPriceHistoryRow[]):
   return badges.slice(0, 3)
 }
 
-async function enrichListingSignals(listings: ListingPublic[]): Promise<ListingPublic[]> {
+export async function enrichListingSignals(
+  listings: ListingPublic[],
+  options: { hydrateFipe?: boolean } = {},
+): Promise<ListingPublic[]> {
   if (!listings.length) return listings
-  const hydratedListings = await hydrateMissingFipePrices(listings)
+  const hydratedListings = options.hydrateFipe === false ? listings : await hydrateMissingFipePrices(listings)
   const supabase = getSupabaseServerClient()
   const listingIds = hydratedListings.map((item) => item.id)
   const historyByListing = new Map<string, ListingPriceHistoryRow[]>()
@@ -437,7 +440,8 @@ export async function getRelatedListings(params: {
 export async function getLatestPublicListings(limit = 8): Promise<ListingPublic[]> {
   if (!isSupabaseConfigured()) return []
   const listings = await queryListings({ limit })
-  return enrichListingSignals(listings)
+  // Homepage cards use persisted FIPE data; don't fan out to the external API for every missing value.
+  return enrichListingSignals(listings, { hydrateFipe: false })
 }
 
 export async function searchPublicListings(query: string, limit = 24): Promise<ListingPublic[]> {

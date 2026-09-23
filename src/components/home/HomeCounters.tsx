@@ -31,7 +31,6 @@ export default function HomeCounters({
   }, [stats])
 
   const metrics = [
-    { label: 'Anúncios ativos', value: stats?.active_listings },
     { label: 'Visualizações totais', value: stats?.total_views },
   ].filter((metric): metric is { label: string; value: number } =>
     typeof metric.value === 'number' && Number.isFinite(metric.value) && metric.value > 0,
