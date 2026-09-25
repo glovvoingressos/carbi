@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { TextScramble } from '@/components/core/text-scramble'
 
 const HERO_ACTIONS = ['Encontre', 'Venda', 'Compre', 'Pesquise']
 const ROTATION_INTERVAL_MS = 2800
@@ -35,9 +36,9 @@ export default function HeroRotatingTitle() {
   return (
     <h1 className="cb-hero-title">
       <span className="cb-hero-title-word-slot" aria-live="polite" aria-atomic="true">
-        <span key={activeWord} data-testid="hero-rotating-word" className="cb-hero-title-word">
+        <TextScramble data-testid="hero-rotating-word" className="cb-hero-title-word" duration={620}>
           {activeWord}
-        </span>
+        </TextScramble>
       </span>{' '}
       o carro <u>certo</u>, sem complicação.
     </h1>

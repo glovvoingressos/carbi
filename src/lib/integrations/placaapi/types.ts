@@ -47,9 +47,22 @@ function numberValue(value: unknown): number | null {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+function engineFromFipeModel(value: unknown): string {
+  if (typeof value !== 'string') return ''
+  const match = value.match(/\b(\d+(?:[.,]\d+))\s*(Turbo|Biturbo|Bi[- ]Turbo)?\b/i)
+  if (!match) return ''
+  return [match[1].replace(',', '.'), match[2]].filter(Boolean).join(' ')
+}
+
 export function mapPlacaApiResponse(raw: Record<string, unknown>, cleanPlate: string): PlacaApiResponse {
   const extra = raw.extra && typeof raw.extra === 'object' ? raw.extra as Record<string, unknown> : {}
   const dados = raw.dados && typeof raw.dados === 'object' ? raw.dados as Record<string, unknown> : {}
+  const fipe = raw.fipe && typeof raw.fipe === 'object' ? raw.fipe as Record<string, unknown> : {}
+  const fipeEntries = Array.isArray(fipe.dados)
+    ? fipe.dados.filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object')
+    : []
+  const bestFipeEntry = [...fipeEntries].sort((a, b) => (numberValue(b.score) || 0) - (numberValue(a.score) || 0))[0]
+  const fipeEngine = engineFromFipeModel(bestFipeEntry?.texto_modelo)
   const value = (...keys: string[]) => first(...keys.flatMap((key) => [raw[key], extra[key], dados[key]]))
   const known = new Set(['extra', 'dados'])
   const structured_data = Object.fromEntries([
@@ -67,8 +80,8 @@ export function mapPlacaApiResponse(raw: Record<string, unknown>, cleanPlate: st
     anoFabricacao: numberValue(value('ano_fabricacao', 'anoFabricacao', 'ano')) || 0,
     anoModelo: numberValue(value('ano_modelo', 'anoModelo')) || 0,
     cor: String(value('cor') || ''),
-    combustivel: String(value('combustivel') || ''),
-    cilindradas: String(value('cilindradas') || ''),
+    combustivel: String(first(value('combustivel'), bestFipeEntry?.combustivel) || ''),
+    cilindradas: String(first(value('cilindradas'), fipeEngine) || ''),
     potencia: String(value('potencia', 'hp') || ''),
     cambio: String(value('caixa_cambio', 'cambio') || ''),
     tipoVeiculo: String(value('tipo_veiculo', 'tipoVeiculo') || ''),

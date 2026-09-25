@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'motion/react'
 import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2, Check, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
@@ -11,6 +10,7 @@ import { trackEvent } from '@/lib/analytics'
 import { lookupPlateClient, readPlateLookup } from '@/lib/integrations/placaapi/client'
 import type { PlacaApiResponse } from '@/lib/integrations/placaapi/types'
 import PlateInput from '@/components/marketplace/PlateInput'
+import ListingStepper from '@/components/marketplace/ListingStepper'
 import {
   LISTING_ALLOWED_TYPES,
   LISTING_MAX_IMAGES,
@@ -26,6 +26,7 @@ import { formatBRL } from '@/data/cars'
 import { enrichVehicle } from '@/lib/vehicle-enrichment'
 import { brandsAreEquivalent } from '@/lib/brand-normalization'
 import { parseDescription } from '@/lib/format-description'
+import FadeContent from '@/components/FadeContent'
 import DescriptionAiControls from './DescriptionAiControls'
 import {
   LISTING_DRAFT_KEY,
@@ -312,6 +313,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const [validationDetails, setValidationDetails] = useState<string[]>([])
   const [titleTouched, setTitleTouched] = useState(false)
   const draftHydrated = useRef(false)
+  const [draftReady, setDraftReady] = useState(false)
 
   const resolveCatalogModelName = (brandName: string, rawModelName: string): string => {
     const normalizedRaw = normalize(rawModelName)
@@ -377,7 +379,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       } catch {
         // A browser without IndexedDB can still recover the text fields.
       } finally {
-        if (!cancelled) draftHydrated.current = true
+        if (!cancelled) {
+          draftHydrated.current = true
+          setDraftReady(true)
+        }
       }
     }
 
@@ -386,6 +391,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   }, [])
 
   useEffect(() => {
+    if (!draftReady) return
     const plate = new URLSearchParams(window.location.search).get('placa')
     if (!plate) return
 
@@ -437,7 +443,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     } catch {
       // ignore malformed cache
     }
-  }, [])
+  }, [draftReady])
 
   useEffect(() => {
     if (!draftHydrated.current) return
@@ -755,7 +761,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     const inferredCategory = inferCategoryFromModel(form.model || '')
 
     // Hierarquia: catálogo > enriquecimento > inferência
-    const engineText = enriched.engine || inferredEngine
+    const engineText = enriched.engine || (inferredEngine !== 'Não informado' ? inferredEngine : '') || form.engine || 'Não informado'
     const hpText = enriched.horsepower ? `${enriched.horsepower} cv` : 'Não informado'
     const torqueText = enriched.torque ? `${enriched.torque} Nm` : 'Não informado'
     const fuelText = enriched.fuel || fipeResult?.fuel?.trim() || form.fuel || 'Não informado'
@@ -942,11 +948,19 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     }
 
     if (step === 2) {
-      if (!form.price || !form.mileage || !form.city || !form.state || !form.color || !resolvedFuelValue || !resolvedTransmissionValue) {
-        return 'Preencha preço, quilometragem, combustível, câmbio, cor, cidade e estado.'
-      }
-      if (images.length === 0) {
-        return 'Adicione pelo menos 1 foto para publicar.'
+      const step2RequiredItems = [
+        { label: 'Preço', complete: hasAskingPrice },
+        { label: 'Quilometragem', complete: Boolean(form.mileage.trim()) },
+        { label: 'Combustível', complete: Boolean(resolvedFuelValue.trim()) },
+        { label: 'Câmbio', complete: Boolean(resolvedTransmissionValue.trim()) },
+        { label: 'Cor', complete: Boolean(form.color.trim()) },
+        { label: 'Cidade', complete: Boolean(form.city.trim()) },
+        { label: 'Estado', complete: /^[A-Za-z]{2}$/.test(form.state) },
+        { label: 'Fotos', complete: images.length > 0 },
+      ]
+      const missingStep2Labels = step2RequiredItems.filter((item) => !item.complete).map((item) => item.label)
+      if (missingStep2Labels.length > 0) {
+        return `Preencha: ${missingStep2Labels.join(', ')}.`
       }
     }
 
@@ -1230,28 +1244,23 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   return (
     <div className="listing-form-ref space-y-6 sm:space-y-8 pb-4 w-full max-w-none sm:max-w-3xl mx-auto">
-      <div className="space-y-3">
-        <div
-          className="tfp-progress-track"
-          role="progressbar"
-          aria-valuenow={currentStep}
-          aria-valuemin={1}
-          aria-valuemax={3}
-          aria-label={`Etapa ${currentStep} de 3`}
-        >
-          <div
-            className="tfp-progress-fill"
-            style={{ width: `${(currentStep / 3) * 100}%` }}
-          />
-        </div>
-        <p className="tfp-step-label">
-          {currentStep === 1 && 'Etapa 1 de 3: Selecione seu carro'}
-          {currentStep === 2 && 'Etapa 2 de 3: Preço, dados básicos e fotos'}
-          {currentStep === 3 && 'Etapa 3 de 3: Revisar e publicar'}
-        </p>
-      </div>
+      <ListingStepper currentStep={currentStep} onStepChange={(step) => {
+        if (step < currentStep) {
+          setError(null)
+          setValidationDetails([])
+          setListingSubStep(1)
+          setCurrentStep(step)
+        }
+      }} />
 
       <div className="space-y-6">
+        <FadeContent
+          key={`${currentStep}-${listingSubStep}`}
+          className="listing-flow-step-transition"
+          duration={260}
+          threshold={0}
+          initialOpacity={0}
+        >
         {currentStep === 1 && (
           <div className="space-y-6">
             <div>
@@ -1425,7 +1434,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             </div>
 
             {fipeResult ? (
-              <div className="fingen-flow-fipe-comparison-dark rounded-[24px] p-5 max-[330px]:p-4" style={{ background: '#1A1A1A', color: '#FFFFFF' }}>
+              <div className="fingen-flow-fipe-comparison-dark listing-fipe-comparison rounded-[24px] p-5 max-[330px]:p-4" style={{ background: '#1A1A1A', color: '#FFFFFF' }}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-1">
                     <p className="fingen-flow-fipe-dark-label max-[330px]:text-[11px]" style={{ color: '#D4F576' }}>
@@ -1493,7 +1502,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               </div>
               <div>
                 <label htmlFor="listing-description" className="sr-only">Descrição do veículo</label>
-                <textarea id="listing-description" className="fingen-flow-input min-h-[180px] sm:min-h-[200px] py-3 resize-none leading-relaxed" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} aria-label="Descrição do veículo" />
+                <textarea id="listing-description" className="fingen-flow-input listing-description-field min-h-[180px] sm:min-h-[200px] py-3 resize-none leading-relaxed" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} aria-label="Descrição do veículo" />
               </div>
               <DescriptionAiControls
                 value={form.description}
@@ -1501,7 +1510,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               />
               <div>
                 <label htmlFor="listing-optionals" className="sr-only">Opcionais extras</label>
-                <input id="listing-optionals" className="fingen-flow-input" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} aria-label="Opcionais extras" />
+                <input id="listing-optionals" className="fingen-flow-input listing-optionals-field" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} aria-label="Opcionais extras" />
               </div>
             </div>
 
@@ -1748,15 +1757,16 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             ) : null}
           </div>
         )}
+        </FadeContent>
 
         {error ? (
-          <div className="rounded-2xl p-5 bg-[#FEF2F2] border border-[#FECACA]" role="alert">
-            <p className="text-sm font-bold text-[#DC2626]">{error}</p>
+          <div className="listing-form-error rounded-2xl p-5" role="alert">
+            <p className="listing-form-error-copy text-sm font-bold">{error}</p>
             {validationDetails.length > 0 ? (
-              <ul className="mt-3 space-y-1.5 text-xs font-medium text-[#B91C1C] bg-white/60 p-4 rounded-xl">
+              <ul className="listing-form-error-details mt-3 space-y-1.5 text-xs font-medium bg-white/60 p-4 rounded-xl">
                 {validationDetails.map((detail) => (
                   <li key={detail} className="flex items-start gap-2">
-                    <span className="text-[#DC2626] mt-0.5">•</span>
+                    <span className="listing-form-error-bullet mt-0.5">•</span>
                     {detail}
                   </li>
                 ))}
@@ -1793,7 +1803,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               <button
                 type="button"
                 onClick={currentStep === 3 ? handleSubmit : nextStep}
-                className="tfp-btn-primary"
+                className={`tfp-btn-primary listing-next-step-button${currentStep === 3 ? ' listing-final-submit-button' : ''}`}
                 disabled={saving || fipeLoading}
               >
                 {saving ? (

@@ -60,7 +60,7 @@ export default function DescriptionAiControls({ value, onApply }: Props) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-[#7B7466]">
+        <p className="listing-ai-helper text-xs text-[#7B7466]">
           {trimmed.length < 20
             ? 'Digite pelo menos 20 caracteres para usar a IA.'
             : 'A IA só reorganiza o que você escreveu — sem inventar nada.'}

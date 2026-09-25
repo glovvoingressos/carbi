@@ -23,12 +23,15 @@ describe('HeroRotatingTitle', () => {
     expect(screen.getByTestId('hero-rotating-word').textContent).toBe('Encontre')
 
     act(() => vi.advanceTimersByTime(2800))
+    act(() => vi.advanceTimersByTime(700))
     expect(screen.getByTestId('hero-rotating-word').textContent).toBe('Venda')
 
     act(() => vi.advanceTimersByTime(2800))
+    act(() => vi.advanceTimersByTime(700))
     expect(screen.getByTestId('hero-rotating-word').textContent).toBe('Compre')
 
     act(() => vi.advanceTimersByTime(2800))
+    act(() => vi.advanceTimersByTime(700))
     expect(screen.getByTestId('hero-rotating-word').textContent).toBe('Pesquise')
   })
 })
