@@ -78,6 +78,7 @@ export default function PlateBannerLookup() {
           src="/assets/cars/plate-lookup-desert-pickup.jpg"
           alt="Picape em uma estrada no deserto"
           fill
+          unoptimized
           sizes="(max-width: 760px) calc(100vw - 64px), 42vw"
           className="cb-plate-premium-image"
         />

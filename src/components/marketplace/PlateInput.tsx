@@ -108,14 +108,13 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
         </div>
         <div>
           <h4 className="text-xs font-semibold text-[#1A1A1A]">Preencher pela placa</h4>
-          <p className="text-[11px] text-gray-400">Consulta FIPE e Denatran automática</p>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 p-4">
         <div className="flex items-center gap-2 mb-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200">
           <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-          <p className="text-[12px] text-amber-700">A placa é usada apenas para preencher os dados do veículo. Ela <strong>não será publicada</strong> no anúncio.</p>
+          <p className="text-xs text-amber-700" style={{ fontSize: '12px' }}>A placa é usada apenas para preencher os dados do veículo. Ela <strong>não será publicada</strong> no anúncio.</p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch gap-3">

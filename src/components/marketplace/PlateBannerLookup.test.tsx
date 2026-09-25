@@ -21,6 +21,8 @@ describe('PlateBannerLookup', () => {
     const heading = screen.getByRole('heading', { name: 'Anuncie seu carro em menos de 2 minutos.' })
 
     expect(image.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(image.getAttribute('src')).toBe('/assets/cars/plate-lookup-desert-pickup.jpg')
+    expect(image.getAttribute('srcset')).toBeNull()
     expect(screen.getByRole('textbox', { name: 'Placa do veículo' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Consultar' })).toBeTruthy()
   })
