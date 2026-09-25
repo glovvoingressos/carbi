@@ -157,7 +157,6 @@ export default async function HomePage() {
         <div className="cb-wrap">
           <div className="cb-head">
             <div>
-              <p className="cb-eyebrow">Estoque selecionado</p>
               <h2>Os anúncios mais procurados desta semana</h2>
             </div>
             <Link href="/carros-a-venda" className="cb-head-link">
@@ -276,10 +275,10 @@ export default async function HomePage() {
         <div className="cb-wrap cb-process-grid">
           <div>
             <p className="cb-eyebrow">Como funciona</p>
-            <h2 style={{ fontFamily: 'var(--cb-head)', fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1, margin: '0 0 12px' }}>
+            <h2 className="cb-process-title" style={{ fontFamily: 'var(--cb-head)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1, margin: '0 0 12px' }}>
               Do jeito mais simples
             </h2>
-            <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--cb-ink-soft)', margin: '0 0 24px', maxWidth: '46ch' }}>
+            <p className="cb-process-intro" style={{ lineHeight: 1.6, color: 'var(--cb-ink-soft)', margin: '0 0 24px', maxWidth: '46ch' }}>
               Do primeiro filtro ao contrato, todo o processo pensado para você economizar tempo e dinheiro.
             </p>
 
@@ -316,7 +315,7 @@ export default async function HomePage() {
       <section className="cb-section-pad cb-build-section">
         <div className="cb-wrap">
           <div className="cb-build-grid">
-            <Link href="/anunciar-carro" className="cb-build-card cb-build-card-dark">
+            <Link href="/anunciar-carro" className="cb-build-card cb-build-card-dark cb-build-card-featured">
               <div>
                 <div className="cb-build-card-tag">Para vender</div>
                 <h3>Anuncie grátis em 2 minutos</h3>
@@ -326,7 +325,7 @@ export default async function HomePage() {
                 Anunciar meu carro <ArrowRight size={16} />
               </span>
             </Link>
-            <Link href="/qual-carro" className="cb-build-card cb-build-card-lime">
+            <Link href="/qual-carro" className="cb-build-card cb-build-card-lime cb-build-card-secondary">
               <div>
                 <div className="cb-build-card-tag">Para comparar</div>
                 <h3>Compare com a FIPE</h3>
@@ -336,7 +335,7 @@ export default async function HomePage() {
                 Comparar agora <ArrowRight size={16} />
               </span>
             </Link>
-            <Link href="/trafego-pago-gratis" className="cb-build-card cb-build-card-light">
+            <Link href="/trafego-pago-gratis" className="cb-build-card cb-build-card-light cb-build-card-secondary">
               <div>
                 <div className="cb-build-card-tag">Para vender</div>
                 <h3>Tráfego pago grátis</h3>

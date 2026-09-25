@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Search, Loader2, AlertCircle, Car, ArrowRight, ShieldCheck } from 'lucide-react'
 import { lookupPlateClient, savePlateLookup } from '@/lib/integrations/placaapi/client'
 import { formatBRL } from '@/data/cars'
@@ -72,61 +73,73 @@ export default function PlateBannerLookup() {
 
   return (
     <div className={`cb-plate-premium ${step === 'preview' ? 'is-preview' : ''}`}>
-      <div className="cb-plate-premium-copy">
-        <span className="cb-plate-premium-kicker">Grátis por tempo limitado</span>
-        <h3>{step === 'preview' && found ? 'Seu carro está pronto para anunciar' : 'Anuncie seu carro em menos de 2 minutos.'}</h3>
-        <p>{step === 'preview' && found ? 'Confira os dados encontrados e publique em poucos passos.' : 'Consulte pela placa e nós buscamos marca, modelo, ano e FIPE para você.'}</p>
-        <div className="cb-plate-premium-trust"><ShieldCheck size={14} /> A placa não será publicada</div>
+      <div className="cb-plate-premium-visual">
+        <Image
+          src="/assets/cars/plate-lookup-desert-pickup.jpg"
+          alt="Picape em uma estrada no deserto"
+          fill
+          sizes="(max-width: 760px) calc(100vw - 64px), 42vw"
+          className="cb-plate-premium-image"
+        />
       </div>
 
-      <div className="cb-plate-premium-panel">
-        {step === 'input' ? (
-          <div className="cb-plate-premium-form">
-            <label htmlFor="plate-premium-input">Placa do veículo</label>
-            <div className="cb-plate-premium-entry">
-              <div className="cb-plate-premium-input-wrap">
-                <Car size={19} />
-                <input
-                  id="plate-premium-input"
-                  value={plate}
-                  onChange={(event) => { setPlate(formatPlate(event.target.value)); setError(null) }}
-                  onKeyDown={(event) => { if (event.key === 'Enter' && !loading && plate.length === 7) handleLookup() }}
-                  placeholder="ABC1D23"
-                  maxLength={7}
-                  disabled={loading}
-                  aria-label="Placa do veículo"
-                />
+      <div className="cb-plate-premium-content">
+        <div className="cb-plate-premium-copy">
+          <span className="cb-plate-premium-kicker">Grátis por tempo limitado</span>
+          <h3>{step === 'preview' && found ? 'Seu carro está pronto para anunciar' : 'Anuncie seu carro em menos de 2 minutos.'}</h3>
+          <p>{step === 'preview' && found ? 'Confira os dados encontrados e publique em poucos passos.' : 'Consulte pela placa e nós buscamos marca, modelo, ano e FIPE para você.'}</p>
+          <div className="cb-plate-premium-trust"><ShieldCheck size={14} /> A placa não será publicada</div>
+        </div>
+
+        <div className="cb-plate-premium-panel">
+          {step === 'input' ? (
+            <div className="cb-plate-premium-form">
+              <label htmlFor="plate-premium-input">Placa do veículo</label>
+              <div className="cb-plate-premium-entry">
+                <div className="cb-plate-premium-input-wrap">
+                  <Car size={19} />
+                  <input
+                    id="plate-premium-input"
+                    value={plate}
+                    onChange={(event) => { setPlate(formatPlate(event.target.value)); setError(null) }}
+                    onKeyDown={(event) => { if (event.key === 'Enter' && !loading && plate.length === 7) handleLookup() }}
+                    placeholder="ABC1D23"
+                    maxLength={7}
+                    disabled={loading}
+                    aria-label="Placa do veículo"
+                  />
+                </div>
+                <button type="button" onClick={handleLookup} disabled={loading || plate.length < 7}>
+                  {loading ? <Loader2 className="cb-plate-spin" size={18} /> : <Search size={18} />}
+                  {loading ? 'Consultando' : 'Consultar'}
+                </button>
               </div>
-              <button type="button" onClick={handleLookup} disabled={loading || plate.length < 7}>
-                {loading ? <Loader2 className="cb-plate-spin" size={18} /> : <Search size={18} />}
-                {loading ? 'Consultando' : 'Consultar'}
-              </button>
+              {error && <p className="cb-plate-premium-error"><AlertCircle size={15} /> {error}</p>}
             </div>
-            {error && <p className="cb-plate-premium-error"><AlertCircle size={15} /> {error}</p>}
-          </div>
-        ) : found ? (
-          <div className="cb-plate-result">
-            <div className="cb-plate-result-heading"><span>Veículo identificado</span><ShieldCheck size={18} /></div>
-            <div className="cb-plate-result-main">
-              <div>
-                <strong>{found.brand} {found.model}</strong>
-                <span>{found.version || 'Versão não informada'}</span>
+          ) : found ? (
+            <div className="cb-plate-result">
+              <div className="cb-plate-result-heading"><span>Veículo identificado</span><ShieldCheck size={18} /></div>
+              <div className="cb-plate-result-main">
+                <div>
+                  <strong>{found.brand} {found.model}</strong>
+                  <span>{found.version || 'Versão não informada'}</span>
+                </div>
+                <div className="cb-plate-result-price">
+                  <small>FIPE estimada</small>
+                  <b>{found.fipePrice != null && found.fipePrice > 0 ? formatBRL(found.fipePrice) : 'Indisponível'}</b>
+                </div>
               </div>
-              <div className="cb-plate-result-price">
-                <small>FIPE estimada</small>
-                <b>{found.fipePrice != null && found.fipePrice > 0 ? formatBRL(found.fipePrice) : 'Indisponível'}</b>
+              <div className="cb-plate-result-details">
+                <span><small>Ano</small>{found.year}{found.yearModel && found.yearModel !== found.year ? `/${found.yearModel}` : ''}</span>
+                <span><small>Cor</small>{found.color || 'Não informada'}</span>
+              </div>
+              <div className="cb-plate-result-actions">
+                <button type="button" onClick={handleAnunciar}>Continuar anúncio <ArrowRight size={17} /></button>
+                <button type="button" onClick={handleReset}>Outra placa</button>
               </div>
             </div>
-            <div className="cb-plate-result-details">
-              <span><small>Ano</small>{found.year}{found.yearModel && found.yearModel !== found.year ? `/${found.yearModel}` : ''}</span>
-              <span><small>Cor</small>{found.color || 'Não informada'}</span>
-            </div>
-            <div className="cb-plate-result-actions">
-              <button type="button" onClick={handleAnunciar}>Continuar anúncio <ArrowRight size={17} /></button>
-              <button type="button" onClick={handleReset}>Outra placa</button>
-            </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
       </div>
     </div>
   )
