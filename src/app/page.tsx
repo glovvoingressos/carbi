@@ -316,18 +316,26 @@ export default async function HomePage() {
         <div className="cb-wrap">
           <div className="cb-build-grid">
             <Link href="/anunciar-carro" className="cb-build-card cb-build-card-dark cb-build-card-featured">
-              <div>
-                <div className="cb-build-card-tag">Para vender</div>
-                <h3>Anuncie grátis em 2 minutos</h3>
-                <p>Seu anúncio com fotos, FIPE verificada e alcance de milhares de compradores.</p>
+              <div className="cb-build-card-featured-visual">
+                <img
+                  src="/assets/cars/build-card-omoda-electric.jpg"
+                  alt="SUV elétrico OMODA em fundo tecnológico"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
-              <span className="cb-build-cta">
-                Anunciar meu carro <ArrowRight size={16} />
-              </span>
+              <div className="cb-build-card-featured-content">
+                <div>
+                  <h3>Anuncie grátis em 2 minutos</h3>
+                  <p>Seu anúncio com fotos, FIPE verificada e alcance de milhares de compradores.</p>
+                </div>
+                <span className="cb-build-cta">
+                  Anunciar meu carro <ArrowRight size={16} />
+                </span>
+              </div>
             </Link>
             <Link href="/qual-carro" className="cb-build-card cb-build-card-lime cb-build-card-secondary">
               <div>
-                <div className="cb-build-card-tag">Para comparar</div>
                 <h3>Compare com a FIPE</h3>
                 <p>Saiba se o preço está justo antes de fechar negócio.</p>
               </div>
@@ -337,7 +345,6 @@ export default async function HomePage() {
             </Link>
             <Link href="/trafego-pago-gratis" className="cb-build-card cb-build-card-light cb-build-card-secondary">
               <div>
-                <div className="cb-build-card-tag">Para vender</div>
                 <h3>Tráfego pago grátis</h3>
                 <p>Divulgamos seus anúncios no Google e Meta Ads sem custo.</p>
               </div>
