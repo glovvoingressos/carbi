@@ -6,6 +6,7 @@ import {
   PeriodRankingData,
   StateRankingData,
 } from '../data/rankings-july-2026'
+import { SEPTEMBER_2026_NEW_RANKINGS } from '../data/rankings-september-2026'
 
 export type { RankingModelItem, PeriodRankingData, StateRankingData }
 
@@ -13,6 +14,9 @@ export async function getMonthlyRankings(
   period = 'julho-2026',
   marketType: 'new' | 'used' = 'new'
 ): Promise<RankingModelItem[]> {
+  if (period === 'setembro-2026') {
+    return marketType === 'new' ? SEPTEMBER_2026_NEW_RANKINGS : JULY_2026_USED_RANKINGS
+  }
   if (period === 'julho-2026') {
     return marketType === 'new' ? JULY_2026_NEW_RANKINGS : JULY_2026_USED_RANKINGS
   }

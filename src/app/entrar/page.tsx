@@ -15,7 +15,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <div className="auth-page-shell">
       <div className="auth-page-grid">
-        <section className="auth-hero-card surface-strong">
+        <section className="auth-hero-content">
           <div className="auth-hero-image-wrap">
             <img
               src="/images/porsche-hero.jpg"

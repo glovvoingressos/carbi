@@ -14,7 +14,7 @@ type SupportAdminNotificationResult = {
 
 const DEFAULT_SITE_URL = 'https://www.carbi.com.br'
 const DEFAULT_FROM_EMAIL = 'Carbi <noreply@carbi.com.br>'
-const SUBJECT = 'Nova mensagem de suporte no CarDecision'
+const SUBJECT = 'Nova mensagem de suporte no Carbi'
 
 export async function sendSupportAdminNotification(
   params: SupportAdminNotificationParams,

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { getMonthlyRankings } from '@/lib/rankings-data'
 import { formatBRL } from '@/data/cars'
 import { ArrowRight, TrendingUp, ChevronUp, ChevronDown } from 'lucide-react'
@@ -7,34 +8,31 @@ type Tab = 'novos' | 'seminovos'
 
 function avatarColor(position: number): string {
   const palette = [
-    'rgba(217, 248, 95, 0.55)',
-    'rgba(167, 139, 250, 0.55)',
-    'rgba(252, 211, 77, 0.55)',
-    'rgba(110, 231, 183, 0.55)',
-    'rgba(244, 114, 182, 0.55)',
-    'rgba(96, 165, 250, 0.55)',
-    'rgba(251, 146, 60, 0.55)',
-    'rgba(148, 163, 184, 0.55)',
-    'rgba(196, 181, 253, 0.55)',
-    'rgba(253, 164, 175, 0.55)',
+    'rgba(76, 139, 245, 0.18)',
+    'rgba(125, 111, 245, 0.18)',
+    'rgba(69, 168, 232, 0.18)',
+    'rgba(83, 181, 163, 0.18)',
+    'rgba(217, 112, 171, 0.18)',
+    'rgba(103, 145, 228, 0.18)',
+    'rgba(221, 151, 83, 0.18)',
+    'rgba(148, 163, 184, 0.22)',
+    'rgba(146, 126, 232, 0.18)',
+    'rgba(218, 119, 135, 0.18)',
   ]
   return palette[(position - 1) % palette.length]
 }
 
 function avatarInkColor(position: number): string {
-  const palette = ['#3F4A00', '#3B1F70', '#5A3D00', '#0F4A30', '#7A1F4A', '#1A3A6B', '#6B2E0F', '#1F2937', '#2E1B5C', '#6B1F2E']
+  const palette = ['#225CB7', '#4C3DB7', '#1F6B98', '#176B5A', '#963F78', '#315EAA', '#915A22', '#465466', '#5B4BA9', '#963D4B']
   return palette[(position - 1) % palette.length]
 }
 
 export default async function RankingsBanner() {
-  const [topNew, topUsed] = await Promise.all([
-    getMonthlyRankings('julho-2026', 'new'),
-    getMonthlyRankings('julho-2026', 'used'),
-  ])
+  const topNew = await getMonthlyRankings('setembro-2026', 'new')
 
   const top10 = topNew.slice(0, 10)
   const totalUnits = top10.reduce((sum, c) => sum + c.unitsSold, 0)
-  const monthLabel = 'Julho / 2026'
+  const monthLabel = 'Setembro / 2026 · 1ª quinzena'
 
   return (
     <section className="cb-section-pad pt-0">
@@ -42,12 +40,21 @@ export default async function RankingsBanner() {
         <div className="cb-top10-card">
           <div className="cb-top10-head">
             <div>
+              <div className="cb-top10-feature-media">
+                <Image
+                  src="/assets/cars/fiat-strada-ultra-10-turbo-cvt-2026.png"
+                  alt="Fiat Strada 2027"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 55vw"
+                  priority
+                />
+              </div>
               <p className="cb-top10-eyebrow">Top 10 mais vendidos · {monthLabel}</p>
               <h2 className="cb-top10-title">
                 Os carros mais vendidos do Brasil
               </h2>
               <p className="cb-top10-lead">
-                Ranking oficial de emplacamentos 0km. Atualizado com dados FIPE verificados.
+                Ranking oficial de emplacamentos 0km. Dados parciais de setembro, com base na Fenabrave.
               </p>
             </div>
 
@@ -125,7 +132,7 @@ export default async function RankingsBanner() {
               <ArrowRight size={18} />
             </Link>
             <span className="cb-top10-foot-note">
-              <TrendingUp size={14} /> Dados atualizados mensalmente com base em emplacamentos Fenabrave.
+              <TrendingUp size={14} /> 1ª quinzena de setembro · Fenabrave / Bright Consulting.
             </span>
           </div>
         </div>

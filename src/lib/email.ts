@@ -57,7 +57,7 @@ export async function sendNewMessageEmail(params: NewMessageEmailParams) {
           <div style="text-align: center; margin-bottom: 24px;">
             <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
           </div>
-          <h2 style="color: #2563eb; text-align: center;">Nova Mensagem no CarDecision</h2>
+          <h2 style="color: #2563eb; text-align: center;">Nova Mensagem no Carbi</h2>
           <p>Olá, <strong>${recipientName || 'Cliente'}</strong>!</p>
           <p>O usuário <strong>${senderName || 'Alguém'}</strong> enviou uma mensagem a respeito do veículo <strong>${vehicleTitle}</strong>:</p>
           
@@ -73,7 +73,7 @@ export async function sendNewMessageEmail(params: NewMessageEmailParams) {
 
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
-            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Esta é uma notificação automática do marketplace Carbi.<br />
             Por favor, não responda a este e-mail.
           </p>
         </div>
@@ -141,7 +141,7 @@ export async function sendNewOfferEmail(params: NewOfferEmailParams) {
 
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
-            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Esta é uma notificação automática do marketplace Carbi.<br />
             Por favor, não responda a este e-mail.
           </p>
         </div>
@@ -242,7 +242,7 @@ export async function sendOfferStatusUpdateEmail(params: OfferStatusUpdateEmailP
 
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
-            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Esta é uma notificação automática do marketplace Carbi.<br />
             Por favor, não responda a este e-mail.
           </p>
         </div>
@@ -315,7 +315,7 @@ export async function sendListingCreatedEmail(params: ListingCreatedEmailParams)
 
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
-            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Esta é uma notificação automática do marketplace Carbi.<br />
             Por favor, não responda a este e-mail.
           </p>
         </div>
@@ -371,7 +371,7 @@ export async function sendAdminNewListingEmail(params: AdminNewListingEmailParam
             <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
           </div>
           <h2 style="color: #7c3aed; text-align: center;">Novo anúncio no marketplace</h2>
-          <p>Um novo veículo foi anunciado na plataforma CarDecision.</p>
+          <p>Um novo veículo foi anunciado na plataforma Carbi.</p>
 
           <div style="background-color: #f5f3ff; border-left: 4px solid #7c3aed; padding: 16px; border-radius: 4px; margin: 24px 0;">
             <p style="margin: 0; font-size: 18px; font-weight: bold; color: #5b21b6;">
@@ -393,7 +393,7 @@ export async function sendAdminNewListingEmail(params: AdminNewListingEmailParam
 
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
-            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Esta é uma notificação automática do marketplace Carbi.<br />
             Por favor, não responda a este e-mail.
           </p>
         </div>
@@ -434,7 +434,7 @@ export async function sendListingDeletedEmail(params: ListingDeletedEmailParams)
           </div>
           <h2 style="color: #4b5563; text-align: center;">Confirmação de Exclusão</h2>
           <p>Olá, <strong>${userName || 'Anunciante'}</strong>!</p>
-          <p>Confirmamos que o anúncio do veículo <strong>${vehicleTitle}</strong> foi removido do marketplace CarDecision.</p>
+          <p>Confirmamos que o anúncio do veículo <strong>${vehicleTitle}</strong> foi removido do marketplace Carbi.</p>
           
           <div style="background-color: #f3f4f6; border-left: 4px solid #4b5563; padding: 16px; border-radius: 4px; margin: 24px 0;">
             <p style="margin: 0; font-size: 14px; color: #374151;">
@@ -447,7 +447,7 @@ export async function sendListingDeletedEmail(params: ListingDeletedEmailParams)
 
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
-            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Esta é uma notificação automática do marketplace Carbi.<br />
             Por favor, não responda a este e-mail.
           </p>
         </div>
@@ -541,7 +541,7 @@ export async function sendListingStatusChangedEmail(params: ListingStatusChanged
 
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
-            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Esta é uma notificação automática do marketplace Carbi.<br />
             Por favor, não responda a este e-mail.
           </p>
         </div>
@@ -609,7 +609,7 @@ export async function sendWelcomeEmail(params: WelcomeEmailParams) {
 
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
-            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Esta é uma notificação automática do marketplace Carbi.<br />
             Por favor, não responda a este e-mail.
           </p>
         </div>

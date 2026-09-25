@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
           <p style="font-size: 13px; color: #6b7280;">Ou copie e cole este link no navegador:<br/>${confirmationLink}</p>
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 48px;" />
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
-            Esta é uma notificação automática do marketplace CarDecision.<br />
+            Esta é uma notificação automática do marketplace Carbi.<br />
             Por favor, não responda a este e-mail.
           </p>
         </div>

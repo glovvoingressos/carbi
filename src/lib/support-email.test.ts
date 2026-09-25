@@ -22,7 +22,7 @@ describe('sendSupportAdminNotification', () => {
     process.env.ADMIN_NOTIFY_EMAIL = 'support-admin@carbi.com.br'
     process.env.NEXT_PUBLIC_SITE_URL = 'https://carbi.com.br'
     process.env.RESEND_API_KEY = 'test-resend-key'
-    process.env.RESEND_FROM_EMAIL = 'CarDecision <support@carbi.com.br>'
+    process.env.RESEND_FROM_EMAIL = 'Carbi <support@carbi.com.br>'
     resendSend.mockResolvedValue({ data: { id: 'email-1' }, error: null })
   })
 
@@ -43,16 +43,17 @@ describe('sendSupportAdminNotification', () => {
     })).resolves.toEqual({ success: true })
 
     expect(resendSend).toHaveBeenCalledWith(expect.objectContaining({
-      from: 'CarDecision <support@carbi.com.br>',
+      from: 'Carbi <support@carbi.com.br>',
       to: ['support-admin@carbi.com.br'],
       replyTo: 'ana&co@example.com',
-      subject: 'Nova mensagem de suporte no CarDecision',
+      subject: 'Nova mensagem de suporte no Carbi',
     }))
     const payload = resendSend.mock.calls[0][0]
     expect(payload.html).toContain('Ana &lt;script&gt;alert(1)&lt;/script&gt;')
     expect(payload.html).toContain('ana&amp;co@example.com')
     expect(payload.html).toContain('Preciso de &lt;ajuda&gt; &amp; &quot;resposta&quot;')
     expect(payload.html).toContain('https://carbi.com.br/admin/suporte?conversation=conversation-1')
+    expect(payload.html).not.toContain('CarDecision')
     expect(payload.html).not.toContain('<script>alert(1)</script>')
   })
 

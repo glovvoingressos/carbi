@@ -12,6 +12,7 @@ import RankingsBanner from '@/components/home/RankingsBanner'
 import HomeCounters from '@/components/home/HomeCounters'
 import PlateBannerLookup from '@/components/marketplace/PlateBannerLookup'
 import ExploreCarousel from '@/components/home/ExploreCarousel'
+import HeroRotatingTitle from '@/components/home/HeroRotatingTitle'
 
 export const dynamic = 'force-dynamic'
 
@@ -98,9 +99,7 @@ export default async function HomePage() {
         <div className="cb-wrap">
           <div className="cb-hero-grid">
             <div className="cb-hero-copy">
-              <h1 className="cb-hero-title">
-                Encontre o carro <u>certo</u>, sem complicação.
-              </h1>
+              <HeroRotatingTitle />
               <p className="cb-hero-lead">
                 Anuncie grátis, compare com a FIPE e negocie direto com o vendedor.
                 Dados reais, chat interno e as melhores ofertas de seminovos do país.
@@ -170,6 +169,10 @@ export default async function HomePage() {
               recentListings.map((listing) => {
                 const fipe = fipePercent(listing)
                 const imageUrls = listing.images?.map((img) => img.url) || []
+                const version = listing.version?.trim()
+                const hasDistinctVersion = Boolean(
+                  version && !listing.model.toLowerCase().includes(version.toLowerCase()),
+                )
                 return (
                   <Link key={listing.id} href={`/anuncios/${listing.slug}`} className="cb-listing-card">
                     <div className="cb-listing-card-image">
@@ -180,15 +183,6 @@ export default async function HomePage() {
                         imageUrls={imageUrls}
                         alt={`${listing.brand} ${listing.model} ${listing.year_model}`}
                       />
-                      <div className="cb-listing-card-topbar">
-                        <span
-                          className="cb-listing-fav"
-                          aria-label="Favoritar"
-                          role="img"
-                        >
-                          ♡
-                        </span>
-                      </div>
                     </div>
                     <div className="cb-listing-card-body">
                       <div className="cb-listing-card-head">
@@ -196,28 +190,28 @@ export default async function HomePage() {
                           <span className="cb-listing-card-brand">{listing.brand}</span>
                           <span className="cb-listing-card-model">{listing.model}</span>
                         </div>
-                        {listing.version ? (
-                          <span className="cb-listing-card-version">{listing.version}</span>
+                        {hasDistinctVersion ? (
+                          <span className="cb-listing-card-version">{version}</span>
                         ) : null}
                       </div>
 
-                      <div className="cb-listing-card-specs">
-                        <div className="cb-listing-spec">
+                      <div className="cb-listing-card-specs" aria-label="Detalhes do veículo">
+                        <div className="cb-listing-spec" aria-label={`Ano ${listing.year_model}`}>
                           <CalendarIcon size={13} />
-                          <span className="cb-listing-spec-label">Ano</span>
                           <span className="cb-listing-spec-value">{listing.year_model}</span>
                         </div>
-                        <div className="cb-listing-spec">
+                        <div
+                          className="cb-listing-spec"
+                          aria-label={`Quilometragem ${listing.mileage ? `${(listing.mileage / 1000).toFixed(listing.mileage % 1000 === 0 ? 0 : 1)} mil quilômetros` : 'não informada'}`}
+                        >
                           <Gauge size={13} />
-                          <span className="cb-listing-spec-label">KM</span>
                           <span className="cb-listing-spec-value">
-                            {listing.mileage ? `${(listing.mileage / 1000).toFixed(listing.mileage % 1000 === 0 ? 0 : 1)}k` : '0'}
+                            {listing.mileage ? `${(listing.mileage / 1000).toFixed(listing.mileage % 1000 === 0 ? 0 : 1)}k km` : '—'}
                           </span>
                         </div>
                         {listing.transmission ? (
-                          <div className="cb-listing-spec">
+                          <div className="cb-listing-spec" aria-label={`Câmbio ${listing.transmission}`}>
                             <Settings2 size={13} />
-                            <span className="cb-listing-spec-label">Câmbio</span>
                             <span className="cb-listing-spec-value">{listing.transmission}</span>
                           </div>
                         ) : null}
