@@ -3,6 +3,7 @@ import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { LISTING_MAX_IMAGES, ListingImageInput } from '@/lib/marketplace'
 import { sanitizeListingStorageImage } from '@/lib/license-plate-blur'
+import { getObsoleteListingStoragePaths } from '@/lib/listing-images'
 
 export async function POST(
   req: NextRequest,
@@ -103,9 +104,11 @@ export async function POST(
       }
     }
 
-    const oldStoragePaths = (oldImages || []).map((row) => row.storage_path).filter(Boolean)
-    if (oldStoragePaths.length > 0) {
-      await supabase.storage.from('vehicle-listings').remove(oldStoragePaths)
+    const oldStoragePaths = (oldImages || []).map((row) => row.storage_path)
+    const keptStoragePaths = normalized.map((image) => image.storage_path)
+    const obsoleteStoragePaths = getObsoleteListingStoragePaths(oldStoragePaths, keptStoragePaths)
+    if (obsoleteStoragePaths.length > 0) {
+      await supabase.storage.from('vehicle-listings').remove(obsoleteStoragePaths)
     }
 
     return NextResponse.json({ ok: true })

@@ -26,3 +26,14 @@ export function normalizeListingImages(
     is_primary: image.is_primary,
   }))
 }
+
+export function getObsoleteListingStoragePaths(
+  oldPaths: Array<string | null | undefined>,
+  keptPaths: Array<string | null | undefined>,
+): string[] {
+  const kept = new Set(keptPaths.filter((path): path is string => Boolean(path)))
+
+  return [...new Set(oldPaths.filter((path): path is string => Boolean(path)))].filter(
+    (path) => !kept.has(path),
+  )
+}
