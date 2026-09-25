@@ -1,0 +1,2 @@
+- [x] Refactor email sending block in src/app/api/marketplace/listings/route.ts to be properly awaited or have proper try/catch logging
+- [x] Fix price input bug in ListingForm.tsx to correctly handle user typing partial inputs without incorrect formatting

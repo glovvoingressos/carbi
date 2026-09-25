@@ -10,6 +10,14 @@ const FIPE_API_TOKEN = process.env.FIPE_API_TOKEN
 let cachedReference: string | null = null
 let refExpiresAt = 0
 const REFERENCE_TTL = 1000 * 60 * 60 // 1 hour
+const DEFAULT_RATE_LIMIT_COOLDOWN_MS = 30_000
+let rateLimitedUntil = 0
+const FIPE_HISTORY_CACHE_TTL = 24 * 60 * 60 * 1000
+const monthlyHistoryCache = new Map<string, {
+  data: { month: string; price: string; priceNum: number }[]
+  expiresAt: number
+}>()
+const monthlyHistoryRequests = new Map<string, Promise<{ month: string; price: string; priceNum: number }[]>>()
 
 let cachedBrands: Record<string, FipeItem[]> = {}
 let brandsExpiresAt = 0
@@ -64,6 +72,8 @@ export function normalize(str: string): string {
  * Base fetcher for Parallelum v2
  */
 async function fetchFipe<T>(endpoint: string, useReference = true, type = 'cars', referenceOverride?: string): Promise<T> {
+  if (rateLimitedUntil > Date.now()) return [] as any
+
   const ref = referenceOverride || (useReference ? await getLatestReference() : null)
   const query = ref ? `?reference=${ref}` : ''
   const url = endpoint.startsWith('/references') 
@@ -85,7 +95,23 @@ async function fetchFipe<T>(endpoint: string, useReference = true, type = 'cars'
     })
 
     if (!res.ok) {
-      console.error(`FIPE API Error (${res.status}): ${url}`)
+      if (res.status === 429) {
+        const retryAfter = res.headers.get('retry-after')
+        const retryAfterSeconds = Number(retryAfter)
+        const retryAfterDate = retryAfter ? Date.parse(retryAfter) : Number.NaN
+        const cooldown = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+          ? retryAfterSeconds * 1000
+          : Number.isFinite(retryAfterDate)
+            ? Math.max(0, retryAfterDate - Date.now())
+            : DEFAULT_RATE_LIMIT_COOLDOWN_MS
+
+        if (rateLimitedUntil <= Date.now()) {
+          rateLimitedUntil = Date.now() + Math.max(cooldown, 1000)
+          console.warn(`[FIPE API] 429 em ${new URL(url).pathname}; Retry-After: ${retryAfter || 'não informado'}.`)
+        }
+      } else {
+        console.error(`FIPE API Error (${res.status}): ${url}`)
+      }
       return [] as any
     }
 
@@ -203,6 +229,7 @@ export async function getFipeVersionsByYear(brandCode: string, modelCode: string
 export interface ResolvedModel {
   brand: FipeItem
   model: FipeItem
+  versionsForYear?: FipeVersionOption[]
 }
 
 async function getCandidateModels(
@@ -346,10 +373,10 @@ export async function resolveBrandAndModelByYear(
   // so a short/ambiguous version never resolves to a wrong trim.
   for (const candidate of candidates) {
     const versions = await getFipeVersionsByYear(brand.code, candidate.code, targetYear)
-    if (versions.length > 0) return { brand, model: candidate }
+    if (versions.length > 0) return { brand, model: candidate, versionsForYear: versions }
   }
 
-  return { brand, model: candidates[0] }
+  return { brand, model: candidates[0], versionsForYear: [] }
 }
 
 export async function getFipeYearsByModelName(brandName: string, modelName: string, limit = 6, _versionName?: string): Promise<number[]> {
@@ -363,7 +390,7 @@ export async function getFipePrice(
   brandName: string,
   modelName: string,
   year: number | string,
-  versionName?: string
+  versionName?: string,
 ): Promise<FipeResult | null> {
   const targetYear = typeof year === 'number' ? year : parseInt(year, 10)
   if (!targetYear) return null
@@ -371,7 +398,7 @@ export async function getFipePrice(
   const resolved = await resolveBrandAndModelByYear(brandName, modelName, targetYear, versionName, 'cars')
   if (!resolved) return null
 
-  const versions = await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, targetYear)
+  const versions = resolved.versionsForYear ?? await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, targetYear)
   if (versions.length === 0) return null
 
   let selected = versions[0]
@@ -419,7 +446,7 @@ export async function getFipeHistory(
   return history.filter((h): h is { year: number; price: string; priceNum: number } => h !== null)
 }
 
-export async function getFipeMonthlyHistory(
+async function loadFipeMonthlyHistory(
   brandName: string,
   modelName: string,
   year: number | string,
@@ -432,7 +459,7 @@ export async function getFipeMonthlyHistory(
   const resolved = await resolveBrandAndModelByYear(brandName, modelName, targetYear, versionName, 'cars')
   if (!resolved) return []
 
-  const versions = await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, targetYear)
+  const versions = resolved.versionsForYear ?? await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, targetYear)
   if (versions.length === 0) return []
 
   let selected = versions[0]
@@ -456,4 +483,35 @@ export async function getFipeMonthlyHistory(
   }
 
   return results
+}
+
+export async function getFipeMonthlyHistory(
+  brandName: string,
+  modelName: string,
+  year: number | string,
+  versionName?: string,
+  monthsCount = 5
+): Promise<{ month: string; price: string; priceNum: number }[]> {
+  const key = [normalize(brandName), normalize(modelName), String(year), normalize(versionName || ''), String(monthsCount)].join('|')
+  const cached = monthlyHistoryCache.get(key)
+  if (cached && cached.expiresAt > Date.now()) return cached.data
+
+  const existingRequest = monthlyHistoryRequests.get(key)
+  if (existingRequest) return existingRequest
+
+  const request = loadFipeMonthlyHistory(brandName, modelName, year, versionName, monthsCount)
+  monthlyHistoryRequests.set(key, request)
+  try {
+    const data = await request
+    if (data.length > 0) {
+      monthlyHistoryCache.set(key, { data, expiresAt: Date.now() + FIPE_HISTORY_CACHE_TTL })
+    }
+    return data
+  } finally {
+    monthlyHistoryRequests.delete(key)
+  }
+}
+
+export function isFipeRateLimited(): boolean {
+  return rateLimitedUntil > Date.now()
 }

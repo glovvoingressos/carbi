@@ -1,0 +1,697 @@
+{
+  "summary": {
+    "measured": 73,
+    "failed": 0,
+    "bytes_avg": 1319831,
+    "bytes_median": 379240,
+    "megapixels_median": 1.56,
+    "megapixels_mean": 3.56,
+    "top_pairs": [
+      [
+        "1280x960",
+        9
+      ],
+      [
+        "1600x1200",
+        7
+      ],
+      [
+        "1672x941",
+        7
+      ],
+      [
+        "5712x4284",
+        6
+      ],
+      [
+        "898x1598",
+        5
+      ],
+      [
+        "941x1672",
+        5
+      ],
+      [
+        "899x1599",
+        4
+      ],
+      [
+        "526x526",
+        4
+      ],
+      [
+        "900x1600",
+        3
+      ],
+      [
+        "1179x2556",
+        3
+      ],
+      [
+        "1440x1080",
+        2
+      ],
+      [
+        "1200x1600",
+        2
+      ],
+      [
+        "1672x940",
+        2
+      ],
+      [
+        "854x758",
+        1
+      ],
+      [
+        "1148x796",
+        1
+      ]
+    ],
+    "top_widths": [
+      [
+        "1280",
+        9
+      ],
+      [
+        "1672",
+        9
+      ],
+      [
+        "1600",
+        7
+      ],
+      [
+        "5712",
+        6
+      ],
+      [
+        "898",
+        5
+      ],
+      [
+        "941",
+        5
+      ],
+      [
+        "526",
+        4
+      ],
+      [
+        "899",
+        4
+      ],
+      [
+        "1179",
+        4
+      ],
+      [
+        "900",
+        3
+      ]
+    ],
+    "top_heights": [
+      [
+        "960",
+        9
+      ],
+      [
+        "941",
+        7
+      ],
+      [
+        "1200",
+        7
+      ],
+      [
+        "1600",
+        6
+      ],
+      [
+        "4284",
+        6
+      ],
+      [
+        "1598",
+        5
+      ],
+      [
+        "1672",
+        5
+      ],
+      [
+        "526",
+        4
+      ],
+      [
+        "1599",
+        4
+      ],
+      [
+        "2556",
+        3
+      ]
+    ],
+    "aspect_buckets": {
+      "other (1.13)": 1,
+      "4:3 / 5:4 (~1.33)": 26,
+      "other (1.44)": 1,
+      "other (1.22)": 1,
+      "other (1.65)": 1,
+      "9:16 portrait (0.56)": 17,
+      "other (1.40)": 1,
+      "4:5 portrait (0.80)": 4,
+      "16:9 (1.78)": 10,
+      "other (1.24)": 1,
+      "1:1 square": 5,
+      "other (1.95)": 1,
+      "other (0.45)": 1,
+      "other (0.46)": 3
+    },
+    "formats": {
+      "jpeg": 53,
+      "png": 20
+    },
+    "size_distribution": {
+      "lt_0.5MB": 41,
+      "0.5_1MB": 6,
+      "1_2MB": 1,
+      "2_5MB": 24,
+      "5_10MB": 1,
+      "gte_10MB": 0
+    }
+  },
+  "results": [
+    {
+      "name": "19e17024-953f-4e2c-90f1-e7347f376f8c/af9c42f9-e01a-4119-b998-439ec3fb12af/01-1782406844989-1_080208.jpg",
+      "bytes": 217404,
+      "width": 854,
+      "height": 758,
+      "format": "jpeg"
+    },
+    {
+      "name": "19e17024-953f-4e2c-90f1-e7347f376f8c/af9c42f9-e01a-4119-b998-439ec3fb12af/06-1782406847552-1_080219.jpg",
+      "bytes": 380870,
+      "width": 1440,
+      "height": 1080,
+      "format": "jpeg"
+    },
+    {
+      "name": "19e17024-953f-4e2c-90f1-e7347f376f8c/af9c42f9-e01a-4119-b998-439ec3fb12af/02-1782406845689-1_080209.jpg",
+      "bytes": 364938,
+      "width": 1148,
+      "height": 796,
+      "format": "jpeg"
+    },
+    {
+      "name": "19e17024-953f-4e2c-90f1-e7347f376f8c/af9c42f9-e01a-4119-b998-439ec3fb12af/04-1782406846646-1_080212.jpg",
+      "bytes": 414294,
+      "width": 1440,
+      "height": 1080,
+      "format": "jpeg"
+    },
+    {
+      "name": "19e17024-953f-4e2c-90f1-e7347f376f8c/af9c42f9-e01a-4119-b998-439ec3fb12af/05-1782406847153-1_080218.jpg",
+      "bytes": 210968,
+      "width": 1059,
+      "height": 868,
+      "format": "jpeg"
+    },
+    {
+      "name": "19e17024-953f-4e2c-90f1-e7347f376f8c/af9c42f9-e01a-4119-b998-439ec3fb12af/08-1782406848428-1_080229.jpg",
+      "bytes": 556437,
+      "width": 1381,
+      "height": 1060,
+      "format": "jpeg"
+    },
+    {
+      "name": "19e17024-953f-4e2c-90f1-e7347f376f8c/af9c42f9-e01a-4119-b998-439ec3fb12af/07-1782406848011-1_080227.jpg",
+      "bytes": 318683,
+      "width": 1237,
+      "height": 749,
+      "format": "jpeg"
+    },
+    {
+      "name": "364b5214-28f3-4106-b279-c26a2b74277d/7a32af1f-22aa-447b-b6f6-efeafe76ae53/01-1787549688618-794be909-d4be-4233-b19f-a196c4490e81.jpeg",
+      "bytes": 326070,
+      "width": 1600,
+      "height": 1200,
+      "format": "jpeg"
+    },
+    {
+      "name": "19e17024-953f-4e2c-90f1-e7347f376f8c/af9c42f9-e01a-4119-b998-439ec3fb12af/09-1782406848904-IMG-20250312-WA0009.jpg",
+      "bytes": 148373,
+      "width": 900,
+      "height": 1600,
+      "format": "jpeg"
+    },
+    {
+      "name": "19e17024-953f-4e2c-90f1-e7347f376f8c/af9c42f9-e01a-4119-b998-439ec3fb12af/10-1782406849283-IMG-20250312-WA0010.jpg",
+      "bytes": 141649,
+      "width": 900,
+      "height": 1600,
+      "format": "jpeg"
+    },
+    {
+      "name": "19e17024-953f-4e2c-90f1-e7347f376f8c/af9c42f9-e01a-4119-b998-439ec3fb12af/03-1782406846215-1_080211.jpg",
+      "bytes": 345093,
+      "width": 1164,
+      "height": 830,
+      "format": "jpeg"
+    },
+    {
+      "name": "646d8957-12ea-405a-86f2-5830822ae5fa/d086df35-95d2-4c5f-b8ae-6d066eb71ace/01-1787597442502-94291.jpg",
+      "bytes": 539115,
+      "width": 898,
+      "height": 1598,
+      "format": "jpeg"
+    },
+    {
+      "name": "364b5214-28f3-4106-b279-c26a2b74277d/7a32af1f-22aa-447b-b6f6-efeafe76ae53/03-1787549691240-a5b787a3-891d-45e4-8f36-7d08f97d7c06.jpeg",
+      "bytes": 334561,
+      "width": 1200,
+      "height": 1600,
+      "format": "jpeg"
+    },
+    {
+      "name": "364b5214-28f3-4106-b279-c26a2b74277d/7a32af1f-22aa-447b-b6f6-efeafe76ae53/05-1787549693075-8e004f0e-b524-4d25-9856-3e03ef0d9d33.jpeg",
+      "bytes": 379240,
+      "width": 1600,
+      "height": 1200,
+      "format": "jpeg"
+    },
+    {
+      "name": "364b5214-28f3-4106-b279-c26a2b74277d/7a32af1f-22aa-447b-b6f6-efeafe76ae53/02-1787549689928-62b38147-8fa5-4a58-ab41-4ba4a508b9d9.jpeg",
+      "bytes": 309277,
+      "width": 1200,
+      "height": 1600,
+      "format": "jpeg"
+    },
+    {
+      "name": "364b5214-28f3-4106-b279-c26a2b74277d/7a32af1f-22aa-447b-b6f6-efeafe76ae53/04-1787549692439-c67ecd47-10f0-4d1f-ae73-c231faa18a2d.jpeg",
+      "bytes": 353271,
+      "width": 1600,
+      "height": 1200,
+      "format": "jpeg"
+    },
+    {
+      "name": "646d8957-12ea-405a-86f2-5830822ae5fa/d086df35-95d2-4c5f-b8ae-6d066eb71ace/02-1787597445668-94285.jpg",
+      "bytes": 288327,
+      "width": 1599,
+      "height": 899,
+      "format": "jpeg"
+    },
+    {
+      "name": "646d8957-12ea-405a-86f2-5830822ae5fa/d086df35-95d2-4c5f-b8ae-6d066eb71ace/03-1787597447073-94303.jpg",
+      "bytes": 632569,
+      "width": 898,
+      "height": 1598,
+      "format": "jpeg"
+    },
+    {
+      "name": "646d8957-12ea-405a-86f2-5830822ae5fa/d086df35-95d2-4c5f-b8ae-6d066eb71ace/05-1787597451742-94297.jpg",
+      "bytes": 664092,
+      "width": 898,
+      "height": 1598,
+      "format": "jpeg"
+    },
+    {
+      "name": "646d8957-12ea-405a-86f2-5830822ae5fa/d086df35-95d2-4c5f-b8ae-6d066eb71ace/04-1787597450300-94300.jpg",
+      "bytes": 346616,
+      "width": 899,
+      "height": 1599,
+      "format": "jpeg"
+    },
+    {
+      "name": "646d8957-12ea-405a-86f2-5830822ae5fa/d086df35-95d2-4c5f-b8ae-6d066eb71ace/06-1787597455259-94294.jpg",
+      "bytes": 654632,
+      "width": 898,
+      "height": 1598,
+      "format": "jpeg"
+    },
+    {
+      "name": "646d8957-12ea-405a-86f2-5830822ae5fa/d086df35-95d2-4c5f-b8ae-6d066eb71ace/08-1787597460786-94306.jpg",
+      "bytes": 430704,
+      "width": 898,
+      "height": 1598,
+      "format": "jpeg"
+    },
+    {
+      "name": "8323e410-3ecc-40da-9082-a32d30c69d21/3b5324f6-4667-4470-9dda-2c9f234b33a6/01-1784982869729-Captura-de-Tela-2026-06-05-a-s-17.04.51.png",
+      "bytes": 589134,
+      "width": 552,
+      "height": 444,
+      "format": "png"
+    },
+    {
+      "name": "646d8957-12ea-405a-86f2-5830822ae5fa/d086df35-95d2-4c5f-b8ae-6d066eb71ace/09-1787597463210-94282.jpg",
+      "bytes": 177061,
+      "width": 899,
+      "height": 1599,
+      "format": "jpeg"
+    },
+    {
+      "name": "646d8957-12ea-405a-86f2-5830822ae5fa/d086df35-95d2-4c5f-b8ae-6d066eb71ace/10-1787597465071-94281.jpg",
+      "bytes": 190006,
+      "width": 899,
+      "height": 1599,
+      "format": "jpeg"
+    },
+    {
+      "name": "646d8957-12ea-405a-86f2-5830822ae5fa/d086df35-95d2-4c5f-b8ae-6d066eb71ace/07-1787597458869-94288.jpg",
+      "bytes": 313918,
+      "width": 899,
+      "height": 1599,
+      "format": "jpeg"
+    },
+    {
+      "name": "8323e410-3ecc-40da-9082-a32d30c69d21/3b5324f6-4667-4470-9dda-2c9f234b33a6/02-1784982870602-Captura-de-Tela-2026-06-05-a-s-17.05.09.png",
+      "bytes": 326068,
+      "width": 394,
+      "height": 398,
+      "format": "png"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/433f5d60-068e-4c04-8ca3-a5cef7f6d69f/03-1787688535337-03.png",
+      "bytes": 2376542,
+      "width": 941,
+      "height": 1672,
+      "format": "png"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/433f5d60-068e-4c04-8ca3-a5cef7f6d69f/01-1787688532121-01.png",
+      "bytes": 2517870,
+      "width": 941,
+      "height": 1672,
+      "format": "png"
+    },
+    {
+      "name": "8323e410-3ecc-40da-9082-a32d30c69d21/e32474c1-0f36-46b5-a261-9ba73d35cf4c/03-1784914300500-712603630_2049030126041740_2818627292812266198_n.jpg",
+      "bytes": 50742,
+      "width": 526,
+      "height": 526,
+      "format": "jpeg"
+    },
+    {
+      "name": "8323e410-3ecc-40da-9082-a32d30c69d21/e32474c1-0f36-46b5-a261-9ba73d35cf4c/04-1784914301034-715078164_1918843568829813_8697151770379839636_n.jpg",
+      "bytes": 52191,
+      "width": 526,
+      "height": 526,
+      "format": "jpeg"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/433f5d60-068e-4c04-8ca3-a5cef7f6d69f/04-1787688537256-04.png",
+      "bytes": 2480124,
+      "width": 1672,
+      "height": 941,
+      "format": "png"
+    },
+    {
+      "name": "8323e410-3ecc-40da-9082-a32d30c69d21/e32474c1-0f36-46b5-a261-9ba73d35cf4c/01-1784914299277-711846582_1156947199942289_3564460891340361974_n.jpg",
+      "bytes": 52036,
+      "width": 526,
+      "height": 526,
+      "format": "jpeg"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/433f5d60-068e-4c04-8ca3-a5cef7f6d69f/02-1787688533818-02.png",
+      "bytes": 2423642,
+      "width": 1672,
+      "height": 941,
+      "format": "png"
+    },
+    {
+      "name": "8323e410-3ecc-40da-9082-a32d30c69d21/e32474c1-0f36-46b5-a261-9ba73d35cf4c/02-1784914299848-711865188_1315796329977733_6228651121257890602_n.jpg",
+      "bytes": 47497,
+      "width": 526,
+      "height": 526,
+      "format": "jpeg"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/433f5d60-068e-4c04-8ca3-a5cef7f6d69f/07-1787688542585-08.jfif",
+      "bytes": 167554,
+      "width": 900,
+      "height": 1600,
+      "format": "jpeg"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/433f5d60-068e-4c04-8ca3-a5cef7f6d69f/05-1787688538864-05.png",
+      "bytes": 2529939,
+      "width": 941,
+      "height": 1672,
+      "format": "png"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/433f5d60-068e-4c04-8ca3-a5cef7f6d69f/06-1787688540475-06.png",
+      "bytes": 2740592,
+      "width": 941,
+      "height": 1672,
+      "format": "png"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/810d49fe-fc0d-4f2f-bb35-67b1877ed106/02-1787688066264-02-nova.png",
+      "bytes": 2449519,
+      "width": 941,
+      "height": 1672,
+      "format": "png"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/810d49fe-fc0d-4f2f-bb35-67b1877ed106/03-1787688068025-03---nova.png",
+      "bytes": 2506573,
+      "width": 1672,
+      "height": 941,
+      "format": "png"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/810d49fe-fc0d-4f2f-bb35-67b1877ed106/01-1787688064098-01-NOVA.png",
+      "bytes": 2674654,
+      "width": 1672,
+      "height": 941,
+      "format": "png"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/810d49fe-fc0d-4f2f-bb35-67b1877ed106/05-1787688071695-05---Nova.png",
+      "bytes": 2580169,
+      "width": 1672,
+      "height": 940,
+      "format": "png"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/810d49fe-fc0d-4f2f-bb35-67b1877ed106/04-1787688069753-04--nova.png",
+      "bytes": 2559197,
+      "width": 1672,
+      "height": 941,
+      "format": "png"
+    },
+    {
+      "name": "bc179333-8c6d-4e0f-8e46-a95dca0d46fc/02318d1e-15d9-41df-9b08-655d4d1681b8/02-1784486831063-20240410_170440.jpg",
+      "bytes": 1415825,
+      "width": 3885,
+      "height": 1992,
+      "format": "jpeg"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/810d49fe-fc0d-4f2f-bb35-67b1877ed106/06-1787688073206-06-Nova.png",
+      "bytes": 2684380,
+      "width": 1672,
+      "height": 940,
+      "format": "png"
+    },
+    {
+      "name": "bc179333-8c6d-4e0f-8e46-a95dca0d46fc/02318d1e-15d9-41df-9b08-655d4d1681b8/05-1784486832763-WhatsApp-Image-2026-07-19-at-15.21.10.jpeg",
+      "bytes": 65724,
+      "width": 720,
+      "height": 1600,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/0cf81129-f4f1-4313-baa8-f23f16682e14/01-1784317986616-WhatsApp-Image-2026-07-17-at-16.14.52--2-.jpeg",
+      "bytes": 223637,
+      "width": 1280,
+      "height": 960,
+      "format": "jpeg"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/810d49fe-fc0d-4f2f-bb35-67b1877ed106/08-1787688076769-08-Nova.png",
+      "bytes": 2715801,
+      "width": 1672,
+      "height": 941,
+      "format": "png"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/810d49fe-fc0d-4f2f-bb35-67b1877ed106/07-1787688074831-07-Nova.png",
+      "bytes": 2580136,
+      "width": 1086,
+      "height": 1448,
+      "format": "png"
+    },
+    {
+      "name": "a3685c77-8cbd-418b-ba16-1b1149d7903f/810d49fe-fc0d-4f2f-bb35-67b1877ed106/09-1787688078656-09-nova.png",
+      "bytes": 2433522,
+      "width": 1672,
+      "height": 941,
+      "format": "png"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/0cf81129-f4f1-4313-baa8-f23f16682e14/02-1784317988026-WhatsApp-Image-2026-07-17-at-16.14.52--1-.jpeg",
+      "bytes": 191234,
+      "width": 1280,
+      "height": 960,
+      "format": "jpeg"
+    },
+    {
+      "name": "bc179333-8c6d-4e0f-8e46-a95dca0d46fc/02318d1e-15d9-41df-9b08-655d4d1681b8/06-1784486833275-20230813_144938.jpg",
+      "bytes": 4536898,
+      "width": 4032,
+      "height": 3024,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/0cf81129-f4f1-4313-baa8-f23f16682e14/03-1784317988775-WhatsApp-Image-2026-07-17-at-16.14.52.jpeg",
+      "bytes": 209006,
+      "width": 1280,
+      "height": 960,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/0cf81129-f4f1-4313-baa8-f23f16682e14/04-1784317989534-WhatsApp-Image-2026-07-17-at-16.14.51--1-.jpeg",
+      "bytes": 215884,
+      "width": 1280,
+      "height": 960,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/4e554b6c-10f3-4294-b47e-2d71a8bbfcc8/01-1784321336063-WhatsApp-Image-2026-07-16-at-17.45.13.jpeg",
+      "bytes": 218087,
+      "width": 1600,
+      "height": 1200,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/4e554b6c-10f3-4294-b47e-2d71a8bbfcc8/03-1784321337762-WhatsApp-Image-2026-07-16-at-17.45.08.jpeg",
+      "bytes": 258284,
+      "width": 1600,
+      "height": 1200,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/e82d6d43-4120-41c9-b669-85f2ad690d51/01-1784320335577-WhatsApp-Image-2026-07-17-at-17.01.30--5-.jpeg",
+      "bytes": 196131,
+      "width": 1280,
+      "height": 960,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/4e554b6c-10f3-4294-b47e-2d71a8bbfcc8/02-1784321336933-WhatsApp-Image-2026-07-16-at-17.45.12.jpeg",
+      "bytes": 413291,
+      "width": 1600,
+      "height": 1200,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/4e554b6c-10f3-4294-b47e-2d71a8bbfcc8/04-1784321338482-WhatsApp-Image-2026-07-16-at-17.45.06.jpeg",
+      "bytes": 266782,
+      "width": 1600,
+      "height": 1200,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/e82d6d43-4120-41c9-b669-85f2ad690d51/02-1784320336695-WhatsApp-Image-2026-07-17-at-17.01.30--4-.jpeg",
+      "bytes": 130727,
+      "width": 1280,
+      "height": 960,
+      "format": "jpeg"
+    },
+    {
+      "name": "f3c9a3c8-81fc-406a-ab41-acc5b8b6a2fe/2cdb6632-cc74-4370-aef3-8dff4b95521a/01-1787766379704-IMG_1288.jpeg",
+      "bytes": 4209908,
+      "width": 5712,
+      "height": 4284,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/e82d6d43-4120-41c9-b669-85f2ad690d51/04-1784320337890-WhatsApp-Image-2026-07-17-at-17.01.30--2-.jpeg",
+      "bytes": 216763,
+      "width": 1280,
+      "height": 960,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/e82d6d43-4120-41c9-b669-85f2ad690d51/03-1784320337255-WhatsApp-Image-2026-07-17-at-17.01.30--3-.jpeg",
+      "bytes": 181214,
+      "width": 1280,
+      "height": 960,
+      "format": "jpeg"
+    },
+    {
+      "name": "c38b8b09-016e-4cea-9eb2-de2292d13644/e82d6d43-4120-41c9-b669-85f2ad690d51/05-1784320338450-WhatsApp-Image-2026-07-17-at-17.01.29.jpeg",
+      "bytes": 200495,
+      "width": 1280,
+      "height": 960,
+      "format": "jpeg"
+    },
+    {
+      "name": "f3c9a3c8-81fc-406a-ab41-acc5b8b6a2fe/66680f1f-49b1-4362-8892-86fdf09cea0c/01-1787764370826-IMG_1264.png",
+      "bytes": 3979451,
+      "width": 1179,
+      "height": 2556,
+      "format": "png"
+    },
+    {
+      "name": "f3c9a3c8-81fc-406a-ab41-acc5b8b6a2fe/66680f1f-49b1-4362-8892-86fdf09cea0c/04-1787764377627-IMG_1263.jpeg",
+      "bytes": 265975,
+      "width": 1179,
+      "height": 1529,
+      "format": "jpeg"
+    },
+    {
+      "name": "f3c9a3c8-81fc-406a-ab41-acc5b8b6a2fe/2cdb6632-cc74-4370-aef3-8dff4b95521a/04-1787766385341-IMG_1289.jpeg",
+      "bytes": 4100719,
+      "width": 5712,
+      "height": 4284,
+      "format": "jpeg"
+    },
+    {
+      "name": "f3c9a3c8-81fc-406a-ab41-acc5b8b6a2fe/2cdb6632-cc74-4370-aef3-8dff4b95521a/03-1787766383299-IMG_1287.jpeg",
+      "bytes": 3523510,
+      "width": 5712,
+      "height": 4284,
+      "format": "jpeg"
+    },
+    {
+      "name": "f3c9a3c8-81fc-406a-ab41-acc5b8b6a2fe/1b06779d-e895-49ac-9e79-fc118d4fcf5c/05-1787767186133-IMG_1284.jpeg",
+      "bytes": 4352950,
+      "width": 5712,
+      "height": 4284,
+      "format": "jpeg"
+    },
+    {
+      "name": "f3c9a3c8-81fc-406a-ab41-acc5b8b6a2fe/66680f1f-49b1-4362-8892-86fdf09cea0c/02-1787764373174-IMG_1265.png",
+      "bytes": 3714276,
+      "width": 1179,
+      "height": 2556,
+      "format": "png"
+    },
+    {
+      "name": "f3c9a3c8-81fc-406a-ab41-acc5b8b6a2fe/2cdb6632-cc74-4370-aef3-8dff4b95521a/02-1787766381343-IMG_1286.jpeg",
+      "bytes": 4051714,
+      "width": 5712,
+      "height": 4284,
+      "format": "jpeg"
+    },
+    {
+      "name": "f3c9a3c8-81fc-406a-ab41-acc5b8b6a2fe/ebfc269b-ab2f-46c6-95d2-7f1074cf5f97/04-1787766195862-IMG_1289.jpeg",
+      "bytes": 4100719,
+      "width": 5712,
+      "height": 4284,
+      "format": "jpeg"
+    },
+    {
+      "name": "f3c9a3c8-81fc-406a-ab41-acc5b8b6a2fe/66680f1f-49b1-4362-8892-86fdf09cea0c/03-1787764375006-IMG_1266.png",
+      "bytes": 6532432,
+      "width": 1179,
+      "height": 2556,
+      "format": "png"
+    }
+  ]
+}

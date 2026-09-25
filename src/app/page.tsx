@@ -5,6 +5,7 @@ import {
   MapPin, Plus, Zap, Gauge, Calendar as CalendarIcon, Settings2,
 } from 'lucide-react'
 import { getLatestPublicListings } from '@/lib/marketplace-server'
+import { getFipeDifferencePercent } from '@/lib/marketplace'
 import { formatBRL, cars } from '@/data/cars'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
 import ModelComparison from '@/components/home/ModelComparison'
@@ -12,6 +13,8 @@ import RankingsBanner from '@/components/home/RankingsBanner'
 import HomeCounters from '@/components/home/HomeCounters'
 import PlateBannerLookup from '@/components/marketplace/PlateBannerLookup'
 import ExploreCarousel from '@/components/home/ExploreCarousel'
+import RotatingHeroWord from '@/components/home/RotatingHeroWord'
+import buildCardsLayout from '@/components/home/BuildCardsCollage.module.css'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,8 +39,12 @@ export const metadata: Metadata = {
 type Listing = Awaited<ReturnType<typeof getLatestPublicListings>>[number]
 
 function fipePercent(listing: Listing) {
-  if (typeof listing.fipe_difference_percent !== 'number') return null
-  return Math.round(listing.fipe_difference_percent)
+  const difference = getFipeDifferencePercent(
+    listing.price,
+    listing.fipe_price,
+    listing.fipe_difference_percent,
+  )
+  return difference === null ? null : Math.round(difference)
 }
 
 export default async function HomePage() {
@@ -97,8 +104,13 @@ export default async function HomePage() {
         <div className="cb-wrap">
           <div className="cb-hero-grid">
             <div className="cb-hero-copy">
-              <h1 className="cb-hero-title">
-                Encontre o carro <u>certo</u>, sem complicação.
+              <h1
+                className="cb-hero-title"
+                aria-label="Encontre, compre, venda ou pesquise o carro certo, sem complicação."
+              >
+                <span aria-hidden="true">
+                  <RotatingHeroWord /> o carro <u>certo</u>, sem complicação.
+                </span>
               </h1>
               <p className="cb-hero-lead">
                 Anuncie grátis, compare com a FIPE e negocie direto com o vendedor.
@@ -138,9 +150,41 @@ export default async function HomePage() {
                 fetchPriority="high"
               />
             </div>
+
           </div>
 
           <HomeCounters />
+        </div>
+      </section>
+
+      {/* ═══ BUILD / SOLUTIONS ═══ */}
+      <section className="cb-section-pad cb-build-section">
+        <div className="cb-wrap">
+          <div className="cb-head cb-build-head">
+            <div>
+              <h2>Recursos para comprar e vender melhor</h2>
+            </div>
+          </div>
+          <div className={`cb-build-grid ${buildCardsLayout.grid}`}>
+            <Link href="/qual-carro" className={`cb-build-card cb-build-card-lime ${buildCardsLayout.card} ${buildCardsLayout.fipe}`}>
+              <div>
+                <h3>Compare com a FIPE</h3>
+                <p>Saiba se o preço está justo antes de fechar negócio.</p>
+              </div>
+              <span className="cb-build-cta">
+                Comparar agora <ArrowRight size={16} />
+              </span>
+            </Link>
+            <Link href="/trafego-pago-gratis" className={`cb-build-card cb-build-card-light ${buildCardsLayout.card} ${buildCardsLayout.traffic}`}>
+              <div>
+                <h3>Tráfego pago grátis</h3>
+                <p>Divulgamos seus anúncios no Google e Meta Ads sem custo.</p>
+              </div>
+              <span className="cb-build-cta">
+                Saiba mais <ArrowRight size={16} />
+              </span>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -152,11 +196,10 @@ export default async function HomePage() {
       </section>
 
       {/* ═══ LISTINGS TABLE ═══ */}
-      <section className="cb-section-pad">
+      <section className="cb-section-pad cb-stock-section">
         <div className="cb-wrap">
           <div className="cb-head">
             <div>
-              <p className="cb-eyebrow">Estoque selecionado</p>
               <h2>Os anúncios mais procurados desta semana</h2>
             </div>
             <Link href="/carros-a-venda" className="cb-head-link">
@@ -225,12 +268,16 @@ export default async function HomePage() {
 
                       <div className="cb-listing-card-footer">
                         <strong className="cb-listing-card-price-main">{formatBRL(Number(listing.price))}</strong>
-                        {fipe !== null ? (
-                          <span className={`cb-listing-fipe-inline ${fipe <= 0 ? 'is-good' : 'is-bad'}`}>
-                            {fipe <= 0 ? <TrendingDown size={10} /> : <TrendingUp size={10} />}
-                            {Math.abs(fipe)}% {fipe <= 0 ? 'abaixo da FIPE' : 'acima da FIPE'}
-                          </span>
-                        ) : null}
+                        <span className={`cb-listing-fipe-inline ${fipe === null ? 'is-unavailable' : fipe <= -3 ? 'is-good' : fipe >= 3 ? 'is-bad' : 'is-neutral'}`}>
+                          {fipe === null ? null : fipe <= -3 ? <TrendingDown size={10} /> : fipe >= 3 ? <TrendingUp size={10} /> : null}
+                          {fipe === null
+                            ? 'FIPE indisponível'
+                            : fipe <= -3
+                              ? `${Math.abs(fipe)}% abaixo da FIPE`
+                              : fipe >= 3
+                                ? `${Math.abs(fipe)}% acima da FIPE`
+                                : 'Na média da FIPE'}
+                        </span>
                         <span className="cb-listing-card-arrow" aria-hidden="true">
                           <ArrowRight size={14} />
                         </span>
@@ -307,44 +354,6 @@ export default async function HomePage() {
 
           <div className="cb-process-visual">
             <img src="/images/ChatGPT Image 31 de ago. de 2026, 22_12_52-2.png" alt="Chat interno Carbi" loading="lazy" />
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ BUILD / SOLUTIONS ═══ */}
-      <section className="cb-section-pad cb-build-section">
-        <div className="cb-wrap">
-          <div className="cb-build-grid">
-            <Link href="/anunciar-carro" className="cb-build-card cb-build-card-dark">
-              <div>
-                <div className="cb-build-card-tag">Para vender</div>
-                <h3>Anuncie grátis em 2 minutos</h3>
-                <p>Seu anúncio com fotos, FIPE verificada e alcance de milhares de compradores.</p>
-              </div>
-              <span className="cb-build-cta">
-                Anunciar meu carro <ArrowRight size={16} />
-              </span>
-            </Link>
-            <Link href="/qual-carro" className="cb-build-card cb-build-card-lime">
-              <div>
-                <div className="cb-build-card-tag">Para comparar</div>
-                <h3>Compare com a FIPE</h3>
-                <p>Saiba se o preço está justo antes de fechar negócio.</p>
-              </div>
-              <span className="cb-build-cta">
-                Comparar agora <ArrowRight size={16} />
-              </span>
-            </Link>
-            <Link href="/trafego-pago-gratis" className="cb-build-card cb-build-card-light">
-              <div>
-                <div className="cb-build-card-tag">Para vender</div>
-                <h3>Tráfego pago grátis</h3>
-                <p>Divulgamos seus anúncios no Google e Meta Ads sem custo.</p>
-              </div>
-              <span className="cb-build-cta">
-                Saiba mais <ArrowRight size={16} />
-              </span>
-            </Link>
           </div>
         </div>
       </section>

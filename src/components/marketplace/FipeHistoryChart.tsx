@@ -5,11 +5,12 @@ import { Loader2, TrendingDown } from 'lucide-react'
 import { formatBRL } from '@/data/cars'
 
 interface Props {
+  listingId: string
   brand: string
   model: string
   version?: string | null
   year: number
-  currentFipePrice: number
+  currentFipePrice?: number | null
 }
 
 interface DataPoint {
@@ -18,22 +19,23 @@ interface DataPoint {
   priceNum: number
 }
 
-export default function FipeHistoryChart({ brand, model, version, year, currentFipePrice }: Props) {
+export default function FipeHistoryChart({ listingId, brand, model, version, year, currentFipePrice }: Props) {
   const [data, setData] = useState<DataPoint[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [historySource, setHistorySource] = useState<'historical' | 'current-snapshot'>('historical')
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
-        const params = new URLSearchParams({ brand, model, year: String(year) })
-        if (version) params.set('version', version)
+        const params = new URLSearchParams({ listingId })
         const res = await fetch(`/api/fipe/history?${params}`)
         if (!res.ok) throw new Error('API error')
         const result: DataPoint[] = await res.json()
         if (!cancelled) {
           setData(result)
+          setHistorySource(res.headers.get('x-fipe-history-source') === 'current-snapshot' ? 'current-snapshot' : 'historical')
           if (result.length === 0) setError(true)
         }
       } catch {
@@ -43,20 +45,26 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
       }
     })()
     return () => { cancelled = true }
-  }, [brand, model, version, year])
+  }, [listingId, brand, model, version, year])
 
   if (loading) {
     return (
       <section className="fingen-detail-card-dark">
-        <div className="flex items-center justify-center py-6">
+        <div className="fingen-detail-dark-header">
+          <h3 style={{ color: '#FFFFFF' }}>Histórico FIPE</h3>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Carregando…</span>
+        </div>
+        <div className="flex items-center justify-center gap-2 py-6" role="status" aria-live="polite">
           <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'rgba(255,255,255,0.4)' }} />
+          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Carregando histórico FIPE…</span>
         </div>
       </section>
     )
   }
 
-  const maxPrice = Math.max(...data.map(d => d.priceNum), currentFipePrice)
-  const minPrice = Math.min(...data.map(d => d.priceNum), currentFipePrice)
+  const values = [...data.map(d => d.priceNum), ...(currentFipePrice && currentFipePrice > 0 ? [currentFipePrice] : [])]
+  const maxPrice = values.length > 0 ? Math.max(...values) : 0
+  const minPrice = values.length > 0 ? Math.min(...values) : 0
   const range = maxPrice - minPrice || 1
 
   return (
@@ -64,7 +72,9 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
       <div className="fingen-detail-dark-header">
         <h3 style={{ color: '#FFFFFF' }}>Histórico FIPE</h3>
         {data.length > 0 ? (
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>últimos {data.length} registros</span>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+            {historySource === 'current-snapshot' ? 'último valor salvo' : `últimos ${data.length} registros`}
+          </span>
         ) : null}
       </div>
 
@@ -122,7 +132,7 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
             )
           })}
 
-          <div style={{
+          {data.length > 1 && <div style={{
             marginTop: 12,
             padding: '10px 12px',
             background: 'rgba(255,255,255,0.04)',
@@ -135,7 +145,12 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
           }}>
             <TrendingDown size={14} />
             Variação de {formatBRL(minPrice)} a {formatBRL(maxPrice)}
-          </div>
+          </div>}
+          {historySource === 'current-snapshot' && (
+            <p style={{ marginTop: 10, fontSize: 12, lineHeight: 1.5, color: 'rgba(255,255,255,0.55)' }}>
+              A FIPE não disponibilizou a série histórica agora. Este é o último valor salvo pela consulta da placa.
+            </p>
+          )}
         </div>
       ) : (
         <div style={{
@@ -147,7 +162,7 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
           fontSize: 13,
           color: 'rgba(255,255,255,0.4)',
         }}>
-          Histórico FIPE indisponível para este veículo
+          Histórico FIPE indisponível no momento.
         </div>
       )}
 

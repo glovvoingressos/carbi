@@ -1,7 +1,6 @@
+import { cache } from 'react'
 import { getSupabaseServerClient, getSupabaseAdminClient, isSupabaseConfigured } from '@/lib/supabase-server'
-import { ListingPublic } from '@/lib/marketplace'
-import { getFipePrice } from '@/lib/fipe-api'
-import { parseFipePriceToNumber } from '@/lib/marketplace'
+import { ListingPublic, sanitizeVehicleStructuredData } from '@/lib/marketplace'
 import { classifyVehicleCategory, classifyByFuelType } from '@/lib/vehicle-category'
 import { applyTruckQueryFilters } from '@/lib/truck-filters'
 import { normalizeListingImages } from '@/lib/listing-images'
@@ -81,9 +80,58 @@ type ListingPriceHistoryRow = {
   changed_at: string
 }
 
-type FipeFallbackValue = {
-  price: number | null
-  referenceMonth: string | null
+type VehicleFipeSnapshot = {
+  id: string
+  fipe_price: number | string | null
+  fipe_reference_month: string | null
+}
+
+export function restoreListingFipeSnapshots<T extends Pick<ListingPublic, 'vehicle_id' | 'fipe_price' | 'fipe_reference_month' | 'price' | 'fipe_difference_value' | 'fipe_difference_percent'>>(
+  listings: T[],
+  vehicles: VehicleFipeSnapshot[],
+): T[] {
+  const snapshotsByVehicle = new Map(vehicles.map(vehicle => [vehicle.id, vehicle]))
+
+  return listings.map(listing => {
+    if (Number(listing.fipe_price) > 0 || !listing.vehicle_id) return listing
+    const snapshot = snapshotsByVehicle.get(listing.vehicle_id)
+    const fipePrice = Number(snapshot?.fipe_price)
+    if (!snapshot || !Number.isFinite(fipePrice) || fipePrice <= 0) return listing
+
+    const price = Number(listing.price)
+    const difference = Number.isFinite(price) ? Number((price - fipePrice).toFixed(2)) : null
+    const differencePercent = difference == null
+      ? null
+      : Number(((difference / fipePrice) * 100).toFixed(3))
+
+    return {
+      ...listing,
+      fipe_price: fipePrice,
+      fipe_reference_month: listing.fipe_reference_month || snapshot.fipe_reference_month,
+      fipe_difference_value: difference,
+      fipe_difference_percent: differencePercent,
+    }
+  })
+}
+
+async function restoreMissingListingFipeSnapshots<T extends Pick<ListingPublic, 'vehicle_id' | 'fipe_price' | 'fipe_reference_month' | 'price' | 'fipe_difference_value' | 'fipe_difference_percent'>>(
+  listings: T[],
+): Promise<T[]> {
+  const vehicleIds = [...new Set(listings
+    .filter(listing => !(Number(listing.fipe_price) > 0) && listing.vehicle_id)
+    .map(listing => listing.vehicle_id as string))]
+  if (!vehicleIds.length) return listings
+
+  try {
+    const { data, error } = await getSupabaseServerClient()
+      .from('vehicles')
+      .select('id, fipe_price, fipe_reference_month')
+      .in('id', vehicleIds)
+    if (error || !Array.isArray(data)) return listings
+    return restoreListingFipeSnapshots(listings, data as VehicleFipeSnapshot[])
+  } catch {
+    return listings
+  }
 }
 
 function isMissingRelationError(message?: string): boolean {
@@ -118,7 +166,9 @@ function applyTextSearch<T>(query: T, inputQuery?: string): T {
 }
 
 function normalizeTableRow(row: ListingRow): ListingPublic {
-  const structured = row.structured_data || row.technical_data || {}
+  const publicRow = { ...row }
+  delete publicRow.vin
+  const structured = sanitizeVehicleStructuredData(row.structured_data || row.technical_data || {})
   const normalizedTruck = row.vehicle_type === 'truck' ? {
     truck_type: row.truck_type || (structured.truck_type as string | undefined) || null,
     load_capacity: row.load_capacity ?? (structured.load_capacity as number | undefined) ?? null,
@@ -135,7 +185,10 @@ function normalizeTableRow(row: ListingRow): ListingPublic {
     || null
   
   return {
-    ...row,
+    ...publicRow,
+    plate_final: null,
+    structured_data: structured,
+    technical_data: sanitizeVehicleStructuredData(row.technical_data || {}),
     ...normalizedTruck,
     category,
     images: normalizeListingImages(row.images),
@@ -183,12 +236,10 @@ function buildBadges(listing: ListingPublic, history: ListingPriceHistoryRow[]):
 
 export async function enrichListingSignals(
   listings: ListingPublic[],
-  options: { hydrateFipe?: boolean } = {},
 ): Promise<ListingPublic[]> {
   if (!listings.length) return listings
-  const hydratedListings = options.hydrateFipe === false ? listings : await hydrateMissingFipePrices(listings)
   const supabase = getSupabaseServerClient()
-  const listingIds = hydratedListings.map((item) => item.id)
+  const listingIds = listings.map((item) => item.id)
   const historyByListing = new Map<string, ListingPriceHistoryRow[]>()
 
   const { data: historyData, error: historyError } = await supabase
@@ -205,7 +256,7 @@ export async function enrichListingSignals(
     }
   }
 
-  return hydratedListings.map((listing) => {
+  return listings.map((listing) => {
     const history = historyByListing.get(listing.id) || []
     const lastChange = history[0] || null
     const changesLast30d = history.filter((row) => {
@@ -227,49 +278,6 @@ export async function enrichListingSignals(
       },
     }
   })
-}
-
-async function hydrateMissingFipePrices(listings: ListingPublic[]): Promise<ListingPublic[]> {
-  const cache = new Map<string, FipeFallbackValue>()
-
-  return Promise.all(
-    listings.map(async (listing) => {
-      if (typeof listing.fipe_price === 'number' && listing.fipe_price > 0) return listing
-
-      const key = `${listing.brand}|${listing.model}|${listing.year_model}|${listing.version || ''}`
-      if (!cache.has(key)) {
-        try {
-          const detail = await getFipePrice(
-            listing.brand,
-            listing.model,
-            listing.year_model,
-            listing.version || undefined,
-          )
-          const parsed = detail?.price ? parseFipePriceToNumber(detail.price) : 0
-          cache.set(key, {
-            price: Number.isFinite(parsed) && parsed > 0 ? parsed : null,
-            referenceMonth: detail?.referenceMonth || null,
-          })
-        } catch {
-          cache.set(key, { price: null, referenceMonth: null })
-        }
-      }
-
-      const fallback = cache.get(key)
-      if (!fallback?.price) return listing
-
-      const diffValue = Number(listing.price) - fallback.price
-      const diffPercent = fallback.price > 0 ? (diffValue / fallback.price) * 100 : null
-
-      return {
-        ...listing,
-        fipe_price: fallback.price,
-        fipe_reference_month: listing.fipe_reference_month || fallback.referenceMonth,
-        fipe_difference_value: Number.isFinite(diffValue) ? diffValue : null,
-        fipe_difference_percent: diffPercent !== null && Number.isFinite(diffPercent) ? diffPercent : null,
-      }
-    })
-  )
 }
 
 async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]> {
@@ -295,16 +303,17 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
    if (!viewError) {
      if (!viewData) return []
      const rows = Array.isArray(viewData) ? (viewData as ListingRow[]) : [viewData as ListingRow]
+     const rowsWithFipe = await restoreMissingListingFipeSnapshots(rows)
      try {
-       const ids = rows.map(row => row.id)
+       const ids = rowsWithFipe.map(row => row.id)
        const extras = await supabase.from('vehicle_listings_public').select('id, structured_data, cabin_type, pbt, cmt, truck_category, chassis').in('id', ids)
        if (!extras.error && Array.isArray(extras.data)) {
          const byId = new Map(extras.data.map(row => [row.id, row]))
-         return rows.map(row => normalizeTableRow({ ...row, ...(byId.get(row.id) || {}) }))
+         return rowsWithFipe.map(row => normalizeTableRow({ ...row, ...(byId.get(row.id) || {}) }))
        }
      } catch {
      }
-     return rows.map(normalizeTableRow)
+     return rowsWithFipe.map(normalizeTableRow)
    }
 
 
@@ -338,7 +347,6 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
       optional_items,
       engine,
       horsepower,
-      plate_final,
       doors,
       fipe_price,
       fipe_difference_value,
@@ -400,7 +408,8 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
      }
    } catch {
    }
-   return rows.map(normalizeTableRow)
+   const rowsWithFipe = await restoreMissingListingFipeSnapshots(rows)
+   return rowsWithFipe.map(normalizeTableRow)
 
 }
 
@@ -410,13 +419,13 @@ export async function queryPublicListings(input: ListingQueryInput): Promise<Lis
   return enrichListingSignals(listings)
 }
 
-export async function getPublicListingBySlug(slug: string): Promise<ListingPublic | null> {
+export const getPublicListingBySlug = cache(async (slug: string): Promise<ListingPublic | null> => {
   if (!isSupabaseConfigured()) return null
   const results = await queryListings({ slug, single: true, limit: 1 })
   if (!results[0]) return null
   const [enriched] = await enrichListingSignals(results)
   return enriched || null
-}
+})
 
 export async function getRelatedListings(params: {
   brand: string
@@ -440,8 +449,8 @@ export async function getRelatedListings(params: {
 export async function getLatestPublicListings(limit = 8): Promise<ListingPublic[]> {
   if (!isSupabaseConfigured()) return []
   const listings = await queryListings({ limit })
-  // Homepage cards use persisted FIPE data; don't fan out to the external API for every missing value.
-  return enrichListingSignals(listings, { hydrateFipe: false })
+  // Use the FIPE snapshot persisted during the Placa API lookup; don't re-query a provider here.
+  return enrichListingSignals(listings)
 }
 
 export async function searchPublicListings(query: string, limit = 24): Promise<ListingPublic[]> {
@@ -480,6 +489,7 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
     .select(`
       id,
       user_id,
+      vehicle_id,
       title,
       description,
       brand,
@@ -498,7 +508,6 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
       optional_items,
       engine,
       horsepower,
-      plate_final,
       doors,
       fipe_price,
       fipe_difference_value,
@@ -600,6 +609,7 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
    } catch {
    }
 
+   dataWithImages = await restoreMissingListingFipeSnapshots(dataWithImages)
    const normalized = dataWithImages.map(normalizeTableRow)
 
   const items = await enrichListingSignals(normalized)

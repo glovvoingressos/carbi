@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
 import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2, Check, Sparkles } from 'lucide-react'
 import Link from 'next/link'
-import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
+import type { FipeResult } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import { resolveSessionOrTimeout } from '@/lib/session-ready'
 import { trackEvent } from '@/lib/analytics'
@@ -74,6 +74,8 @@ type PlateFormData = {
   version: string
   fipePrice?: number | null
   fipeReference?: string | null
+  fipeModelName?: string | null
+  fipeCode?: string | null
   truck_type?: string | null
   truck_body_type?: string | null
   load_capacity?: number | null
@@ -105,7 +107,6 @@ interface FormState {
   optionalItems: string
   engine: string
   horsepower: string
-  plateFinal: string
   doors: string
   vin: string
   truck_type: string
@@ -117,6 +118,13 @@ interface FormState {
   cmt: string
   truck_category: string
   structured_data: Record<string, unknown>
+  private_plate: string
+  private_lookup_brand: string
+  private_lookup_model: string
+  private_lookup_year_model: string
+  private_lookup_version: string
+  private_fipe_model_name: string
+  private_fipe_code: string
 }
 
 const LISTING_FLOW_STEPS = [
@@ -171,7 +179,6 @@ const INITIAL_STATE: FormState = {
   optionalItems: '',
   engine: '',
   horsepower: '',
-  plateFinal: '',
   doors: '',
   vin: '',
   truck_type: '',
@@ -183,6 +190,13 @@ const INITIAL_STATE: FormState = {
   cmt: '',
   truck_category: '',
   structured_data: {},
+  private_plate: '',
+  private_lookup_brand: '',
+  private_lookup_model: '',
+  private_lookup_year_model: '',
+  private_lookup_version: '',
+  private_fipe_model_name: '',
+  private_fipe_code: '',
 
 }
 
@@ -295,22 +309,12 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const [form, setForm] = useState<FormState>({ ...INITIAL_STATE, vehicle_type: vehicleType })
   const [images, setImages] = useState<UploadImageItem[]>([])
 
-  const [brands, setBrands] = useState<FipeItem[]>([])
-  const [models, setModels] = useState<FipeItem[]>([])
-  const [years, setYears] = useState<number[]>([])
-  const [versions, setVersions] = useState<FipeVersionOption[]>([])
-  const [selectedBrandCode, setSelectedBrandCode] = useState('')
-  const [selectedModelCode, setSelectedModelCode] = useState('')
-  const [selectedYear, setSelectedYear] = useState<number | null>(null)
-  const [selectedVersionCode, setSelectedVersionCode] = useState('')
   const [fipeResult, setFipeResult] = useState<FipeResult | null>(null)
   const [catalogCars, setCatalogCars] = useState<CatalogCar[]>([])
   const [technical, setTechnical] = useState<TechnicalSnapshot>(EMPTY_TECHNICAL)
-  const skipFipeClearOnMount = useRef(true)
 
   const [sessionReady, setSessionReady] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [fipeLoading, setFipeLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -340,22 +344,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       .sort((a, b) => b.n.length - a.n.length)
 
     return ranked[0]?.model || rawModelName
-  }
-
-  const clearVehicleDependentFields = (scope: 'brand' | 'model' | 'year') => {
-    setForm((prev) => ({
-      ...prev,
-      model: scope === 'brand' ? '' : prev.model,
-      version: scope === 'brand' || scope === 'model' ? '' : prev.version,
-      year: scope === 'brand' || scope === 'model' || scope === 'year' ? '' : prev.year,
-      yearModel: scope === 'brand' || scope === 'model' || scope === 'year' ? '' : prev.yearModel,
-      engine: '',
-      horsepower: '',
-      fuel: scope === 'brand' || scope === 'model' ? '' : prev.fuel,
-      transmission: '',
-      bodyType: '',
-    }))
-    setTechnical(EMPTY_TECHNICAL)
   }
 
   useEffect(() => {
@@ -410,7 +398,13 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         horsepower: data.potencia || prev.horsepower,
         transmission: data.cambio || 'Automático',
         bodyType: data.tipoVeiculo || prev.bodyType,
-        plateFinal: data.placa || plate,
+        private_plate: data.placa || plate,
+        private_lookup_brand: data.marca || '',
+        private_lookup_model: data.modelo || '',
+        private_lookup_year_model: String(data.anoModelo || data.anoFabricacao || ''),
+        private_lookup_version: data.versao || '',
+        private_fipe_model_name: data.fipe_model_name || '',
+        private_fipe_code: data.fipe_code || '',
       }))
       if (data.fipe_price && data.fipe_price > 0) {
         setFipeResult({
@@ -505,47 +499,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   }, [supabaseReady])
 
   useEffect(() => {
-    if (skipFipeClearOnMount.current) return
-    if (!selectedBrandCode) {
-      clearVehicleDependentFields('brand')
-    }
-  }, [selectedBrandCode])
-
-  useEffect(() => {
-    if (skipFipeClearOnMount.current) return
-    if (!selectedModelCode) {
-      clearVehicleDependentFields('model')
-    }
-  }, [selectedModelCode])
-
-  useEffect(() => {
-    if (skipFipeClearOnMount.current) return
-    if (!selectedYear) {
-      clearVehicleDependentFields('year')
-    }
-  }, [selectedYear])
-
-  useEffect(() => {
-    skipFipeClearOnMount.current = false
-  }, [])
-
-  useEffect(() => {
-    if (currentStep < 2 && listingSubStep < 2) return
-    const loadBrands = async () => {
-      try {
-        const response = await fetch('/api/fipe/brands')
-        if (!response.ok) throw new Error('Falha na consulta de marcas.')
-        const data = (await response.json()) as unknown
-        setBrands(Array.isArray(data) ? (data as FipeItem[]) : [])
-      } catch {
-        setError('Falha ao carregar marcas de referência.')
-      }
-    }
-
-    void loadBrands()
-  }, [currentStep, listingSubStep])
-
-  useEffect(() => {
     if (currentStep < 2) return
     const loadCatalogCars = async () => {
       try {
@@ -562,140 +515,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
     void loadCatalogCars()
   }, [currentStep])
-
-  useEffect(() => {
-    if (!selectedBrandCode) {
-      setModels([])
-      setSelectedModelCode('')
-      return
-    }
-
-    const loadModels = async () => {
-      try {
-        const response = await fetch(`/api/fipe/models?brandCode=${selectedBrandCode}`)
-        if (!response.ok) throw new Error('Falha na consulta de modelos.')
-        const data = (await response.json()) as unknown
-        setModels(Array.isArray(data) ? (data as FipeItem[]) : [])
-      } catch {
-        setError('Falha ao carregar modelos.')
-      }
-      setSelectedModelCode('')
-      setYears([])
-      setSelectedYear(null)
-      setVersions([])
-      setSelectedVersionCode('')
-      setFipeResult(null)
-    }
-
-    void loadModels()
-  }, [selectedBrandCode])
-
-  useEffect(() => {
-    if (!selectedBrandCode || !selectedModelCode) {
-      setYears([])
-      setSelectedYear(null)
-      return
-    }
-
-    const loadYears = async () => {
-      try {
-        const response = await fetch(`/api/fipe/years?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}`)
-        if (!response.ok) throw new Error('Falha na consulta de anos.')
-        const data = (await response.json()) as unknown
-        setYears(Array.isArray(data) ? (data as number[]) : [])
-      } catch {
-        setError('Falha ao carregar anos.')
-      }
-      setSelectedYear(null)
-      setVersions([])
-      setSelectedVersionCode('')
-      setFipeResult(null)
-    }
-
-    void loadYears()
-  }, [selectedBrandCode, selectedModelCode])
-
-  useEffect(() => {
-    if (!selectedBrandCode || !selectedModelCode || !selectedYear) {
-      setVersions([])
-      setSelectedVersionCode('')
-      setFipeResult(null)
-      return
-    }
-
-    const loadVersions = async () => {
-      try {
-        const response = await fetch(
-          `/api/fipe/versions?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}&year=${selectedYear}`,
-        )
-        if (!response.ok) throw new Error('Falha na consulta de versões.')
-        const data = (await response.json()) as unknown
-        setVersions(Array.isArray(data) ? (data as FipeVersionOption[]) : [])
-      } catch {
-        setError('Falha ao carregar versões.')
-      }
-      setSelectedVersionCode('')
-      setFipeResult(null)
-    }
-
-    void loadVersions()
-  }, [selectedBrandCode, selectedModelCode, selectedYear])
-
-  useEffect(() => {
-    if (!selectedYear) return
-    if (versions.length === 0) {
-      setSelectedVersionCode('')
-      setFipeResult(null)
-      return
-    }
-
-    const preserved = versions.find((item) => item.code === selectedVersionCode)
-    const nextCode = preserved?.code || versions[0]?.code || ''
-    if (!nextCode || nextCode === selectedVersionCode) return
-
-    const selected = versions.find((item) => item.code === nextCode)
-    setSelectedVersionCode(nextCode)
-    setForm((prev) => ({
-      ...prev,
-      fuel: selected?.fuelType || prev.fuel,
-      version: selected?.name || prev.version,
-    }))
-  }, [selectedYear, selectedVersionCode, versions])
-
-  useEffect(() => {
-    if (!selectedBrandCode || !selectedModelCode || !selectedVersionCode) {
-      setFipeResult(null)
-      return
-    }
-
-    const loadFipe = async () => {
-      setFipeLoading(true)
-      try {
-        const response = await fetch(
-          `/api/fipe/detail?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}&yearCode=${selectedVersionCode}`,
-        )
-        if (!response.ok) {
-          setFipeResult(null)
-          setError('Não foi possível obter o valor atualizado para esta versão.')
-          return
-        }
-        const data = (await response.json()) as FipeResult | null
-        if (!data?.codeFipe || !data?.price) {
-          setFipeResult(null)
-          setError('Resposta inválida para esta combinação de modelo/ano/versão.')
-          return
-        }
-        setFipeResult(data)
-      } catch {
-        setFipeResult(null)
-        setError('Não foi possível consultar a FIPE agora. Você pode continuar preenchendo manualmente.')
-      } finally {
-        setFipeLoading(false)
-      }
-    }
-
-    void loadFipe()
-  }, [selectedBrandCode, selectedModelCode, selectedVersionCode])
 
   useEffect(() => {
     if (!fipeResult) return
@@ -868,7 +687,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     { label: 'Categoria', complete: Boolean(resolvedBodyTypeValue.trim()) },
     { label: 'Motor', complete: Boolean(form.engine.trim() || technical.engine !== 'Não informado') },
     { label: 'Potência', complete: Boolean(form.horsepower.trim() || technical.horsepower !== 'Não informado') },
-    { label: 'Final de placa', complete: Boolean(form.plateFinal.trim()) },
     { label: 'Portas', complete: Boolean(form.doors.trim()) },
     { label: 'VIN', complete: Boolean(form.vin.trim()) },
   ]
@@ -1116,12 +934,20 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
           fuel: resolvedFuel,
           color: form.color || 'Não informado',
           body_type: resolvedBodyType,
+          private_vehicle_lookup: form.private_plate ? {
+            plate: form.private_plate,
+            brand: form.private_lookup_brand || form.brand,
+            model: form.private_lookup_model || form.model,
+            version: form.private_lookup_version || form.version,
+            year_model: parseBrazilianInt(form.private_lookup_year_model || form.yearModel),
+            fipe_model_name: form.private_fipe_model_name || null,
+            fipe_code: form.private_fipe_code || null,
+          } : null,
           city: form.city,
           state: form.state,
           optional_items: normalizeOptionalItems(form.optionalItems),
           engine: resolvedEngine,
           horsepower: Number.isFinite(resolvedHorsepower) ? resolvedHorsepower : null,
-          plate_final: form.plateFinal,
           doors: form.doors ? Number(form.doors) : null,
           vin: form.vin ? form.vin.trim().toUpperCase() : null,
           ...(form.vehicle_type === 'truck' ? {
@@ -1134,9 +960,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             cmt: form.cmt ? parseBrazilianInt(form.cmt) : null,
             truck_category: form.truck_category || null,
           } : {}),
-          fipe_brand_code: selectedBrandCode || null,
-          fipe_model_code: selectedModelCode || null,
-          fipe_year_code: selectedVersionCode || null,
           ...fipeSnapshot,
 
             structured_data: {
@@ -1288,7 +1111,16 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             {/* Sub-step 1: Plate Lookup */}
             {listingSubStep === 1 && (
               <div className="fingen-flow-substep-card listing-flow-lookup-card space-y-4 animate-fade-in">
-                <PlateInput onPlateFound={(data: PlateFormData) => {
+                <PlateInput onPlateChange={() => {
+                  handleInput('private_plate', '')
+                  handleInput('private_lookup_brand', '')
+                  handleInput('private_lookup_model', '')
+                  handleInput('private_lookup_year_model', '')
+                  handleInput('private_lookup_version', '')
+                  handleInput('private_fipe_model_name', '')
+                  handleInput('private_fipe_code', '')
+                  setFipeResult(null)
+                }} onPlateFound={(data: PlateFormData) => {
                    handleInput('brand', data.brand)
                    handleInput('model', data.model)
                    handleInput('year', String(data.year))
@@ -1299,7 +1131,13 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                    handleInput('horsepower', data.horsepower)
                    handleInput('transmission', data.transmission)
                    handleInput('bodyType', data.bodyType)
-                     handleInput('plateFinal', data.plate)
+                   handleInput('private_plate', data.plate)
+                   handleInput('private_lookup_brand', data.brand)
+                   handleInput('private_lookup_model', data.model)
+                   handleInput('private_lookup_year_model', String(data.yearModel || data.year))
+                   handleInput('private_lookup_version', data.version || '')
+                   handleInput('private_fipe_model_name', data.fipeModelName || '')
+                   handleInput('private_fipe_code', data.fipeCode || '')
                      if (data.fipePrice && data.fipePrice > 0) {
                        setFipeResult({
                          price: formatBRL(data.fipePrice),
@@ -1378,10 +1216,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                    <div>
                      <label htmlFor="vehicle-horsepower" className="listing-flow-field-label">Potência (cv)</label>
                      <input id="vehicle-horsepower" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.horsepower} onChange={(e) => handleInput('horsepower', e.target.value)} placeholder="Ex: 116" />
-                   </div>
-                   <div>
-                     <label htmlFor="vehicle-plate-final" className="listing-flow-field-label">Placa</label>
-                     <input id="vehicle-plate-final" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1 uppercase" value={form.plateFinal} onChange={(e) => handleInput('plateFinal', e.target.value)} placeholder="ABC1D23" maxLength={7} />
                    </div>
                  </div>
                 <button type="button" onClick={() => { setCurrentStep(2); setListingSubStep(1); }} className="fingen-flow-btn-primary w-full mt-2">
@@ -1609,7 +1443,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               <h3 className="text-sm font-semibold text-[#111] mb-6 uppercase tracking-[0.08em]">Informações</h3>
               <div className="space-y-5">
                 {[
-                  { label: 'Placa', value: form.plateFinal || 'Não informada' },
                   { label: 'Veículo', value: `${form.brand} ${form.model} ${form.version}` },
                   { label: 'Ano', value: `${form.year}/${form.yearModel}` },
                   { label: 'Motor', value: form.engine || 'Não informado' },
@@ -1801,7 +1634,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                 type="button"
                 onClick={prevStep}
                 className="tfp-btn-secondary"
-                disabled={saving || fipeLoading}
+                disabled={saving}
               >
                 <ArrowLeft className="h-4 w-4" />
                 Voltar
@@ -1817,7 +1650,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                 type="button"
                 onClick={currentStep === 3 ? handleSubmit : nextStep}
                 className="tfp-btn-primary"
-                disabled={saving || fipeLoading}
+                disabled={saving}
               >
                 {saving ? (
                   <>

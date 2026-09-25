@@ -41,6 +41,15 @@ export interface ListingFormPayload {
   fipe_reference_month?: string
   fipe_price?: number | null
   structured_data?: Record<string, unknown>
+  private_vehicle_lookup?: {
+    plate: string
+    brand: string
+    model: string
+    version?: string | null
+    year_model: number
+    fipe_model_name?: string | null
+    fipe_code?: string | null
+  } | null
   // Truck-specific fields
   truck_type?: string | null
   load_capacity?: number | null
@@ -79,6 +88,8 @@ export interface ListingPublic {
   plate_final: string | null
   doors: number | null
   vin?: string | null
+  structured_data?: Record<string, unknown> | null
+  technical_data?: Record<string, unknown> | null
   fipe_price: number | null
   fipe_difference_value: number | null
   fipe_difference_percent: number | null
@@ -162,6 +173,25 @@ export function parseFipePriceToNumber(priceLabel: string): number {
   return Number.isFinite(parsed) ? parsed : 0
 }
 
+const sensitiveVehicleDataKeys = ['placa', 'plate', 'chassi', 'chassis', 'vin', 'renavam', 'cpf', 'cnpj', 'proprietario', 'owner', 'token']
+
+function sanitizeVehicleStructuredDataValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sanitizeVehicleStructuredDataValue)
+  if (value && typeof value === 'object') return sanitizeVehicleStructuredData(value as Record<string, unknown>)
+  return value
+}
+
+export function sanitizeVehicleStructuredData(value: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(value).flatMap(([key, entry]) => {
+      const normalizedKey = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '')
+      if (sensitiveVehicleDataKeys.some((sensitiveKey) => normalizedKey.includes(sensitiveKey))) return []
+
+      return [[key, sanitizeVehicleStructuredDataValue(entry)]]
+    }),
+  )
+}
+
 export function getFipeComparison(
   listingPrice: number,
   fipePrice: number | null,
@@ -178,6 +208,22 @@ export function getFipeComparison(
   if (diffPercent >= 3) status = 'above'
 
   return { diffValue, diffPercent, status }
+}
+
+export function getFipeDifferencePercent(
+  listingPrice: unknown,
+  fipePrice: unknown,
+  storedDifferencePercent?: unknown,
+): number | null {
+  const price = Number(listingPrice)
+  const fipe = Number(fipePrice)
+  if (Number.isFinite(price) && Number.isFinite(fipe) && fipe > 0) {
+    return ((price - fipe) / fipe) * 100
+  }
+
+  if (storedDifferencePercent === null || storedDifferencePercent === undefined || storedDifferencePercent === '') return null
+  const storedDifference = Number(storedDifferencePercent)
+  return Number.isFinite(storedDifference) ? storedDifference : null
 }
 
 export function normalizeTruckPayload(payload: Partial<ListingFormPayload>): Record<string, unknown> {

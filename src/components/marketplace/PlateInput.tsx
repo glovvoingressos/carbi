@@ -7,6 +7,7 @@ import { lookupPlateClient } from '@/lib/integrations/placaapi/client'
 import { formatBRL } from '@/data/cars'
 
 interface PlateInputProps {
+  onPlateChange?: () => void
   onPlateFound: (data: {
     brand: string
     model: string
@@ -22,6 +23,8 @@ interface PlateInputProps {
     version: string
     fipePrice?: number | null
     fipeReference?: string | null
+    fipeModelName?: string | null
+    fipeCode?: string | null
     truck_type?: string | null
     load_capacity?: number | null
     axles?: number | null
@@ -34,7 +37,7 @@ interface PlateInputProps {
   }) => void
 }
 
-export default function PlateInput({ onPlateFound }: PlateInputProps) {
+export default function PlateInput({ onPlateFound, onPlateChange }: PlateInputProps) {
   const [plate, setPlate] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -85,6 +88,8 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
         version: data.versao || '',
          fipePrice: data.fipe_price || null,
          fipeReference: data.fipe_reference_month || null,
+         fipeModelName: data.fipe_model_name || null,
+         fipeCode: data.fipe_code || null,
          truck_type: data.tipoVeiculo,
          truck_body_type: data.structured_data.truck_body_type as string | null,
          load_capacity: data.capacidadeCarga,
@@ -105,7 +110,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
       <div className="listing-flow-plate-card bg-white rounded-2xl border border-gray-100 p-4">
         <div className="flex items-start gap-2 mb-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200">
           <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-          <p className="text-[12px] text-amber-700">A placa é usada apenas para preencher os dados do veículo. Ela <strong>não será publicada</strong> no anúncio.</p>
+          <p className="listing-flow-plate-note text-amber-700">A placa é usada apenas para preencher os dados do veículo. Ela <strong>não será publicada</strong> no anúncio.</p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch gap-3">
@@ -119,7 +124,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
               id="listing-plate"
               type="text"
               value={plate}
-              onChange={(e) => { setPlate(formatPlate(e.target.value)); setError(null); setSuccess(false); setVehicleData(null) }}
+              onChange={(e) => { setPlate(formatPlate(e.target.value)); setError(null); setSuccess(false); setVehicleData(null); onPlateChange?.() }}
               onKeyDown={(e) => { if (e.key === 'Enter' && !loading && plate.length === 7) handleLookup() }}
               placeholder="ABC1D23"
               maxLength={7}

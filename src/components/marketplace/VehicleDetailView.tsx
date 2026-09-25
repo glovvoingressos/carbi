@@ -26,7 +26,6 @@ import { trackEvent } from '@/lib/analytics'
 import ListingImageGallery from './ListingImageGallery'
 import ChatStarter from './ChatStarter'
 import OfferHistory from './OfferHistory'
-import FipeHistoryChart from './FipeHistoryChart'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import MarketplaceListingImage from './MarketplaceListingImage'
 import ConfirmModal from '@/components/animations/ConfirmModal'
@@ -255,37 +254,34 @@ export default function VehicleDetailView({
       {/* Below: the rest of the listing, full width */}
       <div className="fingen-detail-rest">
         {/* FIPE Comparison */}
-        {fipePrice && (
-          <section className="fingen-detail-card-dark">
-            <div className="fingen-detail-dark-header">
-              <h3 style={{ color: '#FFFFFF' }}>Comparativo FIPE</h3>
-              <span className={`fingen-detail-dark-badge ${comparison.status === 'below' ? 'success' : ''}`}>
-                {fipeStatus}
-              </span>
-            </div>
-            <div className="fingen-detail-dark-value">{formatBRL(fipePrice)}</div>
-            <div className="fingen-detail-dark-label">Tabela FIPE referência</div>
-            {diffValue !== null && (
-              <div className="fingen-detail-dark-diff">
-                <span className={diffValue <= 0 ? 'positive' : 'negative'}>
-                  {diffValue <= 0 ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
-                  {diffValue > 0 ? '+' : ''}{formatBRL(diffValue)}
-                </span>
+        <section className="fingen-detail-card-dark">
+          <div className="fingen-detail-dark-header">
+            <h3 style={{ color: '#FFFFFF' }}>Comparativo FIPE</h3>
+            <span className={`fingen-detail-dark-badge ${comparison.status === 'below' ? 'success' : ''}`}>
+              {fipeStatus}
+            </span>
+          </div>
+          {fipePrice ? (
+            <>
+              <div className="fingen-detail-dark-value">{formatBRL(fipePrice)}</div>
+              <div className="fingen-detail-dark-label">
+                {listing.fipe_reference_month
+                  ? `Tabela FIPE · referência ${listing.fipe_reference_month}`
+                  : 'Tabela FIPE · referência não informada'}
               </div>
-            )}
-          </section>
-        )}
-
-        {/* FIPE History Chart */}
-        {fipePrice && (
-          <FipeHistoryChart
-            brand={listing.brand}
-            model={listing.model}
-            version={listing.version}
-            year={listing.year_model}
-            currentFipePrice={fipePrice}
-          />
-        )}
+              {diffValue !== null && (
+                <div className="fingen-detail-dark-diff">
+                  <span className={diffValue <= 0 ? 'positive' : 'negative'}>
+                    {diffValue <= 0 ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
+                    {diffValue > 0 ? '+' : ''}{formatBRL(diffValue)}
+                  </span>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="fingen-detail-dark-label">Valor de referência indisponível no momento.</div>
+          )}
+        </section>
 
         {/* Details */}
         <section className="fingen-detail-card">

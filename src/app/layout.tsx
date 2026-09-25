@@ -1,26 +1,26 @@
 import type { Metadata } from 'next'
-import { Urbanist } from 'next/font/google'
+import { Poppins } from 'next/font/google'
 import './globals.css'
 import ClientShell from '@/components/layout/ClientShell'
 import { OrganizationSchema, WebSiteSchema } from '@/components/seo/JSONLD'
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics'
 import { cn } from "@/lib/utils";
 
-const fontSans = Urbanist({
+const fontSans = Poppins({
   subsets: ['latin'],
   weight: ['300', '500', '600', '700', '800'],
   variable: '--font-sans',
   display: 'swap',
 })
 
-const fontHeading = Urbanist({
+const fontHeading = Poppins({
   subsets: ['latin'],
   weight: ['500', '600', '700', '800'],
   variable: '--font-heading',
   display: 'swap',
 })
 
-const fontMono = Urbanist({
+const fontMono = Poppins({
   subsets: ['latin'],
   weight: ['500', '600'],
   variable: '--font-mono',

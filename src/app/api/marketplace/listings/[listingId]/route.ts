@@ -3,7 +3,7 @@ import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingDeletedEmail, sendListingStatusChangedEmail } from '@/lib/email'
-import { buildListingRollbackPayload, resolveTruckPatch } from '@/lib/marketplace'
+import { buildListingRollbackPayload, resolveTruckPatch, sanitizeVehicleStructuredData } from '@/lib/marketplace'
 import type { TruckCategory } from '@/lib/trucks'
 
 type ListingPatchPayload = {
@@ -27,7 +27,6 @@ type ListingPatchPayload = {
   optional_items?: string[]
   engine?: string
   horsepower?: number
-  plate_final?: string
   doors?: number
   vehicle_type?: 'car' | 'truck'
   truck_type?: string | null
@@ -113,7 +112,6 @@ export async function PATCH(
       if (!Number.isInteger(body.horsepower) || body.horsepower < 0) return NextResponse.json({ error: 'Potência inválida.' }, { status: 400 })
       updates.horsepower = body.horsepower
     }
-    if (typeof body.plate_final === 'string') updates.plate_final = body.plate_final.substring(0, 1)
     if (typeof body.doors === 'number') {
       if (!Number.isInteger(body.doors) || body.doors < 1 || body.doors > 20) return NextResponse.json({ error: 'Portas inválidas.' }, { status: 400 })
       updates.doors = body.doors
@@ -139,6 +137,9 @@ export async function PATCH(
     const truckPatch = resolveTruckPatch(body, listing.vehicle_type)
     if (truckPatch.error) return NextResponse.json({ error: truckPatch.error }, { status: 400 })
     Object.assign(updates, truckPatch.updates)
+    if ('structured_data' in updates) {
+      updates.structured_data = sanitizeVehicleStructuredData(updates.structured_data as Record<string, unknown>)
+    }
 
     // Handle status transition for published_at
     if (typeof body.status === 'string') {
@@ -251,7 +252,17 @@ export async function PATCH(
       })()
     }
 
-    return NextResponse.json(data)
+    const responseData = { ...data }
+    delete responseData.vin
+    delete responseData.chassis
+    delete responseData.plate_final
+    for (const field of ['structured_data', 'technical_data'] as const) {
+      const value = responseData[field]
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        responseData[field] = sanitizeVehicleStructuredData(value as Record<string, unknown>)
+      }
+    }
+    return NextResponse.json(responseData)
   } catch (error) {
     console.error('PATCH /api/marketplace/listings/[listingId] failed', error)
     return NextResponse.json({ error: 'Falha ao atualizar anúncio.' }, { status: 500 })

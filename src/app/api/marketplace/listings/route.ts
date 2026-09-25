@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
-import { ListingFormPayload, normalizeTruckPayload, validateListingPayload } from '@/lib/marketplace'
+import { ListingFormPayload, normalizeTruckPayload, sanitizeVehicleStructuredData, validateListingPayload } from '@/lib/marketplace'
 import { queryPublicListings } from '@/lib/marketplace-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingCreatedEmail, sendAdminNewListingEmail } from '@/lib/email'
 import { notifyListingPublished } from '@/lib/notifications'
+import { savePrivateVehicleLookup } from '@/lib/vehicle-private-data'
+import { parseFipeReferenceMonth } from '@/lib/fipe-refresh'
 
 export async function GET(req: NextRequest) {
   try {
@@ -62,7 +64,11 @@ export async function POST(req: NextRequest) {
       .trim()
     const resolvedTitle = payload.title?.trim() || generatedTitle
     const resolvedBodyType = payload.body_type?.trim() || 'Não informado'
-    const truckPayload = normalizeTruckPayload(payload)
+    const safeStructuredData = sanitizeVehicleStructuredData(payload.structured_data || {})
+    const truckPayload = normalizeTruckPayload({ ...payload, structured_data: safeStructuredData })
+    const finalStructuredData = sanitizeVehicleStructuredData(
+      (truckPayload.structured_data as Record<string, unknown> | undefined) || safeStructuredData,
+    )
 
     // Limite de anúncios grátis
     const { count: activeCount, error: countError } = await supabase
@@ -73,6 +79,16 @@ export async function POST(req: NextRequest) {
 
     if (!countError && activeCount !== null && activeCount >= 5) {
       return NextResponse.json({ error: 'Você já atingiu o limite de 5 anúncios grátis. Remova ou arquive um anúncio antes de criar outro.' }, { status: 403 })
+    }
+
+    const fipePrice = typeof payload.fipe_price === 'number' && Number.isFinite(payload.fipe_price) && payload.fipe_price > 0
+      ? payload.fipe_price
+      : null
+    const fipeReferenceMonth = payload.fipe_reference_month || null
+    const hasValidFipeSnapshot = fipePrice !== null && parseFipeReferenceMonth(fipeReferenceMonth) !== null
+    const fipeSnapshot = {
+      fipe_price: hasValidFipeSnapshot ? fipePrice : null,
+      fipe_reference_month: hasValidFipeSnapshot ? fipeReferenceMonth : null,
     }
 
     const vehiclePayload = {
@@ -95,9 +111,9 @@ export async function POST(req: NextRequest) {
       fipe_brand_code: payload.fipe_brand_code || null,
       fipe_model_code: payload.fipe_model_code || null,
       fipe_year_code: payload.fipe_year_code || null,
-      fipe_reference_month: payload.fipe_reference_month || null,
-      fipe_price: payload.fipe_price || null,
-      technical_data: (truckPayload.structured_data as Record<string, unknown> | undefined) || payload.structured_data || {},
+      fipe_reference_month: fipeSnapshot.fipe_reference_month,
+      fipe_price: fipeSnapshot.fipe_price,
+      technical_data: finalStructuredData,
     }
 
     const { data: vehicle, error: vehicleError } = await supabase
@@ -108,6 +124,16 @@ export async function POST(req: NextRequest) {
 
     if (vehicleError || !vehicle) {
       return NextResponse.json({ error: vehicleError?.message || 'Falha ao criar veículo.' }, { status: 500 })
+    }
+
+    if (payload.private_vehicle_lookup) {
+      try {
+        await savePrivateVehicleLookup(vehicle.id, auth.userId, payload.private_vehicle_lookup)
+      } catch (privateDataError) {
+        await supabase.from('vehicles').delete().eq('id', vehicle.id)
+        console.error('[marketplace] private vehicle lookup could not be stored', privateDataError)
+        return NextResponse.json({ error: 'Não foi possível salvar os dados privados da placa. Tente novamente.' }, { status: 503 })
+      }
     }
 
     const insertPayload = {
@@ -131,16 +157,15 @@ export async function POST(req: NextRequest) {
       optional_items: payload.optional_items || [],
       engine: payload.engine?.trim() || null,
       horsepower: payload.horsepower || null,
-      plate_final: payload.plate_final?.trim() || null,
       doors: payload.doors || null,
       vin: payload.vin?.trim().toUpperCase() || null,
       fipe_brand_code: payload.fipe_brand_code || null,
       fipe_model_code: payload.fipe_model_code || null,
       fipe_year_code: payload.fipe_year_code || null,
-      fipe_reference_month: payload.fipe_reference_month || null,
-      fipe_price: payload.fipe_price || null,
-      structured_data: payload.structured_data || {},
+      fipe_reference_month: fipeSnapshot.fipe_reference_month,
+      fipe_price: fipeSnapshot.fipe_price,
       ...truckPayload,
+      structured_data: finalStructuredData,
       status: 'active',
     }
 

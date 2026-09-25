@@ -28,13 +28,16 @@ export interface PlacaApiResponse {
   dataAtualizacao: string
   fipe_price?: number | null
   fipe_reference_month?: string | null
+  fipe_code?: string | null
+  fipe_model_name?: string | null
+  fipe_brand_name?: string | null
 }
 
-export interface PlacaLookupResult {
-  success: boolean
-  data?: PlacaApiResponse
-  error?: string
-}
+export type PlacaLookupFailureKind = 'invalid-result' | 'rate-limited' | 'provider-error' | 'network-error'
+
+export type PlacaLookupResult =
+  | { success: true; data: PlacaApiResponse; error?: never; failureKind?: never }
+  | { success: false; data?: never; error: string; failureKind: PlacaLookupFailureKind }
 
 function first(...values: unknown[]): unknown {
   return values.find((value) => value !== undefined && value !== null && value !== '')
@@ -61,17 +64,17 @@ export function mapPlacaApiResponse(raw: Record<string, unknown>, cleanPlate: st
     placa: String(first(raw.placa, cleanPlate) || cleanPlate),
     chassi: String(value('chassi', 'vin') || ''),
     renavam: String(raw.renavam || ''),
-    marca: String(value('marca') || ''),
-    modelo: String(value('modelo') || ''),
-    versao: String(raw.VERSAO || raw.versao || ''),
+    marca: String(value('MARCA', 'marca') || ''),
+    modelo: String(value('MODELO', 'modelo') || ''),
+    versao: String(raw.VERSAO || raw.SUBMODELO || raw.versao || raw.submodelo || ''),
     anoFabricacao: numberValue(value('ano_fabricacao', 'anoFabricacao', 'ano')) || 0,
     anoModelo: numberValue(value('ano_modelo', 'anoModelo')) || 0,
-    cor: String(value('cor') || ''),
-    combustivel: String(value('combustivel') || ''),
+    cor: String(value('cor', 'COR') || ''),
+    combustivel: String(value('combustivel', 'COMBUSTIVEL') || ''),
     cilindradas: String(value('cilindradas') || ''),
     potencia: String(value('potencia', 'hp') || ''),
     cambio: String(value('caixa_cambio', 'cambio') || ''),
-    tipoVeiculo: String(value('tipo_veiculo', 'tipoVeiculo') || ''),
+    tipoVeiculo: String(value('tipo_veiculo', 'tipoVeiculo', 'TIPO_VEICULO') || ''),
     situacao: String(raw.situacao || ''),
     uf: String(value('uf') || ''),
     municipio: String(value('municipio') || ''),
@@ -81,8 +84,8 @@ export function mapPlacaApiResponse(raw: Record<string, unknown>, cleanPlate: st
     capacidadeCarga: numberValue(value('capacidade_carga', 'capacidadeCarga')),
     numeroEixos: numberValue(value('numero_eixos', 'quantidadeEixos', 'eixos')),
     tipoCabine: String(value('tipo_cabine', 'cabine') || ''),
-    pbt: numberValue(value('pbt', 'pesoBrutoTotal')),
-    cmt: numberValue(value('cmt', 'capacidadeMaximaTracao')),
+    pbt: numberValue(value('pbt', 'peso_bruto_total', 'pesoBrutoTotal')),
+    cmt: numberValue(value('cmt', 'cap_maxima_tracao', 'capacidadeMaximaTracao')),
     categoria: String(value('categoria', 'tipo_veiculo', 'tipoVeiculo') || ''),
     structured_data,
   }

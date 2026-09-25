@@ -2,17 +2,23 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Heart, TrendingUp, Gauge, Calendar, MapPin } from 'lucide-react'
-import { ListingPublic } from '@/lib/marketplace'
+import { Heart, TrendingDown, TrendingUp, Gauge, Calendar, MapPin } from 'lucide-react'
+import { getFipeDifferencePercent, ListingPublic } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from './MarketplaceListingImage'
 
 export default function ListingCard({ listing, priority = false, index = 0 }: { listing: ListingPublic; priority?: boolean; index?: number }) {
   const [favorited, setFavorited] = useState(false)
 
-  const hasFipe = typeof listing.fipe_price === 'number' && listing.fipe_price > 0
-  const fipe = hasFipe ? Math.round((1 - Number(listing.price) / Number(listing.fipe_price)) * 100) : null
-  const isBelowFipe = fipe !== null && fipe <= -3
+  const difference = getFipeDifferencePercent(listing.price, listing.fipe_price, listing.fipe_difference_percent)
+  const fipe = difference === null ? null : Math.round(difference)
+  const fipeLabel = fipe === null
+    ? 'FIPE indisponível'
+    : fipe <= -3
+      ? `${Math.abs(fipe)}% abaixo da FIPE`
+      : fipe >= 3
+        ? `${Math.abs(fipe)}% acima da FIPE`
+        : 'Na média da FIPE'
   const imageUrls = listing.images?.map((img) => img.url) || []
 
   return (
@@ -31,12 +37,10 @@ export default function ListingCard({ listing, priority = false, index = 0 }: { 
           className="absolute inset-0 w-full h-full object-cover"
           priority={priority}
         />
-        {isBelowFipe && (
-          <span className="cbi-card-badge">
-            <TrendingUp size={10} />
-            {Math.abs(fipe!)}% abaixo FIPE
-          </span>
-        )}
+        <span className={`cbi-card-badge${fipe === null ? ' is-unavailable' : fipe <= -3 ? '' : fipe >= 3 ? ' is-above' : ' is-neutral'}`}>
+          {fipe === null ? null : fipe <= -3 ? <TrendingDown size={10} /> : fipe >= 3 ? <TrendingUp size={10} /> : null}
+          {fipeLabel}
+        </span>
         <button
           type="button"
           onClick={(e) => {

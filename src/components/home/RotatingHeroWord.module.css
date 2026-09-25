@@ -1,0 +1,34 @@
+.rotator {
+  display: inline-grid;
+  vertical-align: baseline;
+}
+
+.space,
+.word {
+  grid-area: 1 / 1;
+}
+
+.space {
+  visibility: hidden;
+}
+
+.word {
+  opacity: 0;
+  transform: translateY(0.22em);
+  animation: cycle 12s cubic-bezier(0.16, 1, 0.3, 1) infinite both;
+}
+
+.find { animation-delay: -3s; }
+.buy { animation-delay: 0s; }
+.sell { animation-delay: 3s; }
+.search { animation-delay: 6s; }
+
+@keyframes cycle {
+  0%, 15%, 40%, 100% { opacity: 0; transform: translateY(0.22em); }
+  20%, 35% { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word { animation: none; transform: none; }
+  .find { opacity: 1; }
+}
