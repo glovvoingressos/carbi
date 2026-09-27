@@ -47,7 +47,7 @@ export default function ExploreCarousel({ categories }: { categories: Category[]
   const [active, setActive] = useState(0)
 
   return (
-    <div className="cb-cat-row" role="tablist" aria-label="Categorias de veículos">
+    <nav className="cb-cat-row" aria-label="Categorias de veículos">
       {categories.map((cat, i) => {
         const Icon = iconFor(cat)
         const [bg, fg] = STYLE_SET[i % STYLE_SET.length]
@@ -58,6 +58,7 @@ export default function ExploreCarousel({ categories }: { categories: Category[]
             href={`/carros-a-venda?body_type=${encodeURIComponent(cat.filter)}`}
             className={`cb-cat-item ${isActive ? 'is-active' : ''}`}
             onMouseEnter={() => setActive(i)}
+            onFocus={() => setActive(i)}
             style={{
               '--cat-bg': bg,
               '--cat-fg': fg,
@@ -73,6 +74,6 @@ export default function ExploreCarousel({ categories }: { categories: Category[]
           </Link>
         )
       })}
-    </div>
+    </nav>
   )
 }

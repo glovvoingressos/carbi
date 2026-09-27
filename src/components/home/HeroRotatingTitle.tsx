@@ -34,11 +34,13 @@ export default function HeroRotatingTitle() {
   const activeWord = HERO_ACTIONS[activeIndex]
 
   return (
-    <h1 className="cb-hero-title">
-      <span className="cb-hero-title-word-slot" aria-live="polite" aria-atomic="true">
-        <TextScramble data-testid="hero-rotating-word" className="cb-hero-title-word" duration={620}>
-          {activeWord}
-        </TextScramble>
+    <h1 className="cb-hero-title" aria-label={`${activeWord} o carro certo, sem complicação.`}>
+      <span className="cb-hero-title-word-slot">
+        <span aria-hidden="true">
+          <TextScramble data-testid="hero-rotating-word" className="cb-hero-title-word" duration={620}>
+            {activeWord}
+          </TextScramble>
+        </span>
       </span>{' '}
       o carro <u>certo</u>, sem complicação.
     </h1>

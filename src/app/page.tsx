@@ -18,23 +18,25 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Carbi | anunciar carros grátis, seminovos à venda e FIPE',
-  description: 'Anuncie carros grátis, encontre seminovos à venda e compare preço com FIPE em uma plataforma com chat interno e dados reais.',
+  description: 'Anuncie carros grátis, encontre seminovos à venda, compare preço com FIPE e negocie pelo chat interno.',
   keywords: ['anunciar carros grátis', 'seminovos à venda', 'carros à venda', 'anunciar carro', 'vender carro', 'comprar carro', 'tabela fipe'],
   alternates: { canonical: '/' },
   openGraph: {
     title: 'Carbi | anunciar carros grátis, seminovos à venda e FIPE',
-    description: 'Anuncie carros grátis, encontre seminovos à venda e compare preço com FIPE em uma plataforma com chat interno e dados reais.',
+    description: 'Anuncie carros grátis, encontre seminovos à venda, compare preço com FIPE e negocie pelo chat interno.',
     url: '/',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Carbi | anunciar carros grátis, seminovos à venda e FIPE',
-    description: 'Anuncie carros grátis, encontre seminovos à venda e compare preço com FIPE em uma plataforma com chat interno e dados reais.',
+    description: 'Anuncie carros grátis, encontre seminovos à venda, compare preço com FIPE e negocie pelo chat interno.',
   },
 }
 
 type Listing = Awaited<ReturnType<typeof getLatestPublicListings>>[number]
+
+const HOME_LISTING_LIMIT = 8
 
 function fipePercent(listing: Listing) {
   if (typeof listing.fipe_difference_percent !== 'number') return null
@@ -46,12 +48,12 @@ export default async function HomePage() {
   let fetchError = false
 
   try {
-    listings = await getLatestPublicListings(100)
+    listings = await getLatestPublicListings(HOME_LISTING_LIMIT)
   } catch {
     fetchError = true
   }
 
-  const recentListings = listings
+  const recentListings = listings.slice(0, HOME_LISTING_LIMIT)
   const topBrands = [...new Set(listings.map((l) => l.brand))].slice(0, 6)
   const cities = [...new Set(listings.map((l) => l.city))].filter(Boolean).slice(0, 6)
 
@@ -85,7 +87,7 @@ export default async function HomePage() {
   ]
 
   const budgetOptions = [
-    { label: 'Qualquer orçamento', value: '' },
+    { label: 'Qualquer valor', value: '' },
     { label: 'Até R$ 50 mil', value: '50000' },
     { label: 'Até R$ 80 mil', value: '80000' },
     { label: 'Até R$ 120 mil', value: '120000' },
@@ -102,8 +104,53 @@ export default async function HomePage() {
               <HeroRotatingTitle />
               <p className="cb-hero-lead">
                 Anuncie grátis, compare com a FIPE e negocie direto com o vendedor.
-                Dados reais, chat interno e as melhores ofertas de seminovos do país.
+                Informações do anúncio, chat interno e opções de seminovos para comparar com calma.
               </p>
+
+              <form
+                action="/carros-a-venda"
+                method="get"
+                className="cb-search"
+                role="search"
+                aria-label="Buscar carros à venda"
+              >
+                <div className="cb-search-field">
+                  <label htmlFor="home-search-query">Marca ou modelo</label>
+                  <input
+                    id="home-search-query"
+                    name="q"
+                    type="search"
+                    placeholder="Ex.: Honda Civic"
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="cb-search-divider" aria-hidden="true" />
+                <div className="cb-search-field">
+                  <label htmlFor="home-search-body-type">Tipo de carro</label>
+                  <select id="home-search-body-type" name="body_type" defaultValue="">
+                    <option value="">Todos os tipos</option>
+                    {categories.map((category) => (
+                      <option key={category.filter} value={category.filter}>
+                        {category.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="cb-search-divider" aria-hidden="true" />
+                <div className="cb-search-field">
+                  <label htmlFor="home-search-budget">Orçamento</label>
+                  <select id="home-search-budget" name="price_max" defaultValue="">
+                    {budgetOptions.map((option) => (
+                      <option key={option.value || 'any'} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button type="submit" className="cb-search-go" aria-label="Buscar carros">
+                  <Search size={20} aria-hidden="true" />
+                </button>
+              </form>
 
               <div className="cb-hero-cta-row">
                 <Link href="/carros-a-venda" className="cb-btn cb-btn-lime cb-btn-arrow">
@@ -124,7 +171,7 @@ export default async function HomePage() {
                   <div className="cb-avatar-more">+8</div>
                 </div>
                 <p>
-                  <strong>32 mil+</strong> compradores ativos todo mês
+                  <strong>Dados reais</strong> para decidir com confiança
                 </p>
               </div>
             </div>
@@ -241,9 +288,18 @@ export default async function HomePage() {
                   </Link>
                 )
               })
+            ) : fetchError ? (
+              <div className="cb-listing-empty" role="alert">
+                <strong>Não foi possível carregar os anúncios agora.</strong>
+                <p>Verifique sua conexão e tente novamente.</p>
+                  <Link href="/?retry=1" className="cb-btn cb-btn-dark cb-btn-arrow">
+                  Tentar novamente
+                  <ArrowRight size={16} aria-hidden="true" />
+                </Link>
+              </div>
             ) : (
               <div className="cb-listing-empty">
-                {fetchError ? 'Carregando anúncios...' : 'Nenhum anúncio ainda'}
+                Ainda não há anúncios públicos disponíveis.
               </div>
             )}
           </div>
@@ -273,7 +329,7 @@ export default async function HomePage() {
               Do jeito mais simples
             </h2>
             <p className="cb-process-intro" style={{ lineHeight: 1.6, color: 'var(--cb-ink-soft)', margin: '0 0 24px', maxWidth: '46ch' }}>
-              Do primeiro filtro ao contrato, todo o processo pensado para você economizar tempo e dinheiro.
+              Do primeiro filtro à negociação, todo o processo pensado para você economizar tempo e comparar melhor.
             </p>
 
             <div className="cb-process-step">
@@ -294,7 +350,7 @@ export default async function HomePage() {
               <div className="cb-step-num">03</div>
               <div className="cb-step-body">
                 <h3>Fechou o negócio</h3>
-                <p>Dados verificados, preço justo, zero surpresas. O carro certo, no preço certo.</p>
+                <p>Compare as informações, consulte a FIPE e negocie com mais clareza antes de fechar.</p>
               </div>
             </div>
           </div>
@@ -321,7 +377,7 @@ export default async function HomePage() {
               <div className="cb-build-card-featured-content">
                 <div>
                   <h3>Anuncie grátis em 2 minutos</h3>
-                  <p>Seu anúncio com fotos, FIPE verificada e alcance de milhares de compradores.</p>
+                  <p>Seu anúncio com fotos, comparação com a FIPE e alcance para compradores interessados.</p>
                 </div>
                 <span className="cb-build-cta">
                   Anunciar meu carro <ArrowRight size={16} />
@@ -357,16 +413,27 @@ export default async function HomePage() {
       <ModelComparison cars={comparisonCars} allCars={allComparisonCars} />
 
       {/* ═══ BRAND MARQUEE ═══ */}
-      <section className="cb-marquee" aria-label="Marcas disponíveis">
-        <div className="cb-marquee-track">
-          {[...topBrands, ...topBrands].map((brand, i) => (
-            <Link key={`${brand}-${i}`} href={`/carros-a-venda?brand=${encodeURIComponent(brand)}`} className="cb-marquee-item">
-              <Zap size={18} fill="currentColor" />
-              {brand}
-            </Link>
-          ))}
-        </div>
-      </section>
+      {topBrands.length > 0 ? (
+        <section className="cb-marquee" aria-label="Marcas disponíveis">
+          <div className="cb-marquee-track">
+            {[...topBrands, ...topBrands].map((brand, i) => {
+              const isDuplicate = i >= topBrands.length
+              return (
+                <Link
+                  key={`${brand}-${i}`}
+                  href={`/carros-a-venda?brand=${encodeURIComponent(brand)}`}
+                  className="cb-marquee-item"
+                  aria-hidden={isDuplicate}
+                  tabIndex={isDuplicate ? -1 : undefined}
+                >
+                  <Zap size={18} fill="currentColor" aria-hidden="true" />
+                  {brand}
+                </Link>
+              )
+            })}
+          </div>
+        </section>
+      ) : null}
 
       {/* ═══ FINAL CTA ═══ */}
       <section className="cb-final-cta">
@@ -391,8 +458,8 @@ export default async function HomePage() {
               </div>
             </div>
             <div className="cb-cta-big">
-              <strong>4.9</strong>
-              <span>avaliação média dos usuários</span>
+              <strong>FIPE</strong>
+              <span>comparação transparente de preços</span>
             </div>
           </div>
         </div>

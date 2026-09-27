@@ -3,7 +3,7 @@ import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingDeletedEmail, sendListingStatusChangedEmail } from '@/lib/email'
-import { buildListingRollbackPayload, resolveTruckPatch } from '@/lib/marketplace'
+import { buildListingRollbackPayload, normalizePlateFinal, resolveTruckPatch } from '@/lib/marketplace'
 import type { TruckCategory } from '@/lib/trucks'
 
 type ListingPatchPayload = {
@@ -113,7 +113,7 @@ export async function PATCH(
       if (!Number.isInteger(body.horsepower) || body.horsepower < 0) return NextResponse.json({ error: 'Potência inválida.' }, { status: 400 })
       updates.horsepower = body.horsepower
     }
-    if (typeof body.plate_final === 'string') updates.plate_final = body.plate_final.substring(0, 1)
+    if (typeof body.plate_final === 'string') updates.plate_final = normalizePlateFinal(body.plate_final)
     if (typeof body.doors === 'number') {
       if (!Number.isInteger(body.doors) || body.doors < 1 || body.doors > 20) return NextResponse.json({ error: 'Portas inválidas.' }, { status: 400 })
       updates.doors = body.doors

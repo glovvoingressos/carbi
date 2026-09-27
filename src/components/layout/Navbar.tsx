@@ -22,8 +22,11 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
   const [isAuth, setIsAuth] = useState(false)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const pathname = usePathname()
   const lastScroll = useRef(0)
+  const menuToggleRef = useRef<HTMLButtonElement>(null)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
 
   // Scroll hide/show
   useEffect(() => {
@@ -47,6 +50,64 @@ export default function Navbar() {
     const closeMenu = window.setTimeout(() => setOpen(false), 0)
     return () => window.clearTimeout(closeMenu)
   }, [pathname])
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+    if (!mediaQuery) return
+
+    const updateMotionPreference = () => setPrefersReducedMotion(mediaQuery.matches)
+    updateMotionPreference()
+    mediaQuery.addEventListener?.('change', updateMotionPreference)
+
+    return () => mediaQuery.removeEventListener?.('change', updateMotionPreference)
+  }, [])
+
+  useEffect(() => {
+    if (!open) return
+
+    const menu = mobileMenuRef.current
+    if (!menu) return
+
+    const focusableElements = Array.from(
+      menu.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+    )
+    const focusFrame = window.requestAnimationFrame(() => focusableElements[0]?.focus())
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setOpen(false)
+        window.requestAnimationFrame(() => menuToggleRef.current?.focus())
+        return
+      }
+
+      if (event.key !== 'Tab' || focusableElements.length === 0) return
+
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault()
+        lastElement.focus()
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault()
+        firstElement.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      window.cancelAnimationFrame(focusFrame)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [open])
+
+  const closeMobileMenu = (restoreFocus = false) => {
+    setOpen(false)
+    if (restoreFocus) {
+      window.requestAnimationFrame(() => menuToggleRef.current?.focus())
+    }
+  }
 
   const fetchUnreadCount = async (token: string) => {
     try {
@@ -81,7 +142,7 @@ export default function Navbar() {
   return (
     <>
       {/* Desktop Navbar */}
-      <nav className={`navbar ${hidden ? 'navbar--hidden' : ''}`}>
+      <nav className={`navbar ${hidden ? 'navbar--hidden' : ''}`} aria-label="Navegação principal">
         <div className="navbar-inner">
           <Link href="/" className="navbar-logo">
             <Logo height={64} />
@@ -116,7 +177,15 @@ export default function Navbar() {
             <Link href={isAuth ? '/minha-conta' : '/entrar'} className="navbar-icon-btn navbar-icon-btn--mobile" aria-label={isAuth ? 'Minha conta' : 'Entrar'}>
               <User size={18} strokeWidth={1.75} />
             </Link>
-            <button className="navbar-toggle" onClick={() => setOpen((v) => !v)} aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open}>
+            <button
+              ref={menuToggleRef}
+              type="button"
+              className="navbar-toggle"
+              onClick={() => setOpen((v) => !v)}
+              aria-label={open ? 'Fechar menu' : 'Abrir menu'}
+              aria-expanded={open}
+              aria-controls="navbar-mobile-menu"
+            >
               {open ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
@@ -131,8 +200,9 @@ export default function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            onClick={() => setOpen(false)}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
+            onClick={() => closeMobileMenu(true)}
+            aria-hidden="true"
           />
         )}
       </AnimatePresence>
@@ -142,10 +212,15 @@ export default function Navbar() {
         {open && (
           <motion.div
             className="navbar-mobile"
+            id="navbar-mobile-menu"
+            ref={mobileMenuRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu principal"
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="navbar-mobile-inner">
               {LINKS.map((l) => (

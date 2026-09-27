@@ -1,7 +1,7 @@
 import { getSupabaseServerClient, getSupabaseAdminClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { ListingPublic } from '@/lib/marketplace'
 import { getFipePrice } from '@/lib/fipe-api'
-import { parseFipePriceToNumber } from '@/lib/marketplace'
+import { normalizePlateFinal, parseFipePriceToNumber } from '@/lib/marketplace'
 import { classifyVehicleCategory, classifyByFuelType } from '@/lib/vehicle-category'
 import { applyTruckQueryFilters } from '@/lib/truck-filters'
 import { normalizeListingImages } from '@/lib/listing-images'
@@ -136,6 +136,8 @@ function normalizeTableRow(row: ListingRow): ListingPublic {
   
   return {
     ...row,
+    // Keep legacy rows safe too: public responses must never expose a full plate.
+    plate_final: normalizePlateFinal(row.plate_final),
     ...normalizedTruck,
     category,
     images: normalizeListingImages(row.images),

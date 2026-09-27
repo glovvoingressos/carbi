@@ -1,9 +1,52 @@
 import type { FipeResult } from '@/lib/fipe-api'
 import type { TruckCategory } from '@/lib/trucks'
+import { formatBRL } from '@/data/cars'
 
 export const LISTING_MAX_IMAGES = 10
 export const LISTING_MAX_IMAGE_SIZE_MB = 10
+export const LISTING_MAX_IMAGE_SIZE_BYTES = LISTING_MAX_IMAGE_SIZE_MB * 1024 * 1024
 export const LISTING_ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+
+export function normalizePlateFinal(value: string | null | undefined): string | null {
+  const normalized = String(value || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase()
+  return normalized ? normalized.slice(-1) : null
+}
+
+export interface PlateFipeLookupInput {
+  brand: string
+  model: string
+  yearModel: number
+  fuel: string
+  plate?: string
+  fipePrice?: number | null
+  fipeReference?: string | null
+}
+
+export function buildFipeResultFromPlateLookup(input: PlateFipeLookupInput): FipeResult | null {
+  if (!input.fipePrice || input.fipePrice <= 0) return null
+
+  return {
+    price: formatBRL(input.fipePrice),
+    brand: input.brand,
+    model: input.model,
+    modelYear: input.yearModel,
+    fuel: input.fuel,
+    codeFipe: `plate-${normalizePlateFinal(input.plate) || 'lookup'}`,
+    referenceMonth: input.fipeReference || '',
+    vehicleType: 1,
+    fuelAcronym: '',
+  }
+}
+
+export function getListingImageRejection(
+  file: Pick<File, 'type' | 'size'>,
+  currentCount: number,
+): string | null {
+  if (currentCount >= LISTING_MAX_IMAGES) return `Você pode adicionar até ${LISTING_MAX_IMAGES} imagens.`
+  if (!LISTING_ALLOWED_TYPES.includes(file.type)) return 'Use imagens JPG, PNG ou WEBP.'
+  if (file.size > LISTING_MAX_IMAGE_SIZE_BYTES) return `Cada imagem deve ter no máximo ${LISTING_MAX_IMAGE_SIZE_MB} MB.`
+  return null
+}
 
 export interface ListingImageInput {
   storage_path: string

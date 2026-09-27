@@ -16,8 +16,11 @@ import {
   LISTING_MAX_IMAGES,
   LISTING_MAX_IMAGE_SIZE_MB,
   buildFipeSnapshot,
+  buildFipeResultFromPlateLookup,
+  getListingImageRejection,
   getFipeComparison,
   normalizeOptionalItems,
+  normalizePlateFinal,
   formatBrazilianInt,
   parseBrazilianInt,
   parseMoneyInputToNumber,
@@ -301,6 +304,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const [catalogCars, setCatalogCars] = useState<CatalogCar[]>([])
   const [technical, setTechnical] = useState<TechnicalSnapshot>(EMPTY_TECHNICAL)
   const skipFipeClearOnMount = useRef(true)
+  const plateFipeLookupRef = useRef(false)
 
   const [sessionReady, setSessionReady] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -311,8 +315,11 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const [account, setAccount] = useState(ACCOUNT_INITIAL)
   const [accountEmailExists, setAccountEmailExists] = useState(false)
   const [validationDetails, setValidationDetails] = useState<string[]>([])
+  const [imageErrors, setImageErrors] = useState<string[]>([])
+  const [manualVehicleMode, setManualVehicleMode] = useState(false)
   const [titleTouched, setTitleTouched] = useState(false)
   const draftHydrated = useRef(false)
+  const stepHeadingRef = useRef<HTMLHeadingElement | null>(null)
   const [draftReady, setDraftReady] = useState(false)
 
   const resolveCatalogModelName = (brandName: string, rawModelName: string): string => {
@@ -363,7 +370,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         // Continue with an empty draft when browser storage is unavailable.
       }
       if (parsed && !cancelled) {
-        setForm({ ...INITIAL_STATE, ...parsed.form })
+        setForm({ ...INITIAL_STATE, ...parsed.form, plateFinal: normalizePlateFinal(parsed.form.plateFinal) || '' })
         setCurrentStep(parsed.currentStep)
         setListingSubStep(parsed.listingSubStep)
       }
@@ -392,8 +399,25 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   useEffect(() => {
     if (!draftReady) return
-    const plate = new URLSearchParams(window.location.search).get('placa')
+    const queryPlate = new URLSearchParams(window.location.search).get('placa')
+    let cached: PlacaApiResponse | null = null
+
+    try {
+      cached = readPlateLookup()
+    } catch {
+      cached = null
+    }
+
+    const plate = queryPlate || cached?.placa || ''
     if (!plate) return
+
+    // Keep backwards compatibility with old links, but remove the sensitive
+    // value from the visible URL as soon as the flow is opened.
+    if (queryPlate) {
+      const url = new URL(window.location.href)
+      url.searchParams.delete('placa')
+      window.history.replaceState(window.history.state, '', url)
+    }
 
     const applyData = (data: PlacaApiResponse) => {
       setForm((prev) => ({
@@ -409,26 +433,25 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         horsepower: data.potencia || prev.horsepower,
         transmission: data.cambio || 'Automático',
         bodyType: data.tipoVeiculo || prev.bodyType,
-        plateFinal: data.placa || plate,
+        plateFinal: normalizePlateFinal(data.placa || plate) || '',
       }))
-      if (data.fipe_price && data.fipe_price > 0) {
-        setFipeResult({
-          price: formatBRL(data.fipe_price),
+      const nextFipeResult = data.fipe_price && data.fipe_price > 0
+        ? buildFipeResultFromPlateLookup({
           brand: data.marca,
           model: data.modelo,
-          modelYear: data.anoModelo || data.anoFabricacao,
+          yearModel: data.anoModelo || data.anoFabricacao,
           fuel: data.combustivel || '',
-          codeFipe: `plate-${data.placa || plate}`,
-          referenceMonth: data.fipe_reference_month || '',
-          vehicleType: 1,
-          fuelAcronym: '',
+          plate: data.placa || plate,
+          fipePrice: data.fipe_price,
+          fipeReference: data.fipe_reference_month,
         })
-      }
+        : null
+      plateFipeLookupRef.current = Boolean(nextFipeResult)
+      setFipeResult(nextFipeResult)
       setListingSubStep(2)
     }
 
     try {
-      const cached = readPlateLookup()
       if (cached) {
         applyData(cached)
         return
@@ -471,6 +494,15 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     url.searchParams.set('subetapa', String(listingSubStep))
     window.history.replaceState(window.history.state, '', url)
   }, [currentStep, listingSubStep])
+
+  useEffect(() => {
+    if (!draftReady) return
+    const timeout = window.setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'auto' })
+      stepHeadingRef.current?.focus({ preventScroll: true })
+    }, 0)
+    return () => window.clearTimeout(timeout)
+  }, [currentStep, listingSubStep, draftReady])
 
   useEffect(() => {
     if (!supabaseReady) {
@@ -660,6 +692,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   useEffect(() => {
     if (!selectedBrandCode || !selectedModelCode || !selectedVersionCode) {
+      if (plateFipeLookupRef.current) return
       setFipeResult(null)
       return
     }
@@ -877,6 +910,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   const handleInput = (field: keyof FormState, value: string) => {
     if (field === 'title') setTitleTouched(true)
+    if (['brand', 'model', 'year', 'yearModel', 'version'].includes(field) && plateFipeLookupRef.current) {
+      plateFipeLookupRef.current = false
+      setFipeResult(null)
+    }
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -899,10 +936,13 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     if (!fileList) return
 
     const next = [...images]
+    const rejections: string[] = []
     Array.from(fileList).forEach((file) => {
-      if (next.length >= LISTING_MAX_IMAGES) return
-      if (!LISTING_ALLOWED_TYPES.includes(file.type)) return
-      if (file.size > LISTING_MAX_IMAGE_SIZE_MB * 1024 * 1024) return
+      const rejection = getListingImageRejection(file, next.length)
+      if (rejection) {
+        if (!rejections.includes(rejection)) rejections.push(rejection)
+        return
+      }
       next.push({
         id: `${file.name}-${file.lastModified}-${file.size}-${globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)}`,
         file,
@@ -911,6 +951,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     })
 
     setImages(next)
+    setImageErrors(rejections)
   }
 
   const removeImage = (index: number) => {
@@ -941,9 +982,14 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   const validateStep = (step: number): string | null => {
     if (step === 1) {
-      // Step 1 is now plate-based: brand must be filled (from plate or manually)
-      if (!form.brand) {
-        return 'Consulte uma placa ou preencha a marca manualmente.'
+      const identityMissing = [
+        { label: 'marca', complete: Boolean(form.brand.trim()) },
+        { label: 'modelo', complete: Boolean(form.model.trim()) },
+        { label: 'ano', complete: Boolean(form.year.trim()) },
+        { label: 'ano/modelo', complete: Boolean(form.yearModel.trim()) },
+      ].filter((item) => !item.complete).map((item) => item.label)
+      if (identityMissing.length > 0) {
+        return `Preencha: ${identityMissing.join(', ')}.`
       }
     }
 
@@ -997,11 +1043,45 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   }
 
   const handleSubStepNext = () => {
-    // On sub-step 1 (plate lookup), brand is auto-filled from plate
-    // Only require manual brand selection if no brand was auto-filled
-    if (listingSubStep === 1 && !form.brand) { setError('Consulte uma placa ou selecione a marca manualmente.'); return }
+    if (listingSubStep === 1) {
+      const validation = validateStep(1)
+      if (validation) {
+        setError(validation)
+        return
+      }
+    }
     setError(null)
     setListingSubStep((prev) => Math.min(4, prev + 1))
+  }
+
+  const startManualVehicleEntry = () => {
+    setManualVehicleMode(true)
+    setError(null)
+    setForm((prev) => ({
+      ...prev,
+      brand: '',
+      model: '',
+      version: '',
+      year: '',
+      yearModel: '',
+      engine: '',
+      horsepower: '',
+      fuel: '',
+      transmission: '',
+      bodyType: '',
+      plateFinal: '',
+    }))
+  }
+
+  const continueManualVehicleEntry = () => {
+    const validation = validateStep(1)
+    if (validation) {
+      setError(validation)
+      return
+    }
+    setError(null)
+    setManualVehicleMode(false)
+    setListingSubStep(2)
   }
 
   const validateAccount = (): string | null => {
@@ -1123,7 +1203,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
           optional_items: normalizeOptionalItems(form.optionalItems),
           engine: resolvedEngine,
           horsepower: Number.isFinite(resolvedHorsepower) ? resolvedHorsepower : null,
-          plate_final: form.plateFinal,
+          plate_final: normalizePlateFinal(form.plateFinal),
           doors: form.doors ? Number(form.doors) : null,
           vin: form.vin ? form.vin.trim().toUpperCase() : null,
           ...(form.vehicle_type === 'truck' ? {
@@ -1264,7 +1344,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         {currentStep === 1 && (
           <div className="space-y-6">
             <div>
-              <h2 className="tfp-section-title">Selecione seu veículo</h2>
+              <h2 ref={stepHeadingRef} tabIndex={-1} className="tfp-section-title outline-none">Selecione seu veículo</h2>
               <p className="tfp-section-sub">
                 Comece pela placa. Com ela puxamos todos os dados automaticamente.
               </p>
@@ -1275,36 +1355,85 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             {/* Sub-step 1: Plate Lookup */}
             {listingSubStep === 1 && (
               <div className="fingen-flow-substep-card p-3 sm:p-5 space-y-3 sm:space-y-4 animate-fade-in">
-                 <PlateInput onPlateFound={(data: PlateFormData) => {
-                   handleInput('brand', data.brand)
-                   handleInput('model', data.model)
-                   handleInput('year', String(data.year))
-                   handleInput('yearModel', String(data.yearModel))
-                   handleInput('color', data.color)
-                   handleInput('fuel', data.fuel)
-                   handleInput('engine', data.engine)
-                   handleInput('horsepower', data.horsepower)
-                   handleInput('transmission', data.transmission)
-                   handleInput('bodyType', data.bodyType)
-                     handleInput('plateFinal', data.plate)
-                     if (form.vehicle_type === 'truck') {
-                       handleInput('truck_type', data.truck_type || '')
-                       handleInput('truck_body_type', data.truck_body_type || '')
-                       handleInput('load_capacity', data.load_capacity == null ? '' : String(data.load_capacity))
-                       handleInput('axles', data.axles == null ? '' : String(data.axles))
-                       handleInput('cabin_type', data.cabin_type || '')
-                       handleInput('pbt', data.pbt == null ? '' : String(data.pbt))
-                       handleInput('cmt', data.cmt == null ? '' : String(data.cmt))
-                       handleInput('truck_category', data.truck_category || '')
-                       setForm((prev) => ({ ...prev, structured_data: { ...prev.structured_data, ...(data.structured_data || {}) } }))
-                     }
-                     if (data.version) {
-                      handleInput('version', data.version)
-                    }
-                  }} />
-                <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
-                  Continuar <ArrowRight className="w-4 h-4" />
-                </button>
+                {manualVehicleMode ? (
+                  <div className="space-y-4">
+                    <div>
+                      <p className="fingen-flow-field-label">Preencher manualmente</p>
+                      <p className="mt-1 text-[12px] text-[#767676]">Não conseguimos consultar a placa? Informe os dados básicos para continuar.</p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      {[
+                        ['manual-brand', 'brand', 'Marca', 'Ex: Volkswagen'],
+                        ['manual-model', 'model', 'Modelo', 'Ex: T-Cross'],
+                        ['manual-year', 'year', 'Ano de fabricação', 'Ex: 2020'],
+                        ['manual-year-model', 'yearModel', 'Ano/modelo', 'Ex: 2021'],
+                      ].map(([id, field, label, placeholder]) => (
+                        <div key={id}>
+                          <label htmlFor={id} className="listing-flow-field-label">{label}</label>
+                          <input
+                            id={id}
+                            className="fingen-flow-input listing-flow-input-field mt-1"
+                            value={form[field as keyof FormState] as string}
+                            onChange={(event) => handleInput(field as keyof FormState, event.target.value)}
+                            placeholder={placeholder}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <button type="button" onClick={continueManualVehicleEntry} className="fingen-flow-btn-primary w-full">
+                      Continuar <ArrowRight className="w-4 h-4" />
+                    </button>
+                    <button type="button" onClick={() => { setManualVehicleMode(false); setError(null) }} className="w-full text-center text-[13px] text-[#767676] font-medium hover:text-[#1A1A1A]">
+                      Voltar para consulta por placa
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <PlateInput onPlateFound={(data: PlateFormData) => {
+                      setManualVehicleMode(false)
+                      handleInput('brand', data.brand)
+                      handleInput('model', data.model)
+                      handleInput('year', String(data.year))
+                      handleInput('yearModel', String(data.yearModel))
+                      handleInput('color', data.color)
+                      handleInput('fuel', data.fuel)
+                      handleInput('engine', data.engine)
+                      handleInput('horsepower', data.horsepower)
+                      handleInput('transmission', data.transmission)
+                      handleInput('bodyType', data.bodyType)
+                      handleInput('plateFinal', normalizePlateFinal(data.plate) || '')
+                      const nextFipeResult = buildFipeResultFromPlateLookup({
+                        brand: data.brand,
+                        model: data.model,
+                        yearModel: data.yearModel,
+                        fuel: data.fuel,
+                        plate: data.plate,
+                        fipePrice: data.fipePrice,
+                        fipeReference: data.fipeReference,
+                      })
+                      plateFipeLookupRef.current = Boolean(nextFipeResult)
+                      setFipeResult(nextFipeResult)
+                      if (form.vehicle_type === 'truck') {
+                        handleInput('truck_type', data.truck_type || '')
+                        handleInput('truck_body_type', data.truck_body_type || '')
+                        handleInput('load_capacity', data.load_capacity == null ? '' : String(data.load_capacity))
+                        handleInput('axles', data.axles == null ? '' : String(data.axles))
+                        handleInput('cabin_type', data.cabin_type || '')
+                        handleInput('pbt', data.pbt == null ? '' : String(data.pbt))
+                        handleInput('cmt', data.cmt == null ? '' : String(data.cmt))
+                        handleInput('truck_category', data.truck_category || '')
+                        setForm((prev) => ({ ...prev, structured_data: { ...prev.structured_data, ...(data.structured_data || {}) } }))
+                      }
+                      if (data.version) handleInput('version', data.version)
+                    }} />
+                    <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
+                      Continuar <ArrowRight className="w-4 h-4" />
+                    </button>
+                    <button type="button" onClick={startManualVehicleEntry} className="w-full text-center text-[13px] text-[#767676] font-medium hover:text-[#1A1A1A]">
+                      Preencher dados manualmente
+                    </button>
+                  </>
+                )}
               </div>
             )}
 
@@ -1354,11 +1483,11 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                      <input id="vehicle-horsepower" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.horsepower} onChange={(e) => handleInput('horsepower', e.target.value)} placeholder="Ex: 116" />
                    </div>
                    <div>
-                     <label htmlFor="vehicle-plate-final" className="listing-flow-field-label">Placa</label>
-                     <input id="vehicle-plate-final" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1 uppercase" value={form.plateFinal} onChange={(e) => handleInput('plateFinal', e.target.value)} placeholder="ABC1D23" maxLength={7} />
+                     <label htmlFor="vehicle-plate-final" className="listing-flow-field-label">Final da placa (opcional)</label>
+                     <input id="vehicle-plate-final" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1 uppercase" value={normalizePlateFinal(form.plateFinal) || ''} onChange={(e) => handleInput('plateFinal', normalizePlateFinal(e.target.value) || '')} placeholder="Ex: 3" maxLength={1} />
                    </div>
                  </div>
-                <button type="button" onClick={() => { setCurrentStep(2); setListingSubStep(1); }} className="fingen-flow-btn-primary w-full mt-2">
+                <button type="button" onClick={nextStep} className="fingen-flow-btn-primary w-full mt-2">
                   <span className="truncate">Continuar para preço e fotos</span>
                   <ArrowRight className="h-4 w-4 shrink-0" />
                 </button>
@@ -1373,7 +1502,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         {currentStep === 2 && (
           <div className="space-y-8 animate-fade-in">
             <div>
-              <h2 className="tfp-section-title">Dados essenciais</h2>
+              <h2 ref={stepHeadingRef} tabIndex={-1} className="tfp-section-title outline-none">Dados essenciais</h2>
               <p className="tfp-section-sub">
                 Só pedimos o necessário para publicar rápido. O restante pode ser completado depois.
               </p>
@@ -1385,17 +1514,16 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                  {([['truck_type', 'Tipo de caminhão'], ['load_capacity', 'Capacidade de carga (kg)'], ['axles', 'Eixos'], ['truck_body_type', 'Carroceria'], ['cabin_type', 'Cabine'], ['pbt', 'PBT (kg)'], ['cmt', 'CMT (kg)'], ['truck_category', 'Categoria']] as const).map(([field, label]) => (
                    <input key={field} className="fingen-flow-input" placeholder={label} value={form[field]} onChange={(e) => handleInput(field, e.target.value)} aria-label={label} />
                  ))}
-                 {!fipeResult && <p className="sm:col-span-2 text-xs font-medium text-amber-700">FIPE não disponível</p>}
                  <p className="sm:col-span-2 text-xs text-[#767676]">Você pode preencher manualmente os dados que não vierem na consulta da placa.</p>
                </div>
              )}
             <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
 
               <div>
-                <label htmlFor="listing-price" className="sr-only">Preço pedido</label>
+                <label htmlFor="listing-price" className="listing-flow-field-label">Preço pedido (R$)</label>
                 <input
                   id="listing-price"
-                  className="fingen-flow-input"
+                  className="fingen-flow-input mt-1"
                   placeholder="Preço (R$)"
                   value={formatPriceInput(form.price)}
                   onChange={(e) => {
@@ -1408,32 +1536,42 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                 />
               </div>
               <div>
-                <label htmlFor="listing-mileage" className="sr-only">Quilometragem</label>
-                <input id="listing-mileage" className="fingen-flow-input" placeholder="Quilometragem" value={formatBrazilianInt(form.mileage)} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} aria-label="Quilometragem" />
+                <label htmlFor="listing-mileage" className="listing-flow-field-label">Quilometragem (km)</label>
+                <input id="listing-mileage" className="fingen-flow-input mt-1" placeholder="Ex: 45.000" value={formatBrazilianInt(form.mileage)} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} aria-label="Quilometragem" />
               </div>
               <div>
-                <label htmlFor="listing-fuel" className="sr-only">Combustível</label>
-                <input id="listing-fuel" className="fingen-flow-input" placeholder="Combustível" value={form.fuel || resolvedFuelValue} onChange={(e) => handleInput('fuel', e.target.value)} aria-label="Combustível" />
+                <label htmlFor="listing-fuel" className="listing-flow-field-label">Combustível</label>
+                <input id="listing-fuel" className="fingen-flow-input mt-1" placeholder="Ex: Flex" value={form.fuel || resolvedFuelValue} onChange={(e) => handleInput('fuel', e.target.value)} aria-label="Combustível" />
               </div>
               <div>
-                <label htmlFor="listing-transmission" className="sr-only">Câmbio</label>
-                <input id="listing-transmission" className="fingen-flow-input" placeholder="Câmbio" value={form.transmission || resolvedTransmissionValue} onChange={(e) => handleInput('transmission', e.target.value)} aria-label="Câmbio" />
+                <label htmlFor="listing-transmission" className="listing-flow-field-label">Câmbio</label>
+                <input id="listing-transmission" className="fingen-flow-input mt-1" placeholder="Ex: Automático" value={form.transmission || resolvedTransmissionValue} onChange={(e) => handleInput('transmission', e.target.value)} aria-label="Câmbio" />
               </div>
               <div>
-                <label htmlFor="listing-color" className="sr-only">Cor</label>
-                <input id="listing-color" className="fingen-flow-input" placeholder="Cor" value={form.color} onChange={(e) => handleInput('color', e.target.value)} aria-label="Cor" />
+                <label htmlFor="listing-color" className="listing-flow-field-label">Cor</label>
+                <input id="listing-color" className="fingen-flow-input mt-1" placeholder="Ex: Branco" value={form.color} onChange={(e) => handleInput('color', e.target.value)} aria-label="Cor" />
               </div>
               <div>
-                <label htmlFor="listing-city" className="sr-only">Cidade</label>
-                <input id="listing-city" className="fingen-flow-input" placeholder="Cidade" value={form.city} onChange={(e) => handleInput('city', e.target.value)} aria-label="Cidade" />
+                <label htmlFor="listing-city" className="listing-flow-field-label">Cidade</label>
+                <input id="listing-city" className="fingen-flow-input mt-1" placeholder="Ex: São Paulo" value={form.city} onChange={(e) => handleInput('city', e.target.value)} aria-label="Cidade" />
               </div>
               <div>
-                <label htmlFor="listing-state" className="sr-only">Estado</label>
-                <input id="listing-state" className="fingen-flow-input" placeholder="Estado (UF)" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} aria-label="Estado" />
+                <label htmlFor="listing-state" className="listing-flow-field-label">Estado (UF)</label>
+                <input id="listing-state" className="fingen-flow-input mt-1" placeholder="Ex: SP" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} aria-label="Estado" />
               </div>
             </div>
 
-            {fipeResult ? (
+            {fipeLoading ? (
+              <div className="fingen-flow-fipe-comparison-dark rounded-[24px] p-5" style={{ background: '#1A1A1A', color: '#FFFFFF' }} role="status" aria-live="polite">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-5 w-5 animate-spin" style={{ color: '#D4F576' }} />
+                  <div>
+                    <p className="font-semibold">Consultando a FIPE</p>
+                    <p className="mt-1 text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>Estamos buscando a referência mais recente para este veículo.</p>
+                  </div>
+                </div>
+              </div>
+            ) : fipeResult ? (
               <div className="fingen-flow-fipe-comparison-dark listing-fipe-comparison rounded-[24px] p-5 max-[330px]:p-4" style={{ background: '#1A1A1A', color: '#FFFFFF' }}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-1">
@@ -1493,7 +1631,12 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                   </div>
                 </div>
               </div>
-            ) : null}
+            ) : (
+              <div className="rounded-2xl border border-[#E5E5E5] bg-[#FAFAFA] p-4" role="status">
+                <p className="text-sm font-semibold text-[#333]">FIPE não disponível</p>
+                <p className="mt-1 text-xs text-[#767676]">Você pode continuar com o preço informado. A consulta da placa não alterou os demais dados.</p>
+              </div>
+            )}
 
             <div className="fingen-flow-substep-card p-4 space-y-3">
               <div className="flex items-center justify-between gap-3">
@@ -1501,7 +1644,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                 <span className="fingen-flow-badge-outline text-[10px]">Opcional</span>
               </div>
               <div>
-                <label htmlFor="listing-description" className="sr-only">Descrição do veículo</label>
+                <label htmlFor="listing-description" className="listing-flow-field-label">Descrição do veículo</label>
                 <textarea id="listing-description" className="fingen-flow-input listing-description-field min-h-[180px] sm:min-h-[200px] py-3 resize-none leading-relaxed" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} aria-label="Descrição do veículo" />
               </div>
               <DescriptionAiControls
@@ -1509,7 +1652,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                 onApply={(next) => handleInput('description', next)}
               />
               <div>
-                <label htmlFor="listing-optionals" className="sr-only">Opcionais extras</label>
+                <label htmlFor="listing-optionals" className="listing-flow-field-label">Opcionais extras</label>
                 <input id="listing-optionals" className="fingen-flow-input listing-optionals-field" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} aria-label="Opcionais extras" />
               </div>
             </div>
@@ -1528,15 +1671,25 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                 <ImagePlus className="h-6 w-6 text-[#1A1A1A]" />
               </div>
               <span className="text-sm text-[#1A1A1A] mt-1 max-[330px]:text-[13px]">Arraste fotos ou clique ({images.length}/{LISTING_MAX_IMAGES})</span>
-              <span className="fingen-flow-badge-accent text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens</span>
-              <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} />
+              <span className="fingen-flow-badge-accent text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens • 10 MB por imagem</span>
+              <input id="listing-images" type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} aria-describedby="listing-images-help" />
             </label>
-            <p className="text-xs font-medium text-[#6F6F6F] text-center">Inclua pelo menos 1 foto para publicar.</p>
+            <p id="listing-images-help" className="text-xs font-medium text-[#6F6F6F] text-center">Inclua pelo menos 1 foto para publicar. Cada arquivo pode ter até {LISTING_MAX_IMAGE_SIZE_MB} MB.</p>
+            {imageErrors.length > 0 && (
+              <div className="rounded-xl border border-[#FECACA] bg-[#FEF2F2] p-3 text-sm text-[#B91C1C]" role="alert">
+                <p className="font-semibold">Não adicionamos algumas imagens:</p>
+                <ul className="mt-1 list-disc pl-5 text-xs">
+                  {imageErrors.map((imageError) => <li key={imageError}>{imageError}</li>)}
+                </ul>
+              </div>
+            )}
 
             {images.length > 0 && (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8 max-[330px]:grid-cols-1 max-[330px]:gap-4">
                 {images.map((image, index) => (
                   <div key={image.previewUrl} className="fingen-flow-substep-card p-3 hover:shadow-md transition-shadow max-[330px]:p-2.5">
+                    {/* Object URLs are generated locally for instant previews before upload. */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={image.previewUrl} alt={`Preview ${index + 1}`} width={1920} height={1080} className="aspect-video w-full rounded-xl object-cover" />
                     <p className="mt-4 px-2 text-[10px] font-semibold uppercase tracking-wider text-[#6F6F6F] max-[330px]:mt-3">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
                     <div className="mt-3 flex items-center gap-2 px-2 pb-1 max-[330px]:gap-1.5">
@@ -1562,7 +1715,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             {/* Header */}
             <div className="mb-10">
               <p className="tfp-section-label">Confirmação</p>
-              <h2 className="tfp-section-title">
+              <h2 ref={stepHeadingRef} tabIndex={-1} className="tfp-section-title outline-none">
                 Confira os dados do seu veículo
               </h2>
               <p className="tfp-section-sub">
@@ -1595,7 +1748,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               <h3 className="text-sm font-semibold text-[#111] mb-6 uppercase tracking-[0.08em]">Informações</h3>
               <div className="space-y-5">
                 {[
-                  { label: 'Placa', value: form.plateFinal || 'Não informada' },
+                  { label: 'Final da placa', value: normalizePlateFinal(form.plateFinal) || 'Não informado' },
                   { label: 'Veículo', value: `${form.brand} ${form.model} ${form.version}` },
                   { label: 'Ano', value: `${form.year}/${form.yearModel}` },
                   { label: 'Motor', value: form.engine || 'Não informado' },
@@ -1692,6 +1845,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         id="account-name"
                         className="fingen-flow-input mt-1"
                         placeholder="Seu nome completo"
+                        autoComplete="name"
                         value={account.name}
                         onChange={(e) => handleAccountInput('name', e.target.value)}
                       />
@@ -1703,6 +1857,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         className="fingen-flow-input mt-1"
                         placeholder="(00) 00000-0000"
                         inputMode="tel"
+                        autoComplete="tel"
                         value={account.phone}
                         onChange={(e) => handleAccountInput('phone', formatPhone(e.target.value))}
                       />
@@ -1714,6 +1869,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         className="fingen-flow-input mt-1"
                         placeholder="000.000.000-00"
                         maxLength={14}
+                        autoComplete="off"
                         value={account.cpf}
                         onChange={(e) => handleAccountInput('cpf', formatCPF(e.target.value))}
                       />
@@ -1725,6 +1881,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         type="email"
                         className="fingen-flow-input mt-1"
                         placeholder="voce@email.com"
+                        autoComplete="email"
                         value={account.email}
                         onChange={(e) => handleAccountInput('email', e.target.value)}
                       />
@@ -1736,9 +1893,11 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         type="password"
                         className="fingen-flow-input mt-1"
                         placeholder="Crie uma senha"
+                        autoComplete="new-password"
                         value={account.password}
                         onChange={(e) => handleAccountInput('password', e.target.value)}
                       />
+                      <p className="mt-1 text-[11px] leading-relaxed text-[#767676]">Use 8+ caracteres, com uma letra maiúscula, um número e um símbolo.</p>
                     </div>
                     <div>
                       <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-confirm">Confirmar senha</label>
@@ -1747,6 +1906,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         type="password"
                         className="fingen-flow-input mt-1"
                         placeholder="Repita a senha"
+                        autoComplete="new-password"
                         value={account.confirmPassword}
                         onChange={(e) => handleAccountInput('confirmPassword', e.target.value)}
                       />

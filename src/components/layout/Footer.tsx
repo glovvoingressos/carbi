@@ -46,10 +46,9 @@ export default function Footer() {
       <div className="ref-footer-bottom">
         <div className="ref-footer-legal">© 2026 Carbi. Todos os direitos reservados.</div>
         <div className="ref-footer-social">
-          <Link href="/" className="ref-social-btn">in</Link>
-          <Link href="/" className="ref-social-btn">ig</Link>
-          <Link href="/" className="ref-social-btn">tw</Link>
-          <Link href="/" className="ref-social-btn">wa</Link>
+          <a href="https://www.linkedin.com/company/carbi" target="_blank" rel="noopener noreferrer" className="ref-social-btn" aria-label="Carbi no LinkedIn">in</a>
+          <a href="https://www.instagram.com/carbioficial" target="_blank" rel="noopener noreferrer" className="ref-social-btn" aria-label="Carbi no Instagram">ig</a>
+          <a href="https://twitter.com/carbioficial" target="_blank" rel="noopener noreferrer" className="ref-social-btn" aria-label="Carbi no Twitter">tw</a>
         </div>
       </div>
     </footer>

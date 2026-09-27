@@ -2,33 +2,15 @@
 
 import { useEffect, useRef, useState, type HTMLAttributes } from 'react'
 
-const SCRAMBLE_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-const FRAME_INTERVAL_MS = 32
-
 type TextScrambleProps = Omit<HTMLAttributes<HTMLSpanElement>, 'children'> & {
   children: string
   duration?: number
 }
 
-function randomCharacter() {
-  return SCRAMBLE_CHARACTERS[Math.floor(Math.random() * SCRAMBLE_CHARACTERS.length)]
-}
-
-function createScrambledFrame(source: string, target: string, progress: number) {
-  const length = Math.max(source.length, target.length)
-  const revealedCharacters = Math.floor(length * progress)
-
-  return Array.from({ length }, (_, index) => {
-    const targetCharacter = target[index] ?? ''
-    if (index < revealedCharacters) return targetCharacter
-    if (targetCharacter === ' ') return ' '
-    return randomCharacter()
-  }).join('')
-}
-
 export function TextScramble({ children, className, duration = 620, ...props }: TextScrambleProps) {
   const [displayedText, setDisplayedText] = useState(children)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [isTransitioning, setIsTransitioning] = useState(false)
   const previousText = useRef(children)
 
   useEffect(() => {
@@ -48,24 +30,31 @@ export function TextScramble({ children, className, duration = 620, ...props }: 
 
     if (source === children || prefersReducedMotion) {
       setDisplayedText(children)
+      setIsTransitioning(false)
       return
     }
 
-    const startedAt = Date.now()
-    const timer = window.setInterval(() => {
-      const progress = Math.min(1, (Date.now() - startedAt) / duration)
-      setDisplayedText(createScrambledFrame(source, children, progress))
+    // Keep the word readable during the transition. Random placeholder
+    // characters can be captured by assistive technology and by users on a
+    // slow frame, so the effect is intentionally deterministic.
+    setDisplayedText(children)
+    setIsTransitioning(true)
+    const timer = window.setTimeout(() => setIsTransitioning(false), duration)
 
-      if (progress >= 1) {
-        window.clearInterval(timer)
-      }
-    }, FRAME_INTERVAL_MS)
-
-    return () => window.clearInterval(timer)
+    return () => window.clearTimeout(timer)
   }, [children, duration, prefersReducedMotion])
 
   return (
-    <span {...props} className={className} aria-live="polite" aria-atomic="true">
+    <span
+      {...props}
+      className={className}
+      style={{
+        ...props.style,
+        opacity: isTransitioning ? 0.72 : 1,
+        transform: isTransitioning ? 'translateY(0.04em)' : 'translateY(0)',
+        transition: prefersReducedMotion ? 'none' : `opacity ${duration}ms ease-out, transform ${duration}ms ease-out`,
+      }}
+    >
       {displayedText}
     </span>
   )

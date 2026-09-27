@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
-import { ListingFormPayload, normalizeTruckPayload, validateListingPayload } from '@/lib/marketplace'
+import { ListingFormPayload, normalizePlateFinal, normalizeTruckPayload, validateListingPayload } from '@/lib/marketplace'
 import { queryPublicListings } from '@/lib/marketplace-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingCreatedEmail, sendAdminNewListingEmail } from '@/lib/email'
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
       optional_items: payload.optional_items || [],
       engine: payload.engine?.trim() || null,
       horsepower: payload.horsepower || null,
-      plate_final: payload.plate_final?.trim() || null,
+      plate_final: normalizePlateFinal(payload.plate_final),
       doors: payload.doors || null,
       vin: payload.vin?.trim().toUpperCase() || null,
       fipe_brand_code: payload.fipe_brand_code || null,

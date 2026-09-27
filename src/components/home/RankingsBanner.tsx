@@ -4,8 +4,6 @@ import { getMonthlyRankings } from '@/lib/rankings-data'
 import { formatBRL } from '@/data/cars'
 import { ArrowRight, TrendingUp, ChevronUp, ChevronDown } from 'lucide-react'
 
-type Tab = 'novos' | 'seminovos'
-
 function avatarColor(position: number): string {
   const palette = [
     'rgba(76, 139, 245, 0.18)',
@@ -28,11 +26,13 @@ function avatarInkColor(position: number): string {
 }
 
 export default async function RankingsBanner() {
-  const topNew = await getMonthlyRankings('setembro-2026', 'new')
+  const rankingPeriod = 'setembro-2026'
+  const topNew = await getMonthlyRankings(rankingPeriod, 'new')
 
   const top10 = topNew.slice(0, 10)
   const totalUnits = top10.reduce((sum, c) => sum + c.unitsSold, 0)
   const monthLabel = 'Setembro / 2026 · 1ª quinzena'
+  const sourceLabel = 'Fenabrave / Bright Consulting'
 
   return (
     <section className="cb-section-pad pt-0">
@@ -43,7 +43,7 @@ export default async function RankingsBanner() {
               <div className="cb-top10-feature-media">
                 <Image
                   src="/assets/cars/fiat-strada-ultra-10-turbo-cvt-2026.png"
-                  alt="Fiat Strada 2027"
+                  alt="Fiat Strada em destaque no ranking de setembro de 2026"
                   fill
                   sizes="(max-width: 768px) 100vw, 55vw"
                   priority
@@ -54,7 +54,7 @@ export default async function RankingsBanner() {
                 Os carros mais vendidos do Brasil
               </h2>
               <p className="cb-top10-lead">
-                Ranking oficial de emplacamentos 0km. Dados parciais de setembro, com base na Fenabrave.
+                Base de emplacamentos de carros 0 km. Dados parciais da primeira quinzena de setembro de 2026.
               </p>
             </div>
 
@@ -70,18 +70,18 @@ export default async function RankingsBanner() {
             </div>
           </div>
 
-          <div className="cb-top10-tabs" role="tablist" aria-label="Tipo de mercado">
-            <button className="cb-top10-tab is-active" type="button" role="tab" aria-selected="true">
+          <nav className="cb-top10-tabs" aria-label="Explorar rankings">
+            <span className="cb-top10-tab is-active" aria-current="page">
               Mais vendidos
               <span className="cb-top10-tab-bar" aria-hidden="true" />
-            </button>
-            <Link href="/carros-mais-vendidos-brasil" className="cb-top10-tab" role="tab">
+            </span>
+            <Link href="/carros-mais-vendidos-brasil" className="cb-top10-tab">
               Ver top 100
             </Link>
-            <Link href="/rankings" className="cb-top10-tab" role="tab">
+            <Link href="/rankings" className="cb-top10-tab">
               Por estado
             </Link>
-          </div>
+          </nav>
 
           <ol className="cb-top10-list">
             {top10.map((car) => {
@@ -132,7 +132,7 @@ export default async function RankingsBanner() {
               <ArrowRight size={18} />
             </Link>
             <span className="cb-top10-foot-note">
-              <TrendingUp size={14} /> 1ª quinzena de setembro · Fenabrave / Bright Consulting.
+              <TrendingUp size={14} aria-hidden="true" /> Fonte: {sourceLabel} · {monthLabel}.
             </span>
           </div>
         </div>

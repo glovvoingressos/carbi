@@ -98,6 +98,26 @@ function PasswordChecklist({ password }: { password: string }) {
   )
 }
 
+function ErrorBanner({ error }: { error: string | null }) {
+  if (!error) return null
+  return (
+    <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
+      <AlertCircle size={16} className="text-[var(--color-danger)] mt-0.5 shrink-0" />
+      <p className="text-sm text-[var(--color-danger)]">{error}</p>
+    </div>
+  )
+}
+
+function SuccessBanner({ message }: { message: string | null }) {
+  if (!message) return null
+  return (
+    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2">
+      <Check size={16} className="text-emerald-500 mt-0.5 shrink-0" />
+      <p className="text-sm text-emerald-600">{message}</p>
+    </div>
+  )
+}
+
 export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'login' }: Props) {
   const router = useRouter()
   const supabaseReady = isSupabaseBrowserConfigured()
@@ -221,20 +241,6 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
     } finally { setLoading(false) }
   }
 
-  const ErrorBanner = () => error ? (
-    <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
-      <AlertCircle size={16} className="text-[var(--color-danger)] mt-0.5 shrink-0" />
-      <p className="text-sm text-[var(--color-danger)]">{error}</p>
-    </div>
-  ) : null
-
-  const SuccessBanner = () => message ? (
-    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2">
-      <Check size={16} className="text-emerald-500 mt-0.5 shrink-0" />
-      <p className="text-sm text-emerald-600">{message}</p>
-    </div>
-  ) : null
-
   return (
     <div className="w-full max-w-md mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-8 md:p-10 text-[14px] md:text-[15px]">
       <AnimatePresence mode="wait">
@@ -261,8 +267,8 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
               </button>
             </div>
 
-            <ErrorBanner />
-            <SuccessBanner />
+            <ErrorBanner error={error} />
+            <SuccessBanner message={message} />
 
             <button type="submit" disabled={loading || !supabaseReady}
               className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 active:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
@@ -330,8 +336,8 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
               )}
             </AnimatePresence>
 
-            <ErrorBanner />
-            <SuccessBanner />
+            <ErrorBanner error={error} />
+            <SuccessBanner message={message} />
 
             {mode === 'signup' && (
               step === 1 ? (
@@ -372,8 +378,8 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
               <InputField icon={Mail} id="forgot-email" label="E-mail" type="email" value={email} onChange={setEmail} placeholder="voce@email.com" required />
             </div>
 
-            <ErrorBanner />
-            <SuccessBanner />
+            <ErrorBanner error={error} />
+            <SuccessBanner message={message} />
 
             <button type="submit" disabled={loading || !supabaseReady}
               className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">

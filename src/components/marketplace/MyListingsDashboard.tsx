@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Loader2, Save, Upload, Trash2, Check, AlertCircle, Image as ImageIcon, GripVertical, Star, X, Search, Car, Plus, Filter, Grid, List, Eye, TrendingUp, BarChart3 } from 'lucide-react'
 import { motion, AnimatePresence, Reorder } from 'motion/react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
-import { LISTING_ALLOWED_TYPES, LISTING_MAX_IMAGES, LISTING_MAX_IMAGE_SIZE_MB, parseMoneyInputToNumber, parseBrazilianInt, formatBrazilianInt } from '@/lib/marketplace'
+import { LISTING_ALLOWED_TYPES, LISTING_MAX_IMAGES, LISTING_MAX_IMAGE_SIZE_MB, normalizePlateFinal, parseMoneyInputToNumber, parseBrazilianInt, formatBrazilianInt } from '@/lib/marketplace'
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from './MarketplaceListingImage'
@@ -499,7 +499,7 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
     if (!selected) return
     localImages.forEach((img) => { if (!img.isExisting) URL.revokeObjectURL(img.previewUrl) })
     const timer = setTimeout(() => {
-      setFormData({ title: selected.title, description: selected.description, vehicle_type: selected.vehicle_type, price: selected.price, vin: selected.vin || '', status: selected.status, mileage: selected.mileage, brand: selected.brand, model: selected.model, version: selected.version, year: selected.year, year_model: selected.year_model, transmission: selected.transmission, fuel: selected.fuel, color: selected.color, body_type: selected.body_type, city: selected.city, state: selected.state, optional_items: selected.optional_items || [], engine: selected.engine, horsepower: selected.horsepower, doors: selected.doors, plate_final: selected.plate_final, truck_type: selected.truck_type, load_capacity: selected.load_capacity, axles: selected.axles, truck_body_type: selected.truck_body_type, structured_data: selected.structured_data || null })
+      setFormData({ title: selected.title, description: selected.description, vehicle_type: selected.vehicle_type, price: selected.price, vin: selected.vin || '', status: selected.status, mileage: selected.mileage, brand: selected.brand, model: selected.model, version: selected.version, year: selected.year, year_model: selected.year_model, transmission: selected.transmission, fuel: selected.fuel, color: selected.color, body_type: selected.body_type, city: selected.city, state: selected.state, optional_items: selected.optional_items || [], engine: selected.engine, horsepower: selected.horsepower, doors: selected.doors, plate_final: normalizePlateFinal(selected.plate_final), truck_type: selected.truck_type, load_capacity: selected.load_capacity, axles: selected.axles, truck_body_type: selected.truck_body_type, structured_data: selected.structured_data || null })
       setLocalImages((selected.images || []).map((img) => ({ id: img.id, previewUrl: img.public_url, isExisting: true, originalImage: img, is_primary: img.is_primary, sort_order: img.sort_order })).sort((a, b) => a.sort_order - b.sort_order))
       setIsDirty(false); setSaveStatus('idle'); setErrors({})
     }, 0)

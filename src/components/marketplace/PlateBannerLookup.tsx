@@ -17,7 +17,6 @@ type FoundVehicle = {
   year: number
   yearModel?: number
   fipePrice?: number | null
-  rawPlate: string
 }
 
 export default function PlateBannerLookup() {
@@ -50,7 +49,6 @@ export default function PlateBannerLookup() {
         year: data.anoFabricacao,
         yearModel: data.anoModelo,
         fipePrice: data.fipe_price,
-        rawPlate: data.placa || plate,
       })
       setStep('preview')
     } catch (err) {
@@ -61,7 +59,7 @@ export default function PlateBannerLookup() {
   }
 
   const handleAnunciar = () => {
-    if (found) router.push(`/anunciar-carro/fluxo?placa=${encodeURIComponent(found.rawPlate)}`)
+    if (found) router.push('/anunciar-carro/fluxo')
   }
 
   const handleReset = () => {
