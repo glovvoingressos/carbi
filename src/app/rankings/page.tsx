@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import type { ListingPublic } from '@/lib/marketplace'
 import ListingCard from '@/components/marketplace/ListingCard'
 import { fetchPublicListingsPage } from '@/lib/marketplace-server'
@@ -6,6 +7,26 @@ import { profiles, priceRanges } from '@/data/cars'
 import { Filter, Sparkles } from 'lucide-react'
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+
+export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
+  const sp = await searchParams
+  const hasParameters = Object.values(sp).some((value) =>
+    Array.isArray(value) ? value.some(Boolean) : typeof value === 'string' && value.trim().length > 0,
+  )
+
+  return {
+    title: 'Rankings de carros à venda | Carbi',
+    description: 'Compare carros à venda por custo-benefício, economia, família, segurança, desempenho e tecnologia na Carbi.',
+    alternates: { canonical: '/rankings' },
+    robots: hasParameters ? { index: false, follow: true } : { index: true, follow: true },
+    openGraph: {
+      title: 'Rankings de carros à venda | Carbi',
+      description: 'Compare carros à venda por perfil e faixa de preço na Carbi.',
+      url: '/rankings',
+      type: 'website',
+    },
+  }
+}
 
 function readValue(searchParams: Record<string, string | string[] | undefined>, key: string): string | undefined {
   const value = searchParams[key]

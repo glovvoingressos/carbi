@@ -18,9 +18,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return { title: 'Anúncio não encontrado' }
   }
 
+  const listingName = [listing.brand, listing.model, listing.version, listing.year_model]
+    .filter(Boolean)
+    .join(' ')
+  const price = formatBRL(Number(listing.price))
+  const listingTitle = `${listingName} por ${price} em ${listing.city} | Carbi`
+  const listingDescription = truncateDescription(
+    `${listingName} por ${price} em ${listing.city}/${listing.state}. Veja preço, ${listing.mileage.toLocaleString('pt-BR')} km, ${listing.transmission}, ${listing.fuel} e comparação com a Tabela FIPE na Carbi.`,
+  )
+  const imageUrl = listing.images?.[0]?.url
+
   return {
-    title: `${listing.title} | Comprar carro com preço FIPE na Carbi`,
-    description: `Comprar carro ${listing.brand} ${listing.model} ${listing.year_model} em ${listing.city}/${listing.state}. Preço do anúncio e preço FIPE como referência.`,
+    title: listingTitle,
+    description: listingDescription,
     keywords: [
       'comprar carro',
       `preço FIPE ${listing.brand} ${listing.model}`,
@@ -31,12 +41,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       canonical: `/anuncios/${listing.slug}`,
     },
     openGraph: {
-      title: `${listing.title} | Comprar carro com preço FIPE na Carbi`,
-      description: `Comprar carro ${listing.brand} ${listing.model} ${listing.year_model} em ${listing.city}/${listing.state}. Preço do anúncio e preço FIPE como referência.`,
+      title: listingTitle,
+      description: listingDescription,
       url: `/anuncios/${listing.slug}`,
       type: 'website',
+      ...(imageUrl ? { images: [{ url: imageUrl, alt: listingName }] } : {}),
+    },
+    twitter: {
+      card: imageUrl ? 'summary_large_image' : 'summary',
+      title: listingTitle,
+      description: listingDescription,
+      ...(imageUrl ? { images: [imageUrl] } : {}),
     },
   }
+}
+
+function truncateDescription(value: string, maxLength = 160): string {
+  if (value.length <= maxLength) return value
+  return `${value.slice(0, maxLength - 1).trimEnd()}…`
 }
 
 export default async function ListingDetailPage({ params }: { params: Promise<{ slug: string }> }) {

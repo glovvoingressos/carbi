@@ -66,7 +66,7 @@ export default function ConfiguracoesPage() {
       <div className="space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">Configurações</h1>
+          <h1 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A] tracking-tight">Configurações</h1>
           <p className="text-sm text-gray-500 mt-1">Gerencie sua conta e preferências</p>
         </div>
 
@@ -74,7 +74,7 @@ export default function ConfiguracoesPage() {
         {settingsSections.map((section) => (
           <div key={section.title}>
             <div className="mb-4">
-              <h2 className="text-base font-bold text-[#1A1A1A]">{section.title}</h2>
+              <h2 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A]">{section.title}</h2>
               <p className="text-sm text-gray-500 mt-0.5">{section.description}</p>
             </div>
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">

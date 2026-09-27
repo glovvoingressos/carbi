@@ -77,7 +77,7 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
             <div className="w-24 h-24 rounded-2xl overflow-hidden bg-white border-4 border-white shadow-lg">
               {avatarUrl
                 ? <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                : <div className="w-full h-full flex items-center justify-center bg-[#1A1A1A]"><User className="w-10 h-10 text-[#D4F576]" strokeWidth={1.5} /></div>}
+                : <div className="w-full h-full flex items-center justify-center bg-[#00A36A]"><User className="w-10 h-10 text-[#0A0A0A]" strokeWidth={1.5} /></div>}
             </div>
             <label htmlFor="avatar-upload" className="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
               <Camera className="w-6 h-6 text-white" strokeWidth={1.75} />
@@ -92,11 +92,11 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
           </div>
           
           <div className="flex-1 pb-1">
-            <h1 className="text-2xl font-bold text-[#1A1A1A]">{fullName || 'Seu nome'}</h1>
+            <h1 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A]">{fullName || 'Seu nome'}</h1>
             <p className="text-sm text-gray-500 mt-0.5">{email}</p>
           </div>
 
-          <label htmlFor="avatar-upload" className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1A1A1A] text-[#D4F576] rounded-xl text-sm font-semibold hover:bg-[#2D2D2D] transition-colors cursor-pointer shrink-0">
+          <label htmlFor="avatar-upload" className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#00A36A] text-[#0A0A0A] rounded-xl text-sm font-semibold hover:bg-[#008E5D] transition-colors cursor-pointer shrink-0">
             <Camera className="w-4 h-4" />
             Alterar foto
           </label>
@@ -118,7 +118,7 @@ function PersonalInfo({ fullName, email, phone, cpf, onNameChange, onPhoneChange
           <User className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
         </div>
         <div>
-          <h3 className="text-base font-bold text-[#1A1A1A]">Informações pessoais</h3>
+          <h3 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A]">Informações pessoais</h3>
           <p className="text-xs text-gray-500">Atualize seus dados de contato</p>
         </div>
       </div>
@@ -202,7 +202,7 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
           <Shield className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
         </div>
         <div>
-          <h3 className="text-base font-bold text-[#1A1A1A]">Segurança</h3>
+        <h3 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A]">Segurança</h3>
           <p className="text-xs text-gray-500">Proteja sua conta</p>
         </div>
       </div>
@@ -308,7 +308,7 @@ function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
           <AlertTriangle className="w-5 h-5 text-[#DC2626]" strokeWidth={1.75} />
         </div>
         <div>
-          <h3 className="text-base font-bold text-[#DC2626]">Zona de perigo</h3>
+          <h3 className="text-[14px] md:text-[15px] font-bold text-[#DC2626]">Zona de perigo</h3>
           <p className="text-xs text-gray-500">Ações irreversíveis</p>
         </div>
       </div>
@@ -508,10 +508,10 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
         <SecuritySection userId={userId} toast={showToast} />
       </div>
 
-      <div className="sticky bottom-28 lg:bottom-6 pt-4">
+      <div className="pt-4">
         <button
           type="button"
-          className="w-full py-4 rounded-xl text-white text-base font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+          className="w-full py-4 rounded-xl text-white text-[14px] md:text-[15px] font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-2"
           style={{ backgroundColor: '#16855C', boxShadow: '0 4px 12px rgba(22,133,92,0.25)' }}
           onClick={saveProfile}
           disabled={saving || uploading}

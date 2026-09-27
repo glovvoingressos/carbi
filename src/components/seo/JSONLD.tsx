@@ -24,7 +24,7 @@ export function LocalBusinessSchema() {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     'name': 'Carbi Marketplace',
-    'image': absoluteUrl('/logo.png'),
+    'image': absoluteUrl('/logo.svg'),
     '@id': SITE_URL,
     'url': SITE_URL,
     'description': 'Marketplace automotivo premium para anunciar e comprar carros usados e seminovos com dados reais da FIPE.',
@@ -78,7 +78,7 @@ export function OrganizationSchema() {
     '@type': 'Organization',
     'name': 'Carbi',
     'url': SITE_URL,
-    'logo': absoluteUrl('/logo.png'),
+    'logo': absoluteUrl('/logo.svg'),
     'sameAs': [
       'https://instagram.com/carbi'
     ]
@@ -89,11 +89,17 @@ export function OrganizationSchema() {
 export function VehicleSchema({ vehicle }: { vehicle: any }) {
   // Handle both ListingPublic (with price) and CarSpec (catalog)
   const isListing = 'price' in vehicle;
-  
+  const vehicleName = [vehicle.brand, vehicle.model, vehicle.version, vehicle.year_model || vehicle.year]
+    .filter(Boolean)
+    .join(' ')
+  const imageUrls = Array.isArray(vehicle.images)
+    ? vehicle.images.map((image: { url?: string }) => image?.url).filter(Boolean)
+    : []
+
   const schema: any = {
     '@context': 'https://schema.org',
     '@type': 'Car',
-    'name': `${vehicle.brand} ${vehicle.model}`,
+    'name': vehicleName,
     'description': vehicle.description || `Ficha técnica completa do ${vehicle.brand} ${vehicle.model} ${vehicle.year_model || ''}.`,
       'brand': {
         '@type': 'Brand',
@@ -105,6 +111,13 @@ export function VehicleSchema({ vehicle }: { vehicle: any }) {
     'vehicleTransmission': vehicle.transmission,
   }
 
+  if (imageUrls.length > 0) schema.image = imageUrls
+  if (vehicle.version) schema.vehicleConfiguration = vehicle.version
+  if (isListing) {
+    schema.url = absoluteUrl(`/anuncios/${vehicle.slug}`)
+    schema.itemCondition = 'https://schema.org/UsedCondition'
+  }
+
   if (vehicle.mileage !== undefined) {
     schema.mileageFromOdometer = {
       '@type': 'QuantitativeValue',
@@ -113,12 +126,12 @@ export function VehicleSchema({ vehicle }: { vehicle: any }) {
     }
   }
 
-  if (isListing && vehicle.price) {
+  if (isListing && vehicle.price != null) {
     schema.offers = {
       '@type': 'Offer',
       'price': vehicle.price,
       'priceCurrency': 'BRL',
-      'availability': 'https://schema.org/InStock',
+      'availability': vehicle.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut',
       'url': absoluteUrl(`/anuncios/${vehicle.slug}`)
     }
   }

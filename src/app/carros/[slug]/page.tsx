@@ -30,10 +30,13 @@ export const dynamicParams = true
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }): Promise<Metadata> {
   const { slug } = await params
+  const sp = await searchParams
   const preset = resolveSeoPreset(slug)
   if (!preset) {
     return {
@@ -43,6 +46,9 @@ export async function generateMetadata({
   }
 
   const canonicalUrl = `${SITE_URL}/carros/${preset.slug}`
+  const hasParameters = Object.values(sp).some((value) =>
+    Array.isArray(value) ? value.some(Boolean) : typeof value === 'string' && value.trim().length > 0,
+  )
 
   return {
     title: preset.title,
@@ -51,6 +57,7 @@ export async function generateMetadata({
     alternates: {
       canonical: canonicalUrl,
     },
+    robots: hasParameters ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
       title: preset.title,
       description: preset.description,

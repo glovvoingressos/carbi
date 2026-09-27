@@ -141,8 +141,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
             type="button"
             onClick={handleLookup}
             disabled={loading || plate.length < 7}
-            className="h-10 px-5 rounded-xl text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40 shrink-0"
-            style={{ backgroundColor: '#16855C' }}
+            className="flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#00A36A] px-5 text-xs font-semibold text-[#0A0A0A] transition-colors hover:bg-[#008E5D] disabled:cursor-not-allowed disabled:bg-[#DDE9E4] disabled:text-[#557066]"
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" /> : <Search className="w-3.5 h-3.5" aria-hidden="true" />}
             {loading ? 'Consultando…' : 'Buscar'}

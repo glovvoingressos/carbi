@@ -55,6 +55,26 @@ typography:
     fontFamily: "Plus Jakarta Sans, DM Sans, system-ui, sans-serif"
     fontSize: "13px"
     fontWeight: 500
+  account-ui:
+    fontFamily: "DM Sans, system-ui, sans-serif"
+    fontSize: "15px"
+    fontWeight: 400
+    lineHeight: 1.45
+  account-mobile:
+    fontFamily: "DM Sans, system-ui, sans-serif"
+    fontSize: "14px"
+    fontWeight: 400
+    lineHeight: 1.45
+  account-helper:
+    fontFamily: "Plus Jakarta Sans, DM Sans, system-ui, sans-serif"
+    fontSize: "11px"
+    fontWeight: 500
+    lineHeight: 1.35
+  account-micro:
+    fontFamily: "Plus Jakarta Sans, DM Sans, system-ui, sans-serif"
+    fontSize: "10px"
+    fontWeight: 500
+    lineHeight: 1.3
 rounded:
   xs: "10px"
   sm: "14px"
@@ -166,6 +186,9 @@ A Carbi combina a confiança e clareza de uma fintech com a paixão do universo 
 - **Title** (700, 24px): Card titles
 - **Body** (400, 16px): Paragraphs, descriptions
 - **Label** (600, 13px): Badges, tags, metadata
+- **Account UI** (400, 15px desktop / 14px mobile): Dense authenticated surfaces
+- **Account helper** (500, 11px): Secondary descriptions and navigation hints
+- **Account micro** (500, 10px): Compact status metadata
 
 ## 4. Elevation
 

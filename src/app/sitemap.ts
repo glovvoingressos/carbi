@@ -1,9 +1,9 @@
 import { MetadataRoute } from 'next'
-import { fetchPublicListingsPage, fetchPublicTruckListingsPage } from '@/lib/marketplace-server'
 import { MARKETPLACE_SEO_SLUGS, MAJOR_CITIES, buildTruckSeoPaths } from '@/lib/marketplace-seo'
 import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import { slugifyBrand } from '@/lib/brand-utils'
 import { getRankingSitemapPaths } from '@/lib/rankings-seo'
+import { getAllPublicSitemapListings } from '@/lib/sitemap-listings'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 
@@ -33,27 +33,19 @@ const YEAR_RANGE = Array.from({ length: 7 }, (_, i) => String(2020 + i))
 const CATEGORY_INTENTS = [
   'ate-50-mil', 'ate-100-mil', 'economicos', 'para-familia',
   '7-lugares', 'hibridos', 'off-road', 'esportivos',
-  'eletricos', 'suv-automaticos', 'sedan-automaticos', 'picapes-diesel',
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [cars, listingsPage1, listingsPage2, truckListingsPage] = await Promise.all([
+  const [cars, publicListings] = await Promise.all([
     getAllCars().catch(() => []),
-    fetchPublicListingsPage({ page: 1, pageSize: 48, sort: 'recent' }).catch(() => ({ items: [] })),
-    fetchPublicListingsPage({ page: 2, pageSize: 48, sort: 'recent' }).catch(() => ({ items: [] })),
-    fetchPublicTruckListingsPage({ page: 1, pageSize: 48, sort: 'recent' }).catch(() => ({ items: [] })),
+    getAllPublicSitemapListings().catch((error) => {
+      console.error('Erro ao gerar URLs de anúncios no sitemap:', error)
+      return { cars: [], trucks: [] }
+    }),
   ])
 
   const uniqueBrands = Array.from(new Set(cars.map((car) => slugifyBrand(car.brand)))).filter(Boolean)
   const modelEntries = groupCarsByModel(cars)
-
-  const allListings = [...listingsPage1.items, ...listingsPage2.items]
-  const seenSlugs = new Set<string>()
-  const uniqueListings = allListings.filter((l) => {
-    if (seenSlugs.has(l.slug)) return false
-    seenSlugs.add(l.slug)
-    return true
-  })
 
   const entries: MetadataRoute.Sitemap = []
 
@@ -134,19 +126,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
-  for (const listing of truckListingsPage.items) {
+  for (const listing of publicListings.trucks) {
     entries.push({
       url: `${SITE_URL}/caminhoes/anuncio/${listing.slug}`,
-      lastModified: new Date(listing.updated_at || listing.published_at || listing.created_at),
+      ...getLastModified(listing.updated_at || listing.published_at || listing.created_at),
       changeFrequency: 'daily',
       priority: 0.9,
     })
   }
 
-  for (const listing of uniqueListings) {
+  for (const listing of publicListings.cars) {
     entries.push({
       url: `${SITE_URL}/anuncios/${listing.slug}`,
-      lastModified: new Date(listing.updated_at || listing.published_at || listing.created_at),
+      ...getLastModified(listing.updated_at || listing.published_at || listing.created_at),
       changeFrequency: 'daily',
       priority: 0.9,
     })
@@ -171,4 +163,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   return entries
+}
+
+function getLastModified(value: string | null | undefined): { lastModified?: Date } {
+  if (!value) return {}
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? {} : { lastModified: date }
 }

@@ -12843,6 +12843,9 @@ p {
 }
 .cb-hero-title-word-slot {
   display: inline-block;
+  width: 8.5ch;
+  min-width: 8.5ch;
+  white-space: nowrap;
   vertical-align: baseline;
 }
 .cb-hero-title-word {

@@ -109,29 +109,28 @@ export default function MinhaContaPage() {
 
   return (
     <AccountLayout user={user} stats={stats}>
-      <div className="space-y-6">
+      <div className="min-w-0 space-y-6">
         {/* Hero Welcome */}
-        <div className="rounded-2xl p-8 relative overflow-hidden" style={{ backgroundColor: '#16855C', backgroundImage: 'linear-gradient(135deg, #16855C 0%, #1A7A54 50%, #146B4A 100%)' }}>
-          <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
+        <div className="relative overflow-hidden rounded-[32px] bg-[#00A36A] p-5 text-[#0A0A0A] md:p-8">
+          <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[#B8FF00]/30 blur-3xl" />
           <div className="relative z-10">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight" style={{ color: '#FFFFFF' }}>
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#0A0A0A]">Carbi member space</p>
+            <h1 className="text-[14px] font-bold tracking-tight text-[#0A0A0A] md:text-[15px]">
               Olá, {user.fullName?.split(' ')[0] || 'Usuário'} 👋
             </h1>
-            <p className="mt-2 text-sm sm:text-base" style={{ color: 'rgba(255,255,255,0.85)' }}>Bem-vindo de volta à sua área de membros</p>
+            <p className="mt-2 text-xs text-black/70 md:text-sm">Seu espaço para vender, acompanhar e decidir melhor.</p>
             
-            <div className="flex flex-wrap gap-3 mt-6">
+            <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/minha-conta/anuncios"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition-colors"
-                style={{ backgroundColor: '#D4F576', color: '#1A1A1A' }}
+                className="inline-flex items-center gap-2 rounded-full bg-[#B8FF00] px-5 py-3 text-sm font-bold text-[#0A0A0A] transition-transform hover:-translate-y-0.5 hover:bg-[#A9EE00]"
               >
                 <Plus className="w-4 h-4" />
                 Novo anúncio
               </Link>
               <Link
                 href="/carros-a-venda"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-colors"
-                style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#FFFFFF', border: '1px solid rgba(255,255,255,0.2)' }}
+                className="inline-flex items-center gap-2 rounded-full border border-black/20 bg-white/65 px-5 py-3 text-sm font-semibold text-[#0A0A0A] transition-colors hover:bg-white/85"
               >
                 Explorar seminovos
                 <ArrowUpRight className="w-4 h-4" />
@@ -141,60 +140,60 @@ export default function MinhaContaPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link href="/minha-conta/anuncios" className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md hover:border-gray-200 transition-all group">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-[#D4F576]/20 flex items-center justify-center">
-                <Car className="w-5 h-5 text-[#1A1A1A]" strokeWidth={1.75} />
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <Link href="/minha-conta/anuncios" className="group rounded-[24px] border border-black/[0.06] bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-5">
+            <div className="mb-3 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#B8FF00]">
+                <Car className="h-5 w-5 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
-              <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-[#1A1A1A] transition-colors ml-auto" />
+              <ArrowUpRight className="ml-auto h-4 w-4 text-black/20 transition-colors group-hover:text-[#0A0A0A]" />
             </div>
-            <p className="text-2xl font-bold text-[#1A1A1A]">{dashboardStats.totalListings}</p>
-            <p className="text-xs text-gray-500 mt-1">Anúncios totais</p>
+            <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{dashboardStats.totalListings}</p>
+            <p className="mt-1 text-xs text-[#5C5C66]">Anúncios totais</p>
           </Link>
 
-          <div className="bg-white rounded-2xl border border-gray-100 p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-                <Eye className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
+          <div className="rounded-[24px] border border-black/[0.06] bg-white p-4 sm:p-5">
+            <div className="mb-3 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#00A36A]">
+                <Eye className="h-5 w-5 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
             </div>
-            <p className="text-2xl font-bold text-[#1A1A1A]">{dashboardStats.totalViews > 999 ? `${(dashboardStats.totalViews / 1000).toFixed(1)}k` : dashboardStats.totalViews}</p>
-            <p className="text-xs text-gray-500 mt-1">Visualizações</p>
+            <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{dashboardStats.totalViews > 999 ? `${(dashboardStats.totalViews / 1000).toFixed(1)}k` : dashboardStats.totalViews}</p>
+            <p className="mt-1 text-xs text-[#5C5C66]">Visualizações</p>
           </div>
 
-          <Link href="/minha-conta/anuncios" className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md hover:border-gray-200 transition-all group">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
+          <Link href="/minha-conta/anuncios" className="group rounded-[24px] border border-black/[0.06] bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-5">
+            <div className="mb-3 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#F1F1F6]">
+                <TrendingUp className="h-5 w-5 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
-              <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-[#1A1A1A] transition-colors ml-auto" />
+              <ArrowUpRight className="ml-auto h-4 w-4 text-black/20 transition-colors group-hover:text-[#0A0A0A]" />
             </div>
-            <p className="text-2xl font-bold text-[#1A1A1A]">{dashboardStats.activeListings}</p>
-            <p className="text-xs text-gray-500 mt-1">Ativos agora</p>
+            <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{dashboardStats.activeListings}</p>
+            <p className="mt-1 text-xs text-[#5C5C66]">Ativos agora</p>
           </Link>
 
-          <Link href="/minha-conta/conversas" className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md hover:border-gray-200 transition-all group">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                <MessageCircle className="w-5 h-5 text-blue-600" strokeWidth={1.75} />
+          <Link href="/minha-conta/conversas" className="group rounded-[24px] border border-black/[0.06] bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-5">
+            <div className="mb-3 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#B8FF00]">
+                <MessageCircle className="h-5 w-5 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
-              <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-[#1A1A1A] transition-colors ml-auto" />
+              <ArrowUpRight className="ml-auto h-4 w-4 text-black/20 transition-colors group-hover:text-[#0A0A0A]" />
             </div>
-            <p className="text-2xl font-bold text-[#1A1A1A]">{dashboardStats.unreadMessages}</p>
-            <p className="text-xs text-gray-500 mt-1">Mensagens não lidas</p>
+            <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{dashboardStats.unreadMessages}</p>
+            <p className="mt-1 text-xs text-[#5C5C66]">Mensagens não lidas</p>
           </Link>
         </div>
 
         {/* Recent Listings */}
         {recentListings.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-5">
+          <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
+            <div className="mb-5 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-bold text-[#1A1A1A]">Anúncios recentes</h2>
-                <p className="text-sm text-gray-500 mt-0.5">Seus últimos veículos publicados</p>
+                <h2 className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Anúncios recentes</h2>
+                <p className="mt-0.5 text-sm text-[#5C5C66]">Seus últimos veículos publicados</p>
               </div>
-              <Link href="/minha-conta/anuncios" className="text-sm font-semibold text-[#1A1A1A] hover:underline">
+              <Link href="/minha-conta/anuncios" className="text-sm font-semibold text-[#0A0A0A] hover:underline">
                 Ver todos →
               </Link>
             </div>
@@ -203,24 +202,24 @@ export default function MinhaContaPage() {
                 <Link
                   key={listing.id}
                   href={`/minha-conta/anuncios`}
-                  className="flex items-center gap-4 p-4 rounded-xl hover:bg-[#F8F9FA] transition-colors"
+                  className="flex min-w-0 items-center gap-4 rounded-[18px] p-3 transition-colors hover:bg-[#F1F1F6] sm:p-4"
                 >
-                  <div className="w-16 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
+                  <div className="h-12 w-16 shrink-0 overflow-hidden rounded-[14px] bg-[#F1F1F6]">
                     {listing.images?.[0]?.public_url ? (
                       <img src={listing.images[0].public_url} alt={listing.title} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-[#1A1A1A]">
-                        <Car className="w-5 h-5 text-[#D4F576]" />
+                      <div className="flex h-full w-full items-center justify-center bg-[#00A36A]">
+                        <Car className="h-5 w-5 text-[#0A0A0A]" />
                       </div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#1A1A1A] truncate">{listing.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{listing.year}/{listing.year_model} · {listing.mileage?.toLocaleString('pt-BR')} km</p>
+                    <p className="truncate text-sm font-semibold text-[#0A0A0A]">{listing.title}</p>
+                    <p className="mt-0.5 text-xs text-[#5C5C66]">{listing.year}/{listing.year_model} · {listing.mileage?.toLocaleString('pt-BR')} km</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold text-[#1A1A1A]">{formatBRL(listing.price)}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">{listing.status === 'active' ? 'Ativo' : listing.status === 'paused' ? 'Pausado' : 'Vendido'}</p>
+                    <p className="text-sm font-bold text-[#0A0A0A]">{formatBRL(listing.price)}</p>
+                    <p className="mt-0.5 text-[10px] text-[#5C5C66]">{listing.status === 'active' ? 'Ativo' : listing.status === 'paused' ? 'Pausado' : 'Vendido'}</p>
                   </div>
                 </Link>
               ))}
@@ -229,30 +228,30 @@ export default function MinhaContaPage() {
         )}
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <h2 className="text-lg font-bold text-[#1A1A1A] mb-5">Ações rápidas</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <Link href="/minha-conta/anuncios" className="flex flex-col items-center gap-3 p-4 rounded-xl bg-[#F8F9FA] hover:bg-gray-200 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#D4F576]/20 flex items-center justify-center">
-                <Plus className="w-6 h-6 text-[#1A1A1A]" strokeWidth={1.75} />
+        <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
+          <h2 className="mb-5 text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Ações rápidas</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Link href="/minha-conta/anuncios" className="group flex flex-col items-center gap-3 rounded-[20px] bg-[#B8FF00] p-4 transition-transform hover:-translate-y-0.5">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#00A36A]">
+                <Plus className="h-6 w-6 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
-              <span className="text-sm font-semibold text-[#1A1A1A]">Novo anúncio</span>
+              <span className="text-sm font-semibold text-[#0A0A0A]">Novo anúncio</span>
             </Link>
-            <Link href="/minha-conta/favoritos" className="flex flex-col items-center gap-3 p-4 rounded-xl bg-[#F8F9FA] hover:bg-gray-200 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#D4F576]/20 flex items-center justify-center">
-                <Heart className="w-6 h-6 text-[#1A1A1A]" strokeWidth={1.75} />
+            <Link href="/minha-conta/favoritos" className="group flex flex-col items-center gap-3 rounded-[20px] bg-[#F1F1F6] p-4 transition-colors hover:bg-[#E7E7ED]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
+                <Heart className="h-6 w-6 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
               <span className="text-sm font-semibold text-[#1A1A1A]">Favoritos</span>
             </Link>
-            <Link href="/minha-conta/conversas" className="flex flex-col items-center gap-3 p-4 rounded-xl bg-[#F8F9FA] hover:bg-gray-200 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#D4F576]/20 flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-[#1A1A1A]" strokeWidth={1.75} />
+            <Link href="/minha-conta/conversas" className="group flex flex-col items-center gap-3 rounded-[20px] bg-[#F1F1F6] p-4 transition-colors hover:bg-[#E7E7ED]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
+                <MessageCircle className="h-6 w-6 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
               <span className="text-sm font-semibold text-[#1A1A1A]">Mensagens</span>
             </Link>
-            <Link href="/minha-conta/configuracoes" className="flex flex-col items-center gap-3 p-4 rounded-xl bg-[#F8F9FA] hover:bg-gray-200 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#D4F576]/20 flex items-center justify-center">
-                <Settings className="w-6 h-6 text-[#1A1A1A]" strokeWidth={1.75} />
+            <Link href="/minha-conta/configuracoes" className="group flex flex-col items-center gap-3 rounded-[20px] bg-[#F1F1F6] p-4 transition-colors hover:bg-[#E7E7ED]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
+                <Settings className="h-6 w-6 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
               <span className="text-sm font-semibold text-[#1A1A1A]">Configurações</span>
             </Link>

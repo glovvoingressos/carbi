@@ -236,12 +236,12 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
   ) : null
 
   return (
-    <div className="w-full max-w-md mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-8 md:p-10">
+    <div className="w-full max-w-md mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-8 md:p-10 text-[14px] md:text-[15px]">
       <AnimatePresence mode="wait">
         {/* ─── LOGIN ─── */}
         {mode === 'login' && (
           <motion.form key="login" {...fade} onSubmit={handleSubmit}>
-            <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Entrar</h2>
+            <h2 className="text-[14px] md:text-[15px] font-semibold tracking-tight text-gray-900">Entrar</h2>
             <p className="mt-1.5 text-sm text-gray-500">Acesse para gerenciar seus anúncios e conversas.</p>
 
             {!supabaseReady && (
@@ -286,7 +286,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         {/* ─── SIGNUP ─── */}
         {mode === 'signup' && (
           <motion.form key="signup" {...fade} onSubmit={handleSubmit}>
-            <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Criar conta</h2>
+            <h2 className="text-[14px] md:text-[15px] font-semibold tracking-tight text-gray-900">Criar conta</h2>
             <p className="mt-1.5 text-sm text-gray-500">Cadastro gratuito em dois passos.</p>
 
             {/* Step indicator */}
@@ -318,7 +318,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
                       <ArrowRight size={14} className="text-gray-600 rotate-180" />
                     </button>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">Dados de contato e acesso</h3>
+                      <h3 className="text-[14px] md:text-[15px] font-semibold text-gray-900">Dados de contato e acesso</h3>
                     </div>
                   </div>
                   <InputField icon={Phone} id="signup-phone" label="Telefone" type="tel" value={phone} onChange={(v) => setPhone(formatPhone(v))} placeholder="(00) 00000-0000" maxLength={15} required />
@@ -365,7 +365,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         {/* ─── FORGOT PASSWORD ─── */}
         {mode === 'forgot' && (
           <motion.form key="forgot" {...fade} onSubmit={handleSubmit}>
-            <h2 className="text-2xl font-semibold tracking-tight text-gray-900">Redefinir senha</h2>
+            <h2 className="text-[14px] md:text-[15px] font-semibold tracking-tight text-gray-900">Redefinir senha</h2>
             <p className="mt-1.5 text-sm text-gray-500">Informe seu e-mail para receber um link de redefinição.</p>
 
             <div className="mt-6">

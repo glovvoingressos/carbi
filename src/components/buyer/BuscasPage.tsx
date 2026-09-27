@@ -58,10 +58,10 @@ export default function BuscasPage() {
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
       <div className="mb-8">
-        <span className="mb-2 inline-flex items-center gap-2 rounded-full bg-[#1A1A1A] px-3 py-1.5 text-xs font-bold tracking-widest text-[#D4F576]">
+        <span className="mb-2 inline-flex items-center gap-2 rounded-full bg-[#00A36A] px-3 py-1.5 text-xs font-bold tracking-widest text-[#0A0A0A]">
           <BellRing size={13} /> PROCURE MEU CARRO
         </span>
-        <h1 className="text-2xl font-extrabold text-[#1A1A1A]">Minhas buscas</h1>
+        <h1 className="text-[14px] md:text-[15px] font-extrabold text-[#1A1A1A]">Minhas buscas</h1>
         <p className="mt-1 text-sm text-[#3A3A3A]">Acompanhe o que você está procurando e as oportunidades que encontramos.</p>
       </div>
 

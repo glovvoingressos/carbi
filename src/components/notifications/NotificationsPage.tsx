@@ -47,7 +47,7 @@ function EmptyState() {
       <div className="w-24 h-24 rounded-2xl bg-[#F8F9FA] flex items-center justify-center mb-6">
         <Inbox size={40} className="text-gray-300" />
       </div>
-      <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">Nenhuma notificação</h3>
+      <h3 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A] mb-2">Nenhuma notificação</h3>
       <p className="text-sm text-gray-500 max-w-[320px] leading-relaxed">
         Quando alguém interagir com seus anúncios, você será notificado aqui.
       </p>
@@ -110,7 +110,7 @@ export default function NotificationsPage() {
   }, [token])
 
   if (!ready) return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-[14px] md:text-[15px]">
       <div className="h-10 bg-gray-100 rounded-2xl animate-pulse w-48" />
       <div className="space-y-3">
         {[1, 2, 3, 4, 5].map((i) => <NotificationSkeleton key={i} />)}
@@ -126,7 +126,7 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">Notificações</h1>
+          <h1 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A] tracking-tight">Notificações</h1>
           <p className="text-sm text-gray-500 mt-1">
             {unreadCount > 0 ? `${unreadCount} não lida${unreadCount > 1 ? 's' : ''}` : 'Tudo lido'}
           </p>
@@ -169,7 +169,7 @@ export default function NotificationsPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-3">
-                        <p className={`text-base leading-snug ${read ? 'font-medium text-gray-600' : 'font-bold text-[#1A1A1A]'}`}>
+                        <p className={`text-[14px] md:text-[15px] leading-snug ${read ? 'font-medium text-gray-600' : 'font-bold text-[#1A1A1A]'}`}>
                           {n.title}
                         </p>
                         {!read && <span className="w-3 h-3 rounded-full bg-[#D4F576] shrink-0 mt-1.5" />}

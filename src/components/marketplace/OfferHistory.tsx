@@ -89,7 +89,7 @@ export default function OfferHistory({ listingId, isSeller, accessToken }: Offer
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3">
-                  <span className="text-[16px] font-bold text-[#0A0A0A]">{formatBRL(thread[0].amount)}</span>
+                  <span className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{formatBRL(thread[0].amount)}</span>
                   <span className={`rounded-full border px-3 py-0.5 text-[11px] font-semibold ${OFFER_STATUS_COLORS[thread[0].status]}`}>
                     {OFFER_STATUS_LABELS[thread[0].status]}
                   </span>
@@ -128,7 +128,7 @@ export default function OfferHistory({ listingId, isSeller, accessToken }: Offer
                           </span>
                         </div>
                         {response.counter_amount && (
-                          <p className="text-[15px] font-bold text-[#0A0A0A]">{formatBRL(response.counter_amount)}</p>
+                          <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{formatBRL(response.counter_amount)}</p>
                         )}
                         {response.seller_message && (
                           <p className="text-[13px] text-[#525252]">{response.seller_message}</p>

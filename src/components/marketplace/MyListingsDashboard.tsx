@@ -40,13 +40,13 @@ function StatusBadge({ status, isSelected = false }: { status: string; isSelecte
 
   const getStyles = () => {
     if (isSelected) {
-      return { backgroundColor: 'rgba(255,255,255,0.2)', color: '#FFFFFF' }
+      return { backgroundColor: 'rgba(0,0,0,0.12)', color: '#0A0A0A' }
     }
     switch (status) {
-      case 'active': return { backgroundColor: 'rgba(22,133,92,0.1)', color: '#16855C' }
+      case 'active': return { backgroundColor: 'rgba(184,255,0,0.18)', color: '#4D6900' }
       case 'paused': return { backgroundColor: 'rgba(245,158,11,0.1)', color: '#F59E0B' }
       case 'sold': return { backgroundColor: '#F3F4F6', color: '#6B7280' }
-      default: return { backgroundColor: 'rgba(22,133,92,0.1)', color: '#16855C' }
+      default: return { backgroundColor: 'rgba(184,255,0,0.18)', color: '#4D6900' }
     }
   }
 
@@ -64,34 +64,34 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
   isUploading: boolean; pendingUploads: number; imageError: string | null; isDirty: boolean
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
-      <div className="flex items-center justify-between mb-4 sm:mb-5">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-            <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-[#16855C]" strokeWidth={1.75} />
+    <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-4 sm:mb-5">
+        <div className="flex items-start gap-3 min-w-0">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-10 sm:w-10">
+            <ImageIcon className="h-4 w-4 text-[#0A0A0A] sm:h-5 sm:w-5" strokeWidth={1.75} />
           </div>
-          <div>
-            <h3 className="text-sm sm:text-base font-bold text-[#1A1A1A]">Fotos do veículo</h3>
-            <p className="text-[11px] sm:text-xs text-gray-500">Arraste para reordenar. A primeira é a capa.</p>
+          <div className="min-w-0">
+            <h3 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A] whitespace-nowrap">Fotos do veículo</h3>
+            <p className="text-[11px] sm:text-xs text-gray-500 leading-relaxed">Arraste para reordenar. A primeira é a capa.</p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <label className="h-10 px-4 rounded-xl bg-[#F8F9FA] hover:bg-gray-200 text-[#1A1A1A] text-sm font-semibold flex items-center gap-2 cursor-pointer transition-colors border border-gray-200">
+        <div className="flex w-full lg:w-auto gap-2">
+          <label className="flex h-10 flex-1 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-full border border-black/10 bg-white px-4 text-sm font-semibold text-[#0A0A0A] transition-colors hover:bg-[#F1F1F6] lg:flex-none">
             <Upload className="w-4 h-4" /> Adicionar
             <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { onAdd(e.target.files); e.target.value = '' }} />
           </label>
-          <button onClick={onSync} disabled={!isDirty || isUploading} className="h-10 px-5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 disabled:opacity-40 transition-colors" style={{ backgroundColor: '#16855C' }}>
-            {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar
+          <button onClick={onSync} disabled={!isDirty || isUploading} className="flex h-10 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#00A36A] px-5 text-sm font-semibold text-[#0A0A0A] transition-colors hover:bg-[#008E5D] disabled:cursor-not-allowed disabled:bg-[#DDE9E4] disabled:text-[#557066] lg:flex-none">
+            {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Salvar
           </button>
         </div>
       </div>
 
       <div
-        className={`rounded-2xl border-2 border-dashed transition-all ${isDragging ? 'border-[#16855C] bg-[#16855C]/5' : 'border-gray-200 bg-[#F8F9FA]'}`}
+        className={`rounded-[22px] border-2 border-dashed transition-all ${isDragging ? 'border-[#B8FF00] bg-[#B8FF00]/10' : 'border-black/10 bg-[#F1F1F6]'}`}
         onDragEnter={onDragEnter} onDragLeave={onDragLeave} onDragOver={onDragOver} onDrop={onDrop}
       >
         {(isUploading || pendingUploads > 0) && (
-          <div className="flex items-center gap-2 px-4 py-3 bg-[#16855C]/5 text-sm text-[#16855C] m-4 rounded-xl">
+          <div className="m-4 flex items-center gap-2 rounded-[16px] bg-[#B8FF00]/15 px-4 py-3 text-sm text-[#4D6900]">
             <Loader2 className="w-4 h-4 animate-spin" />
             {isUploading ? 'Enviando fotos...' : `${pendingUploads} foto(s) prontas para salvar`}
           </div>
@@ -105,8 +105,8 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
         {images.length === 0 ? (
           <label className="block cursor-pointer p-12 text-center transition-colors hover:bg-gray-100 rounded-2xl">
             <ImageIcon className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-            <p className="text-base font-semibold text-[#1A1A1A]">Arraste fotos ou clique para selecionar</p>
-            <p className="text-sm text-gray-500 mt-2">JPG, PNG ou WEBP · até {LISTING_MAX_IMAGES} imagens · máx {LISTING_MAX_IMAGE_SIZE_MB}MB cada</p>
+            <p className="text-[14px] font-semibold text-[#0A0A0A] md:text-[15px]">Arraste fotos ou clique para selecionar</p>
+            <p className="mt-2 text-sm text-[#5C5C66]">JPG, PNG ou WEBP · até {LISTING_MAX_IMAGES} imagens · máx {LISTING_MAX_IMAGE_SIZE_MB}MB cada</p>
             <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { onAdd(e.target.files); e.target.value = '' }} />
           </label>
         ) : (
@@ -121,17 +121,17 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
                       <X className="w-4 h-4" />
                     </button>
                   </div>
-                  <button onClick={() => onSetPrimary(img.id)} className={`w-full py-2 rounded-lg text-xs font-semibold transition-colors ${img.is_primary ? 'bg-[#16855C] text-white' : 'bg-white text-[#1A1A1A]'}`}>
+                  <button onClick={() => onSetPrimary(img.id)} className={`w-full rounded-full py-2 text-xs font-semibold transition-colors ${img.is_primary ? 'bg-[#B8FF00] text-[#0A0A0A]' : 'bg-white text-[#0A0A0A]'}`}>
                     {img.is_primary ? '✓ Capa' : 'Definir como capa'}
                   </button>
                 </div>
                 {img.is_primary && (
-                  <div className="absolute top-2 left-2 bg-[#16855C] text-white px-2.5 py-1 rounded-full text-[10px] font-semibold flex items-center gap-1">
+                  <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-[#B8FF00] px-2.5 py-1 text-[10px] font-semibold text-[#0A0A0A]">
                     <Star className="w-3 h-3 fill-current" /> Capa
                   </div>
                 )}
                 {!img.isExisting && (
-                  <div className="absolute top-2 right-2 bg-[#D4F576] text-[#1A1A1A] px-2.5 py-1 rounded-full text-[10px] font-semibold">Novo</div>
+                  <div className="absolute right-2 top-2 rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold text-[#0A0A0A]">Novo</div>
                 )}
               </Reorder.Item>
             ))}
@@ -149,26 +149,26 @@ function ListingCard({ listing, isSelected, onSelect }: { listing: DashboardList
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
       onClick={onSelect}
-      className="w-full text-left p-3 rounded-2xl transition-all border"
+      className="w-full rounded-[22px] border p-3 text-left transition-all"
       style={{
-        backgroundColor: isSelected ? '#16855C' : '#FFFFFF',
-        borderColor: isSelected ? '#16855C' : '#E5E7EB',
-        boxShadow: isSelected ? '0 4px 12px rgba(22,133,92,0.25)' : undefined
+        backgroundColor: isSelected ? '#00A36A' : '#FFFFFF',
+        borderColor: isSelected ? '#00A36A' : 'rgba(0,0,0,0.08)',
+        boxShadow: isSelected ? '0 12px 24px rgba(0,0,0,0.12)' : undefined
       }}
     >
       <div className="flex gap-3">
-        <div className="w-16 h-12 rounded-xl overflow-hidden flex-shrink-0" style={{ backgroundColor: isSelected ? '#146B4A' : '#F3F4F6' }}>
+        <div className="h-12 w-16 shrink-0 overflow-hidden rounded-[14px]" style={{ backgroundColor: isSelected ? '#B8FF00' : '#F1F1F6' }}>
           <MarketplaceListingImage brand={listing.brand} model={listing.model} year={listing.year_model} imageUrls={listing.images?.map((img) => img.public_url) || []} alt={listing.title} className="h-full w-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <p className="text-xs font-bold truncate" style={{ color: isSelected ? '#FFFFFF' : '#1A1A1A' }}>{listing.title}</p>
+            <p className="truncate text-xs font-bold text-[#0A0A0A]">{listing.title}</p>
             <StatusBadge status={listing.status} isSelected={isSelected} />
           </div>
-          <p className="text-sm font-bold mt-1" style={{ color: isSelected ? '#FFFFFF' : '#1A1A1A' }}>{formatBRL(listing.price)}</p>
+          <p className="mt-1 text-sm font-bold text-[#0A0A0A]">{formatBRL(listing.price)}</p>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-[10px]" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : '#6B7280' }}>{listing.year}/{listing.year_model}</span>
-            <span className="text-[10px]" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : '#6B7280' }}>{listing.mileage?.toLocaleString('pt-BR')} km</span>
+            <span className="text-[10px]" style={{ color: isSelected ? 'rgba(10,10,10,0.7)' : '#6B7280' }}>{listing.year}/{listing.year_model}</span>
+            <span className="text-[10px]" style={{ color: isSelected ? 'rgba(10,10,10,0.7)' : '#6B7280' }}>{listing.mileage?.toLocaleString('pt-BR')} km</span>
           </div>
         </div>
       </div>
@@ -196,42 +196,42 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
     setErrors(next)
   }, [errors, setFormData, setIsDirty, setErrors])
 
-  const ic = (f: string, x = '') => `w-full h-11 sm:h-12 px-3 sm:px-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all ${x} ${errors[f] ? '!border-[#DC2626] !text-[#DC2626]' : ''}`
+  const ic = (f: string, x = '') => `w-full h-11 sm:h-12 px-3 sm:px-4 rounded-[16px] bg-[#F1F1F6] border border-black/[0.06] text-sm text-[#0A0A0A] placeholder-[#6A6A74] focus:outline-none focus:border-[#B8FF00] focus:ring-2 focus:ring-[#B8FF00]/20 transition-all ${x} ${errors[f] ? '!border-[#D94A3A] !text-[#D94A3A]' : ''}`
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       {/* Toolbar */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-3 sm:p-5 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-        <div className={`flex items-center gap-2 text-sm font-medium ${saveStatus === 'saving' ? 'text-[#F59E0B]' : saveStatus === 'saved' ? 'text-[#16855C]' : saveStatus === 'error' ? 'text-[#DC2626]' : 'text-gray-500'}`}>
-          {saveStatus === 'saving' ? <Loader2 className="w-4 h-4 animate-spin" /> : saveStatus === 'saved' ? <Check className="w-4 h-4" /> : saveStatus === 'error' ? <AlertCircle className="w-4 h-4" /> : <div className="w-2 h-2 rounded-full bg-[#16855C]" />}
+      <div className="flex flex-col gap-4 rounded-[28px] bg-[#00A36A] p-5 text-[#0A0A0A] sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:p-6">
+        <div className={`flex min-h-10 min-w-0 items-center gap-3 whitespace-nowrap text-sm font-semibold ${saveStatus === 'saving' ? 'text-[#5B3800]' : saveStatus === 'saved' ? 'text-[#0A0A0A]' : saveStatus === 'error' ? 'text-[#8B1E16]' : 'text-[#0A0A0A]'}`}>
+          {saveStatus === 'saving' ? <Loader2 className="h-4 w-4 animate-spin" /> : saveStatus === 'saved' ? <Check className="h-4 w-4" /> : saveStatus === 'error' ? <AlertCircle className="h-4 w-4" /> : <div className="h-2 w-2 rounded-full bg-[#0A0A0A]" />}
           {saveStatus === 'saving' ? 'Salvando alterações...' : saveStatus === 'saved' ? 'Alterações salvas' : saveStatus === 'error' ? 'Erro ao salvar' : 'Todas alterações salvas'}
         </div>
-        <div className="flex items-center gap-3">
-          <button onClick={onDelete} disabled={isDeleting} className="h-11 px-5 rounded-xl border border-gray-200 flex items-center gap-2 text-sm font-medium text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors disabled:opacity-40">
-            {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+        <div className="flex w-full items-center gap-3 sm:w-auto">
+          <button onClick={onDelete} disabled={isDeleting} className="flex h-12 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-black/25 px-5 text-sm font-semibold text-[#0A0A0A] transition-colors hover:bg-black/10 disabled:cursor-not-allowed disabled:border-black/15 disabled:text-black/45 sm:min-w-36 sm:flex-none">
+            {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Excluir
           </button>
-          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="h-11 px-8 rounded-xl text-white text-sm font-bold flex items-center gap-2 transition-colors disabled:opacity-40" style={{ backgroundColor: '#16855C', boxShadow: '0 4px 12px rgba(22,133,92,0.25)' }}>
-            <Save className="w-4 h-4" /> Salvar anúncio
+          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="flex h-12 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#B8FF00] px-8 text-sm font-bold text-[#0A0A0A] transition-colors hover:bg-[#A9EE00] disabled:cursor-not-allowed disabled:bg-[#DCE5B6] disabled:text-[#4D6900] sm:min-w-48 sm:flex-none">
+            <Save className="h-4 w-4" /> Salvar anúncio
           </button>
         </div>
       </div>
 
       {/* Stats Header */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+      <div className="flex flex-col gap-4 rounded-[28px] bg-[#00A36A] p-4 text-[#0A0A0A] sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4 sm:gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-                <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-[#16855C]" strokeWidth={1.75} />
+              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-12 sm:w-12">
+                <Eye className="h-5 w-5 text-[#0A0A0A] sm:h-6 sm:w-6" strokeWidth={1.75} />
               </div>
               <div>
-                <span className="text-xl sm:text-3xl font-bold text-[#1A1A1A] block leading-none">{(listing.view_count || 0).toLocaleString('pt-BR')}</span>
-                <span className="text-[11px] sm:text-xs text-gray-500 mt-1 block">visualizações</span>
+                <span className="block text-[14px] font-bold leading-none text-[#0A0A0A] md:text-[15px]">{(listing.view_count || 0).toLocaleString('pt-BR')}</span>
+                <span className="mt-1 block text-[11px] text-black/70">visualizações</span>
               </div>
             </div>
           </div>
-          <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-[#16855C]/10 text-[#16855C] rounded-xl text-xs sm:text-sm font-semibold hover:bg-[#16855C]/20 transition-colors">
+          <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-black/25 px-3 py-2 text-xs font-semibold text-[#0A0A0A] transition-colors hover:bg-black/10 md:px-5 md:py-2.5 md:text-sm">
             Ver ao vivo →
           </a>
         </div>
@@ -273,13 +273,13 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       }} />
 
       {/* Basic Info */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+      <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-            <Car className="w-4 h-4 sm:w-5 sm:h-5 text-[#16855C]" strokeWidth={1.75} />
+          <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-10 sm:w-10">
+            <Car className="h-4 w-4 text-[#0A0A0A] sm:h-5 sm:w-5" strokeWidth={1.75} />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-bold text-[#1A1A1A]">Informações do veículo</h3>
+            <h3 className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Informações do veículo</h3>
             <p className="text-[11px] sm:text-xs text-gray-500">Dados básicos do anúncio</p>
           </div>
         </div>
@@ -289,7 +289,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
             <input className={ic('title')} value={formData.title || ''} onChange={(e) => update('title', e.target.value)} placeholder="Ex: Toyota Corolla 2.0 XEi 2024" />
             {errors.title && <p className="text-sm font-medium text-[#DC2626] mt-2">{errors.title}</p>}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 min-[480px]:grid-cols-2 sm:grid-cols-4 gap-4">
             <div><label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Marca</label><input className={ic('brand')} value={formData.brand || ''} onChange={(e) => update('brand', e.target.value)} /></div>
             <div><label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Modelo</label><input className={ic('model')} value={formData.model || ''} onChange={(e) => update('model', e.target.value)} /></div>
             <div><label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Ano Fabricação</label><input type="number" className={ic('year')} value={formData.year || ''} onChange={(e) => update('year', parseBrazilianInt(e.target.value))} /></div>
@@ -308,13 +308,13 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       </div>
 
       {/* Price & Location */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+      <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#16855C]" strokeWidth={1.75} />
+          <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-10 sm:w-10">
+            <TrendingUp className="h-4 w-4 text-[#0A0A0A] sm:h-5 sm:w-5" strokeWidth={1.75} />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-bold text-[#1A1A1A]">Preço e localização</h3>
+            <h3 className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Preço e localização</h3>
             <p className="text-[11px] sm:text-xs text-gray-500">Onde está o veículo</p>
           </div>
         </div>
@@ -352,17 +352,17 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       </div>
 
       {/* Specs */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+      <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-            <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-[#16855C]" strokeWidth={1.75} />
+          <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-10 sm:w-10">
+            <BarChart3 className="h-4 w-4 text-[#0A0A0A] sm:h-5 sm:w-5" strokeWidth={1.75} />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-bold text-[#1A1A1A]">Especificações</h3>
+            <h3 className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Especificações</h3>
             <p className="text-[11px] sm:text-xs text-gray-500">Detalhes técnicos do veículo</p>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 min-[480px]:grid-cols-2 sm:grid-cols-3 gap-4">
           <div>
             <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Câmbio</label>
             <select className={`${ic('transmission')} cursor-pointer`} value={formData.transmission || ''} onChange={(e) => update('transmission', e.target.value)}>
@@ -401,7 +401,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
           </div>
         </div>
          {formData.vehicle_type === 'truck' && (
-           <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4 rounded-xl bg-[#D4F576]/20 p-4">
+           <div className="mt-4 grid grid-cols-1 gap-4 rounded-[18px] bg-[#B8FF00]/15 p-4 min-[480px]:grid-cols-2 sm:grid-cols-3">
              {([['truck_type', 'Tipo de caminhão'], ['load_capacity', 'Capacidade (kg)'], ['axles', 'Eixos'], ['truck_body_type', 'Carroceria']] as const).map(([field, label]) => (
                <div key={field}><label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">{label}</label><input type={field === 'load_capacity' || field === 'axles' ? 'number' : 'text'} className={ic(field)} value={formData[field] ?? ''} onChange={(e) => update(field, field === 'load_capacity' || field === 'axles' ? parseBrazilianInt(e.target.value) : e.target.value)} /></div>
              ))}
@@ -414,23 +414,23 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       </div>
 
       {/* Description */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+      <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-            <span className="text-[#16855C] text-base sm:text-lg font-bold">Aa</span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-10 sm:w-10">
+              <span className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Aa</span>
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-bold text-[#1A1A1A]">Descrição</h3>
+            <h3 className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Descrição</h3>
             <p className="text-[11px] sm:text-xs text-gray-500">Detalhes sobre o veículo</p>
           </div>
         </div>
         <textarea
-          className={`w-full min-h-[140px] p-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#1A1A1A] focus:ring-2 focus:ring-[#1A1A1A]/10 transition-all resize-y leading-relaxed ${errors.description ? '!border-[#DC2626] !text-[#DC2626]' : ''}`}
+          className={`min-h-[140px] w-full resize-y rounded-[18px] border border-black/[0.06] bg-[#F1F1F6] p-4 text-sm leading-relaxed text-[#0A0A0A] placeholder-[#6A6A74] transition-all focus:border-[#B8FF00] focus:outline-none focus:ring-2 focus:ring-[#B8FF00]/20 ${errors.description ? '!border-[#D94A3A] !text-[#D94A3A]' : ''}`}
           value={formData.description || ''}
           onChange={(e) => update('description', e.target.value)}
           placeholder="Descreva o estado de conservação, revisões feitas, opcionais e diferenciais do veículo..."
         />
-        <div className="flex justify-between items-center mt-3">
+        <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center mt-3">
           {errors.description ? <p className="text-sm font-medium text-[#DC2626]">{errors.description}</p> : <p className="text-sm text-gray-500">Seja transparente sobre o estado do veículo</p>}
           <p className="text-sm text-gray-400 font-medium">{(formData.description || '').length} caracteres</p>
         </div>
@@ -559,7 +559,7 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
   }, [selected, listings, selectedId])
 
   if (!sessionReady) return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       <div className="h-12 bg-gray-100 rounded-2xl animate-pulse w-48" />
       <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
         <div className="space-y-3">
@@ -577,20 +577,20 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
   })
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       {/* Hero Section */}
-      <div className="rounded-2xl p-5 sm:p-8 relative overflow-hidden" style={{ backgroundColor: '#16855C', backgroundImage: 'linear-gradient(135deg, #16855C 0%, #1A7A54 50%, #146B4A 100%)' }}>
-        <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
+      <div className="relative overflow-hidden rounded-[32px] bg-[#00A36A] p-5 text-[#0A0A0A] md:p-8">
+        <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[#B8FF00]/30 blur-3xl" />
         <div className="relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight" style={{ color: '#FFFFFF' }}>Meus anúncios</h1>
-              <p className="mt-2" style={{ color: 'rgba(255,255,255,0.85)' }}>{listings.length} anúncio{listings.length !== 1 ? 's' : ''} encontrado{listings.length !== 1 ? 's' : ''}</p>
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#0A0A0A]">Member inventory</p>
+              <h1 className="text-[14px] font-bold tracking-tight text-[#0A0A0A] md:text-[15px]">Meus anúncios</h1>
+              <p className="mt-2 font-medium text-[#0A0A0A]">{listings.length} anúncio{listings.length !== 1 ? 's' : ''} encontrado{listings.length !== 1 ? 's' : ''}</p>
             </div>
             <button
               onClick={() => router.push('/anunciar-carro')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-colors"
-              style={{ backgroundColor: '#D4F576', color: '#1A1A1A' }}
+              className="inline-flex items-center gap-2 rounded-full bg-[#B8FF00] px-6 py-3 text-sm font-bold text-[#0A0A0A] transition-transform hover:-translate-y-0.5 hover:bg-[#A9EE00]"
             >
               <Plus className="w-5 h-5" />
               Novo anúncio
@@ -598,36 +598,36 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mt-6">
-            <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
-              <p className="text-2xl font-bold" style={{ color: '#FFFFFF' }}>{listings.length}</p>
-              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>Total</p>
+          <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-4">
+            <div className="rounded-[18px] border border-black/10 bg-white/80 p-3 sm:p-4">
+              <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{listings.length}</p>
+              <p className="mt-1 text-[10px] font-semibold text-[#0A0A0A] md:text-xs">Total</p>
             </div>
-            <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
-              <p className="text-2xl font-bold" style={{ color: '#FFFFFF' }}>{listings.filter(l => l.status === 'active').length}</p>
-              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>Ativos</p>
+            <div className="rounded-[18px] border border-black/10 bg-white/80 p-3 sm:p-4">
+              <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{listings.filter(l => l.status === 'active').length}</p>
+              <p className="mt-1 text-[10px] font-semibold text-[#0A0A0A] md:text-xs">Ativos</p>
             </div>
-            <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
-              <p className="text-2xl font-bold" style={{ color: '#FFFFFF' }}>{listings.reduce((sum, l) => sum + (l.view_count || 0), 0)}</p>
-              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>Visualizações</p>
+            <div className="rounded-[18px] border border-black/10 bg-white/80 p-3 sm:p-4">
+              <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{listings.reduce((sum, l) => sum + (l.view_count || 0), 0)}</p>
+              <p className="mt-1 text-[10px] font-semibold text-[#0A0A0A] md:text-xs">Visualizações</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-3 sm:p-4">
+      <div className="rounded-[28px] border border-black/[0.06] bg-white p-3 sm:p-4">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input className="w-full h-12 pl-12 pr-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all" placeholder="Buscar anúncio..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#5C5C66]" />
+            <input className="h-12 w-full rounded-full border border-black/[0.06] bg-[#F1F1F6] pl-12 pr-4 text-sm text-[#0A0A0A] placeholder-[#6A6A74] transition-all focus:border-[#B8FF00] focus:outline-none focus:ring-2 focus:ring-[#B8FF00]/20" placeholder="Buscar anúncio..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           </div>
           <div className="flex gap-2 overflow-x-auto">
             {(['all', 'active', 'paused', 'sold'] as const).map((s) => (
-              <button key={s} onClick={() => setStatusFilter(s)} className="px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border" style={{
-                backgroundColor: statusFilter === s ? '#16855C' : '#F8F9FA',
-                color: statusFilter === s ? '#FFFFFF' : '#4B5563',
-                borderColor: statusFilter === s ? '#16855C' : '#E5E7EB'
+              <button key={s} onClick={() => setStatusFilter(s)} className="whitespace-nowrap rounded-full border px-4 py-2.5 text-sm font-semibold transition-all" style={{
+                backgroundColor: statusFilter === s ? '#00A36A' : '#F1F1F6',
+                color: statusFilter === s ? '#B8FF00' : '#55555D',
+                borderColor: statusFilter === s ? '#00A36A' : 'rgba(0,0,0,0.06)'
               }}>
                 {s === 'all' ? 'Todos' : s === 'active' ? 'Ativos' : s === 'paused' ? 'Pausados' : 'Vendidos'}
               </button>
@@ -636,23 +636,23 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
         </div>
       </div>
 
-      <div className="lg:grid lg:grid-cols-[380px_1fr] lg:gap-8 items-start">
+      <div className="xl:grid xl:grid-cols-[320px_minmax(0,1fr)] xl:gap-8 items-start">
         {/* Listings List */}
-        <div className="space-y-3 lg:sticky lg:top-24 mb-6 lg:mb-0">
+        <div className="space-y-3 xl:sticky xl:top-24 mb-6 xl:mb-0">
           {loadingListings ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => <div key={i} className="h-28 bg-gray-100 rounded-2xl animate-pulse" />)}
             </div>
           ) : filteredListings.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-[#F8F9FA] flex items-center justify-center mx-auto mb-4">
-                <Car className="w-8 h-8 text-gray-300" />
+            <div className="rounded-[28px] border border-black/[0.06] bg-white p-12 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-[20px] bg-[#B8FF00]">
+                <Car className="h-8 w-8 text-[#0A0A0A]" />
               </div>
-              <p className="text-lg font-bold text-[#1A1A1A]">Nenhum anúncio</p>
-              <p className="text-sm text-gray-500 mt-2 mb-6">Crie seu primeiro anúncio para começar a vender.</p>
+              <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Nenhum anúncio</p>
+              <p className="mb-6 mt-2 text-sm text-[#5C5C66]">Crie seu primeiro anúncio para começar a vender.</p>
               <button
                 onClick={() => router.push('/anunciar-carro')}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1A1A] text-[#D4F576] rounded-xl text-sm font-bold hover:bg-[#2D2D2D] transition-colors"
+                className="inline-flex items-center gap-2 rounded-full bg-[#00A36A] px-6 py-3 text-sm font-bold text-[#0A0A0A] transition-colors hover:bg-[#008E5D]"
               >
                 <Plus className="w-4 h-4" /> Criar anúncio
               </button>
@@ -714,13 +714,13 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="bg-white rounded-2xl border border-gray-100 p-16 text-center"
+                className="rounded-[28px] border border-black/[0.06] bg-white p-16 text-center"
               >
-                <div className="w-20 h-20 rounded-2xl bg-[#F8F9FA] flex items-center justify-center mx-auto mb-5">
-                  <Car className="w-10 h-10 text-gray-300" />
+                <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[24px] bg-[#B8FF00]">
+                  <Car className="h-10 w-10 text-[#0A0A0A]" />
                 </div>
-                <h2 className="text-xl font-bold text-[#1A1A1A]">Selecione um anúncio</h2>
-                <p className="text-sm text-gray-500 mt-2 max-w-[300px] mx-auto">Escolha um dos seus veículos para editar detalhes, fotos e preço.</p>
+                <h2 className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Selecione um anúncio</h2>
+                <p className="mx-auto mt-2 max-w-[300px] text-sm text-[#5C5C66]">Escolha um dos seus veículos para editar detalhes, fotos e preço.</p>
               </motion.div>
             )}
           </AnimatePresence>

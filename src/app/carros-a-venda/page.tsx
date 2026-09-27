@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import MarketplaceClient from '@/components/marketplace/MarketplaceClient'
 import { fetchPublicListingsPage, ListingSort, getFilterOptions } from '@/lib/marketplace-server'
-import { BreadcrumbSchema, LocalBusinessSchema } from '@/components/seo/JSONLD'
+import { BreadcrumbSchema } from '@/components/seo/JSONLD'
 import { FAQSection } from '@/components/seo/SEOContentSection'
 
 export async function generateMetadata({
@@ -112,7 +112,6 @@ export default async function CarrosAVendaPage({
   return (
     <div className="cbi-page">
       <main className="cbi-main">
-        <LocalBusinessSchema />
         <BreadcrumbSchema items={[
           { name: 'Home', url: '/' },
           { name: 'Carros à venda', url: '/carros-a-venda' },

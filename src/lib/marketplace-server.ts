@@ -602,6 +602,80 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
   return { items, total: count || 0, page, pageSize }
 }
 
+export type PublicSitemapListing = {
+  id: string
+  slug: string
+  updated_at: string | null
+  published_at: string | null
+  created_at: string
+  images?: Array<{ url: string; sort_order: number }>
+}
+
+/**
+ * Lightweight listing query for XML sitemaps. It intentionally skips all of
+ * the FIPE/history enrichment used by the marketplace UI so sitemap generation
+ * remains fast and can cover every active public listing.
+ */
+export async function fetchPublicSitemapListingsPage({
+  vehicleType,
+  page = 1,
+  pageSize = 500,
+  includeImages = false,
+}: {
+  vehicleType: 'car' | 'truck'
+  page?: number
+  pageSize?: number
+  includeImages?: boolean
+}): Promise<{ items: PublicSitemapListing[]; total: number; page: number; pageSize: number }> {
+  if (!isSupabaseConfigured()) return { items: [], total: 0, page, pageSize }
+
+  const supabase = getSupabaseServerClient()
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+  let query = supabase
+    .from('vehicle_listings')
+    .select('id, slug, updated_at, published_at, created_at', { count: 'exact' })
+    .eq('status', 'active')
+
+  query = vehicleType === 'truck'
+    ? query.eq('vehicle_type', 'truck')
+    : query.or('vehicle_type.eq.car,vehicle_type.is.null')
+
+  const { data, error, count } = await query
+    .order('published_at', { ascending: false, nullsFirst: false })
+    .range(from, to)
+
+  if (error || !Array.isArray(data)) {
+    if (error) console.error('fetchPublicSitemapListingsPage query error:', error.message, error.details, error.hint)
+    return { items: [], total: 0, page, pageSize }
+  }
+
+  const items = data as PublicSitemapListing[]
+  if (!includeImages || items.length === 0) return { items, total: count || 0, page, pageSize }
+
+  const listingIds = items.map((item) => item.id)
+  const { data: imageRows } = await supabase
+    .from('vehicle_listing_images')
+    .select('listing_id, public_url, sort_order')
+    .in('listing_id', listingIds)
+    .order('sort_order', { ascending: true })
+
+  const imagesByListing = new Map<string, Array<{ url: string; sort_order: number }>>()
+  for (const image of imageRows || []) {
+    if (!image.public_url) continue
+    const images = imagesByListing.get(image.listing_id) || []
+    images.push({ url: image.public_url, sort_order: image.sort_order })
+    imagesByListing.set(image.listing_id, images)
+  }
+
+  return {
+    items: items.map((item) => ({ ...item, images: imagesByListing.get(item.id) || [] })),
+    total: count || 0,
+    page,
+    pageSize,
+  }
+}
+
 export type TruckListingFilters = ListingsPageInput & {
   truckType?: string | string[]
   axles?: number | number[]

@@ -31,23 +31,37 @@ export async function generateStaticParams() {
     .slice(0, 250)
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ brand: string; model: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ brand: string; model: string }>
+  searchParams: Promise<{ year?: string; version?: string }>
+}): Promise<Metadata> {
   const resolved = await params
+  const sp = await searchParams
   const car = await getCarDetail(resolved.brand, resolved.model)
 
   if (!car) return { title: 'Carro não encontrado' }
+  const modelName = `${car.brand} ${car.model}`
+  const title = `${modelName}: preço, versões e ficha técnica | Carbi`
+  const description = `${modelName} à venda: consulte preço FIPE, versões, consumo, ficha técnica e anúncios de carros usados e seminovos na Carbi.`
+  const hasVariantParameters = Boolean(sp.year?.trim() || sp.version?.trim())
+
   return {
-    title: `${car.brand} ${car.model} ${car.version} (${car.year}) — Preço e Especificações`,
-    description: car.shortDesc,
-    keywords: [car.brand, car.model, car.version, 'carros à venda', 'seminovos à venda', 'carro usado'],
+    title,
+    description,
+    keywords: [car.brand, car.model, car.version, 'preço FIPE', 'carros à venda', 'seminovos à venda', 'carro usado'],
     alternates: {
       canonical: `/${resolved.brand}/${resolved.model}`,
     },
+    robots: hasVariantParameters ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
-      title: `${car.brand} ${car.model} ${car.version} (${car.year}) — Preço e Especificações`,
-      description: car.shortDesc,
+      title,
+      description,
       url: `/${resolved.brand}/${resolved.model}`,
       type: 'website',
+      ...(car.image ? { images: [{ url: car.image, alt: modelName }] } : {}),
     },
   }
 }

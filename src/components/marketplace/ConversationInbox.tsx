@@ -39,7 +39,7 @@ const ease = [0.23, 1, 0.32, 1] as const
 function ConversationThumb({ images, title, className }: { images?: Array<{ url: string }> | null; title: string; className?: string }) {
   const url = getCarImageCandidates([images?.[0]?.url || null])[0]
   return (
-    <div className={`overflow-hidden bg-[#1A1A1A] flex items-center justify-center shrink-0 ${className ?? 'w-14 h-14 rounded-2xl'}`}>
+    <div className={`overflow-hidden bg-[#00A36A] flex items-center justify-center shrink-0 ${className ?? 'w-14 h-14 rounded-2xl'}`}>
       {url ? (
         <img src={url} alt={title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
       ) : (
@@ -60,7 +60,7 @@ function MessageBubble({ message, isMine, showName }: { message: MessageItem; is
       <div
         className={`max-w-[75%] px-4 py-3 rounded-2xl ${
           isMine
-            ? 'bg-[#1A1A1A] text-white rounded-br-md'
+            ? 'bg-[#00A36A] text-[#0A0A0A] rounded-br-md'
             : 'bg-[#F8F9FA] text-[#1A1A1A] rounded-bl-md border border-gray-100'
         }`}
       >
@@ -255,7 +255,7 @@ export default function ConversationInbox() {
   const listPanel = (
     <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-100 overflow-hidden">
       <div className="p-6 border-b border-gray-100">
-        <h2 className="text-lg font-bold text-[#1A1A1A] mb-4">Minhas conversas</h2>
+        <h2 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A] mb-4">Minhas conversas</h2>
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input type="text" placeholder="Buscar conversas..." value={search} onChange={(e) => setSearch(e.target.value)}
@@ -275,7 +275,7 @@ export default function ConversationInbox() {
             type="button"
             onClick={() => { setSelectedId(c.id); setMobileView('chat') }}
             className={`w-full flex items-center gap-4 p-5 transition-all text-left border-b border-gray-100 ${
-              selectedId === c.id ? 'bg-[#1A1A1A]' : 'hover:bg-[#F8F9FA]'
+              selectedId === c.id ? 'bg-[#00A36A]' : 'hover:bg-[#F8F9FA]'
             }`}
           >
             <ConversationThumb
@@ -306,7 +306,7 @@ export default function ConversationInbox() {
             <div className="w-20 h-20 rounded-2xl bg-[#F8F9FA] flex items-center justify-center mb-5">
               <MessageSquare className="w-10 h-10 text-gray-300" strokeWidth={1.5} />
             </div>
-            <p className="text-lg font-bold text-[#1A1A1A]!">Nenhuma conversa</p>
+            <p className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A]!">Nenhuma conversa</p>
             <p className="text-sm text-gray-500! mt-2 max-w-[280px]">Conversas com vendedores aparecerão aqui.</p>
           </div>
         )}
@@ -323,7 +323,7 @@ export default function ConversationInbox() {
         </button>
         <ConversationThumb images={selectedConversation.vehicle_listings_public.images} title={selectedConversation.vehicle_listings_public.title} className="w-12 h-12 rounded-2xl" />
         <div className="flex-1 min-w-0">
-          <p className="text-base font-bold text-[#1A1A1A]! truncate">{selectedConversation.vehicle_listings_public.title}</p>
+          <p className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A]! truncate">{selectedConversation.vehicle_listings_public.title}</p>
           <p className="text-sm text-gray-500! truncate mt-0.5">
             {selectedConversation.vehicle_listings_public.city}/{selectedConversation.vehicle_listings_public.state} · {formatBRL(Number(selectedConversation.vehicle_listings_public.price))}
           </p>
@@ -365,7 +365,7 @@ export default function ConversationInbox() {
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage() } }}
             placeholder="Olá! Tenho interesse no seu veículo. Ele ainda está disponível?" className="flex-1 px-4 py-3 bg-transparent text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none" aria-label="Mensagem" />
           <button type="button" disabled={sending || !messageText.trim()} onClick={() => void sendMessage()}
-            className="p-3 bg-[#1A1A1A] text-[#D4F576] rounded-xl disabled:opacity-40 hover:bg-[#2D2D2D] transition-colors" aria-label="Enviar">
+            className="p-3 bg-[#00A36A] text-[#0A0A0A] rounded-xl disabled:cursor-not-allowed disabled:bg-[#DDE9E4] disabled:text-[#557066] hover:bg-[#008E5D] transition-colors" aria-label="Enviar">
             {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" strokeWidth={1.75} />}
           </button>
         </div>
@@ -376,7 +376,7 @@ export default function ConversationInbox() {
       <div className="w-24 h-24 rounded-2xl bg-[#F8F9FA] flex items-center justify-center mb-6">
         <MessageSquare className="w-12 h-12 text-gray-300" strokeWidth={1.5} />
       </div>
-      <h2 className="text-xl font-bold text-[#1A1A1A]">Selecione uma conversa</h2>
+      <h2 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A]">Selecione uma conversa</h2>
       <p className="text-sm text-gray-500! mt-3 max-w-[300px]">O histórico de mensagens aparecerá aqui em tempo real.</p>
     </div>
   )
@@ -385,7 +385,7 @@ export default function ConversationInbox() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">Mensagens</h1>
+      <h1 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A] tracking-tight">Mensagens</h1>
         <p className="text-sm text-gray-500! mt-1">{conversations.length} conversa{conversations.length !== 1 ? 's' : ''}</p>
       </div>
 

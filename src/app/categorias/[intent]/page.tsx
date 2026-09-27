@@ -117,13 +117,7 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
     notFound()
   }
 
-  const { items } = await fetchPublicListingsPage({
-    ...(data.query || {}),
-    page: 1,
-    pageSize: 48,
-  })
-
-  const filteredListings = items.filter(data.filter).slice(0, 16)
+  const filteredListings = await fetchCategoryListings(data)
 
   return (
     <main className="fingen-shell">
@@ -184,6 +178,32 @@ export default async function IntentHubPage({ params }: { params: Promise<{ inte
       </section>
     </main>
   )
+}
+
+async function fetchCategoryListings(data: IntentData): Promise<ListingPublic[]> {
+  const firstPage = await fetchPublicListingsPage({
+    ...(data.query || {}),
+    page: 1,
+    pageSize: 48,
+  })
+  const firstMatches = firstPage.items.filter(data.filter)
+  const totalPages = Math.min(Math.ceil(firstPage.total / firstPage.pageSize), 3)
+
+  if (firstMatches.length >= 16 || totalPages <= 1) return firstMatches.slice(0, 16)
+
+  const remainingPages = await Promise.all(
+    Array.from({ length: totalPages - 1 }, (_, index) =>
+      fetchPublicListingsPage({
+        ...(data.query || {}),
+        page: index + 2,
+        pageSize: 48,
+      }),
+    ),
+  )
+
+  return [...firstPage.items, ...remainingPages.flatMap((page) => page.items)]
+    .filter(data.filter)
+    .slice(0, 16)
 }
 
 function Badge({ text }: { text: string }) {
