@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
-  Search, ArrowRight, ChevronRight, TrendingUp, TrendingDown,
+  ArrowRight, ChevronRight, TrendingUp, TrendingDown,
   MapPin, Plus, Zap, Gauge, Calendar as CalendarIcon, Settings2,
 } from 'lucide-react'
 import { getLatestPublicListings } from '@/lib/marketplace-server'
@@ -86,14 +86,6 @@ export default async function HomePage() {
     { label: 'Luxo', filter: 'luxo', img: '/categories/luxo.jpg', badge: 'Alto padrão' },
   ]
 
-  const budgetOptions = [
-    { label: 'Qualquer valor', value: '' },
-    { label: 'Até R$ 50 mil', value: '50000' },
-    { label: 'Até R$ 80 mil', value: '80000' },
-    { label: 'Até R$ 120 mil', value: '120000' },
-    { label: 'Até R$ 200 mil', value: '200000' },
-  ]
-
   return (
     <div className="cb-page">
       {/* ═══ HERO ═══ */}
@@ -106,51 +98,6 @@ export default async function HomePage() {
                 Anuncie grátis, compare com a FIPE e negocie direto com o vendedor.
                 Informações do anúncio, chat interno e opções de seminovos para comparar com calma.
               </p>
-
-              <form
-                action="/carros-a-venda"
-                method="get"
-                className="cb-search"
-                role="search"
-                aria-label="Buscar carros à venda"
-              >
-                <div className="cb-search-field">
-                  <label htmlFor="home-search-query">Marca ou modelo</label>
-                  <input
-                    id="home-search-query"
-                    name="q"
-                    type="search"
-                    placeholder="Ex.: Honda Civic"
-                    autoComplete="off"
-                  />
-                </div>
-                <div className="cb-search-divider" aria-hidden="true" />
-                <div className="cb-search-field">
-                  <label htmlFor="home-search-body-type">Tipo de carro</label>
-                  <select id="home-search-body-type" name="body_type" defaultValue="">
-                    <option value="">Todos os tipos</option>
-                    {categories.map((category) => (
-                      <option key={category.filter} value={category.filter}>
-                        {category.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="cb-search-divider" aria-hidden="true" />
-                <div className="cb-search-field">
-                  <label htmlFor="home-search-budget">Orçamento</label>
-                  <select id="home-search-budget" name="price_max" defaultValue="">
-                    {budgetOptions.map((option) => (
-                      <option key={option.value || 'any'} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <button type="submit" className="cb-search-go" aria-label="Buscar carros">
-                  <Search size={20} aria-hidden="true" />
-                </button>
-              </form>
 
               <div className="cb-hero-cta-row">
                 <Link href="/carros-a-venda" className="cb-btn cb-btn-lime cb-btn-arrow">

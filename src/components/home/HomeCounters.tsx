@@ -114,7 +114,7 @@ export default function HomeCounters({
       </div>
       <div className="cb-stat">
         <div className="cb-stat-value">
-          <AnimatedValue value={statsAvailable ? stats?.total_views ?? null : null} />
+          <span>{statsAvailable ? '+30 mil' : '—'}</span>
         </div>
         <div className="cb-stat-label">Visualizações acumuladas</div>
       </div>
