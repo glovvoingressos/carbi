@@ -1,7 +1,10 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import ListingForm from '@/components/marketplace/ListingForm'
+import { buildLoginRedirect } from '@/lib/auth-redirect'
+import { getSupabaseServerClientWithCookies, isSupabaseConfigured } from '@/lib/supabase-server'
 
 export const metadata: Metadata = {
   title: 'Anunciar meu carro | Carbi',
@@ -12,7 +15,15 @@ export const metadata: Metadata = {
   },
 }
 
-export default function AnunciarFluxoPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function AnunciarFluxoPage() {
+  if (isSupabaseConfigured()) {
+    const supabase = await getSupabaseServerClientWithCookies()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect(buildLoginRedirect('/anunciar-carro-bh/fluxo'))
+  }
+
   return (
     <div className="listing-flow-app">
       <header className="listing-flow-header">

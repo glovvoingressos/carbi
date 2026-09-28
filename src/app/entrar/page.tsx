@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import AuthCard from '@/components/marketplace/AuthCard'
+import { getSafeRedirectPath } from '@/lib/auth-redirect'
 
 export const metadata: Metadata = {
   title: 'Criar conta ou Entrar | Carbi',
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ redirect?: string }> }) {
   const { redirect: redirectTo } = await searchParams
+  const safeRedirectTo = getSafeRedirectPath(redirectTo)
 
   return (
     <div className="auth-page-shell">
@@ -45,7 +47,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </section>
 
         <section className="auth-form-card">
-          <AuthCard redirectTo={redirectTo || '/minha-conta'} defaultMode="signup" />
+          <AuthCard redirectTo={safeRedirectTo} defaultMode="signup" />
         </section>
       </div>
     </div>

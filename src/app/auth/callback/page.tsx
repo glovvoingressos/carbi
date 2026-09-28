@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
+import { getAuthCode, getSafeRedirectPath } from '@/lib/auth-redirect'
 
 export default function AuthCallbackPage() {
   const router = useRouter()
@@ -12,8 +13,16 @@ export default function AuthCallbackPage() {
     const supabase = getSupabaseBrowserClient()
     ;(async () => {
       try {
+        const redirectTo = getSafeRedirectPath(new URLSearchParams(window.location.search).get('redirect'))
+        const code = getAuthCode(window.location.search)
+        if (code) {
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+          if (exchangeError) throw exchangeError
+          window.history.replaceState({}, document.title, `${window.location.pathname}?redirect=${encodeURIComponent(redirectTo)}`)
+        }
+
         const hash = window.location.hash
-        if (hash) {
+        if (!code && hash) {
           const p = new URLSearchParams(hash.substring(1))
           const at = p.get('access_token')
           const rt = p.get('refresh_token')
@@ -44,11 +53,11 @@ export default function AuthCallbackPage() {
                 })
               } catch (e) { console.error('Welcome email failed:', e) }
             }
-            return router.replace('/minha-conta')
+            return router.replace(redirectTo)
           }
         }
         const { data: { session } } = await supabase.auth.getSession()
-        router.replace(session ? '/minha-conta' : '/entrar')
+        router.replace(session ? redirectTo : `/entrar?redirect=${encodeURIComponent(redirectTo)}`)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Não foi possível confirmar seu e-mail. Tente fazer login novamente.')
       }

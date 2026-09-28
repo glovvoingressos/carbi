@@ -9,6 +9,7 @@ import {
   Loader2, Check, AlertCircle, CreditCard,
 } from 'lucide-react'
 import { getSupabaseBrowserClient, getSupabaseRecoveryClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
+import { getSafeRedirectPath } from '@/lib/auth-redirect'
 
 interface Props {
   onAuthenticated?: () => void
@@ -120,6 +121,7 @@ function SuccessBanner({ message }: { message: string | null }) {
 
 export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'login' }: Props) {
   const router = useRouter()
+  const safeRedirectTo = getSafeRedirectPath(redirectTo)
   const supabaseReady = isSupabaseBrowserConfigured()
   const [mode, setMode] = useState<Mode>(defaultMode)
   const [step, setStep] = useState<1 | 2>(1)
@@ -169,10 +171,11 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
           await supabase.from('users').upsert(syncData, { onConflict: 'id' }).catch(() => {})
         }
         onAuthenticated?.()
-        router.replace(redirectTo || '/minha-conta')
+        router.replace(safeRedirectTo)
         router.refresh()
       } else if (mode === 'signup') {
-        const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'}/auth/callback`
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
+        const redirectUrl = `${siteUrl}/auth/callback?redirect=${encodeURIComponent(safeRedirectTo)}`
         const { data, error: signUpError } = await supabase.auth.signUp({
           email, password,
           options: {
@@ -228,7 +231,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         setMessage(data.session ? 'Conta criada com sucesso!' : 'Conta criada! Confirme seu e-mail para continuar. Verifique também a pasta de spam.')
         if (data.session) {
           onAuthenticated?.()
-          router.replace(redirectTo || '/minha-conta')
+          router.replace(safeRedirectTo)
           router.refresh()
         }
       } else if (mode === 'forgot') {

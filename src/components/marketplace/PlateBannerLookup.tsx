@@ -6,6 +6,8 @@ import Image from 'next/image'
 import { Search, Loader2, AlertCircle, Car, ArrowRight, ShieldCheck } from 'lucide-react'
 import { lookupPlateClient, savePlateLookup } from '@/lib/integrations/placaapi/client'
 import { formatBRL } from '@/data/cars'
+import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
+import { buildLoginRedirect } from '@/lib/auth-redirect'
 
 type Step = 'input' | 'preview'
 
@@ -24,6 +26,7 @@ export default function PlateBannerLookup() {
   const [step, setStep] = useState<Step>('input')
   const [plate, setPlate] = useState('')
   const [loading, setLoading] = useState(false)
+  const [starting, setStarting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [found, setFound] = useState<FoundVehicle | null>(null)
 
@@ -58,8 +61,24 @@ export default function PlateBannerLookup() {
     }
   }
 
-  const handleAnunciar = () => {
-    if (found) router.push('/anunciar-carro/fluxo')
+  const handleAnunciar = async () => {
+    if (!found || starting) return
+
+    const destination = '/anunciar-carro/fluxo'
+    setStarting(true)
+    try {
+      if (!isSupabaseBrowserConfigured()) {
+        router.push(buildLoginRedirect(destination))
+        return
+      }
+
+      const { data: { session } } = await getSupabaseBrowserClient().auth.getSession()
+      router.push(session ? destination : buildLoginRedirect(destination))
+    } catch {
+      router.push(buildLoginRedirect(destination))
+    } finally {
+      setStarting(false)
+    }
   }
 
   const handleReset = () => {
@@ -133,7 +152,9 @@ export default function PlateBannerLookup() {
                 <span><small>Cor</small>{found.color || 'Não informada'}</span>
               </div>
               <div className="cb-plate-result-actions">
-                <button type="button" onClick={handleAnunciar}>Continuar anúncio <ArrowRight size={17} /></button>
+                <button type="button" onClick={handleAnunciar} disabled={starting}>
+                  {starting ? 'Abrindo...' : 'Continuar anúncio'} <ArrowRight size={17} />
+                </button>
                 <button type="button" onClick={handleReset}>Outra placa</button>
               </div>
             </div>
