@@ -10,6 +10,12 @@ import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from './MarketplaceListingImage'
 import PlateInput from './PlateInput'
+import {
+  FUEL_OPTIONS,
+  TRANSMISSION_OPTIONS,
+  normalizeFuel,
+  normalizeTransmission,
+} from '@/lib/vehicle-filter-normalization'
 
 interface DashboardImage { id: string; public_url: string; storage_path: string; sort_order: number; is_primary: boolean }
 interface DashboardListing { id: string; slug: string; title: string; description: string; vehicle_type?: 'car' | 'truck'; brand: string; model: string; version: string | null; year: number; year_model: number; vin?: string | null; mileage: number; price: number; city: string; state: string; status: string; transmission: string; fuel: string; color: string; body_type: string; optional_items: string[]; engine: string | null; horsepower: number | null; doors: number | null; plate_final: string | null; truck_type?: string | null; load_capacity?: number | null; axles?: number | null; truck_body_type?: string | null; structured_data?: Record<string, unknown> | null; images: DashboardImage[] | null; view_count?: number }
@@ -33,6 +39,25 @@ const parsePriceInput = (input: string): number => {
   if (!cleaned) return 0
   return parseInt(cleaned, 10)
 }
+
+function canonicalOptionValue(
+  value: string | null | undefined,
+  options: readonly string[],
+  normalize: (value: string | null | undefined) => string,
+  fallback: string,
+) {
+  const raw = String(value || '').trim()
+  const direct = options.find((option) => option.toLowerCase() === raw.toLowerCase())
+  if (direct) return direct
+  const normalized = normalize(raw)
+  return options.includes(normalized) ? normalized : fallback
+}
+
+const canonicalTransmission = (value: string | null | undefined) =>
+  canonicalOptionValue(value, TRANSMISSION_OPTIONS, normalizeTransmission, 'Manual')
+
+const canonicalFuel = (value: string | null | undefined) =>
+  canonicalOptionValue(value, FUEL_OPTIONS, normalizeFuel, 'Flex')
 
 // ── StatusBadge ────────────────────────────────────────
 function StatusBadge({ status, isSelected = false }: { status: string; isSelected?: boolean }) {
@@ -87,7 +112,7 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
       </div>
 
       <div
-        className={`rounded-[22px] border-2 border-dashed transition-all ${isDragging ? 'border-[#B8FF00] bg-[#B8FF00]/10' : 'border-black/10 bg-[#F1F1F6]'}`}
+        className={`rounded-[22px] border-2 border-dashed transition-[border-color,background-color] ${isDragging ? 'border-[#B8FF00] bg-[#B8FF00]/10' : 'border-black/10 bg-[#F1F1F6]'}`}
         onDragEnter={onDragEnter} onDragLeave={onDragLeave} onDragOver={onDragOver} onDrop={onDrop}
       >
         {(isUploading || pendingUploads > 0) && (
@@ -117,8 +142,8 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
                   <div className="flex justify-between">
                     <div className="bg-white/90 p-1.5 rounded-lg"><GripVertical className="w-4 h-4 text-gray-600" /></div>
-                    <button onClick={() => onRemove(img.id)} className="w-8 h-8 bg-[#DC2626] text-white rounded-full flex items-center justify-center hover:bg-[#DC2626]/90 transition-colors">
-                      <X className="w-4 h-4" />
+                    <button type="button" onClick={() => onRemove(img.id)} aria-label="Remover foto" className="w-8 h-8 bg-[#DC2626] text-white rounded-full flex items-center justify-center hover:bg-[#DC2626]/90 transition-colors">
+                      <X className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </div>
                   <button onClick={() => onSetPrimary(img.id)} className={`w-full rounded-full py-2 text-xs font-semibold transition-colors ${img.is_primary ? 'bg-[#B8FF00] text-[#0A0A0A]' : 'bg-white text-[#0A0A0A]'}`}>
@@ -149,7 +174,7 @@ function ListingCard({ listing, isSelected, onSelect }: { listing: DashboardList
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
       onClick={onSelect}
-      className="w-full rounded-[22px] border p-3 text-left transition-all"
+      className="w-full rounded-[22px] border p-3 text-left transition-[background-color,border-color,box-shadow,transform]"
       style={{
         backgroundColor: isSelected ? '#00A36A' : '#FFFFFF',
         borderColor: isSelected ? '#00A36A' : 'rgba(0,0,0,0.08)',
@@ -196,13 +221,13 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
     setErrors(next)
   }, [errors, setFormData, setIsDirty, setErrors])
 
-  const ic = (f: string, x = '') => `w-full h-11 sm:h-12 px-3 sm:px-4 rounded-[16px] bg-[#F1F1F6] border border-black/[0.06] text-sm text-[#0A0A0A] placeholder-[#6A6A74] focus:outline-none focus:border-[#B8FF00] focus:ring-2 focus:ring-[#B8FF00]/20 transition-all ${x} ${errors[f] ? '!border-[#D94A3A] !text-[#D94A3A]' : ''}`
+  const ic = (f: string, x = '') => `w-full h-11 sm:h-12 px-3 sm:px-4 rounded-[16px] bg-[#F1F1F6] border border-black/[0.06] text-sm text-[#0A0A0A] placeholder-[#6A6A74] focus-visible:outline-none focus-visible:border-[#B8FF00] focus-visible:ring-2 focus-visible:ring-[#B8FF00]/20 transition-[border-color,box-shadow] ${x} ${errors[f] ? '!border-[#D94A3A] !text-[#D94A3A]' : ''}`
 
   return (
     <div className="space-y-5 sm:space-y-6">
       {/* Toolbar */}
       <div className="flex flex-col gap-4 rounded-[28px] bg-[#00A36A] p-5 text-[#0A0A0A] sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:p-6">
-        <div className={`flex min-h-10 min-w-0 items-center gap-3 whitespace-nowrap text-sm font-semibold ${saveStatus === 'saving' ? 'text-[#5B3800]' : saveStatus === 'saved' ? 'text-[#0A0A0A]' : saveStatus === 'error' ? 'text-[#8B1E16]' : 'text-[#0A0A0A]'}`}>
+        <div aria-live="polite" className={`flex min-h-10 min-w-0 items-center gap-3 whitespace-nowrap text-sm font-semibold ${saveStatus === 'saving' ? 'text-[#5B3800]' : saveStatus === 'saved' ? 'text-[#0A0A0A]' : saveStatus === 'error' ? 'text-[#8B1E16]' : 'text-[#0A0A0A]'}`}>
           {saveStatus === 'saving' ? <Loader2 className="h-4 w-4 animate-spin" /> : saveStatus === 'saved' ? <Check className="h-4 w-4" /> : saveStatus === 'error' ? <AlertCircle className="h-4 w-4" /> : <div className="h-2 w-2 rounded-full bg-[#0A0A0A]" />}
           {saveStatus === 'saving' ? 'Salvando alterações...' : saveStatus === 'saved' ? 'Alterações salvas' : saveStatus === 'error' ? 'Erro ao salvar' : 'Todas alterações salvas'}
         </div>
@@ -250,9 +275,9 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
           if (data.yearModel && !prev.year_model) newData.year_model = data.yearModel
           else if (data.year && !prev.year_model) newData.year_model = data.year
           if (data.color && !prev.color) newData.color = data.color
-          if (data.fuel && !prev.fuel) newData.fuel = data.fuel
+          if (data.fuel && !prev.fuel) newData.fuel = canonicalFuel(data.fuel)
           if (data.engine && !prev.engine) newData.engine = data.engine
-          if (data.transmission && !prev.transmission) newData.transmission = data.transmission
+          if (data.transmission && !prev.transmission) newData.transmission = canonicalTransmission(data.transmission)
           if (data.bodyType && !prev.body_type) newData.body_type = data.bodyType
           if (data.plate && !prev.plate_final) newData.plate_final = data.plate.slice(-1).toUpperCase()
           
@@ -365,22 +390,14 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
         <div className="grid grid-cols-1 min-[480px]:grid-cols-2 sm:grid-cols-3 gap-4">
           <div>
             <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Câmbio</label>
-            <select className={`${ic('transmission')} cursor-pointer`} value={formData.transmission || ''} onChange={(e) => update('transmission', e.target.value)}>
-              <option value="Manual">Manual</option>
-              <option value="Automático">Automático</option>
-              <option value="CVT">CVT</option>
-              <option value="DCT">Automático DCT</option>
+            <select className={`${ic('transmission')} cursor-pointer`} value={canonicalTransmission(formData.transmission)} onChange={(e) => update('transmission', e.target.value)}>
+              {TRANSMISSION_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
             </select>
           </div>
           <div>
             <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Combustível</label>
-            <select className={`${ic('fuel')} cursor-pointer`} value={formData.fuel || ''} onChange={(e) => update('fuel', e.target.value)}>
-              <option value="Flex">Flex</option>
-              <option value="Gasolina">Gasolina</option>
-              <option value="Etanol">Etanol</option>
-              <option value="Diesel">Diesel</option>
-              <option value="Híbrido">Híbrido</option>
-              <option value="Elétrico">Elétrico</option>
+            <select className={`${ic('fuel')} cursor-pointer`} value={canonicalFuel(formData.fuel)} onChange={(e) => update('fuel', e.target.value)}>
+              {FUEL_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
             </select>
           </div>
           <div>
@@ -425,7 +442,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
           </div>
         </div>
         <textarea
-          className={`min-h-[140px] w-full resize-y rounded-[18px] border border-black/[0.06] bg-[#F1F1F6] p-4 text-sm leading-relaxed text-[#0A0A0A] placeholder-[#6A6A74] transition-all focus:border-[#B8FF00] focus:outline-none focus:ring-2 focus:ring-[#B8FF00]/20 ${errors.description ? '!border-[#D94A3A] !text-[#D94A3A]' : ''}`}
+          className={`min-h-[140px] w-full resize-y rounded-[18px] border border-black/[0.06] bg-[#F1F1F6] p-4 text-sm leading-relaxed text-[#0A0A0A] placeholder-[#6A6A74] transition-[border-color,box-shadow] focus-visible:border-[#B8FF00] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8FF00]/20 ${errors.description ? '!border-[#D94A3A] !text-[#D94A3A]' : ''}`}
           value={formData.description || ''}
           onChange={(e) => update('description', e.target.value)}
           placeholder="Descreva o estado de conservação, revisões feitas, opcionais e diferenciais do veículo..."
@@ -484,7 +501,7 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
 
   const loadListings = useCallback(async (selectFirst = false) => {
      if (!supabaseReady) return; setLoadingListings(true); setGlobalError(null)
-     try { const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); if (!session?.access_token) { setGlobalError('Faça login.'); return }; const res = await fetch('/api/marketplace/my-listings', { headers: authH(session.access_token) }); const p = await res.json().catch(() => []); if (!res.ok) throw new Error(p.error || 'Falha ao carregar.'); const list = Array.isArray(p) ? (p as (DashboardListing & { vehicle_type?: string })[]) : []; const filteredList = vehicleType ? list.filter((item) => item.vehicle_type === vehicleType) : list; setListings(filteredList); if (selectFirst && filteredList.length > 0) setSelectedId(filteredList[0].id) }
+     try { const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); if (!session?.access_token) { setGlobalError('Faça login.'); return }; const res = await fetch('/api/marketplace/my-listings', { headers: authH(session.access_token) }); const p = await res.json().catch(() => []); if (!res.ok) throw new Error(p.error || 'Falha ao carregar.'); const list = Array.isArray(p) ? (p as (DashboardListing & { vehicle_type?: string })[]) : []; const filteredList = vehicleType ? list.filter((item) => item.vehicle_type === vehicleType) : list; const normalizedList = filteredList.map((item) => ({ ...item, transmission: canonicalTransmission(item.transmission), fuel: canonicalFuel(item.fuel) })); setListings(normalizedList); if (selectFirst && normalizedList.length > 0) setSelectedId(normalizedList[0].id) }
      catch (err) { setGlobalError(err instanceof Error ? err.message : 'Falha ao carregar.') } finally { setLoadingListings(false) }
   }, [supabaseReady, vehicleType])
 
@@ -499,7 +516,7 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
     if (!selected) return
     localImages.forEach((img) => { if (!img.isExisting) URL.revokeObjectURL(img.previewUrl) })
     const timer = setTimeout(() => {
-      setFormData({ title: selected.title, description: selected.description, vehicle_type: selected.vehicle_type, price: selected.price, vin: selected.vin || '', status: selected.status, mileage: selected.mileage, brand: selected.brand, model: selected.model, version: selected.version, year: selected.year, year_model: selected.year_model, transmission: selected.transmission, fuel: selected.fuel, color: selected.color, body_type: selected.body_type, city: selected.city, state: selected.state, optional_items: selected.optional_items || [], engine: selected.engine, horsepower: selected.horsepower, doors: selected.doors, plate_final: normalizePlateFinal(selected.plate_final), truck_type: selected.truck_type, load_capacity: selected.load_capacity, axles: selected.axles, truck_body_type: selected.truck_body_type, structured_data: selected.structured_data || null })
+      setFormData({ title: selected.title, description: selected.description, vehicle_type: selected.vehicle_type, price: selected.price, vin: selected.vin || '', status: selected.status, mileage: selected.mileage, brand: selected.brand, model: selected.model, version: selected.version, year: selected.year, year_model: selected.year_model, transmission: canonicalTransmission(selected.transmission), fuel: canonicalFuel(selected.fuel), color: selected.color, body_type: selected.body_type, city: selected.city, state: selected.state, optional_items: selected.optional_items || [], engine: selected.engine, horsepower: selected.horsepower, doors: selected.doors, plate_final: normalizePlateFinal(selected.plate_final), truck_type: selected.truck_type, load_capacity: selected.load_capacity, axles: selected.axles, truck_body_type: selected.truck_body_type, structured_data: selected.structured_data || null })
       setLocalImages((selected.images || []).map((img) => ({ id: img.id, previewUrl: img.public_url, isExisting: true, originalImage: img, is_primary: img.is_primary, sort_order: img.sort_order })).sort((a, b) => a.sort_order - b.sort_order))
       setIsDirty(false); setSaveStatus('idle'); setErrors({})
     }, 0)
@@ -620,11 +637,11 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#5C5C66]" />
-            <input className="h-12 w-full rounded-full border border-black/[0.06] bg-[#F1F1F6] pl-12 pr-4 text-sm text-[#0A0A0A] placeholder-[#6A6A74] transition-all focus:border-[#B8FF00] focus:outline-none focus:ring-2 focus:ring-[#B8FF00]/20" placeholder="Buscar anúncio..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            <input className="h-12 w-full rounded-full border border-black/[0.06] bg-[#F1F1F6] pl-12 pr-4 text-sm text-[#0A0A0A] placeholder-[#6A6A74] transition-[border-color,box-shadow] focus-visible:border-[#B8FF00] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8FF00]/20" placeholder="Buscar anúncio..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           </div>
           <div className="flex gap-2 overflow-x-auto">
             {(['all', 'active', 'paused', 'sold'] as const).map((s) => (
-              <button key={s} onClick={() => setStatusFilter(s)} className="whitespace-nowrap rounded-full border px-4 py-2.5 text-sm font-semibold transition-all" style={{
+              <button key={s} onClick={() => setStatusFilter(s)} className="whitespace-nowrap rounded-full border px-4 py-2.5 text-sm font-semibold transition-colors" style={{
                 backgroundColor: statusFilter === s ? '#00A36A' : '#F1F1F6',
                 color: statusFilter === s ? '#B8FF00' : '#55555D',
                 borderColor: statusFilter === s ? '#00A36A' : 'rgba(0,0,0,0.06)'
@@ -729,7 +746,7 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
 
       {/* Error Toast */}
       {globalError && (
-        <div className="fixed bottom-28 lg:bottom-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-3.5 bg-[#DC2626] text-white text-sm font-semibold rounded-2xl shadow-xl flex items-center gap-3">
+        <div role="alert" aria-live="assertive" className="fixed bottom-28 lg:bottom-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-3.5 bg-[#DC2626] text-white text-sm font-semibold rounded-2xl shadow-xl flex items-center gap-3">
           <AlertCircle className="w-5 h-5" />
           {globalError}
           <button onClick={() => setGlobalError(null)} className="ml-2 opacity-60 hover:opacity-100 transition-opacity" aria-label="Fechar">

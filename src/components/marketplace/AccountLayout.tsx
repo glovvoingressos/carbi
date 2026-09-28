@@ -64,8 +64,8 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
   }
 
   return (
-    <div className="member-shell min-h-dvh bg-[#F1F1F6] text-[14px] md:text-[15px] text-[#0A0A0A]">
-      <header className="sticky top-0 z-50 border-b border-black/[0.06] bg-white/90 backdrop-blur-xl">
+    <div className="member-shell min-h-dvh text-[14px] md:text-[15px] text-[#0A0A0A]">
+      <header className="account-header sticky top-0 z-50 border-b bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1500px] items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-4">
             <Link href="/" className="flex shrink-0 items-center gap-2.5">
@@ -80,7 +80,8 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
 
             <button
               onClick={() => setSearchOpen(true)}
-              className="hidden min-w-0 items-center gap-2 rounded-full bg-[#F1F1F6] px-4 py-2.5 text-sm text-[#5C5C66] transition-colors hover:bg-[#E7E7ED] md:flex lg:ml-4 lg:w-72"
+              aria-label="Buscar na sua conta"
+              className="account-search-button hidden min-w-0 items-center gap-2 rounded-full px-4 py-2.5 text-sm transition-colors md:flex lg:ml-4 lg:w-72"
             >
               <Search className="h-4 w-4 shrink-0" />
               <span className="truncate">Buscar anúncios, veículos...</span>
@@ -91,7 +92,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
           <div className="flex items-center gap-2">
             <button
               onClick={() => router.push('/minha-conta/anuncios')}
-              className="hidden items-center gap-2 rounded-full bg-[#B8FF00] px-4 py-2.5 text-sm font-bold text-[#0A0A0A] transition-transform hover:-translate-y-0.5 hover:bg-[#A9EE00] sm:flex"
+              className="account-primary-action hidden items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold transition-transform hover:-translate-y-0.5 sm:flex"
             >
               <Plus className="h-4 w-4" />
               Novo anúncio
@@ -99,7 +100,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
             <button
               aria-label="Notificações"
               onClick={() => router.push('/minha-conta/notificacoes')}
-              className="relative flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] bg-white text-black transition-colors hover:bg-[#F1F1F6]"
+              className="account-icon-button relative flex h-10 w-10 items-center justify-center rounded-full border bg-white text-black transition-colors"
             >
               <Bell className="h-4 w-4" strokeWidth={1.8} />
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#B8FF00] ring-2 ring-white" />
@@ -107,8 +108,10 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
             <div className="mx-1 hidden h-6 w-px bg-black/10 sm:block" />
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="flex items-center gap-2 rounded-full p-1 transition-colors hover:bg-[#F1F1F6]"
-              aria-label="Abrir menu da conta"
+              className="account-profile-toggle flex items-center gap-2 rounded-full p-1 transition-colors"
+              aria-label={sidebarOpen ? 'Fechar menu da conta' : 'Abrir menu da conta'}
+              aria-expanded={sidebarOpen}
+              aria-controls="account-user-menu"
             >
               <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-[#00A36A]">
                 {user.avatarUrl ? <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" /> : <User className="h-4 w-4 text-[#0A0A0A]" strokeWidth={2} />}
@@ -119,7 +122,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
         </div>
       </header>
 
-      <nav className="safe-area-pb fixed inset-x-0 bottom-0 z-50 border-t border-black/[0.06] bg-white/95 backdrop-blur-xl lg:hidden">
+      <nav className="account-bottom-nav safe-area-pb fixed inset-x-0 bottom-0 z-50 border-t bg-white/95 backdrop-blur-xl lg:hidden" aria-label="Navegação da conta">
         <div className="flex items-center justify-around px-2 py-2">
           {navItems.slice(0, 5).map((item) => {
             const active = isActive(item.href)
@@ -140,13 +143,13 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
 
       <div className="mx-auto max-w-[1500px]">
         <div className="lg:grid lg:min-h-[calc(100vh-64px)] lg:grid-cols-[248px_minmax(0,1fr)]">
-          <aside className="hidden border-r border-black/[0.06] bg-white/60 p-4 lg:block">
+          <aside className="account-sidebar hidden border-r bg-white/60 p-4 lg:block">
             <div className="sticky top-24 space-y-5">
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, ease }}
-                className="rounded-[24px] bg-[#00A36A] p-4 text-[#0A0A0A]"
+                className="account-user-card rounded-[24px] p-4 text-white"
               >
                 <div className="mb-5 flex items-start justify-between">
                   <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#B8FF00] text-[#0A0A0A]">
@@ -155,14 +158,14 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
                   <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#B8FF00]">Carbi ID</span>
                 </div>
                 <p className="truncate text-[14px] font-bold md:text-[15px]">{user.fullName || 'Usuário'}</p>
-                <p className="mt-1 truncate text-xs text-black/70">{user.email}</p>
-                <div className="mt-5 flex items-center justify-between border-t border-black/15 pt-3 text-[10px] uppercase tracking-[0.14em] text-black/70">
+                <p className="mt-1 truncate text-xs text-white/70">{user.email}</p>
+                <div className="mt-5 flex items-center justify-between border-t border-white/20 pt-3 text-[10px] uppercase tracking-[0.14em] text-white/70">
                   <span>Conta ativa</span>
                   <span className="h-2 w-2 rounded-full bg-[#B8FF00]" />
                 </div>
               </motion.div>
 
-              <nav className="space-y-1.5">
+              <nav className="account-side-nav space-y-1.5" aria-label="Menu da conta">
                 {navItems.map((item, index) => {
                   const active = isActive(item.href)
                   return (
@@ -193,7 +196,7 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
             </div>
           </aside>
 
-          <main className="min-w-0 px-3 py-4 pb-28 sm:px-6 sm:py-6 lg:px-8 lg:py-8 lg:pb-8">
+          <main className="account-main min-w-0 px-3 py-4 pb-28 sm:px-6 sm:py-6 lg:px-8 lg:py-8 lg:pb-8">
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="min-w-0">
               {children}
             </motion.div>
@@ -224,10 +227,11 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
                 <input
                   autoFocus
                   type="text"
+                  aria-label="Buscar anúncios e configurações"
                   placeholder="Buscar anúncios, configurações..."
                   className="flex-1 text-[14px] md:text-[15px] text-[#0A0A0A] placeholder-[#6A6A74] focus:outline-none"
                 />
-                <button onClick={() => setSearchOpen(false)} className="rounded-full p-1.5 transition-colors hover:bg-[#F1F1F6]">
+                <button aria-label="Fechar busca" onClick={() => setSearchOpen(false)} className="rounded-full p-1.5 transition-colors hover:bg-[#F1F1F6]">
                   <X className="h-5 w-5 text-[#5C5C66]" />
                 </button>
               </div>
@@ -271,7 +275,10 @@ export default function AccountLayout({ children, user, stats = [] }: AccountLay
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
               transition={{ duration: 0.15, ease }}
-              className="fixed right-4 top-16 z-[95] w-72 overflow-hidden rounded-[24px] border border-black/[0.06] bg-white shadow-2xl sm:right-8"
+              id="account-user-menu"
+              role="dialog"
+              aria-label="Menu da conta"
+              className="account-user-menu fixed right-4 top-16 z-[95] w-72 overflow-hidden rounded-[24px] border bg-white shadow-2xl sm:right-8"
             >
               <div className="border-b border-black/[0.06] p-4">
                 <div className="flex items-center gap-3">

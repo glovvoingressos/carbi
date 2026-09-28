@@ -6,12 +6,20 @@ import {
   Search, SlidersHorizontal, X, ChevronDown,
   Check, ChevronLeft, ChevronRight, CarFront,
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import ListingCard from '@/components/marketplace/ListingCard'
 import { ListingPublic } from '@/lib/marketplace'
 import { ListingSort, ListingsPageInput } from '@/lib/marketplace-server'
 import { getFilteredListings, getModelsByBrands } from '@/app/carros-a-venda/actions'
 import { clearTruckListingFilters, serializeTruckListingFilters } from '@/lib/truck-filters'
+import {
+  colorToHex,
+  normalizeBodyType,
+  normalizeColor,
+  normalizeFuel,
+  normalizeTransmission,
+  uniqueNormalizedValues,
+} from '@/lib/vehicle-filter-normalization'
 
 interface MarketplaceClientProps {
   initialListings: ListingPublic[]
@@ -37,24 +45,36 @@ const SORT_OPTIONS: Array<{ value: ListingSort; label: string }> = [
   { value: 'year_desc', label: 'Mais novos' },
 ]
 
-const COLOR_MAP: Record<string, string> = {
-  'Branco': '#FFFFFF',
-  'Preto': '#0A0A0A',
-  'Prata': '#C0C0C0',
-  'Cinza': '#808080',
-  'Vermelho': '#DC2626',
-  'Azul': '#93C5FD',
-  'Verde': '#10B981',
-  'Amarelo': '#FACC15',
-  'Bege': '#F5F5DC',
-  'Laranja': '#F97316',
+type FilterValueNormalizer = (value: string | null | undefined) => string
+
+const normalizeBrand = (value: string | null | undefined) =>
+  String(value || '').trim().replace(/\s+/g, ' ')
+
+function uniqueLabels(values: string[]) {
+  const seen = new Map<string, string>()
+  values.forEach((value) => {
+    const label = normalizeBrand(value)
+    const key = label.toLocaleLowerCase('pt-BR')
+    if (label && !seen.has(key)) seen.set(key, label)
+  })
+  return [...seen.values()].sort((a, b) => a.localeCompare(b, 'pt-BR'))
+}
+
+function expandCanonicalValues(
+  selected: string[],
+  sourceValues: string[],
+  normalize: FilterValueNormalizer,
+) {
+  const selectedSet = new Set(selected)
+  const matchingSourceValues = sourceValues.filter((value) => selectedSet.has(normalize(value)))
+  return [...new Set([...matchingSourceValues, ...selected])]
 }
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <button type="button" onClick={onRemove} className="cbi-chip">
       {label}
-      <X className="w-3 h-3" strokeWidth={2.5} />
+      <X className="w-3 h-3" strokeWidth={2.5} aria-hidden="true" />
     </button>
   )
 }
@@ -79,7 +99,7 @@ function ToggleButton({ active, onClick, children }: { active: boolean; onClick:
 function CheckboxRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
   return (
     <button type="button" onClick={onChange} className={`cbi-check${checked ? ' on' : ''}`}>
-      <span className="box">{checked && <Check className="w-3 h-3 text-white" strokeWidth={3} />}</span>
+      <span className="box">{checked && <Check className="w-3 h-3 text-white" strokeWidth={3} aria-hidden="true" />}</span>
       {label}
     </button>
   )
@@ -102,6 +122,7 @@ export default function MarketplaceClient({
   const [totalPages, setTotalPages] = useState(initialTotalPages)
   const [showFilters, setShowFilters] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
   const didRunInitialTextSearch = useRef(false)
   const didRunInitialFilterSearch = useRef(false)
 
@@ -116,6 +137,12 @@ export default function MarketplaceClient({
     if (values.length > 0) return values
     return getDefaultArray(fallback)
   }
+
+  const getNormalizedSearchArray = (
+    key: string,
+    fallback: unknown,
+    normalize: FilterValueNormalizer,
+  ) => uniqueNormalizedValues(getSearchArray(key, fallback), normalize)
 
   const getSearchNumber = (key: string, fallback: number) => {
     const raw = searchParams.get(key)
@@ -149,12 +176,20 @@ export default function MarketplaceClient({
   const [loadCapacityMax, setLoadCapacityMax] = useState<number>(getSearchNumber('load_capacity_max', typeof defaultFilters?.loadCapacityMax === 'number' ? defaultFilters.loadCapacityMax : 100000))
   const [selectedCities, setSelectedCities] = useState<string[]>(getSearchArray('city', defaultFilters?.city))
   const [selectedState, setSelectedState] = useState<string>(searchParams.get('state') || defaultFilters?.state || '')
-  const [selectedFuels, setSelectedFuels] = useState<string[]>(getSearchArray('fuel', defaultFilters?.fuel))
-  const [selectedTransmissions, setSelectedTransmissions] = useState<string[]>(getSearchArray('transmission', defaultFilters?.transmission))
-  const [selectedColors, setSelectedColors] = useState<string[]>(getSearchArray('color', defaultFilters?.color))
-  const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>(getSearchArray('body_type', defaultFilters?.bodyType))
+  const [selectedFuels, setSelectedFuels] = useState<string[]>(() => getNormalizedSearchArray('fuel', defaultFilters?.fuel, normalizeFuel))
+  const [selectedTransmissions, setSelectedTransmissions] = useState<string[]>(() => getNormalizedSearchArray('transmission', defaultFilters?.transmission, normalizeTransmission))
+  const [selectedColors, setSelectedColors] = useState<string[]>(() => getNormalizedSearchArray('color', defaultFilters?.color, normalizeColor))
+  const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>(() => getNormalizedSearchArray('body_type', defaultFilters?.bodyType, normalizeBodyType))
   const [selectedOptionals, setSelectedOptionals] = useState<string[]>(getSearchArray('optional', defaultFilters?.optionalItems))
   const [sort, setSort] = useState<ListingSort>((searchParams.get('ordem') as ListingSort) || defaultFilters?.sort || 'recent')
+
+  const canonicalFilterOptions = useMemo(() => ({
+    brands: uniqueLabels(filterOptions?.brands || []),
+    fuels: uniqueNormalizedValues(filterOptions?.fuels || [], normalizeFuel),
+    transmissions: uniqueNormalizedValues(filterOptions?.transmissions || [], normalizeTransmission),
+    colors: uniqueNormalizedValues(filterOptions?.colors || [], normalizeColor),
+    bodyTypes: uniqueNormalizedValues(filterOptions?.bodyTypes || [], normalizeBodyType),
+  }), [filterOptions])
 
   const updateResults = useCallback(async (overrides: Partial<ListingsPageInput> = {}) => {
     setIsSearching(true)
@@ -163,10 +198,10 @@ export default function MarketplaceClient({
       vehicle_type: selectedVehicleType || undefined,
       brand: selectedBrands.length > 0 ? selectedBrands : undefined,
       model: selectedModels.length > 0 ? selectedModels : undefined,
-      fuel: selectedFuels.length > 0 ? selectedFuels : undefined,
-      transmission: selectedTransmissions.length > 0 ? selectedTransmissions : undefined,
-      color: selectedColors.length > 0 ? selectedColors : undefined,
-      bodyType: selectedBodyTypes.length > 0 ? selectedBodyTypes : undefined,
+      fuel: selectedFuels.length > 0 ? expandCanonicalValues(selectedFuels, filterOptions?.fuels || [], normalizeFuel) : undefined,
+      transmission: selectedTransmissions.length > 0 ? expandCanonicalValues(selectedTransmissions, filterOptions?.transmissions || [], normalizeTransmission) : undefined,
+      color: selectedColors.length > 0 ? expandCanonicalValues(selectedColors, filterOptions?.colors || [], normalizeColor) : undefined,
+      bodyType: selectedBodyTypes.length > 0 ? expandCanonicalValues(selectedBodyTypes, filterOptions?.bodyTypes || [], normalizeBodyType) : undefined,
       optionalItems: selectedOptionals.length > 0 ? selectedOptionals : undefined,
       priceMin: priceRange[0] > 0 ? priceRange[0] : undefined,
       priceMax: priceRange[1] < 1000000 ? priceRange[1] : undefined,
@@ -191,10 +226,10 @@ export default function MarketplaceClient({
     if (input.q) params.set('q', input.q)
     if (Array.isArray(input.brand)) input.brand.forEach(b => params.append('brand', b))
     if (Array.isArray(input.model)) input.model.forEach(m => params.append('model', m))
-    if (Array.isArray(input.fuel)) input.fuel.forEach(f => params.append('fuel', f))
-    if (Array.isArray(input.transmission)) input.transmission.forEach(t => params.append('transmission', t))
-    if (Array.isArray(input.color)) input.color.forEach(c => params.append('color', c))
-    if (Array.isArray(input.bodyType)) input.bodyType.forEach(bt => params.append('body_type', bt))
+    selectedFuels.forEach(f => params.append('fuel', f))
+    selectedTransmissions.forEach(t => params.append('transmission', t))
+    selectedColors.forEach(c => params.append('color', c))
+    selectedBodyTypes.forEach(bt => params.append('body_type', bt))
     if (Array.isArray(input.optionalItems)) input.optionalItems.forEach(o => params.append('optional', o))
     if (input.priceMin) params.set('price_min', input.priceMin.toString())
     if (input.priceMax) params.set('price_max', input.priceMax.toString())
@@ -219,7 +254,7 @@ export default function MarketplaceClient({
     setTotal(result.total)
     setTotalPages(Math.max(1, Math.ceil(result.total / result.pageSize)))
     setIsSearching(false)
-  }, [q, selectedBrands, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, priceRange, yearRange, mileageMin, mileageMax, selectedTruckTypes, selectedAxles, loadCapacityMin, loadCapacityMax, selectedCities, selectedState, sort, currentPage, router, pathname, selectedVehicleType, selectedModels])
+  }, [q, selectedBrands, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, priceRange, yearRange, mileageMin, mileageMax, selectedTruckTypes, selectedAxles, loadCapacityMin, loadCapacityMax, selectedCities, selectedState, sort, currentPage, router, pathname, selectedVehicleType, selectedModels, filterOptions])
 
   useEffect(() => {
     if (!didRunInitialTextSearch.current) {
@@ -359,7 +394,7 @@ export default function MarketplaceClient({
 
       <FilterSection title="Marcas">
         <div style={{ maxHeight: 200, overflowY: 'auto', paddingRight: 4 }}>
-          {filterOptions?.brands.map(brand => (
+          {canonicalFilterOptions.brands.map(brand => (
             <CheckboxRow key={brand} label={brand} checked={selectedBrands.includes(brand)} onChange={() => toggleItem(selectedBrands, brand, setSelectedBrands)} />
           ))}
         </div>
@@ -410,10 +445,10 @@ export default function MarketplaceClient({
         <div className="cbi-rangelabels"><span>0</span><span>300.000 km</span></div>
       </FilterSection>
 
-      {filterOptions?.fuels && filterOptions.fuels.length > 0 && (
+      {canonicalFilterOptions.fuels.length > 0 && (
         <FilterSection title="Combustível">
           <div className="flex flex-wrap gap-1.5">
-            {filterOptions.fuels.map(fuel => (
+            {canonicalFilterOptions.fuels.map(fuel => (
               <ToggleButton key={fuel} active={selectedFuels.includes(fuel)} onClick={() => toggleItem(selectedFuels, fuel, setSelectedFuels)}>
                 {fuel}
               </ToggleButton>
@@ -422,20 +457,20 @@ export default function MarketplaceClient({
         </FilterSection>
       )}
 
-      {filterOptions?.transmissions && filterOptions.transmissions.length > 0 && (
+      {canonicalFilterOptions.transmissions.length > 0 && (
         <FilterSection title="Câmbio">
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {filterOptions.transmissions.map(t => (
+            {canonicalFilterOptions.transmissions.map(t => (
               <CheckboxRow key={t} label={t} checked={selectedTransmissions.includes(t)} onChange={() => toggleItem(selectedTransmissions, t, setSelectedTransmissions)} />
             ))}
           </div>
         </FilterSection>
       )}
 
-      {filterOptions?.bodyTypes && filterOptions.bodyTypes.length > 0 && (
+      {canonicalFilterOptions.bodyTypes.length > 0 && (
         <FilterSection title="Carroceria">
           <div className="flex flex-wrap gap-1.5">
-            {filterOptions.bodyTypes.map(bt => (
+            {canonicalFilterOptions.bodyTypes.map(bt => (
               <ToggleButton key={bt} active={selectedBodyTypes.includes(bt)} onClick={() => toggleItem(selectedBodyTypes, bt, setSelectedBodyTypes)}>
                 {bt}
               </ToggleButton>
@@ -444,22 +479,24 @@ export default function MarketplaceClient({
         </FilterSection>
       )}
 
-      {filterOptions?.colors && filterOptions.colors.length > 0 && (
+      {canonicalFilterOptions.colors.length > 0 && (
         <FilterSection title="Cores">
           <div className="cbi-swatches">
-            {filterOptions.colors.map(color => {
-              const hex = COLOR_MAP[color] || '#CCCCCC'
+            {canonicalFilterOptions.colors.map(color => {
+              const hex = colorToHex(color)
               const isSelected = selectedColors.includes(color)
               return (
                 <button
                   key={color}
                   title={color}
+                  aria-label={`Filtrar por cor ${color}`}
+                  aria-pressed={isSelected}
                   type="button"
                   onClick={() => toggleItem(selectedColors, color, setSelectedColors)}
                   className={`cbi-swatch${isSelected ? ' on' : ''}`}
                   style={{ backgroundColor: hex }}
                 >
-                  {isSelected && <Check className={`w-3.5 h-3.5 ${hex === '#FFFFFF' || hex === '#FACC15' || hex === '#F5F5DC' ? 'text-[#1A1A1A]' : 'text-white'}`} strokeWidth={3} />}
+                  {isSelected && <Check className={`w-3.5 h-3.5 ${hex === '#FFFFFF' || hex === '#FACC15' || hex === '#D6B98C' ? 'text-[#1A1A1A]' : 'text-white'}`} strokeWidth={3} aria-hidden="true" />}
                 </button>
               )
             })}
@@ -483,9 +520,9 @@ export default function MarketplaceClient({
       </aside>
 
       {/* Main content */}
-      <div className="min-w-0">
+      <div className="cbi-results-column min-w-0">
         {/* Toolbar */}
-        <div className="cbi-toolbar">
+        <div className="cbi-toolbar" data-searching={isSearching ? 'true' : 'false'}>
           <div className="cbi-search">
             <Search strokeWidth={1.75} />
             <input
@@ -494,6 +531,7 @@ export default function MarketplaceClient({
               onChange={e => setQ(e.target.value)}
               placeholder="Buscar por marca, modelo ou versão..."
               aria-label="Buscar anúncios"
+              aria-busy={isSearching}
             />
           </div>
           <button onClick={() => setShowFilters(true)} className="cbi-filter-btn lg:hidden" aria-label="Abrir filtros">
@@ -510,16 +548,32 @@ export default function MarketplaceClient({
 
         {/* Active chips */}
         {activeChips.length > 0 && (
-          <div className="cbi-chips">
-            {activeChips.map((chip, idx) => (<Chip key={idx} label={chip.label} onRemove={chip.onRemove} />))}
-          </div>
+          <motion.div layout className="cbi-chips">
+            <AnimatePresence initial={false} mode="popLayout">
+              {activeChips.map((chip) => (
+                <motion.div
+                  key={chip.label}
+                  layout
+                  initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.88, y: -6 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={prefersReducedMotion ? undefined : { opacity: 0, scale: 0.88, y: -6 }}
+                  transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <Chip label={chip.label} onRemove={chip.onRemove} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         )}
 
         {/* Results header */}
-        <div className="cbi-results">
+        <div className="cbi-results" aria-live="polite">
           <div className="cbi-count">
             {isSearching ? (
-              <span>Buscar...</span>
+              <span className="cbi-count-loading" role="status">
+                <span className="cbi-loading-orb" aria-hidden="true" />
+                Atualizando resultados
+              </span>
             ) : (
               <><b>{total.toLocaleString('pt-BR')}</b>{total === 1 ? 'veículo encontrado' : 'veículos encontrados'}</>
             )}
@@ -527,18 +581,37 @@ export default function MarketplaceClient({
         </div>
 
         {/* Grid */}
-        <div className={`cbi-grid transition-opacity duration-200 ${isSearching ? 'opacity-50' : 'opacity-100'}`}>
-          {listings.length > 0 ? (
-            listings.map((listing, idx) => (
-              <ListingCard key={listing.id} listing={listing} priority={idx < 3} index={idx} />
-            ))
-          ) : !isSearching && (
-            <div className="cbi-empty">
-              <h3>Nenhum resultado</h3>
-              <p>Tente ajustar os filtros para encontrar mais veículos.</p>
-              <button onClick={clearFilters}>Limpar todos os filtros</button>
-            </div>
-          )}
+        <div className={`cbi-grid${isSearching ? ' is-searching' : ''}`} aria-busy={isSearching}>
+          <AnimatePresence initial={false} mode="popLayout">
+            {listings.length > 0 ? (
+              listings.map((listing, idx) => (
+                <motion.div
+                  key={listing.id}
+                  layout
+                  className="cbi-card-shell"
+                  initial={prefersReducedMotion ? false : { opacity: 0, y: 18, scale: 0.985, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+                  exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8, scale: 0.98, filter: 'blur(4px)' }}
+                  transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.42, delay: Math.min(idx, 10) * 0.045, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <ListingCard listing={listing} priority={idx < 3} index={idx} />
+                </motion.div>
+              ))
+            ) : !isSearching && (
+              <motion.div
+                key="empty"
+                className="cbi-empty"
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
+                transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <h3>Nenhum resultado</h3>
+                <p>Tente ajustar os filtros para encontrar mais veículos.</p>
+                <button onClick={clearFilters}>Limpar todos os filtros</button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Pagination */}
@@ -579,11 +652,14 @@ export default function MarketplaceClient({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 250 }}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="mobile-filters-title"
               style={{ position: 'fixed', insetInline: 0, bottom: 0, zIndex: 101, display: 'flex', flexDirection: 'column', maxHeight: '90vh', background: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28 }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderBottom: '1px solid #F2F2EF' }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700 }}>Filtros</h3>
-                <button onClick={() => setShowFilters(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X className="w-5 h-5" strokeWidth={1.75} /></button>
+                <h3 id="mobile-filters-title" style={{ fontSize: 16, fontWeight: 700 }}>Filtros</h3>
+                <button onClick={() => setShowFilters(false)} aria-label="Fechar filtros" style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X className="w-5 h-5" strokeWidth={1.75} /></button>
               </div>
               <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
                 <div className="cbi-panel" style={{ border: 'none', padding: 0 }}>{filtersContent}</div>

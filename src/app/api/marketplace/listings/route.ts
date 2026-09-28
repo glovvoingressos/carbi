@@ -6,6 +6,12 @@ import { queryPublicListings } from '@/lib/marketplace-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingCreatedEmail, sendAdminNewListingEmail } from '@/lib/email'
 import { notifyListingPublished } from '@/lib/notifications'
+import {
+  normalizeBodyType,
+  normalizeColor,
+  normalizeFuel,
+  normalizeTransmission,
+} from '@/lib/vehicle-filter-normalization'
 
 export async function GET(req: NextRequest) {
   try {
@@ -61,7 +67,10 @@ export async function POST(req: NextRequest) {
       .replace(/\s+/g, ' ')
       .trim()
     const resolvedTitle = payload.title?.trim() || generatedTitle
-    const resolvedBodyType = payload.body_type?.trim() || 'Não informado'
+    const normalizedTransmission = normalizeTransmission(payload.transmission)
+    const normalizedFuel = normalizeFuel(payload.fuel)
+    const normalizedColor = normalizeColor(payload.color)
+    const resolvedBodyType = normalizeBodyType(payload.body_type)
     const truckPayload = normalizeTruckPayload(payload)
 
     // Limite de anúncios grátis
@@ -84,9 +93,9 @@ export async function POST(req: NextRequest) {
       vin: payload.vin?.trim().toUpperCase() || null,
       year: payload.year,
       year_model: payload.year_model,
-      transmission: payload.transmission.trim(),
-      fuel: payload.fuel.trim(),
-      color: payload.color.trim(),
+      transmission: normalizedTransmission,
+      fuel: normalizedFuel,
+      color: normalizedColor,
       body_type: resolvedBodyType,
       engine: payload.engine?.trim() || null,
       horsepower: payload.horsepower || null,
@@ -122,9 +131,9 @@ export async function POST(req: NextRequest) {
       year_model: payload.year_model,
       mileage: payload.mileage,
       price: payload.price,
-      transmission: payload.transmission.trim(),
-      fuel: payload.fuel.trim(),
-      color: payload.color.trim(),
+      transmission: normalizedTransmission,
+      fuel: normalizedFuel,
+      color: normalizedColor,
       body_type: resolvedBodyType,
       city: payload.city.trim(),
       state: payload.state.trim().toUpperCase(),

@@ -5,6 +5,16 @@ import { normalizePlateFinal, parseFipePriceToNumber } from '@/lib/marketplace'
 import { classifyVehicleCategory, classifyByFuelType } from '@/lib/vehicle-category'
 import { applyTruckQueryFilters } from '@/lib/truck-filters'
 import { normalizeListingImages } from '@/lib/listing-images'
+import {
+  FUEL_OPTIONS,
+  TRANSMISSION_OPTIONS,
+  filterSearchTokens,
+  normalizeBodyType,
+  normalizeColor,
+  normalizeFuel,
+  normalizeTransmission,
+  uniqueNormalizedValues,
+} from '@/lib/vehicle-filter-normalization'
 
 type ListingImageRow = {
   id: string
@@ -29,11 +39,15 @@ type ListingQueryInput = {
   yearModel?: number
   excludeId?: string
   limit?: number
+  fetchAll?: boolean
   single?: boolean
   vehicle_type?: string
   city?: string | string[]
   state?: string
+  bodyType?: string | string[]
   transmission?: string | string[]
+  fuel?: string | string[]
+  color?: string | string[]
   truckType?: string | string[]
   axles?: number | number[]
   loadCapacityMin?: number
@@ -117,8 +131,49 @@ function applyTextSearch<T>(query: T, inputQuery?: string): T {
   }, query as any) as T
 }
 
+type CanonicalFilterKind = 'transmission' | 'fuel' | 'bodyType' | 'color'
+
+function getCanonicalFilterTokens(
+  value: string | string[] | undefined,
+  kind: CanonicalFilterKind,
+): string[] {
+  const values = Array.isArray(value) ? value : value ? [value] : []
+  const tokens = values.flatMap((item) => {
+    const normalizedTokens = filterSearchTokens(item, kind)
+    const stemTokens = normalizedTokens
+      .filter((token) => kind === 'bodyType' || kind === 'color')
+      .filter((token) => /[oa]$/.test(token))
+      .map((token) => token.slice(0, -1))
+
+    return [...normalizedTokens, ...stemTokens]
+  })
+
+  return [...new Set(tokens
+    .map((token) => token.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, ''))
+    .filter(Boolean))]
+}
+
+function applyCanonicalFilter<T>(
+  query: T,
+  field: string,
+  value: string | string[] | undefined,
+  kind: CanonicalFilterKind,
+): T {
+  const tokens = getCanonicalFilterTokens(value, kind)
+  if (tokens.length === 0) return query
+
+  const clause = tokens.map((token) => `${field}.ilike.%${token}%`).join(',')
+  return (query as any).or(clause) as T
+}
+
 function normalizeTableRow(row: ListingRow): ListingPublic {
   const structured = row.structured_data || row.technical_data || {}
+  const transmission = normalizeTransmission(
+    Array.isArray(row.transmission) ? row.transmission[0] : row.transmission,
+  )
+  const fuel = normalizeFuel(row.fuel)
+  const color = normalizeColor(row.color)
+  const bodyType = normalizeBodyType(row.body_type)
   const normalizedTruck = row.vehicle_type === 'truck' ? {
     truck_type: row.truck_type || (structured.truck_type as string | undefined) || null,
     load_capacity: row.load_capacity ?? (structured.load_capacity as number | undefined) ?? null,
@@ -130,12 +185,16 @@ function normalizeTableRow(row: ListingRow): ListingPublic {
     truck_category: row.truck_category || (structured.truck_category as ListingPublic['truck_category']) || null,
     chassis: row.chassis || (structured.chassis as string | undefined) || null,
   } : {}
-  const category = classifyVehicleCategory(row.body_type, row.brand, row.model) 
-    || classifyByFuelType(row.fuel)
+  const category = classifyVehicleCategory(bodyType, row.brand, row.model)
+    || classifyByFuelType(fuel)
     || null
   
   return {
     ...row,
+    transmission,
+    fuel,
+    color,
+    body_type: bodyType,
     // Keep legacy rows safe too: public responses must never expose a full plate.
     plate_final: normalizePlateFinal(row.plate_final),
     ...normalizedTruck,
@@ -273,19 +332,23 @@ async function hydrateMissingFipePrices(listings: ListingPublic[]): Promise<List
 
 async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]> {
   const supabase = getSupabaseServerClient()
-  const safeLimit = Math.min(Math.max(input.limit || 8, 1), 60)
+  const safeLimit = input.fetchAll ? null : Math.min(Math.max(input.limit || 8, 1), 60)
 
   let viewQuery = supabase
     .from('vehicle_listings_public')
     .select('*')
     .order('published_at', { ascending: false })
-    .limit(safeLimit)
+  if (safeLimit !== null) viewQuery = viewQuery.limit(safeLimit)
 
   if (input.id) viewQuery = viewQuery.eq('id', input.id)
   if (input.slug) viewQuery = viewQuery.eq('slug', input.slug)
   if (input.brand) viewQuery = viewQuery.ilike('brand', `%${input.brand}%`)
   if (input.model) viewQuery = viewQuery.ilike('model', `%${input.model}%`)
   viewQuery = applyTextSearch(viewQuery, input.q)
+   viewQuery = applyCanonicalFilter(viewQuery, 'body_type', input.bodyType, 'bodyType')
+   viewQuery = applyCanonicalFilter(viewQuery, 'transmission', input.transmission, 'transmission')
+   viewQuery = applyCanonicalFilter(viewQuery, 'fuel', input.fuel, 'fuel')
+   viewQuery = applyCanonicalFilter(viewQuery, 'color', input.color, 'color')
    if (input.yearModel) viewQuery = viewQuery.eq('year_model', input.yearModel)
    if (input.excludeId) viewQuery = viewQuery.neq('id', input.excludeId)
    viewQuery = applyTruckQueryFilters(viewQuery, input)
@@ -368,19 +431,22 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
     `)
     .eq('status', 'active')
     .order('published_at', { ascending: false })
-    .limit(safeLimit)
+  if (safeLimit !== null) tableQuery = tableQuery.limit(safeLimit)
 
   if (input.id) tableQuery = tableQuery.eq('id', input.id)
   if (input.slug) tableQuery = tableQuery.eq('slug', input.slug)
   if (input.brand) tableQuery = tableQuery.ilike('brand', `%${input.brand}%`)
   if (input.model) tableQuery = tableQuery.ilike('model', `%${input.model}%`)
   tableQuery = applyTextSearch(tableQuery, input.q)
+  tableQuery = applyCanonicalFilter(tableQuery, 'body_type', input.bodyType, 'bodyType')
+  tableQuery = applyCanonicalFilter(tableQuery, 'transmission', input.transmission, 'transmission')
+  tableQuery = applyCanonicalFilter(tableQuery, 'fuel', input.fuel, 'fuel')
+  tableQuery = applyCanonicalFilter(tableQuery, 'color', input.color, 'color')
   if (input.yearModel) tableQuery = tableQuery.eq('year_model', input.yearModel)
    if (input.excludeId) tableQuery = tableQuery.neq('id', input.excludeId)
    if (input.vehicle_type) tableQuery = tableQuery.eq('vehicle_type', input.vehicle_type)
    if (input.city) tableQuery = Array.isArray(input.city) ? tableQuery.in('city', input.city) : tableQuery.ilike('city', input.city)
    if (input.state) tableQuery = tableQuery.ilike('state', input.state)
-   if (input.transmission) tableQuery = Array.isArray(input.transmission) ? tableQuery.in('transmission', input.transmission) : tableQuery.ilike('transmission', `%${input.transmission}%`)
    if (input.truckType) tableQuery = Array.isArray(input.truckType) ? tableQuery.in('truck_type', input.truckType) : tableQuery.ilike('truck_type', `%${input.truckType}%`)
    if (input.axles) tableQuery = Array.isArray(input.axles) ? tableQuery.in('axles', input.axles) : tableQuery.eq('axles', input.axles)
    if (typeof input.loadCapacityMin === 'number') tableQuery = tableQuery.gte('load_capacity', input.loadCapacityMin)
@@ -436,9 +502,9 @@ export async function getRelatedListings(params: {
   })
 }
 
-export async function getLatestPublicListings(limit = 8): Promise<ListingPublic[]> {
+export async function getLatestPublicListings(limit?: number): Promise<ListingPublic[]> {
   if (!isSupabaseConfigured()) return []
-  const listings = await queryListings({ limit })
+  const listings = await queryListings(limit === undefined ? { fetchAll: true } : { limit })
   return enrichListingSignals(listings)
 }
 
@@ -532,20 +598,10 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
     else query = query.ilike('model', `%${input.model}%`)
   }
   
-  if (input.bodyType) {
-    if (Array.isArray(input.bodyType)) query = query.in('body_type', input.bodyType)
-    else query = query.ilike('body_type', `%${input.bodyType}%`)
-  }
-  
-  if (input.fuel) {
-    if (Array.isArray(input.fuel)) query = query.in('fuel', input.fuel)
-    else query = query.ilike('fuel', `%${input.fuel}%`)
-  }
-
-  if (input.color) {
-    if (Array.isArray(input.color)) query = query.in('color', input.color)
-    else query = query.ilike('color', `%${input.color}%`)
-  }
+  query = applyCanonicalFilter(query, 'body_type', input.bodyType, 'bodyType')
+  query = applyCanonicalFilter(query, 'transmission', input.transmission, 'transmission')
+  query = applyCanonicalFilter(query, 'fuel', input.fuel, 'fuel')
+  query = applyCanonicalFilter(query, 'color', input.color, 'color')
   
   if (typeof input.priceMin === 'number') query = query.gte('price', input.priceMin)
   if (typeof input.priceMax === 'number') query = query.lte('price', input.priceMax)
@@ -823,16 +879,21 @@ export async function getFilterOptions() {
   ])
 
   const distinct = (arr: any[], key: string) => [...new Set(arr?.map(i => i[key]).filter(Boolean))].sort()
+  const normalizedDistinct = (
+    arr: any[],
+    key: string,
+    normalize: (value: string | null | undefined) => string,
+  ) => uniqueNormalizedValues(arr?.map((item) => item[key]) || [], normalize).sort((a, b) => a.localeCompare(b, 'pt-BR'))
 
   const allOptionals = optionalItemsData?.flatMap(i => i.optional_items || []) || []
   const distinctOptionals = [...new Set(allOptionals)].sort()
 
   return {
     brands: distinct(brandsData || [], 'brand'),
-    fuels: distinct(fuelsData || [], 'fuel'),
-    transmissions: distinct(transmissionsData || [], 'transmission'),
-    colors: distinct(colorsData || [], 'color'),
-    bodyTypes: distinct(bodyTypesData || [], 'body_type'),
+    fuels: [...FUEL_OPTIONS],
+    transmissions: [...TRANSMISSION_OPTIONS],
+    colors: normalizedDistinct(colorsData || [], 'color', normalizeColor),
+    bodyTypes: normalizedDistinct(bodyTypesData || [], 'body_type', normalizeBodyType),
     optionalItems: distinctOptionals
   }
 }

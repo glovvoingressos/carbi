@@ -64,11 +64,9 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+    <div className="account-profile-card bg-white rounded-2xl border overflow-hidden">
       {/* Cover */}
-      <div className="h-32 relative" style={{ backgroundColor: '#16855C', backgroundImage: 'linear-gradient(135deg, #16855C 0%, #1A7A54 50%, #146B4A 100%)' }}>
-        <div className="absolute inset-0 bg-[radial-gradient(#D4F576_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
-      </div>
+      <div className="account-profile-cover relative h-32" aria-hidden="true" />
       
       {/* Profile Info */}
       <div className="px-6 pb-6">
@@ -96,7 +94,7 @@ function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, upl
             <p className="text-sm text-gray-500 mt-0.5">{email}</p>
           </div>
 
-          <label htmlFor="avatar-upload" className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#00A36A] text-[#0A0A0A] rounded-xl text-sm font-semibold hover:bg-[#008E5D] transition-colors cursor-pointer shrink-0">
+          <label htmlFor="avatar-upload" className="account-profile-photo-action inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer shrink-0">
             <Camera className="w-4 h-4" />
             Alterar foto
           </label>
@@ -112,7 +110,7 @@ function PersonalInfo({ fullName, email, phone, cpf, onNameChange, onPhoneChange
   onNameChange: (v: string) => void; onPhoneChange: (v: string) => void
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-6">
+    <div className="account-profile-card bg-white rounded-2xl border p-6">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
           <User className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
@@ -125,8 +123,9 @@ function PersonalInfo({ fullName, email, phone, cpf, onNameChange, onPhoneChange
       
       <div className="space-y-5">
         <div>
-          <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Nome completo</label>
-          <input 
+          <label htmlFor="profile-name" className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Nome completo</label>
+          <input
+            id="profile-name"
             type="text"
             value={fullName} 
             onChange={(e) => onNameChange(e.target.value)} 
@@ -135,17 +134,18 @@ function PersonalInfo({ fullName, email, phone, cpf, onNameChange, onPhoneChange
           />
         </div>
         <div>
-          <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">E-mail</label>
+          <label htmlFor="profile-email" className="text-sm font-semibold text-[#1A1A1A] mb-2 block">E-mail</label>
           <div className="relative">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input value={email} disabled className="w-full h-12 pl-11 pr-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-gray-500 cursor-not-allowed" />
+            <input id="profile-email" value={email} disabled className="w-full h-12 pl-11 pr-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-gray-500 cursor-not-allowed" />
           </div>
         </div>
         <div>
-          <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">CPF</label>
+          <label htmlFor="profile-cpf" className="text-sm font-semibold text-[#1A1A1A] mb-2 block">CPF</label>
           <div className="relative">
             <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input 
+            <input
+              id="profile-cpf"
               value={formatCPF(cpf)} 
               disabled 
               placeholder="000.000.000-00" 
@@ -155,10 +155,11 @@ function PersonalInfo({ fullName, email, phone, cpf, onNameChange, onPhoneChange
           </div>
         </div>
         <div>
-          <label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Telefone / WhatsApp</label>
+          <label htmlFor="profile-phone" className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Telefone / WhatsApp</label>
           <div className="relative">
             <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input 
+            <input
+              id="profile-phone"
               type="tel"
               value={phone} 
               onChange={(e) => onPhoneChange(formatPhone(e.target.value))} 
@@ -196,7 +197,7 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-6">
+    <div className="account-profile-card bg-white rounded-2xl border p-6">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
           <Shield className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
@@ -209,6 +210,8 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
 
       <button
         type="button"
+        aria-expanded={open}
+        aria-controls="change-password-panel"
         className="w-full flex items-center justify-between p-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm font-medium text-[#1A1A1A] hover:bg-gray-100 transition-colors"
         onClick={() => setOpen(!open)}
       >
@@ -228,30 +231,35 @@ function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) 
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
+            id="change-password-panel"
             className="overflow-hidden"
           >
             <div className="pt-5 space-y-4">
               <div className="relative">
+                <label htmlFor="new-password" className="sr-only">Nova senha</label>
                 <input
+                  id="new-password"
                   type={showNewPw ? 'text' : 'password'}
                   value={newPw}
                   onChange={(e) => setNewPw(e.target.value)}
                   placeholder="Nova senha (mín. 8 caracteres)"
                   className="w-full h-12 px-4 pr-12 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all"
                 />
-                <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-[#1A1A1A] transition-colors" onClick={() => setShowNewPw(!showNewPw)}>
+                <button type="button" aria-label={showNewPw ? 'Ocultar nova senha' : 'Mostrar nova senha'} className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-[#1A1A1A] transition-colors" onClick={() => setShowNewPw(!showNewPw)}>
                   {showNewPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               <div className="relative">
+                <label htmlFor="confirm-password" className="sr-only">Confirmar nova senha</label>
                 <input
+                  id="confirm-password"
                   type={showConfirmPw ? 'text' : 'password'}
                   value={confirmPw}
                   onChange={(e) => setConfirmPw(e.target.value)}
                   placeholder="Confirmar nova senha"
                   className="w-full h-12 px-4 pr-12 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all"
                 />
-                <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-[#1A1A1A] transition-colors" onClick={() => setShowConfirmPw(!showConfirmPw)}>
+                <button type="button" aria-label={showConfirmPw ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'} className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-[#1A1A1A] transition-colors" onClick={() => setShowConfirmPw(!showConfirmPw)}>
                   {showConfirmPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
@@ -302,7 +310,7 @@ function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#DC2626]/20 p-6">
+    <div className="account-danger-card bg-white rounded-2xl border border-[#DC2626]/20 p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-[#DC2626]/10 flex items-center justify-center">
           <AlertTriangle className="w-5 h-5 text-[#DC2626]" strokeWidth={1.75} />
@@ -332,6 +340,7 @@ function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
         >
           <div className="p-4 rounded-xl bg-[#DC2626]/5 border border-[#DC2626]/20">
             <p className="text-sm font-semibold text-[#DC2626] mb-2">Digite &quot;EXCLUIR&quot; para confirmar:</p>
+            <label htmlFor="confirm-delete" className="sr-only">Digite EXCLUIR para confirmar</label>
             <input
               id="confirm-delete"
               value={delText}
@@ -473,7 +482,8 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
   }
 
   if (loading) return (
-    <div className="space-y-6">
+    <div className="account-loading space-y-6" aria-busy="true">
+      <span className="sr-only" role="status">Carregando seu perfil…</span>
       <div className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
       <div className="h-64 bg-gray-100 rounded-2xl animate-pulse" />
       <div className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
@@ -482,7 +492,7 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
   if (!userId) return null
 
   return (
-    <section className="space-y-6">
+    <section className="account-profile space-y-6">
       <AnimatePresence>
         {toast && (
           <motion.div
@@ -511,7 +521,7 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
       <div className="pt-4">
         <button
           type="button"
-          className="w-full py-4 rounded-xl text-white text-[14px] md:text-[15px] font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+          className="account-profile-save w-full py-4 rounded-xl text-white text-[14px] md:text-[15px] font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-2"
           style={{ backgroundColor: '#16855C', boxShadow: '0 4px 12px rgba(22,133,92,0.25)' }}
           onClick={saveProfile}
           disabled={saving || uploading}

@@ -95,7 +95,8 @@ export default function MinhaContaPage() {
 
   if (loading) return (
     <AccountLayout user={{ email: '', fullName: '', avatarUrl: '' }} stats={[]}>
-      <div className="space-y-6">
+      <div className="account-loading space-y-6" aria-busy="true">
+        <span className="sr-only" role="status">Carregando sua conta…</span>
         <div className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => <div key={i} className="h-32 bg-gray-100 rounded-2xl animate-pulse" />)}
@@ -109,28 +110,27 @@ export default function MinhaContaPage() {
 
   return (
     <AccountLayout user={user} stats={stats}>
-      <div className="min-w-0 space-y-6">
+      <div className="account-dashboard min-w-0 space-y-6">
         {/* Hero Welcome */}
-        <div className="relative overflow-hidden rounded-[32px] bg-[#00A36A] p-5 text-[#0A0A0A] md:p-8">
-          <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[#B8FF00]/30 blur-3xl" />
+        <div className="account-welcome relative overflow-hidden rounded-[32px] p-5 md:p-8">
+          <div className="account-welcome-glow absolute -right-16 -top-20 h-52 w-52 rounded-full blur-3xl" aria-hidden="true" />
           <div className="relative z-10">
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#0A0A0A]">Carbi member space</p>
-            <h1 className="text-[14px] font-bold tracking-tight text-[#0A0A0A] md:text-[15px]">
-              Olá, {user.fullName?.split(' ')[0] || 'Usuário'} 👋
+            <h1 className="account-welcome-title text-3xl font-bold tracking-tight md:text-4xl">
+              Olá, {user.fullName?.split(' ')[0] || 'Usuário'}
             </h1>
-            <p className="mt-2 text-xs text-black/70 md:text-sm">Seu espaço para vender, acompanhar e decidir melhor.</p>
+            <p className="account-welcome-copy mt-3 max-w-[38rem] text-sm md:text-base">Seu espaço para vender, acompanhar e decidir melhor.</p>
             
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/minha-conta/anuncios"
-                className="inline-flex items-center gap-2 rounded-full bg-[#B8FF00] px-5 py-3 text-sm font-bold text-[#0A0A0A] transition-transform hover:-translate-y-0.5 hover:bg-[#A9EE00]"
+                className="account-primary-cta inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold transition-transform hover:-translate-y-0.5"
               >
                 <Plus className="w-4 h-4" />
                 Novo anúncio
               </Link>
               <Link
                 href="/carros-a-venda"
-                className="inline-flex items-center gap-2 rounded-full border border-black/20 bg-white/65 px-5 py-3 text-sm font-semibold text-[#0A0A0A] transition-colors hover:bg-white/85"
+                className="account-secondary-cta inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors"
               >
                 Explorar seminovos
                 <ArrowUpRight className="w-4 h-4" />
@@ -141,59 +141,59 @@ export default function MinhaContaPage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Link href="/minha-conta/anuncios" className="group rounded-[24px] border border-black/[0.06] bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-5">
+          <Link href="/minha-conta/anuncios" data-tone="brand" className="account-stat-card group rounded-[24px] border bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-5">
             <div className="mb-3 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#B8FF00]">
+              <div className="account-stat-icon flex h-10 w-10 items-center justify-center rounded-[14px]">
                 <Car className="h-5 w-5 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
-              <ArrowUpRight className="ml-auto h-4 w-4 text-black/20 transition-colors group-hover:text-[#0A0A0A]" />
+              <ArrowUpRight className="account-stat-arrow ml-auto h-4 w-4 transition-colors" />
             </div>
-            <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{dashboardStats.totalListings}</p>
+            <p className="account-stat-value text-2xl font-bold tabular-nums">{dashboardStats.totalListings}</p>
             <p className="mt-1 text-xs text-[#5C5C66]">Anúncios totais</p>
           </Link>
 
-          <div className="rounded-[24px] border border-black/[0.06] bg-white p-4 sm:p-5">
+          <div data-tone="signal" className="account-stat-card rounded-[24px] border bg-white p-4 sm:p-5">
             <div className="mb-3 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#00A36A]">
+              <div className="account-stat-icon flex h-10 w-10 items-center justify-center rounded-[14px]">
                 <Eye className="h-5 w-5 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
             </div>
-            <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{dashboardStats.totalViews > 999 ? `${(dashboardStats.totalViews / 1000).toFixed(1)}k` : dashboardStats.totalViews}</p>
+            <p className="account-stat-value text-2xl font-bold tabular-nums">{dashboardStats.totalViews > 999 ? `${(dashboardStats.totalViews / 1000).toFixed(1)}k` : dashboardStats.totalViews}</p>
             <p className="mt-1 text-xs text-[#5C5C66]">Visualizações</p>
           </div>
 
-          <Link href="/minha-conta/anuncios" className="group rounded-[24px] border border-black/[0.06] bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-5">
+          <Link href="/minha-conta/anuncios" data-tone="positive" className="account-stat-card group rounded-[24px] border bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-5">
             <div className="mb-3 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#F1F1F6]">
+              <div className="account-stat-icon flex h-10 w-10 items-center justify-center rounded-[14px]">
                 <TrendingUp className="h-5 w-5 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
-              <ArrowUpRight className="ml-auto h-4 w-4 text-black/20 transition-colors group-hover:text-[#0A0A0A]" />
+              <ArrowUpRight className="account-stat-arrow ml-auto h-4 w-4 transition-colors" />
             </div>
-            <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{dashboardStats.activeListings}</p>
+            <p className="account-stat-value text-2xl font-bold tabular-nums">{dashboardStats.activeListings}</p>
             <p className="mt-1 text-xs text-[#5C5C66]">Ativos agora</p>
           </Link>
 
-          <Link href="/minha-conta/conversas" className="group rounded-[24px] border border-black/[0.06] bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-5">
+          <Link href="/minha-conta/conversas" data-tone="brand" className="account-stat-card group rounded-[24px] border bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-5">
             <div className="mb-3 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#B8FF00]">
+              <div className="account-stat-icon flex h-10 w-10 items-center justify-center rounded-[14px]">
                 <MessageCircle className="h-5 w-5 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
-              <ArrowUpRight className="ml-auto h-4 w-4 text-black/20 transition-colors group-hover:text-[#0A0A0A]" />
+              <ArrowUpRight className="account-stat-arrow ml-auto h-4 w-4 transition-colors" />
             </div>
-            <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{dashboardStats.unreadMessages}</p>
+            <p className="account-stat-value text-2xl font-bold tabular-nums">{dashboardStats.unreadMessages}</p>
             <p className="mt-1 text-xs text-[#5C5C66]">Mensagens não lidas</p>
           </Link>
         </div>
 
         {/* Recent Listings */}
         {recentListings.length > 0 && (
-          <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
+          <div className="account-panel rounded-[28px] border bg-white p-4 sm:p-6">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h2 className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Anúncios recentes</h2>
+                <h2 className="text-lg font-bold text-[#0A0A0A]">Anúncios recentes</h2>
                 <p className="mt-0.5 text-sm text-[#5C5C66]">Seus últimos veículos publicados</p>
               </div>
-              <Link href="/minha-conta/anuncios" className="text-sm font-semibold text-[#0A0A0A] hover:underline">
+              <Link href="/minha-conta/anuncios" className="account-text-link text-sm font-semibold hover:underline">
                 Ver todos →
               </Link>
             </div>
@@ -202,13 +202,13 @@ export default function MinhaContaPage() {
                 <Link
                   key={listing.id}
                   href={`/minha-conta/anuncios`}
-                  className="flex min-w-0 items-center gap-4 rounded-[18px] p-3 transition-colors hover:bg-[#F1F1F6] sm:p-4"
+                  className="account-list-row flex min-w-0 items-center gap-4 rounded-[18px] p-3 transition-colors sm:p-4"
                 >
                   <div className="h-12 w-16 shrink-0 overflow-hidden rounded-[14px] bg-[#F1F1F6]">
                     {listing.images?.[0]?.public_url ? (
                       <img src={listing.images[0].public_url} alt={listing.title} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-[#00A36A]">
+                      <div className="account-list-media flex h-full w-full items-center justify-center">
                         <Car className="h-5 w-5 text-[#0A0A0A]" />
                       </div>
                     )}
@@ -228,28 +228,28 @@ export default function MinhaContaPage() {
         )}
 
         {/* Quick Actions */}
-        <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
-          <h2 className="mb-5 text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Ações rápidas</h2>
+        <div className="account-panel rounded-[28px] border bg-white p-4 sm:p-6">
+          <h2 className="mb-5 text-lg font-bold text-[#0A0A0A]">Ações rápidas</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Link href="/minha-conta/anuncios" className="group flex flex-col items-center gap-3 rounded-[20px] bg-[#B8FF00] p-4 transition-transform hover:-translate-y-0.5">
+            <Link href="/minha-conta/anuncios" className="account-action-primary group flex flex-col items-center gap-3 rounded-[20px] p-4 transition-transform hover:-translate-y-0.5">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#00A36A]">
                 <Plus className="h-6 w-6 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
               <span className="text-sm font-semibold text-[#0A0A0A]">Novo anúncio</span>
             </Link>
-            <Link href="/minha-conta/favoritos" className="group flex flex-col items-center gap-3 rounded-[20px] bg-[#F1F1F6] p-4 transition-colors hover:bg-[#E7E7ED]">
+            <Link href="/minha-conta/favoritos" className="account-action-secondary group flex flex-col items-center gap-3 rounded-[20px] p-4 transition-colors">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
                 <Heart className="h-6 w-6 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
               <span className="text-sm font-semibold text-[#1A1A1A]">Favoritos</span>
             </Link>
-            <Link href="/minha-conta/conversas" className="group flex flex-col items-center gap-3 rounded-[20px] bg-[#F1F1F6] p-4 transition-colors hover:bg-[#E7E7ED]">
+            <Link href="/minha-conta/conversas" className="account-action-secondary group flex flex-col items-center gap-3 rounded-[20px] p-4 transition-colors">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
                 <MessageCircle className="h-6 w-6 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>
               <span className="text-sm font-semibold text-[#1A1A1A]">Mensagens</span>
             </Link>
-            <Link href="/minha-conta/configuracoes" className="group flex flex-col items-center gap-3 rounded-[20px] bg-[#F1F1F6] p-4 transition-colors hover:bg-[#E7E7ED]">
+            <Link href="/minha-conta/configuracoes" className="account-action-secondary group flex flex-col items-center gap-3 rounded-[20px] p-4 transition-colors">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
                 <Settings className="h-6 w-6 text-[#0A0A0A]" strokeWidth={1.75} />
               </div>

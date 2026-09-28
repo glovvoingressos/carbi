@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence, useInView } from 'motion/react'
+import type { KeyboardEvent, ReactNode } from 'react'
+import { motion, AnimatePresence, useInView, useReducedMotion } from 'motion/react'
 import Link from 'next/link'
 import {
   ArrowRight,
@@ -39,12 +40,12 @@ interface ModelComparisonProps {
 }
 
 function formatBRL(value: number) {
+  if (!Number.isFinite(value)) return '—'
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
 }
 
-function formatMil(value: number) {
-  if (value >= 1000) return `R$ ${Math.round(value / 1000)} mil`
-  return `R$ ${value}`
+function safeNumber(value: number, fallback = 0) {
+  return Number.isFinite(value) ? value : fallback
 }
 
 const SPECS = [
@@ -54,26 +55,57 @@ const SPECS = [
 ] as const
 
 export default function ModelComparison({ cars, allCars }: ModelComparisonProps) {
+  const availableCars = Array.isArray(cars) ? cars.filter(Boolean) : []
   const [view, setView] = useState<View>('specs')
-  const [leftCar, setLeftCar] = useState<CarComparison>(cars[0])
-  const [rightCar, setRightCar] = useState<CarComparison>(cars[1])
+  const [leftCar, setLeftCar] = useState<CarComparison | null>(() => availableCars[0] ?? null)
+  const [rightCar, setRightCar] = useState<CarComparison | null>(() => availableCars[1] ?? null)
   const [openDropdown, setOpenDropdown] = useState<'left' | 'right' | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [activeOptionIndex, setActiveOptionIndex] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
+  const tabRefs = useRef<Record<View, HTMLButtonElement | null>>({ specs: null, cost: null })
+  const optionRefs = useRef<HTMLButtonElement[]>([])
   const inView = useInView(sectionRef, { once: true, margin: '-80px' })
+  const shouldReduceMotion = useReducedMotion()
 
   useEffect(() => {
-    if (!openDropdown) setSearchTerm('')
+    if (!openDropdown) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!sectionRef.current?.contains(event.target as Node)) {
+        setOpenDropdown(null)
+        setSearchTerm('')
+        setActiveOptionIndex(0)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePointerDown)
   }, [openDropdown])
 
-  if (!cars || cars.length < 2) return null
+  const carOptions = Array.isArray(allCars) && allCars.length > 0 ? allCars : availableCars
+  const hasCar = (candidate: CarComparison | null) => Boolean(
+    candidate && carOptions.some((car) => car.slug === candidate.slug && car.version === candidate.version),
+  )
+  const carA = hasCar(leftCar) ? leftCar : availableCars[0] ?? null
+  const carB = hasCar(rightCar) && (rightCar?.slug !== carA?.slug || rightCar?.version !== carA?.version)
+    ? rightCar
+    : carOptions.find((car) => car.slug !== carA?.slug || car.version !== carA?.version) ?? null
 
-  const carA = leftCar
-  const carB = rightCar
+  if (!carA || !carB) {
+    return (
+      <div className="cmp-card cmp-card-empty" ref={sectionRef} role="status" aria-live="polite">
+        <div className="cmp-empty-icon" aria-hidden="true"><ArrowLeftRight size={20} /></div>
+        <div>
+          <h2 className="cmp-empty-title">Comparativo indisponível</h2>
+          <p className="cmp-empty-copy">Escolha pelo menos dois modelos para comparar especificações e custo-benefício.</p>
+        </div>
+      </div>
+    )
+  }
 
-  const carOptions = allCars || cars
   const availableFor = (side: 'left' | 'right') => {
-    const other = side === 'left' ? rightCar : leftCar
+    const other = side === 'left' ? carB : carA
     const otherKey = `${other.slug}__${other.version}`
     const seen = new Set<string>()
     return carOptions.filter((c) => {
@@ -86,8 +118,37 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
   }
 
   const handleSwap = () => {
-    setLeftCar(rightCar)
-    setRightCar(leftCar)
+    setLeftCar(carB)
+    setRightCar(carA)
+  }
+
+  const openPicker = (side: 'left' | 'right') => {
+    setSearchTerm('')
+    setActiveOptionIndex(0)
+    setOpenDropdown(side)
+  }
+
+  const closePicker = () => {
+    setOpenDropdown(null)
+    setSearchTerm('')
+    setActiveOptionIndex(0)
+  }
+
+  const handleViewKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    const viewOrder: View[] = ['specs', 'cost']
+    const currentIndex = viewOrder.indexOf(view)
+    let nextIndex = currentIndex
+
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % viewOrder.length
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + viewOrder.length) % viewOrder.length
+    if (event.key === 'Home') nextIndex = 0
+    if (event.key === 'End') nextIndex = viewOrder.length - 1
+
+    if (nextIndex === currentIndex) return
+    event.preventDefault()
+    const nextView = viewOrder[nextIndex]
+    setView(nextView)
+    tabRefs.current[nextView]?.focus()
   }
 
   const filteredOptions = (side: 'left' | 'right') => {
@@ -102,37 +163,113 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
   const handlePick = (side: 'left' | 'right', car: CarComparison) => {
     if (side === 'left') setLeftCar(car)
     else setRightCar(car)
-    setOpenDropdown(null)
+    closePicker()
   }
 
-  const winnerBy = (key: keyof CarComparison): 'a' | 'b' | 'tie' => {
-    const a = carA[key] as number
-    const b = carB[key] as number
-    if (a === b) return 'tie'
-    if (key === 'priceBrl') return a < b ? 'a' : 'b'
-    return a > b ? 'a' : 'b'
+  const handlePickerKeyDown = (event: KeyboardEvent<HTMLButtonElement>, side: 'left' | 'right') => {
+    if (!['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(event.key)) return
+    event.preventDefault()
+    openPicker(side)
+  }
+
+  const focusPicker = (side: 'left' | 'right') => {
+    document.getElementById(`cmp-picker-trigger-${side}`)?.focus()
+  }
+
+  const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>, side: 'left' | 'right') => {
+    const options = filteredOptions(side)
+
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      closePicker()
+      focusPicker(side)
+      return
+    }
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      if (options.length === 0) return
+      event.preventDefault()
+      const nextIndex = event.key === 'ArrowDown'
+        ? Math.min(activeOptionIndex + 1, options.length - 1)
+        : Math.max(activeOptionIndex - 1, 0)
+      setActiveOptionIndex(nextIndex)
+      optionRefs.current[nextIndex]?.focus()
+      return
+    }
+
+    if (event.key === 'Enter' && options[activeOptionIndex]) {
+      event.preventDefault()
+      handlePick(side, options[activeOptionIndex])
+    }
+  }
+
+  const handleOptionKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    side: 'left' | 'right',
+    index: number,
+    optionsLength: number,
+  ) => {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      closePicker()
+      focusPicker(side)
+      return
+    }
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Home' || event.key === 'End') {
+      event.preventDefault()
+      const nextIndex = event.key === 'ArrowDown'
+        ? Math.min(index + 1, optionsLength - 1)
+        : event.key === 'ArrowUp'
+          ? Math.max(index - 1, 0)
+          : event.key === 'Home'
+            ? 0
+            : optionsLength - 1
+      setActiveOptionIndex(nextIndex)
+      optionRefs.current[nextIndex]?.focus()
+    }
   }
 
   const savingsPerYear = (litersPerYear: number, fuelPrice = 6.5) =>
-    litersPerYear * fuelPrice
+    safeNumber(litersPerYear) * safeNumber(fuelPrice)
 
   const avgKmYear = 12000
-  const aFuelCost = (avgKmYear / carA.fuelEconomyCityGas)
-  const bFuelCost = (avgKmYear / carB.fuelEconomyCityGas)
+  const aFuelCost = avgKmYear / Math.max(safeNumber(carA.fuelEconomyCityGas), 0.1)
+  const bFuelCost = avgKmYear / Math.max(safeNumber(carB.fuelEconomyCityGas), 0.1)
+
+  const comparisonScore = (car: CarComparison) => {
+    const horsepower = safeNumber(car.horsepower)
+    const fuelEconomy = safeNumber(car.fuelEconomyCityGas)
+    const airbags = safeNumber(car.airbagsCount)
+
+    if (view === 'specs') {
+      return (horsepower / 200) + (fuelEconomy / 20) + (airbags / 10)
+    }
+
+    const maxPrice = Math.max(safeNumber(carA.priceBrl), safeNumber(carB.priceBrl), 1)
+    const priceValue = 1 - Math.min(Math.max(safeNumber(car.priceBrl), 0) / maxPrice, 1)
+    const economyValue = Math.min(Math.max(fuelEconomy, 0) / 20, 1)
+    return priceValue * 0.45 + economyValue * 0.55
+  }
+
+  const scoreDifference = comparisonScore(carA) - comparisonScore(carB)
+  const winningSide: 'left' | 'right' | null = Math.abs(scoreDifference) < 0.001
+    ? null
+    : scoreDifference > 0 ? 'left' : 'right'
 
   return (
     <div className="cmp-card" ref={sectionRef}>
       <motion.div
         className="cmp-header"
-        initial={{ opacity: 0, y: 12 }}
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.5, ease: 'easeOut' }}
       >
         <motion.span
           className="cmp-label"
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9 }}
           animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.4, delay: 0.05 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.4, delay: 0.05 }}
         >
           <Sparkles size={12} /> COMPARATIVO
         </motion.span>
@@ -146,27 +283,37 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
 
       <motion.div
         className="cmp-toggle"
-        initial={{ opacity: 0, y: 8 }}
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-        transition={{ duration: 0.4, delay: 0.15 }}
+        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.4, delay: 0.15 }}
         role="tablist"
         aria-label="Visão do comparativo"
       >
         <button
           type="button"
           role="tab"
+          id="cmp-tab-specs"
+          aria-controls="cmp-panel-specs"
           aria-selected={view === 'specs'}
+          tabIndex={view === 'specs' ? 0 : -1}
+          ref={(element) => { tabRefs.current.specs = element }}
           className={`cmp-toggle-opt ${view === 'specs' ? 'is-active' : ''}`}
           onClick={() => setView('specs')}
+          onKeyDown={handleViewKeyDown}
         >
           Specs técnicas
         </button>
         <button
           type="button"
           role="tab"
+          id="cmp-tab-cost"
+          aria-controls="cmp-panel-cost"
           aria-selected={view === 'cost'}
+          tabIndex={view === 'cost' ? 0 : -1}
+          ref={(element) => { tabRefs.current.cost = element }}
           className={`cmp-toggle-opt ${view === 'cost' ? 'is-active' : ''}`}
           onClick={() => setView('cost')}
+          onKeyDown={handleViewKeyDown}
         >
           Custo-benefício
         </button>
@@ -174,7 +321,7 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
           className="cmp-toggle-thumb"
           layout
           aria-hidden="true"
-          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 30 }}
           style={{ left: view === 'specs' ? '4px' : '50%' }}
         />
       </motion.div>
@@ -182,60 +329,57 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
       <div className="cmp-grid">
         {[{ car: carA, side: 'left' as const }, { car: carB, side: 'right' as const }].map(({ car, side }, i) => {
           const otherCar = side === 'left' ? carB : carA
-          const isLeader =
-            (view === 'specs'
-              ? carA.horsepower + carA.fuelEconomyCityGas + carA.airbagsCount
-              : carA.priceBrl * 0.4 + aFuelCost * -1) >
-            (view === 'specs'
-              ? carB.horsepower + carB.fuelEconomyCityGas + carB.airbagsCount
-              : carB.priceBrl * 0.4 + bFuelCost * -1)
-          const highlight = i === 0 ? isLeader : !isLeader
+          const options = filteredOptions(side)
+          const highlight = winningSide === side
+          const tie = winningSide === null
 
           return (
             <motion.div
               key={`${car.slug}-${side}`}
               className={`cmp-col ${highlight ? 'is-highlight' : ''}`}
-              initial={{ opacity: 0, y: 24 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-              transition={{
-                duration: 0.55,
-                delay: 0.2 + i * 0.12,
-                ease: [0.22, 0.61, 0.36, 1],
-              }}
-              whileHover={{ y: -6 }}
-              layout
+              transition={shouldReduceMotion
+                ? { duration: 0 }
+                : { duration: 0.55, delay: 0.2 + i * 0.12, ease: [0.22, 0.61, 0.36, 1] }}
+              whileHover={shouldReduceMotion ? undefined : { y: -6 }}
+              layout={!shouldReduceMotion}
+              aria-label={`${car.brand} ${car.model}${highlight ? ', melhor escolha nesta visão' : tie ? ', empate nesta visão' : ''}`}
             >
               {highlight && (
                 <motion.div
                   className="cmp-col-glow"
                   aria-hidden="true"
-                  animate={{ opacity: [0.4, 0.8, 0.4] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  animate={{ opacity: shouldReduceMotion ? 0.34 : [0.4, 0.8, 0.4] }}
+                  transition={shouldReduceMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 />
               )}
 
               <div className="cmp-col-top">
-                <span className={`cmp-badge ${highlight ? 'is-highlight' : ''}`}>
-                  {highlight ? <><Crown size={11} /> Melhor escolha</> : car.segment}
+                <span className={`cmp-badge ${highlight ? 'is-highlight' : ''} ${tie ? 'is-tie' : ''}`}>
+                  {highlight ? <><Crown size={11} /> Melhor escolha</> : tie ? <><ArrowLeftRight size={11} /> Empate técnico</> : car.segment}
                 </span>
 
                 <div className="cmp-picker">
                   <button
                     type="button"
+                    id={`cmp-picker-trigger-${side}`}
                     className="cmp-picker-btn"
-                    onClick={() => setOpenDropdown(openDropdown === side ? null : side)}
+                    onClick={() => openDropdown === side ? closePicker() : openPicker(side)}
+                    onKeyDown={(event) => handlePickerKeyDown(event, side)}
                     aria-haspopup="listbox"
                     aria-expanded={openDropdown === side}
+                    aria-controls={openDropdown === side ? `cmp-picker-list-${side}` : undefined}
                     aria-label={`Trocar carro ${car.brand} ${car.model}`}
                   >
-                    <h3 className="cmp-name">
+                    <span className="cmp-name">
                       <span className="cmp-name-brand">{car.brand}</span>
                       <span className="cmp-name-model">{car.model}</span>
-                    </h3>
+                    </span>
                     <motion.span
                       className="cmp-picker-icon"
                       animate={{ rotate: openDropdown === side ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
+                      transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
                       aria-hidden="true"
                     >
                       <ChevronDown size={16} />
@@ -246,39 +390,59 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                     {openDropdown === side && (
                       <motion.div
                         className="cmp-picker-dropdown"
-                        initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                        initial={shouldReduceMotion ? false : { opacity: 0, y: -6, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                        transition={{ duration: 0.18 }}
-                        role="listbox"
+                        exit={shouldReduceMotion ? undefined : { opacity: 0, y: -6, scale: 0.98 }}
+                        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.18 }}
                       >
                         <div className="cmp-picker-search">
                           <SearchIcon size={13} />
                           <input
                             type="text"
+                            role="searchbox"
                             placeholder={`Buscar carro para o ${side === 'left' ? 'lado A' : 'lado B'}…`}
+                            aria-label={`Buscar carro para o ${side === 'left' ? 'lado A' : 'lado B'}`}
+                            aria-controls={`cmp-picker-list-${side}`}
+                            aria-autocomplete="list"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => {
+                              setSearchTerm(e.target.value)
+                              setActiveOptionIndex(0)
+                            }}
+                            onKeyDown={(event) => handleSearchKeyDown(event, side)}
                             autoFocus
                           />
                         </div>
-                        <div className="cmp-picker-scroll">
-                          {filteredOptions(side).map((opt, oi) => (
+                        <div
+                          className="cmp-picker-scroll"
+                          id={`cmp-picker-list-${side}`}
+                          role={options.length > 0 ? 'listbox' : 'status'}
+                          aria-label={`Modelos disponíveis para o lado ${side === 'left' ? 'A' : 'B'}`}
+                        >
+                          {options.map((opt, oi) => (
                             <button
                               key={`${opt.slug}-${opt.version}-${oi}`}
                               type="button"
+                              id={`cmp-picker-option-${side}-${oi}`}
                               role="option"
                               aria-selected={opt.slug === car.slug && opt.version === car.version}
-                              className={`cmp-picker-item ${opt.slug === car.slug && opt.version === car.version ? 'is-active' : ''}`}
+                              tabIndex={activeOptionIndex === oi ? 0 : -1}
+                              className={`cmp-picker-item ${opt.slug === car.slug && opt.version === car.version ? 'is-active' : ''} ${activeOptionIndex === oi ? 'is-focused' : ''}`}
                               onClick={() => handlePick(side, opt)}
+                              onFocus={() => setActiveOptionIndex(oi)}
+                              onKeyDown={(event) => handleOptionKeyDown(event, side, oi, options.length)}
+                              ref={(element) => { if (element) optionRefs.current[oi] = element }}
                             >
                               <span className="cmp-picker-item-brand">{opt.brand}</span>
                               <span className="cmp-picker-item-model">{opt.model}</span>
                               <span className="cmp-picker-item-price">{formatBRL(opt.priceBrl)}</span>
                             </button>
                           ))}
-                          {filteredOptions(side).length === 0 && (
-                            <div className="cmp-picker-empty">Nenhum modelo encontrado.</div>
+                          {options.length === 0 && (
+                            <div className="cmp-picker-empty">
+                              <strong>Nenhum modelo encontrado.</strong>
+                              <span>Tente outra marca ou modelo.</span>
+                            </div>
                           )}
                         </div>
                       </motion.div>
@@ -294,11 +458,11 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                 <motion.span
                   key={`price-${car.slug}`}
                   className="cmp-price-value"
-                  initial={{ opacity: 0, y: 6 }}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
+                  transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.4 }}
                 >
-                  {Math.round(car.priceBrl / 1000)}
+                  {Number.isFinite(car.priceBrl) ? Math.round(car.priceBrl / 1000) : '—'}
                 </motion.span>
                 <span className="cmp-price-suffix">mil</span>
               </div>
@@ -309,40 +473,51 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                   <motion.div
                     key="specs"
                     className="cmp-features"
-                    initial={{ opacity: 0, y: 8 }}
+                    id="cmp-panel-specs"
+                    role="tabpanel"
+                    aria-labelledby="cmp-tab-specs"
+                    tabIndex={0}
+                    initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.3 }}
+                    exit={shouldReduceMotion ? undefined : { opacity: 0, y: -8 }}
+                    transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
                   >
                     {SPECS.map((spec, si) => {
                       const Icon = spec.icon
-                      const value = car[spec.key as keyof CarComparison] as number
-                      const pct = Math.min((value / spec.max) * 100, 100)
-                      const otherPct = Math.min((otherCar[spec.key as keyof CarComparison] as number / spec.max) * 100, 100)
-                      const isWinner = pct > otherPct
+                      const value = safeNumber(car[spec.key as keyof CarComparison] as number)
+                      const otherValue = safeNumber(otherCar[spec.key as keyof CarComparison] as number)
+                      const pct = Math.min(Math.max((value / spec.max) * 100, 0), 100)
+                      const otherPct = Math.min(Math.max((otherValue / spec.max) * 100, 0), 100)
+                      const isTie = value === otherValue
+                      const isWinner = !isTie && pct > otherPct
                       return (
                         <motion.div
                           key={spec.key}
                           className="cmp-spec"
-                          initial={{ opacity: 0, x: -6 }}
+                          initial={shouldReduceMotion ? false : { opacity: 0, x: -6 }}
                           animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -6 }}
-                          transition={{ duration: 0.35, delay: 0.45 + i * 0.08 + si * 0.05 }}
+                          transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.35, delay: 0.45 + i * 0.08 + si * 0.05 }}
                         >
                           <div className="cmp-spec-top">
                             <div className="cmp-spec-label-wrap">
                               <Icon size={13} className="cmp-spec-icon" />
                               <span className="cmp-spec-label">{spec.label}</span>
                             </div>
-                            <span className={`cmp-spec-value ${isWinner ? 'is-winner' : ''}`}>
-                                  {value}{spec.suffix}
-                                </span>
+                            <span
+                              className={`cmp-spec-value ${isWinner ? 'is-winner' : ''}`}
+                              aria-label={`${value}${spec.suffix}${isWinner ? ', melhor resultado' : isTie ? ', empate' : ''}`}
+                            >
+                              {value}{spec.suffix}
+                            </span>
                           </div>
                           <div className="cmp-progress-track">
                             <motion.div
                               className="cmp-progress-fill"
-                              initial={{ width: 0 }}
+                              initial={shouldReduceMotion ? false : { width: 0 }}
                               animate={inView ? { width: `${pct}%` } : { width: 0 }}
-                              transition={{ duration: 0.8, delay: 0.5 + i * 0.08 + si * 0.05, ease: [0.25, 0.46, 0.45, 0.94] }}
+                              transition={shouldReduceMotion
+                                ? { duration: 0 }
+                                : { duration: 0.8, delay: 0.5 + i * 0.08 + si * 0.05, ease: [0.25, 0.46, 0.45, 0.94] }}
                             />
                           </div>
                         </motion.div>
@@ -353,10 +528,14 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                   <motion.div
                     key="cost"
                     className="cmp-features"
-                    initial={{ opacity: 0, y: 8 }}
+                    id="cmp-panel-cost"
+                    role="tabpanel"
+                    aria-labelledby="cmp-tab-cost"
+                    tabIndex={0}
+                    initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.3 }}
+                    exit={shouldReduceMotion ? undefined : { opacity: 0, y: -8 }}
+                    transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
                   >
                     <CostRow
                       icon={<Zap size={13} />}
@@ -364,7 +543,6 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                       current={car.fuelEconomyCityGas}
                       other={otherCar.fuelEconomyCityGas}
                       suffix=" km/l"
-                      invert
                     />
                     <CostRow
                       icon={<TrendingUp size={13} />}
@@ -372,13 +550,13 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                       current={i === 0 ? aFuelCost : bFuelCost}
                       other={i === 0 ? bFuelCost : aFuelCost}
                       formatter={(v) => formatBRL(savingsPerYear(v))}
-                      invert
+                      lowerIsBetter
                     />
                     <CostRow
                       icon={<Gauge size={13} />}
                       label="Potência por R$ mil"
-                      current={(car.horsepower / car.priceBrl) * 1000}
-                      other={(otherCar.horsepower / otherCar.priceBrl) * 1000}
+                      current={(safeNumber(car.horsepower) / Math.max(safeNumber(car.priceBrl), 1)) * 1000}
+                      other={(safeNumber(otherCar.horsepower) / Math.max(safeNumber(otherCar.priceBrl), 1)) * 1000}
                       formatter={(v) => `${v.toFixed(2)} cv/mil`}
                     />
                     <CostRow
@@ -397,13 +575,17 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                 <span>Ideal para: {car.idealFor}</span>
               </div>
 
-              <Link href={`/carros/${car.slug}`} className={`cmp-cta ${highlight ? 'is-highlight' : ''}`}>
+              <Link
+                href={`/carros/${car.slug}`}
+                className={`cmp-cta ${highlight ? 'is-highlight' : ''}`}
+                aria-label={`Ver detalhes do ${car.brand} ${car.model}`}
+              >
                 <span>Ver {car.model}</span>
                 <motion.span
                   className="cmp-cta-arrow"
                   aria-hidden="true"
-                  whileHover={{ x: 4 }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 20 }}
+                  whileHover={shouldReduceMotion ? undefined : { x: 4 }}
+                  transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 20 }}
                 >
                   <ArrowRight size={16} />
                 </motion.span>
@@ -425,9 +607,9 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
 
       <motion.div
         className="cmp-hint"
-        initial={{ opacity: 0 }}
+        initial={shouldReduceMotion ? false : { opacity: 0 }}
         animate={inView ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.4, delay: 0.6 }}
+        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.4, delay: 0.6 }}
       >
         <Sparkles size={13} />
         <span>Clique no nome do carro para trocar</span>
@@ -443,18 +625,21 @@ function CostRow({
   other,
   suffix,
   formatter,
-  invert,
+  lowerIsBetter,
 }: {
-  icon: React.ReactNode
+  icon: ReactNode
   label: string
   current: number
   other: number
   suffix?: string
   formatter?: (v: number) => string
-  invert?: boolean
+  lowerIsBetter?: boolean
 }) {
-  const isWinner = invert ? current > other : current > other
-  const formatted = formatter ? formatter(current) : `${current}${suffix || ''}`
+  const safeCurrent = safeNumber(current)
+  const safeOther = safeNumber(other)
+  const isTie = safeCurrent === safeOther
+  const isWinner = !isTie && (lowerIsBetter ? safeCurrent < safeOther : safeCurrent > safeOther)
+  const formatted = formatter ? formatter(safeCurrent) : `${safeCurrent}${suffix || ''}`
   return (
     <div className="cmp-spec">
       <div className="cmp-spec-top">
@@ -462,7 +647,12 @@ function CostRow({
           {icon}
           <span className="cmp-spec-label">{label}</span>
         </div>
-        <span className={`cmp-spec-value ${isWinner ? 'is-winner' : ''}`}>{formatted}</span>
+        <span
+          className={`cmp-spec-value ${isWinner ? 'is-winner' : ''}`}
+          aria-label={`${formatted}${isWinner ? ', melhor resultado' : isTie ? ', empate' : ''}`}
+        >
+          {formatted}
+        </span>
       </div>
       <div className="cmp-progress-track">
         <div

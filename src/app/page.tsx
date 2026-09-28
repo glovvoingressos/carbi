@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
-  ArrowRight, ChevronRight, TrendingUp, TrendingDown,
-  MapPin, Plus, Zap, Gauge, Calendar as CalendarIcon, Settings2,
+  ArrowRight, ChevronRight, Plus, Zap,
 } from 'lucide-react'
-import { getLatestPublicListings } from '@/lib/marketplace-server'
-import { formatBRL, cars } from '@/data/cars'
+import { getLatestPublicListings, searchPublicListings } from '@/lib/marketplace-server'
+import { cars } from '@/data/cars'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
 import ModelComparison from '@/components/home/ModelComparison'
 import RankingsBanner from '@/components/home/RankingsBanner'
@@ -13,6 +12,8 @@ import HomeCounters from '@/components/home/HomeCounters'
 import PlateBannerLookup from '@/components/marketplace/PlateBannerLookup'
 import ExploreCarousel from '@/components/home/ExploreCarousel'
 import HeroRotatingTitle from '@/components/home/HeroRotatingTitle'
+import HomeListings from '@/components/home/HomeListings'
+import HomeFeaturedListing, { type HomeFeaturedListingData } from '@/components/home/HomeFeaturedListing'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,24 +37,52 @@ export const metadata: Metadata = {
 
 type Listing = Awaited<ReturnType<typeof getLatestPublicListings>>[number]
 
-const HOME_LISTING_LIMIT = 8
+function isPeugeot2008Gt(listing: Listing) {
+  const searchable = `${listing.brand} ${listing.model} ${listing.version ?? ''}`.toLowerCase()
+  return searchable.includes('peugeot') && searchable.includes('2008') && /\bgt\b/.test(searchable)
+}
 
-function fipePercent(listing: Listing) {
-  if (typeof listing.fipe_difference_percent !== 'number') return null
-  return Math.round(listing.fipe_difference_percent)
+function transmissionLabel(value: Listing['transmission']) {
+  return Array.isArray(value) ? value.join(' / ') : value
 }
 
 export default async function HomePage() {
   let listings: Listing[] = []
+  let featuredCandidates: Listing[] = []
   let fetchError = false
 
-  try {
-    listings = await getLatestPublicListings(HOME_LISTING_LIMIT)
-  } catch {
+  const [latestResult, featuredResult] = await Promise.allSettled([
+    getLatestPublicListings(),
+    searchPublicListings('Peugeot 2008 GT'),
+  ])
+
+  if (latestResult.status === 'fulfilled') {
+    listings = latestResult.value
+  } else {
     fetchError = true
   }
+  if (featuredResult.status === 'fulfilled') {
+    featuredCandidates = featuredResult.value
+  }
 
-  const recentListings = listings.slice(0, HOME_LISTING_LIMIT)
+  const recentListings = listings
+  const publishedPeugeot2008Gt = [...recentListings, ...featuredCandidates].find(isPeugeot2008Gt)
+  const featuredListing: HomeFeaturedListingData | null = publishedPeugeot2008Gt
+    ? {
+        brand: publishedPeugeot2008Gt.brand,
+        model: publishedPeugeot2008Gt.model,
+        version: publishedPeugeot2008Gt.version,
+        year: publishedPeugeot2008Gt.year_model || publishedPeugeot2008Gt.year,
+        price: publishedPeugeot2008Gt.price,
+        priceLabel: 'Preço anunciado',
+        fuel: publishedPeugeot2008Gt.fuel,
+        transmission: transmissionLabel(publishedPeugeot2008Gt.transmission),
+        horsepower: publishedPeugeot2008Gt.horsepower,
+        href: `/anuncios/${publishedPeugeot2008Gt.slug}`,
+        imageUrls: publishedPeugeot2008Gt.images?.map((image) => image.url) ?? [],
+        imageAlt: `${publishedPeugeot2008Gt.brand} ${publishedPeugeot2008Gt.model} ${publishedPeugeot2008Gt.year_model}`,
+      }
+    : null
   const topBrands = [...new Set(listings.map((l) => l.brand))].slice(0, 6)
   const cities = [...new Set(listings.map((l) => l.city))].filter(Boolean).slice(0, 6)
 
@@ -145,6 +174,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ═══ FEATURED LISTING ═══ */}
+      <HomeFeaturedListing listing={featuredListing} />
+
       {/* ═══ LISTINGS TABLE ═══ */}
       <section className="cb-section-pad">
         <div className="cb-wrap">
@@ -158,100 +190,12 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="cb-listing-cards">
-            {recentListings.length > 0 ? (
-              recentListings.map((listing) => {
-                const fipe = fipePercent(listing)
-                const imageUrls = listing.images?.map((img) => img.url) || []
-                const version = listing.version?.trim()
-                const hasDistinctVersion = Boolean(
-                  version && !listing.model.toLowerCase().includes(version.toLowerCase()),
-                )
-                return (
-                  <Link key={listing.id} href={`/anuncios/${listing.slug}`} className="cb-listing-card">
-                    <div className="cb-listing-card-image">
-                      <MarketplaceListingImage
-                        brand={listing.brand}
-                        model={listing.model}
-                        year={listing.year_model}
-                        imageUrls={imageUrls}
-                        alt={`${listing.brand} ${listing.model} ${listing.year_model}`}
-                      />
-                    </div>
-                    <div className="cb-listing-card-body">
-                      <div className="cb-listing-card-head">
-                        <div className="cb-listing-card-title">
-                          <span className="cb-listing-card-brand">{listing.brand}</span>
-                          <span className="cb-listing-card-model">{listing.model}</span>
-                        </div>
-                        {hasDistinctVersion ? (
-                          <span className="cb-listing-card-version">{version}</span>
-                        ) : null}
-                      </div>
-
-                      <div className="cb-listing-card-specs" aria-label="Detalhes do veículo">
-                        <div className="cb-listing-spec" aria-label={`Ano ${listing.year_model}`}>
-                          <CalendarIcon size={13} />
-                          <span className="cb-listing-spec-value">{listing.year_model}</span>
-                        </div>
-                        <div
-                          className="cb-listing-spec"
-                          aria-label={`Quilometragem ${listing.mileage ? `${(listing.mileage / 1000).toFixed(listing.mileage % 1000 === 0 ? 0 : 1)} mil quilômetros` : 'não informada'}`}
-                        >
-                          <Gauge size={13} />
-                          <span className="cb-listing-spec-value">
-                            {listing.mileage ? `${(listing.mileage / 1000).toFixed(listing.mileage % 1000 === 0 ? 0 : 1)}k km` : '—'}
-                          </span>
-                        </div>
-                        {listing.transmission ? (
-                          <div className="cb-listing-spec" aria-label={`Câmbio ${listing.transmission}`}>
-                            <Settings2 size={13} />
-                            <span className="cb-listing-spec-value">{listing.transmission}</span>
-                          </div>
-                        ) : null}
-                      </div>
-
-                      <div className="cb-listing-card-footer">
-                        <strong className="cb-listing-card-price-main">{formatBRL(Number(listing.price))}</strong>
-                        {fipe !== null ? (
-                          <span className={`cb-listing-fipe-inline ${fipe <= 0 ? 'is-good' : 'is-bad'}`}>
-                            {fipe <= 0 ? <TrendingDown size={10} /> : <TrendingUp size={10} />}
-                            {Math.abs(fipe)}% {fipe <= 0 ? 'abaixo da FIPE' : 'acima da FIPE'}
-                          </span>
-                        ) : null}
-                        <span className="cb-listing-card-arrow" aria-hidden="true">
-                          <ArrowRight size={14} />
-                        </span>
-                      </div>
-                      {listing.city ? (
-                        <span className="cb-listing-card-location">
-                          <MapPin size={11} />
-                          <span className="cb-listing-card-location-text">
-                            {listing.city}{listing.state ? `, ${listing.state}` : ''}
-                          </span>
-                        </span>
-                      ) : null}
-                    </div>
-                  </Link>
-                )
-              })
-            ) : fetchError ? (
-              <div className="cb-listing-empty" role="alert">
-                <strong>Não foi possível carregar os anúncios agora.</strong>
-                <p>Verifique sua conexão e tente novamente.</p>
-                  <Link href="/?retry=1" className="cb-btn cb-btn-dark cb-btn-arrow">
-                  Tentar novamente
-                  <ArrowRight size={16} aria-hidden="true" />
-                </Link>
-              </div>
-            ) : (
-              <div className="cb-listing-empty">
-                Ainda não há anúncios públicos disponíveis.
-              </div>
-            )}
-          </div>
+          <HomeListings listings={recentListings} fetchError={fetchError} />
         </div>
       </section>
+
+      {/* ═══ MODEL COMPARISON ═══ */}
+      <ModelComparison cars={comparisonCars} allCars={allComparisonCars} />
 
       {/* ═══ EXPLORE BY STYLE ═══ */}
       <section className="cb-section-pad cb-explore-section">
@@ -355,9 +299,6 @@ export default async function HomePage() {
 
       {/* ═══ RANKINGS BANNER ═══ */}
       <RankingsBanner />
-
-      {/* ═══ MODEL COMPARISON ═══ */}
-      <ModelComparison cars={comparisonCars} allCars={allComparisonCars} />
 
       {/* ═══ BRAND MARQUEE ═══ */}
       {topBrands.length > 0 ? (

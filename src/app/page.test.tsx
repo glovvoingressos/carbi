@@ -1,28 +1,39 @@
 // @vitest-environment jsdom
 
 import { cleanup, render, screen, within } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { getLatestPublicListings } = vi.hoisted(() => ({
+const { getLatestPublicListings, searchPublicListings } = vi.hoisted(() => ({
   getLatestPublicListings: vi.fn().mockResolvedValue([]),
+  searchPublicListings: vi.fn().mockResolvedValue([]),
 }))
 
-vi.mock('@/lib/marketplace-server', () => ({ getLatestPublicListings }))
+vi.mock('@/lib/marketplace-server', () => ({ getLatestPublicListings, searchPublicListings }))
 vi.mock('next/link', () => ({
   default: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) => (
     <a href={href} {...props}>{children}</a>
   ),
 }))
-vi.mock('@/components/marketplace/MarketplaceListingImage', () => ({ default: () => null }))
+vi.mock('@/components/marketplace/MarketplaceListingImage', () => ({
+  default: ({ alt, imageUrls }: { alt: string; imageUrls?: string[] }) => (
+    <img src={imageUrls?.[0] ?? ''} alt={alt} />
+  ),
+}))
 vi.mock('@/components/home/ModelComparison', () => ({ default: () => null }))
 vi.mock('@/components/home/RankingsBanner', () => ({ default: () => null }))
 vi.mock('@/components/home/HomeCounters', () => ({ default: () => null }))
 vi.mock('@/components/marketplace/PlateBannerLookup', () => ({ default: () => null }))
 vi.mock('@/components/home/ExploreCarousel', () => ({ default: () => null }))
+vi.mock('@/components/home/HomeListings', () => ({ default: () => null }))
 
 import HomePage from './page'
 
 describe('HomePage featured seller card', () => {
+  beforeEach(() => {
+    getLatestPublicListings.mockResolvedValue([])
+    searchPublicListings.mockResolvedValue([])
+  })
+
   afterEach(() => {
     cleanup()
   })
@@ -46,5 +57,50 @@ describe('HomePage featured seller card', () => {
 
     expect(screen.queryAllByText('Para vender')).toHaveLength(0)
     expect(screen.queryAllByText('Para comparar')).toHaveLength(0)
+  })
+
+  it('does not create a catalog fallback when no real Peugeot 2008 GT listing is available', async () => {
+    const page = await HomePage()
+    render(page)
+
+    expect(screen.queryByTestId('home-featured-listing')).toBeNull()
+    expect(screen.queryByText('Referência do catálogo')).toBeNull()
+    expect(screen.getByRole('heading', { name: 'Os anúncios mais procurados desta semana' })).toBeTruthy()
+  })
+
+  it('uses the real Peugeot 2008 GT marketplace listing data', async () => {
+    searchPublicListings.mockResolvedValueOnce([{
+      brand: 'Peugeot',
+      model: '2008',
+      version: 'GT T200',
+      year: 2024,
+      year_model: 2024,
+      price: 119900,
+      description: 'Peugeot 2008 GT com revisão em dia.',
+      fuel: 'Flex',
+      transmission: 'Automático',
+      horsepower: 130,
+      slug: 'peugeot-2008-gt-real',
+      images: [{ url: '/uploads/peugeot-2008-gt-real.jpg' }],
+    }])
+
+    const page = await HomePage()
+    render(page)
+
+    const featured = screen.getByTestId('home-featured-listing')
+    expect(within(featured).getByRole('heading', { name: '2008' })).toBeTruthy()
+    expect(within(featured).getByRole('img', { name: 'Peugeot 2008 2024' }).getAttribute('src')).toBe('/uploads/peugeot-2008-gt-real.jpg')
+    expect(within(featured).getByText('R$ 119.900')).toBeTruthy()
+    expect(within(featured).queryByText('Peugeot 2008 GT com revisão em dia.')).toBeNull()
+    expect(within(featured).getByText('Anúncio publicado')).toBeTruthy()
+    expect(featured.getAttribute('href')).toBe('/anuncios/peugeot-2008-gt-real')
+  })
+
+  it('removes the buyer shortcut section from the home flow', async () => {
+    const page = await HomePage()
+    render(page)
+
+    expect(screen.queryByRole('heading', { name: 'Comprar' })).toBeNull()
+    expect(screen.getByRole('heading', { name: 'Encontre o seu estilo' })).toBeTruthy()
   })
 })

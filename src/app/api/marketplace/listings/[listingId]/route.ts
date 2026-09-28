@@ -5,6 +5,12 @@ import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingDeletedEmail, sendListingStatusChangedEmail } from '@/lib/email'
 import { buildListingRollbackPayload, normalizePlateFinal, resolveTruckPatch } from '@/lib/marketplace'
 import type { TruckCategory } from '@/lib/trucks'
+import {
+  normalizeBodyType,
+  normalizeColor,
+  normalizeFuel,
+  normalizeTransmission,
+} from '@/lib/vehicle-filter-normalization'
 
 type ListingPatchPayload = {
   title?: string
@@ -97,10 +103,10 @@ export async function PATCH(
       if (!Number.isInteger(body.year_model) || body.year_model < 1950 || body.year_model > 2100) return NextResponse.json({ error: 'Ano/modelo inválido.' }, { status: 400 })
       updates.year_model = body.year_model
     }
-    if (typeof body.transmission === 'string') updates.transmission = body.transmission
-    if (typeof body.fuel === 'string') updates.fuel = body.fuel
-    if (typeof body.color === 'string') updates.color = body.color
-    if (typeof body.body_type === 'string') updates.body_type = body.body_type
+    if (typeof body.transmission === 'string') updates.transmission = normalizeTransmission(body.transmission)
+    if (typeof body.fuel === 'string') updates.fuel = normalizeFuel(body.fuel)
+    if (typeof body.color === 'string') updates.color = normalizeColor(body.color)
+    if (typeof body.body_type === 'string') updates.body_type = normalizeBodyType(body.body_type)
     if (typeof body.city === 'string') updates.city = body.city
     if (typeof body.state === 'string') {
       const state = body.state.trim().toUpperCase()
