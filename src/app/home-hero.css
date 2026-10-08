@@ -105,12 +105,21 @@
   justify-content: flex-end;
 }
 
-/* Porta de entrada da área de caminhões (identidade aço + âmbar) */
+/* Porta de entrada da área de caminhões: verde musgo com texto branco */
 .hh-card-truck {
   grid-column: 1 / -1;
   min-height: 150px;
-  background: #eef0f2;
-  border: 1.5px solid #f5a524;
+  background: #556b2f;
+  border: 1.5px solid #556b2f;
+  color: #ffffff;
+}
+
+.hh-card-truck .hh-card-title {
+  color: #ffffff;
+}
+
+.hh-card-truck .hh-card-sub {
+  color: rgba(255, 255, 255, 0.84);
 }
 
 .hh-card-truck .hh-card-icon {
@@ -119,7 +128,7 @@
 }
 
 .hh-card-truck .hh-card-arrow {
-  color: #101418;
+  color: #ffffff;
 }
 
 .hh-card-icon {
