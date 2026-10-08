@@ -699,6 +699,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 46%;
   display: block;
 }
 
@@ -712,6 +713,44 @@
   height: 8px;
   background: repeating-linear-gradient(90deg, var(--tk-amber) 0 96px, transparent 96px 200px);
   opacity: 0.9;
+}
+
+/* Com a foto, a rodovia de placeholder some e o quadro ganha um leve
+   enquadramento para o texto não competir com a imagem */
+.tk-hero-media.has-photo::after {
+  display: none;
+}
+
+.tk-hero-media.has-photo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(16, 20, 24, 0.18) 0%, rgba(16, 20, 24, 0) 34%),
+    linear-gradient(0deg, rgba(16, 20, 24, 0.34) 0%, rgba(16, 20, 24, 0) 42%);
+}
+
+.tk-hero-media.has-photo img {
+  position: relative;
+  z-index: 0;
+  transform: scale(1.001);
+  transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.tk-hero-media.has-photo:hover img {
+  transform: scale(1.03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tk-hero-media.has-photo img {
+    transform: none;
+    transition: none;
+  }
+  .tk-hero-media.has-photo:hover img {
+    transform: none;
+  }
 }
 
 .tk-hero-stats {

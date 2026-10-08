@@ -110,9 +110,16 @@ export default async function TruckHomePage() {
             </Link>
           </div>
 
-          <div className="tk-hero-media">
+          <div className={hasHeroPhoto ? 'tk-hero-media has-photo' : 'tk-hero-media'}>
             {hasHeroPhoto ? (
-              <img src="/images/caminhao-hero.jpg" alt="Caminhão branco em rodovia" loading="eager" />
+              <img
+                src="/images/caminhao-hero.jpg"
+                alt="Caminhão Scania em rodovia na Islândia"
+                width={736}
+                height={417}
+                loading="eager"
+                fetchPriority="high"
+              />
             ) : null}
           </div>
 
