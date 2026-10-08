@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2, Check, Sparkles } from 'lucide-react'
 import Link from 'next/link'
-import type { FipeItem, FipeResult, FipeVersionOption } from '@/lib/fipe-api'
+import type { FipeResult } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import { trackEvent } from '@/lib/analytics'
 import { lookupPlateClient, readPlateLookup } from '@/lib/integrations/placaapi/client'
@@ -30,7 +30,7 @@ import { enrichVehicle } from '@/lib/vehicle-enrichment'
 import { brandsAreEquivalent } from '@/lib/brand-normalization'
 import { parseDescription } from '@/lib/format-description'
 import FadeContent from '@/components/FadeContent'
-import DescriptionAiControls from './DescriptionAiControls'
+import { FUEL_OPTIONS, TRANSMISSION_OPTIONS } from '@/lib/vehicle-filter-normalization'
 import {
   LISTING_DRAFT_KEY,
   clearListingDraftImages,
@@ -277,6 +277,20 @@ function extractVersionFromFipeModel(fullModelName: string, selectedModelName: s
   return full
 }
 
+const BRAZIL_UFS = [
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
+] as const
+
+function withSelectOption(options: readonly string[], value: string): string[] {
+  if (!value) return [...options]
+  const match = options.find((option) => normalize(option) === normalize(value))
+  return match ? [...options] : [value, ...options]
+}
+
+function canonicalOption(options: readonly string[], value: string): string {
+  return options.find((option) => normalize(option) === normalize(value)) || value
+}
+
 function authHeader(token: string) {
   return {
     Authorization: `Bearer ${token}`,
@@ -292,18 +306,9 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const [form, setForm] = useState<FormState>({ ...INITIAL_STATE, vehicle_type: vehicleType })
   const [images, setImages] = useState<UploadImageItem[]>([])
 
-  const [brands, setBrands] = useState<FipeItem[]>([])
-  const [models, setModels] = useState<FipeItem[]>([])
-  const [years, setYears] = useState<number[]>([])
-  const [versions, setVersions] = useState<FipeVersionOption[]>([])
-  const [selectedBrandCode, setSelectedBrandCode] = useState('')
-  const [selectedModelCode, setSelectedModelCode] = useState('')
-  const [selectedYear, setSelectedYear] = useState<number | null>(null)
-  const [selectedVersionCode, setSelectedVersionCode] = useState('')
   const [fipeResult, setFipeResult] = useState<FipeResult | null>(null)
   const [catalogCars, setCatalogCars] = useState<CatalogCar[]>([])
   const [technical, setTechnical] = useState<TechnicalSnapshot>(EMPTY_TECHNICAL)
-  const skipFipeClearOnMount = useRef(true)
   const plateFipeLookupRef = useRef(false)
 
   const [sessionReady, setSessionReady] = useState(false)
@@ -318,6 +323,9 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const [imageErrors, setImageErrors] = useState<string[]>([])
   const [manualVehicleMode, setManualVehicleMode] = useState(false)
   const [titleTouched, setTitleTouched] = useState(false)
+  const [isDraggingImages, setIsDraggingImages] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<string, boolean>>>({})
+  const [accountErrors, setAccountErrors] = useState<Partial<Record<keyof typeof ACCOUNT_INITIAL, string>>>({})
   const draftHydrated = useRef(false)
   const stepHeadingRef = useRef<HTMLHeadingElement | null>(null)
   const [draftReady, setDraftReady] = useState(false)
@@ -342,22 +350,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       .sort((a, b) => b.n.length - a.n.length)
 
     return ranked[0]?.model || rawModelName
-  }
-
-  const clearVehicleDependentFields = (scope: 'brand' | 'model' | 'year') => {
-    setForm((prev) => ({
-      ...prev,
-      model: scope === 'brand' ? '' : prev.model,
-      version: scope === 'brand' || scope === 'model' ? '' : prev.version,
-      year: scope === 'brand' || scope === 'model' || scope === 'year' ? '' : prev.year,
-      yearModel: scope === 'brand' || scope === 'model' || scope === 'year' ? '' : prev.yearModel,
-      engine: '',
-      horsepower: '',
-      fuel: scope === 'brand' || scope === 'model' ? '' : prev.fuel,
-      transmission: '',
-      bodyType: '',
-    }))
-    setTechnical(EMPTY_TECHNICAL)
   }
 
   useEffect(() => {
@@ -461,7 +453,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
           if (data?.marca) applyData(data)
         })
         .catch(() => {
-          // ignore lookup failure; user can fill the form manually
+          setError('Não conseguimos consultar essa placa agora. Você pode preencher os dados manualmente.')
         })
     } catch {
       // ignore malformed cache
@@ -533,47 +525,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   }, [supabaseReady])
 
   useEffect(() => {
-    if (skipFipeClearOnMount.current) return
-    if (!selectedBrandCode) {
-      clearVehicleDependentFields('brand')
-    }
-  }, [selectedBrandCode])
-
-  useEffect(() => {
-    if (skipFipeClearOnMount.current) return
-    if (!selectedModelCode) {
-      clearVehicleDependentFields('model')
-    }
-  }, [selectedModelCode])
-
-  useEffect(() => {
-    if (skipFipeClearOnMount.current) return
-    if (!selectedYear) {
-      clearVehicleDependentFields('year')
-    }
-  }, [selectedYear])
-
-  useEffect(() => {
-    skipFipeClearOnMount.current = false
-  }, [])
-
-  useEffect(() => {
-    if (currentStep < 2 && listingSubStep < 2) return
-    const loadBrands = async () => {
-      try {
-        const response = await fetch('/api/fipe/brands')
-        if (!response.ok) throw new Error('Falha na consulta de marcas.')
-        const data = (await response.json()) as unknown
-        setBrands(Array.isArray(data) ? (data as FipeItem[]) : [])
-      } catch {
-        setError('Falha ao carregar marcas de referência.')
-      }
-    }
-
-    void loadBrands()
-  }, [currentStep, listingSubStep])
-
-  useEffect(() => {
     if (currentStep < 2) return
     const loadCatalogCars = async () => {
       try {
@@ -592,139 +543,35 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   }, [currentStep])
 
   useEffect(() => {
-    if (!selectedBrandCode) {
-      setModels([])
-      setSelectedModelCode('')
-      return
-    }
+    if (currentStep !== 2 || fipeResult) return
+    if (!form.brand.trim() || !form.model.trim() || !form.yearModel.trim()) return
 
-    const loadModels = async () => {
-      try {
-        const response = await fetch(`/api/fipe/models?brandCode=${selectedBrandCode}`)
-        if (!response.ok) throw new Error('Falha na consulta de modelos.')
-        const data = (await response.json()) as unknown
-        setModels(Array.isArray(data) ? (data as FipeItem[]) : [])
-      } catch {
-        setError('Falha ao carregar modelos.')
-      }
-      setSelectedModelCode('')
-      setYears([])
-      setSelectedYear(null)
-      setVersions([])
-      setSelectedVersionCode('')
-      setFipeResult(null)
-    }
-
-    void loadModels()
-  }, [selectedBrandCode])
-
-  useEffect(() => {
-    if (!selectedBrandCode || !selectedModelCode) {
-      setYears([])
-      setSelectedYear(null)
-      return
-    }
-
-    const loadYears = async () => {
-      try {
-        const response = await fetch(`/api/fipe/years?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}`)
-        if (!response.ok) throw new Error('Falha na consulta de anos.')
-        const data = (await response.json()) as unknown
-        setYears(Array.isArray(data) ? (data as number[]) : [])
-      } catch {
-        setError('Falha ao carregar anos.')
-      }
-      setSelectedYear(null)
-      setVersions([])
-      setSelectedVersionCode('')
-      setFipeResult(null)
-    }
-
-    void loadYears()
-  }, [selectedBrandCode, selectedModelCode])
-
-  useEffect(() => {
-    if (!selectedBrandCode || !selectedModelCode || !selectedYear) {
-      setVersions([])
-      setSelectedVersionCode('')
-      setFipeResult(null)
-      return
-    }
-
-    const loadVersions = async () => {
-      try {
-        const response = await fetch(
-          `/api/fipe/versions?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}&year=${selectedYear}`,
-        )
-        if (!response.ok) throw new Error('Falha na consulta de versões.')
-        const data = (await response.json()) as unknown
-        setVersions(Array.isArray(data) ? (data as FipeVersionOption[]) : [])
-      } catch {
-        setError('Falha ao carregar versões.')
-      }
-      setSelectedVersionCode('')
-      setFipeResult(null)
-    }
-
-    void loadVersions()
-  }, [selectedBrandCode, selectedModelCode, selectedYear])
-
-  useEffect(() => {
-    if (!selectedYear) return
-    if (versions.length === 0) {
-      setSelectedVersionCode('')
-      setFipeResult(null)
-      return
-    }
-
-    const preserved = versions.find((item) => item.code === selectedVersionCode)
-    const nextCode = preserved?.code || versions[0]?.code || ''
-    if (!nextCode || nextCode === selectedVersionCode) return
-
-    const selected = versions.find((item) => item.code === nextCode)
-    setSelectedVersionCode(nextCode)
-    setForm((prev) => ({
-      ...prev,
-      fuel: selected?.fuelType || prev.fuel,
-      version: selected?.name || prev.version,
-    }))
-  }, [selectedYear, selectedVersionCode, versions])
-
-  useEffect(() => {
-    if (!selectedBrandCode || !selectedModelCode || !selectedVersionCode) {
-      if (plateFipeLookupRef.current) return
-      setFipeResult(null)
-      return
-    }
-
-    const loadFipe = async () => {
+    let cancelled = false
+    const timeout = window.setTimeout(async () => {
       setFipeLoading(true)
       try {
-        const response = await fetch(
-          `/api/fipe/detail?brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}&yearCode=${selectedVersionCode}`,
-        )
-        if (!response.ok) {
-          setFipeResult(null)
-          setError('Não foi possível obter o valor atualizado para esta versão.')
-          return
-        }
-        const data = (await response.json()) as FipeResult | null
-        if (!data?.codeFipe || !data?.price) {
-          setFipeResult(null)
-          setError('Resposta inválida para esta combinação de modelo/ano/versão.')
-          return
-        }
-        setFipeResult(data)
+        const params = new URLSearchParams({
+          brand: form.brand.trim(),
+          model: form.model.trim(),
+          year: form.yearModel.trim(),
+        })
+        if (form.version.trim()) params.set('version', form.version.trim())
+        const response = await fetch(`/api/fipe/price?${params.toString()}`, { signal: AbortSignal.timeout(15000) })
+        const data = response.ok ? ((await response.json()) as FipeResult) : null
+        if (!cancelled) setFipeResult(data?.price ? data : null)
       } catch {
-        setFipeResult(null)
-        setError('Não foi possível consultar a FIPE agora. Você pode continuar preenchendo manualmente.')
+        if (!cancelled) setFipeResult(null)
       } finally {
-        setFipeLoading(false)
+        if (!cancelled) setFipeLoading(false)
       }
-    }
+    }, 400)
 
-    void loadFipe()
-  }, [selectedBrandCode, selectedModelCode, selectedVersionCode])
+    return () => {
+      cancelled = true
+      window.clearTimeout(timeout)
+      setFipeLoading(false)
+    }
+  }, [currentStep, form.brand, form.model, form.yearModel, form.version, fipeResult])
 
   useEffect(() => {
     if (!fipeResult) return
@@ -910,7 +757,8 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   const handleInput = (field: keyof FormState, value: string) => {
     if (field === 'title') setTitleTouched(true)
-    if (['brand', 'model', 'year', 'yearModel', 'version'].includes(field) && plateFipeLookupRef.current) {
+    if (fieldErrors[field]) setFieldErrors((prev) => ({ ...prev, [field]: false }))
+    if (['brand', 'model', 'year', 'yearModel', 'version'].includes(field)) {
       plateFipeLookupRef.current = false
       setFipeResult(null)
     }
@@ -952,6 +800,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
     setImages(next)
     setImageErrors(rejections)
+    if (next.length > 0) setFieldErrors((prev) => ({ ...prev, images: false }))
   }
 
   const removeImage = (index: number) => {
@@ -977,46 +826,68 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const onDropFiles = (event: DragEvent<HTMLLabelElement>) => {
     event.preventDefault()
     event.stopPropagation()
+    setIsDraggingImages(false)
     handleImageSelect(event.dataTransfer.files)
   }
 
-  const validateStep = (step: number): string | null => {
-    if (step === 1) {
-      const identityMissing = [
-        { label: 'marca', complete: Boolean(form.brand.trim()) },
-        { label: 'modelo', complete: Boolean(form.model.trim()) },
-        { label: 'ano', complete: Boolean(form.year.trim()) },
-        { label: 'ano/modelo', complete: Boolean(form.yearModel.trim()) },
-      ].filter((item) => !item.complete).map((item) => item.label)
-      if (identityMissing.length > 0) {
-        return `Preencha: ${identityMissing.join(', ')}.`
-      }
-    }
+  const FIELD_INPUT_IDS: Record<string, string> = {
+    brand: 'manual-brand',
+    model: 'manual-model',
+    year: 'manual-year',
+    yearModel: 'manual-year-model',
+    price: 'listing-price',
+    mileage: 'listing-mileage',
+    fuel: 'listing-fuel',
+    transmission: 'listing-transmission',
+    color: 'listing-color',
+    city: 'listing-city',
+    state: 'listing-state',
+    images: 'listing-images',
+  }
 
-    if (step === 2) {
-      const step2RequiredItems = [
-        { label: 'Preço', complete: hasAskingPrice },
-        { label: 'Quilometragem', complete: Boolean(form.mileage.trim()) },
-        { label: 'Combustível', complete: Boolean(resolvedFuelValue.trim()) },
-        { label: 'Câmbio', complete: Boolean(resolvedTransmissionValue.trim()) },
-        { label: 'Cor', complete: Boolean(form.color.trim()) },
-        { label: 'Cidade', complete: Boolean(form.city.trim()) },
-        { label: 'Estado', complete: /^[A-Za-z]{2}$/.test(form.state) },
-        { label: 'Fotos', complete: images.length > 0 },
+  const getMissingFields = (step: number): Array<{ key: string; label: string }> => {
+    const items = step === 1
+      ? [
+        { key: 'brand', label: 'marca', complete: Boolean(form.brand.trim()) },
+        { key: 'model', label: 'modelo', complete: Boolean(form.model.trim()) },
+        { key: 'year', label: 'ano', complete: Boolean(form.year.trim()) },
+        { key: 'yearModel', label: 'ano/modelo', complete: Boolean(form.yearModel.trim()) },
       ]
-      const missingStep2Labels = step2RequiredItems.filter((item) => !item.complete).map((item) => item.label)
-      if (missingStep2Labels.length > 0) {
-        return `Preencha: ${missingStep2Labels.join(', ')}.`
-      }
-    }
+      : step === 2
+      ? [
+        { key: 'price', label: 'Preço', complete: hasAskingPrice },
+        { key: 'mileage', label: 'Quilometragem', complete: Boolean(form.mileage.trim()) },
+        { key: 'fuel', label: 'Combustível', complete: Boolean(resolvedFuelValue.trim()) },
+        { key: 'transmission', label: 'Câmbio', complete: Boolean(resolvedTransmissionValue.trim()) },
+        { key: 'color', label: 'Cor', complete: Boolean(form.color.trim()) },
+        { key: 'city', label: 'Cidade', complete: Boolean(form.city.trim()) },
+        { key: 'state', label: 'Estado', complete: /^[A-Za-z]{2}$/.test(form.state) },
+        { key: 'images', label: 'Fotos', complete: images.length > 0 },
+      ]
+      : []
+    return items.filter((item) => !item.complete).map(({ key, label }) => ({ key, label }))
+  }
 
+  const validateStep = (step: number): string | null => {
     if (step === 3) {
       if (missingRequiredLabels.length > 0) {
         return `Complete os dados obrigatórios: ${missingRequiredLabels.join(', ')}.`
       }
+      return null
     }
 
+    const missing = getMissingFields(step)
+    if (missing.length > 0) {
+      return `Preencha: ${missing.map((item) => item.label).join(', ')}.`
+    }
     return null
+  }
+
+  const markInvalidFields = (step: number) => {
+    const keys = getMissingFields(step).map((item) => item.key)
+    setFieldErrors(Object.fromEntries(keys.map((key) => [key, true])))
+    const firstId = keys[0] ? FIELD_INPUT_IDS[keys[0]] : undefined
+    if (firstId) window.setTimeout(() => document.getElementById(firstId)?.focus(), 0)
   }
 
   const nextStep = () => {
@@ -1024,10 +895,12 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     if (validation) {
       setError(validation)
       setValidationDetails([])
+      markInvalidFields(currentStep)
       return
     }
     setError(null)
     setValidationDetails([])
+    setFieldErrors({})
     setListingSubStep(1)
     setCurrentStep((prev) => Math.min(3, prev + 1))
   }
@@ -1044,9 +917,9 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   const handleSubStepNext = () => {
     if (listingSubStep === 1) {
-      const validation = validateStep(1)
-      if (validation) {
-        setError(validation)
+      const hasVehicle = Boolean(form.brand.trim() && form.model.trim() && form.year.trim() && form.yearModel.trim())
+      if (!hasVehicle) {
+        setError('Busque a placa ou preencha os dados manualmente para continuar.')
         return
       }
     }
@@ -1077,29 +950,43 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     const validation = validateStep(1)
     if (validation) {
       setError(validation)
+      markInvalidFields(1)
       return
     }
     setError(null)
+    setFieldErrors({})
     setManualVehicleMode(false)
     setListingSubStep(2)
   }
 
-  const validateAccount = (): string | null => {
-    if (account.name.trim().length < 3) return 'Informe seu nome completo.'
-    if (account.phone.replace(/\D/g, '').length < 10) return 'Informe um telefone válido.'
-    if (!isValidCPF(account.cpf)) return 'Informe um CPF válido.'
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(account.email.trim())) return 'Informe um e-mail válido.'
+  const getAccountErrors = (): Array<{ key: keyof typeof ACCOUNT_INITIAL; message: string }> => {
+    const errors: Array<{ key: keyof typeof ACCOUNT_INITIAL; message: string }> = []
+    if (account.name.trim().length < 3) errors.push({ key: 'name', message: 'Informe seu nome completo.' })
+    if (account.phone.replace(/\D/g, '').length < 10) errors.push({ key: 'phone', message: 'Informe um telefone válido.' })
+    if (!isValidCPF(account.cpf)) errors.push({ key: 'cpf', message: 'Informe um CPF válido.' })
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(account.email.trim())) errors.push({ key: 'email', message: 'Informe um e-mail válido.' })
     if (
       account.password.length < 8 ||
       !/[A-Z]/.test(account.password) ||
       !/\d/.test(account.password) ||
       !/[^A-Za-z0-9]/.test(account.password)
-    ) return 'A senha deve ter 8+ caracteres, com letra maiúscula, número e símbolo.'
-    if (account.password !== account.confirmPassword) return 'As senhas não coincidem.'
-    return null
+    ) errors.push({ key: 'password', message: 'A senha deve ter 8+ caracteres, com letra maiúscula, número e símbolo.' })
+    if (account.password !== account.confirmPassword) errors.push({ key: 'confirmPassword', message: 'As senhas não coincidem.' })
+    return errors
+  }
+
+  const ACCOUNT_INPUT_IDS: Record<keyof typeof ACCOUNT_INITIAL, string> = {
+    name: 'account-name',
+    phone: 'account-phone',
+    cpf: 'account-cpf',
+    email: 'account-email',
+    password: 'account-password',
+    confirmPassword: 'account-confirm',
   }
 
   const handleSubmit = async () => {
+    if (saving) return
+
     const validation = validateStep(3)
     if (validation) {
       setError(validation)
@@ -1114,8 +1001,14 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
     try {
       if (!isAuthenticated) {
-        const accountError = validateAccount()
-        if (accountError) { setError(accountError); return }
+        const accountErrors = getAccountErrors()
+        if (accountErrors.length > 0) {
+          setError(accountErrors[0].message)
+          setAccountErrors(Object.fromEntries(accountErrors.map((item) => [item.key, item.message])))
+          window.setTimeout(() => document.getElementById(ACCOUNT_INPUT_IDS[accountErrors[0].key])?.focus(), 0)
+          return
+        }
+        setAccountErrors({})
         const signupRes = await fetch('/api/auth/signup-publish', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1216,9 +1109,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             cmt: form.cmt ? parseBrazilianInt(form.cmt) : null,
             truck_category: form.truck_category || null,
           } : {}),
-          fipe_brand_code: selectedBrandCode || null,
-          fipe_model_code: selectedModelCode || null,
-          fipe_year_code: selectedVersionCode || null,
           ...fipeSnapshot,
 
             structured_data: {
@@ -1238,8 +1128,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       }
 
       const created = (await createResponse.json()) as { id: string; slug: string; emailStatus?: unknown }
-      console.log('[DEBUG-EMAIL] POST listing response emailStatus:', created.emailStatus)
-
       const uploaded: Array<{ storage_path: string; public_url: string; sort_order: number; is_primary: boolean }> = []
 
       try {
@@ -1290,7 +1178,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
       localStorage.removeItem(LISTING_DRAFT_KEY)
       await clearListingDraftImages()
-      setSuccess('Carro anunciado com sucesso')
+      setSuccess('Anúncio publicado com sucesso. Redirecionando...')
 
       trackEvent('create_listing', {
         item_brand: form.brand || '',
@@ -1311,6 +1199,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const handleAccountInput = (field: keyof typeof ACCOUNT_INITIAL, value: string) => {
     setAccount((prev) => ({ ...prev, [field]: value }))
     if (field === 'email') setAccountEmailExists(false)
+    if (accountErrors[field]) setAccountErrors((prev) => ({ ...prev, [field]: undefined }))
   }
 
   if (!sessionReady) {
@@ -1323,7 +1212,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   }
 
   return (
-    <div className="listing-form-ref space-y-6 sm:space-y-8 pb-4 w-full max-w-none sm:max-w-3xl mx-auto">
+    <div
+      className={`listing-form-ref space-y-6 sm:space-y-8 w-full max-w-none sm:max-w-3xl mx-auto ${currentStep === 3 ? 'pb-28 sm:pb-4' : 'pb-4'}`}
+      aria-busy={saving || fipeLoading}
+    >
       <ListingStepper currentStep={currentStep} onStepChange={(step) => {
         if (step < currentStep) {
           setError(null)
@@ -1359,7 +1251,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                   <div className="space-y-4">
                     <div>
                       <p className="fingen-flow-field-label">Preencher manualmente</p>
-                      <p className="mt-1 text-[12px] text-[#767676]">Não conseguimos consultar a placa? Informe os dados básicos para continuar.</p>
+                      <p className="mt-1 text-[13px] text-[#767676]">Não conseguimos consultar a placa? Informe os dados básicos para continuar.</p>
                     </div>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       {[
@@ -1376,7 +1268,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                             value={form[field as keyof FormState] as string}
                             onChange={(event) => handleInput(field as keyof FormState, event.target.value)}
                             placeholder={placeholder}
+                            aria-invalid={fieldErrors[field] || undefined}
+                            aria-describedby={fieldErrors[field] ? `${id}-error` : undefined}
                           />
+                          {fieldErrors[field] ? <p id={`${id}-error`} className="listing-field-error">Campo obrigatório.</p> : null}
                         </div>
                       ))}
                     </div>
@@ -1424,7 +1319,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         handleInput('truck_category', data.truck_category || '')
                         setForm((prev) => ({ ...prev, structured_data: { ...prev.structured_data, ...(data.structured_data || {}) } }))
                       }
-                      if (data.version) handleInput('version', data.version)
+                      if (data.version) setForm((prev) => ({ ...prev, version: data.version }))
                     }} />
                     <button type="button" onClick={handleSubStepNext} className="fingen-flow-btn-primary w-full mt-2">
                       Continuar <ArrowRight className="w-4 h-4" />
@@ -1442,49 +1337,55 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               <div className="fingen-flow-substep-card p-3 sm:p-5 space-y-3 sm:space-y-4 animate-fade-in">
                 <div className="flex items-center justify-between gap-3">
                   <p className="fingen-flow-field-label">Dados do veículo</p>
-                  <span className="fingen-flow-badge-accent text-[10px]">Verifique</span>
+                  <span className="fingen-flow-badge-accent text-[11px]">Verifique</span>
                 </div>
-                <p className="text-[12px] text-[#767676]">Revise os dados abaixo. Altere o que precisar.</p>
+                <p className="text-[13px] text-[#767676]">Revise os dados abaixo. Altere o que precisar.</p>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                    <div>
                      <label htmlFor="vehicle-brand" className="listing-flow-field-label">Marca</label>
-                     <input id="vehicle-brand" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.brand} onChange={(e) => handleInput('brand', e.target.value)} />
+                     <input id="vehicle-brand" className="fingen-flow-input listing-flow-input-field text-sm mt-1" value={form.brand} onChange={(e) => handleInput('brand', e.target.value)} />
                    </div>
                    <div>
                      <label htmlFor="vehicle-model" className="listing-flow-field-label">Modelo</label>
-                     <input id="vehicle-model" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.model} onChange={(e) => handleInput('model', e.target.value)} />
+                     <input id="vehicle-model" className="fingen-flow-input listing-flow-input-field text-sm mt-1" value={form.model} onChange={(e) => handleInput('model', e.target.value)} />
                    </div>
                    <div>
                      <label htmlFor="vehicle-version" className="listing-flow-field-label">Versão</label>
-                     <input id="vehicle-version" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.version} onChange={(e) => handleInput('version', e.target.value)} placeholder="Ex: CROSSFOX" />
+                     <input id="vehicle-version" className="fingen-flow-input listing-flow-input-field text-sm mt-1" value={form.version} onChange={(e) => handleInput('version', e.target.value)} placeholder="Ex: CROSSFOX" />
                    </div>
                    <div>
                      <label htmlFor="vehicle-year" className="listing-flow-field-label">Ano de fabricação</label>
-                     <input id="vehicle-year" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.year} onChange={(e) => handleInput('year', e.target.value)} />
+                     <input id="vehicle-year" className="fingen-flow-input listing-flow-input-field text-sm mt-1" value={form.year} onChange={(e) => handleInput('year', e.target.value)} />
                    </div>
                    <div>
                      <label htmlFor="vehicle-color" className="listing-flow-field-label">Cor</label>
-                     <input id="vehicle-color" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
+                     <input id="vehicle-color" className="fingen-flow-input listing-flow-input-field text-sm mt-1" value={form.color} onChange={(e) => handleInput('color', e.target.value)} />
                    </div>
                    <div>
                      <label htmlFor="vehicle-fuel" className="listing-flow-field-label">Combustível</label>
-                     <input id="vehicle-fuel" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.fuel} onChange={(e) => handleInput('fuel', e.target.value)} />
+                     <select id="vehicle-fuel" className="fingen-flow-input listing-flow-input-field text-sm mt-1" value={canonicalOption(FUEL_OPTIONS, form.fuel)} onChange={(e) => handleInput('fuel', e.target.value)}>
+                       <option value="">Selecione</option>
+                       {withSelectOption(FUEL_OPTIONS, form.fuel).map((option) => <option key={option} value={option}>{option}</option>)}
+                     </select>
                    </div>
                    <div>
                      <label htmlFor="vehicle-transmission" className="listing-flow-field-label">Câmbio</label>
-                     <input id="vehicle-transmission" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.transmission} onChange={(e) => handleInput('transmission', e.target.value)} />
+                     <select id="vehicle-transmission" className="fingen-flow-input listing-flow-input-field text-sm mt-1" value={canonicalOption(TRANSMISSION_OPTIONS, form.transmission)} onChange={(e) => handleInput('transmission', e.target.value)}>
+                       <option value="">Selecione</option>
+                       {withSelectOption(TRANSMISSION_OPTIONS, form.transmission).map((option) => <option key={option} value={option}>{option}</option>)}
+                     </select>
                    </div>
                    <div>
                      <label htmlFor="vehicle-engine" className="listing-flow-field-label">Motor</label>
-                     <input id="vehicle-engine" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.engine} onChange={(e) => handleInput('engine', e.target.value)} placeholder="Ex: 2.0 Turbo" />
+                     <input id="vehicle-engine" className="fingen-flow-input listing-flow-input-field text-sm mt-1" value={form.engine} onChange={(e) => handleInput('engine', e.target.value)} placeholder="Ex: 2.0 Turbo" />
                    </div>
                    <div>
                      <label htmlFor="vehicle-horsepower" className="listing-flow-field-label">Potência (cv)</label>
-                     <input id="vehicle-horsepower" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1" value={form.horsepower} onChange={(e) => handleInput('horsepower', e.target.value)} placeholder="Ex: 116" />
+                     <input id="vehicle-horsepower" className="fingen-flow-input listing-flow-input-field text-sm mt-1" value={form.horsepower} onChange={(e) => handleInput('horsepower', e.target.value)} placeholder="Ex: 116" />
                    </div>
                    <div>
                      <label htmlFor="vehicle-plate-final" className="listing-flow-field-label">Final da placa (opcional)</label>
-                     <input id="vehicle-plate-final" className="fingen-flow-input listing-flow-input-field text-[12px] mt-1 uppercase" value={normalizePlateFinal(form.plateFinal) || ''} onChange={(e) => handleInput('plateFinal', normalizePlateFinal(e.target.value) || '')} placeholder="Ex: 3" maxLength={1} />
+                     <input id="vehicle-plate-final" className="fingen-flow-input listing-flow-input-field text-sm mt-1 uppercase" value={normalizePlateFinal(form.plateFinal) || ''} onChange={(e) => handleInput('plateFinal', normalizePlateFinal(e.target.value) || '')} placeholder="Ex: 3" maxLength={1} />
                    </div>
                  </div>
                 <button type="button" onClick={nextStep} className="fingen-flow-btn-primary w-full mt-2">
@@ -1533,31 +1434,49 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                   }}
                   inputMode="decimal"
                   aria-label="Preço pedido"
+                  aria-invalid={fieldErrors.price || undefined}
+                  aria-describedby={fieldErrors.price ? 'listing-price-error' : undefined}
                 />
+                {fieldErrors.price ? <p id="listing-price-error" className="listing-field-error">Informe o preço pedido.</p> : null}
               </div>
               <div>
                 <label htmlFor="listing-mileage" className="listing-flow-field-label">Quilometragem (km)</label>
-                <input id="listing-mileage" className="fingen-flow-input mt-1" placeholder="Ex: 45.000" value={formatBrazilianInt(form.mileage)} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} aria-label="Quilometragem" />
+                <input id="listing-mileage" className="fingen-flow-input mt-1" placeholder="Ex: 45.000" inputMode="numeric" value={formatBrazilianInt(form.mileage)} onChange={(e) => handleInput('mileage', e.target.value.replace(/\D/g, ''))} aria-label="Quilometragem" aria-invalid={fieldErrors.mileage || undefined} aria-describedby={fieldErrors.mileage ? 'listing-mileage-error' : undefined} />
+                {fieldErrors.mileage ? <p id="listing-mileage-error" className="listing-field-error">Informe a quilometragem.</p> : null}
               </div>
               <div>
                 <label htmlFor="listing-fuel" className="listing-flow-field-label">Combustível</label>
-                <input id="listing-fuel" className="fingen-flow-input mt-1" placeholder="Ex: Flex" value={form.fuel || resolvedFuelValue} onChange={(e) => handleInput('fuel', e.target.value)} aria-label="Combustível" />
+                <select id="listing-fuel" className="fingen-flow-input mt-1" value={canonicalOption(FUEL_OPTIONS, form.fuel || resolvedFuelValue)} onChange={(e) => handleInput('fuel', e.target.value)} aria-label="Combustível" aria-invalid={fieldErrors.fuel || undefined} aria-describedby={fieldErrors.fuel ? 'listing-fuel-error' : undefined}>
+                  <option value="">Selecione</option>
+                  {withSelectOption(FUEL_OPTIONS, form.fuel || resolvedFuelValue).map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+                {fieldErrors.fuel ? <p id="listing-fuel-error" className="listing-field-error">Selecione o combustível.</p> : null}
               </div>
               <div>
                 <label htmlFor="listing-transmission" className="listing-flow-field-label">Câmbio</label>
-                <input id="listing-transmission" className="fingen-flow-input mt-1" placeholder="Ex: Automático" value={form.transmission || resolvedTransmissionValue} onChange={(e) => handleInput('transmission', e.target.value)} aria-label="Câmbio" />
+                <select id="listing-transmission" className="fingen-flow-input mt-1" value={canonicalOption(TRANSMISSION_OPTIONS, form.transmission || resolvedTransmissionValue)} onChange={(e) => handleInput('transmission', e.target.value)} aria-label="Câmbio" aria-invalid={fieldErrors.transmission || undefined} aria-describedby={fieldErrors.transmission ? 'listing-transmission-error' : undefined}>
+                  <option value="">Selecione</option>
+                  {withSelectOption(TRANSMISSION_OPTIONS, form.transmission || resolvedTransmissionValue).map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+                {fieldErrors.transmission ? <p id="listing-transmission-error" className="listing-field-error">Selecione o câmbio.</p> : null}
               </div>
               <div>
                 <label htmlFor="listing-color" className="listing-flow-field-label">Cor</label>
-                <input id="listing-color" className="fingen-flow-input mt-1" placeholder="Ex: Branco" value={form.color} onChange={(e) => handleInput('color', e.target.value)} aria-label="Cor" />
+                <input id="listing-color" className="fingen-flow-input mt-1" placeholder="Ex: Branco" value={form.color} onChange={(e) => handleInput('color', e.target.value)} aria-label="Cor" aria-invalid={fieldErrors.color || undefined} aria-describedby={fieldErrors.color ? 'listing-color-error' : undefined} />
+                {fieldErrors.color ? <p id="listing-color-error" className="listing-field-error">Informe a cor.</p> : null}
               </div>
               <div>
                 <label htmlFor="listing-city" className="listing-flow-field-label">Cidade</label>
-                <input id="listing-city" className="fingen-flow-input mt-1" placeholder="Ex: São Paulo" value={form.city} onChange={(e) => handleInput('city', e.target.value)} aria-label="Cidade" />
+                <input id="listing-city" className="fingen-flow-input mt-1" placeholder="Ex: São Paulo" value={form.city} onChange={(e) => handleInput('city', e.target.value)} aria-label="Cidade" aria-invalid={fieldErrors.city || undefined} aria-describedby={fieldErrors.city ? 'listing-city-error' : undefined} />
+                {fieldErrors.city ? <p id="listing-city-error" className="listing-field-error">Informe a cidade.</p> : null}
               </div>
               <div>
                 <label htmlFor="listing-state" className="listing-flow-field-label">Estado (UF)</label>
-                <input id="listing-state" className="fingen-flow-input mt-1" placeholder="Ex: SP" value={form.state} onChange={(e) => handleInput('state', e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2))} aria-label="Estado" />
+                <select id="listing-state" className="fingen-flow-input mt-1" value={form.state} onChange={(e) => handleInput('state', e.target.value)} aria-label="Estado (UF)" aria-invalid={fieldErrors.state || undefined} aria-describedby={fieldErrors.state ? 'listing-state-error' : undefined}>
+                  <option value="">Selecione</option>
+                  {BRAZIL_UFS.map((uf) => <option key={uf} value={uf}>{uf}</option>)}
+                </select>
+                {fieldErrors.state ? <p id="listing-state-error" className="listing-field-error">Selecione o estado.</p> : null}
               </div>
             </div>
 
@@ -1596,7 +1515,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                   <div className="fingen-flow-fipe-dark-stat">
                     <p className="fingen-flow-fipe-dark-stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>Preço anunciado</p>
                     <p className="fingen-flow-fipe-dark-stat-value max-[330px]:text-[20px]" style={{ color: '#FFFFFF' }}>
-                      {hasAskingPrice ? formatBRL(priceNumber) : 'Informe abaixo'}
+                      {hasAskingPrice ? formatBRL(priceNumber) : 'Informe acima'}
                     </p>
                   </div>
 
@@ -1633,24 +1552,20 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               </div>
             ) : (
               <div className="rounded-2xl border border-[#E5E5E5] bg-[#FAFAFA] p-4" role="status">
-                <p className="text-sm font-semibold text-[#333]">FIPE não disponível</p>
-                <p className="mt-1 text-xs text-[#767676]">Você pode continuar com o preço informado. A consulta da placa não alterou os demais dados.</p>
+                <p className="text-sm font-semibold text-[#333]">Não encontramos a referência FIPE</p>
+                <p className="mt-1 text-xs text-[#767676]">Confira marca, modelo, ano e versão. Você pode continuar sem a FIPE e publicar com o preço informado.</p>
               </div>
             )}
 
             <div className="fingen-flow-substep-card p-4 space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="fingen-flow-field-label">Recomendado, não obrigatório</p>
-                <span className="fingen-flow-badge-outline text-[10px]">Opcional</span>
+                <span className="fingen-flow-badge-outline text-[11px]">Opcional</span>
               </div>
               <div>
                 <label htmlFor="listing-description" className="listing-flow-field-label">Descrição do veículo</label>
                 <textarea id="listing-description" className="fingen-flow-input listing-description-field min-h-[180px] sm:min-h-[200px] py-3 resize-none leading-relaxed" placeholder="Descrição do veículo... destaque pontos fortes, revisões e opcionais." value={form.description} onChange={(e) => handleInput('description', e.target.value)} aria-label="Descrição do veículo" />
               </div>
-              <DescriptionAiControls
-                value={form.description}
-                onApply={(next) => handleInput('description', next)}
-              />
               <div>
                 <label htmlFor="listing-optionals" className="listing-flow-field-label">Opcionais extras</label>
                 <input id="listing-optionals" className="fingen-flow-input listing-optionals-field" placeholder="Opcionais extras (separados por vírgula)" value={form.optionalItems} onChange={(e) => handleInput('optionalItems', e.target.value)} aria-label="Opcionais extras" />
@@ -1660,10 +1575,17 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
 
             <label
-              className="fingen-flow-upload-area p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px]"
+              className={`fingen-flow-upload-area p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px] focus-within:ring-2 focus-within:ring-[#16855C] focus-within:ring-offset-2 ${isDraggingImages ? 'border-[#16855C] bg-[#16855C]/5 scale-[1.01]' : ''}${fieldErrors.images ? ' listing-upload-invalid' : ''}`}
+              onDragEnter={(event) => {
+                event.preventDefault()
+                setIsDraggingImages(true)
+              }}
               onDragOver={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
+              }}
+              onDragLeave={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsDraggingImages(false)
               }}
               onDrop={onDropFiles}
             >
@@ -1671,10 +1593,23 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                 <ImagePlus className="h-6 w-6 text-[#1A1A1A]" />
               </div>
               <span className="text-sm text-[#1A1A1A] mt-1 max-[330px]:text-[13px]">Arraste fotos ou clique ({images.length}/{LISTING_MAX_IMAGES})</span>
-              <span className="fingen-flow-badge-accent text-[10px] mt-1">JPG, PNG, WEBP • Até 10 imagens • 10 MB por imagem</span>
-              <input id="listing-images" type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => handleImageSelect(e.target.files)} aria-describedby="listing-images-help" />
+              <span className="fingen-flow-badge-accent text-[11px] mt-1">JPG, PNG, WEBP • Até 10 imagens • 10 MB por imagem</span>
+              <input
+                id="listing-images"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                className="sr-only"
+                onChange={(e) => {
+                  handleImageSelect(e.target.files)
+                  e.target.value = ''
+                }}
+                aria-invalid={fieldErrors.images || undefined}
+                aria-describedby={fieldErrors.images ? 'listing-images-help listing-images-error' : 'listing-images-help'}
+              />
             </label>
             <p id="listing-images-help" className="text-xs font-medium text-[#6F6F6F] text-center">Inclua pelo menos 1 foto para publicar. Cada arquivo pode ter até {LISTING_MAX_IMAGE_SIZE_MB} MB.</p>
+            {fieldErrors.images ? <p id="listing-images-error" className="listing-field-error text-center">Adicione pelo menos uma foto para continuar.</p> : null}
             {imageErrors.length > 0 && (
               <div className="rounded-xl border border-[#FECACA] bg-[#FEF2F2] p-3 text-sm text-[#B91C1C]" role="alert">
                 <p className="font-semibold">Não adicionamos algumas imagens:</p>
@@ -1691,7 +1626,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                     {/* Object URLs are generated locally for instant previews before upload. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={image.previewUrl} alt={`Preview ${index + 1}`} width={1920} height={1080} className="aspect-video w-full rounded-xl object-cover" />
-                    <p className="mt-4 px-2 text-[10px] font-semibold uppercase tracking-wider text-[#6F6F6F] max-[330px]:mt-3">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
+                    <p className="mt-4 px-2 text-[11px] font-semibold uppercase tracking-wider text-[#6F6F6F] max-[330px]:mt-3">{index === 0 ? 'Foto principal' : `Foto ${index + 1}`}</p>
                     <div className="mt-3 flex items-center gap-2 px-2 pb-1 max-[330px]:gap-1.5">
                       <button type="button" className="w-11 h-11 rounded-xl bg-[#F5F5F5] flex items-center justify-center text-[#6F6F6F] hover:text-[#1A1A1A] hover:bg-[#E5E5E5] transition-colors" onClick={() => moveImage(index, -1)} disabled={index === 0} aria-label="Mover imagem para a esquerda">
                         <MoveLeft className="h-4 w-4" />
@@ -1789,7 +1724,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             {/* Technical Specs — minimal grid */}
             <div className="mb-10">
               <div className="flex items-center gap-2 mb-6">
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-[#111] text-white px-2 py-0.5 rounded">AI</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider bg-[#111] text-white px-2 py-0.5 rounded">Sugerido</span>
                 <h3 className="text-sm font-semibold text-[#111] uppercase tracking-[0.08em]">Ficha técnica</h3>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-5">
@@ -1840,7 +1775,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                 ) : (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-name">Nome completo</label>
+                      <label className="text-xs font-medium text-[#767676]" htmlFor="account-name">Nome completo</label>
                       <input
                         id="account-name"
                         className="fingen-flow-input mt-1"
@@ -1848,10 +1783,13 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         autoComplete="name"
                         value={account.name}
                         onChange={(e) => handleAccountInput('name', e.target.value)}
+                        aria-invalid={accountErrors.name ? true : undefined}
+                        aria-describedby={accountErrors.name ? 'account-name-error' : undefined}
                       />
+                      {accountErrors.name ? <p id="account-name-error" className="listing-field-error">{accountErrors.name}</p> : null}
                     </div>
                     <div>
-                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-phone">Telefone</label>
+                      <label className="text-xs font-medium text-[#767676]" htmlFor="account-phone">Telefone</label>
                       <input
                         id="account-phone"
                         className="fingen-flow-input mt-1"
@@ -1860,10 +1798,13 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         autoComplete="tel"
                         value={account.phone}
                         onChange={(e) => handleAccountInput('phone', formatPhone(e.target.value))}
+                        aria-invalid={accountErrors.phone ? true : undefined}
+                        aria-describedby={accountErrors.phone ? 'account-phone-error' : undefined}
                       />
+                      {accountErrors.phone ? <p id="account-phone-error" className="listing-field-error">{accountErrors.phone}</p> : null}
                     </div>
                     <div>
-                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-cpf">CPF</label>
+                      <label className="text-xs font-medium text-[#767676]" htmlFor="account-cpf">CPF</label>
                       <input
                         id="account-cpf"
                         className="fingen-flow-input mt-1"
@@ -1872,10 +1813,13 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         autoComplete="off"
                         value={account.cpf}
                         onChange={(e) => handleAccountInput('cpf', formatCPF(e.target.value))}
+                        aria-invalid={accountErrors.cpf ? true : undefined}
+                        aria-describedby={accountErrors.cpf ? 'account-cpf-error' : undefined}
                       />
+                      {accountErrors.cpf ? <p id="account-cpf-error" className="listing-field-error">{accountErrors.cpf}</p> : null}
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-email">E-mail</label>
+                      <label className="text-xs font-medium text-[#767676]" htmlFor="account-email">E-mail</label>
                       <input
                         id="account-email"
                         type="email"
@@ -1884,10 +1828,13 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         autoComplete="email"
                         value={account.email}
                         onChange={(e) => handleAccountInput('email', e.target.value)}
+                        aria-invalid={accountErrors.email ? true : undefined}
+                        aria-describedby={accountErrors.email ? 'account-email-error' : undefined}
                       />
+                      {accountErrors.email ? <p id="account-email-error" className="listing-field-error">{accountErrors.email}</p> : null}
                     </div>
                     <div>
-                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-password">Senha</label>
+                      <label className="text-xs font-medium text-[#767676]" htmlFor="account-password">Senha</label>
                       <input
                         id="account-password"
                         type="password"
@@ -1896,11 +1843,14 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         autoComplete="new-password"
                         value={account.password}
                         onChange={(e) => handleAccountInput('password', e.target.value)}
+                        aria-invalid={accountErrors.password ? true : undefined}
+                        aria-describedby={accountErrors.password ? 'account-password-error' : undefined}
                       />
+                      {accountErrors.password ? <p id="account-password-error" className="listing-field-error">{accountErrors.password}</p> : null}
                       <p className="mt-1 text-[11px] leading-relaxed text-[#767676]">Use 8+ caracteres, com uma letra maiúscula, um número e um símbolo.</p>
                     </div>
                     <div>
-                      <label className="text-[10px] font-medium text-[#767676]" htmlFor="account-confirm">Confirmar senha</label>
+                      <label className="text-xs font-medium text-[#767676]" htmlFor="account-confirm">Confirmar senha</label>
                       <input
                         id="account-confirm"
                         type="password"
@@ -1909,7 +1859,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         autoComplete="new-password"
                         value={account.confirmPassword}
                         onChange={(e) => handleAccountInput('confirmPassword', e.target.value)}
+                        aria-invalid={accountErrors.confirmPassword ? true : undefined}
+                        aria-describedby={accountErrors.confirmPassword ? 'account-confirm-error' : undefined}
                       />
+                      {accountErrors.confirmPassword ? <p id="account-confirm-error" className="listing-field-error">{accountErrors.confirmPassword}</p> : null}
                     </div>
                   </div>
                 )}

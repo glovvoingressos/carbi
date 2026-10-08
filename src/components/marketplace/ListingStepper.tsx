@@ -1,7 +1,7 @@
 'use client'
 
 import { Check } from 'lucide-react'
-import { motion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
 
 const STEPS = [
   { id: 1, label: 'Veículo', description: 'Placa e dados' },
@@ -15,6 +15,8 @@ interface ListingStepperProps {
 }
 
 export default function ListingStepper({ currentStep, onStepChange }: ListingStepperProps) {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <nav className="listing-stepper" aria-label="Progresso do anúncio">
       <ol className="listing-stepper-row">
@@ -37,7 +39,7 @@ export default function ListingStepper({ currentStep, onStepChange }: ListingSte
                   className="listing-stepper-marker"
                   initial={false}
                   animate={{ scale: isActive ? 1.08 : 1 }}
-                  transition={{ type: 'spring', stiffness: 420, damping: 24 }}
+                  transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 24 }}
                 >
                   {isComplete ? <Check size={14} strokeWidth={2.75} aria-hidden="true" /> : step.id}
                 </motion.span>
@@ -52,7 +54,7 @@ export default function ListingStepper({ currentStep, onStepChange }: ListingSte
                   <motion.span
                     initial={false}
                     animate={{ scaleX: currentStep > step.id ? 1 : 0 }}
-                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                    transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
                   />
                 </span>
               ) : null}

@@ -444,15 +444,14 @@ export async function getFipeMonthlyHistory(
   }
 
   const refs = await getFipeReferences()
-  const recentRefs = refs.slice(0, monthsCount).reverse()
 
+  // Newest first; stop at the first month the API refuses (free plan only covers the latest months).
   const results: { month: string; price: string; priceNum: number }[] = []
-  for (const ref of recentRefs) {
+  for (const ref of refs.slice(0, monthsCount)) {
     const data = await fetchFipe<any>(`/brands/${resolved.brand.code}/models/${resolved.model.code}/years/${selected.code}`, false, 'cars', ref.code)
-    if (data?.price) {
-      const priceNum = parseFloat(data.price.replace(/[^\d,]/g, '').replace(',', '.'))
-      results.push({ month: ref.name, price: data.price, priceNum: isNaN(priceNum) ? 0 : priceNum })
-    }
+    if (!data?.price) break
+    const priceNum = parseFloat(data.price.replace(/[^\d,]/g, '').replace(',', '.'))
+    results.unshift({ month: ref.name, price: data.price, priceNum: isNaN(priceNum) ? 0 : priceNum })
   }
 
   return results

@@ -121,7 +121,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
           <div className="relative flex-1">
             <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
               <Car className="w-4 h-4 text-gray-400" />
-              <span className="text-[10px] font-semibold text-gray-400">BR</span>
+              <span className="text-xs font-semibold text-gray-400">BR</span>
             </div>
             <label htmlFor="listing-plate" className="sr-only">Placa do veículo</label>
             <input
@@ -180,7 +180,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
                     <Check className="w-3.5 h-3.5 text-emerald-600" />
                     <span className="text-sm font-semibold text-[#1A1A1A]">{vehicleData.brand} {vehicleData.model}</span>
                   </div>
-                  <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
                     Preenchido
                   </span>
                 </div>
@@ -199,7 +199,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
                   </div>
                 )}
 
-                <p className="text-[10px] text-emerald-600 mt-1">
+                <p className="text-xs text-emerald-600 mt-1">
                   ✓ Campos vazios foram preenchidos automaticamente
                 </p>
               </div>
