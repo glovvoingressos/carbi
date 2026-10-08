@@ -43,7 +43,10 @@ export default function ListingStepper({ currentStep, onStepChange, showAccountS
                 <motion.span
                   className="listing-stepper-marker"
                   initial={false}
-                  animate={{ scale: isActive ? 1.08 : 1 }}
+                  // O ativo fica em escala 1 (caixa de layout exata) e os inativos
+                  // encolhem: escala > 1 transbordava 1.6px para fora de `main`,
+                  // que tem overflow-x: clip, cortando a borda do círculo.
+                  animate={{ scale: isActive ? 1 : 0.94 }}
                   transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 24 }}
                 >
                   {isComplete ? <Check size={14} strokeWidth={2.75} aria-hidden="true" /> : step.id}
