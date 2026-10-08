@@ -1,4 +1,5 @@
 import type { ListingsPageInput, TruckListingFilters } from '@/lib/marketplace-server'
+import { applyCityFilter } from '@/lib/city-filter'
 
 /* ────────────────────────────────────────────────────────────
    Catálogo de carrocerias de caminhão
@@ -115,7 +116,7 @@ export function applyTruckQueryFilters(query: any, input: TruckListingFilters): 
   if (input.axles != null) result = Array.isArray(input.axles) ? result.in('axles', input.axles) : result.eq('axles', input.axles)
   if (input.loadCapacityMin != null) result = result.gte('load_capacity', input.loadCapacityMin)
   if (input.loadCapacityMax != null) result = result.lte('load_capacity', input.loadCapacityMax)
-  if (input.city) result = Array.isArray(input.city) ? result.in('city', input.city) : result.ilike('city', input.city)
+  result = applyCityFilter(result, input.city)
   if (input.state) result = result.eq('state', input.state)
   if (input.transmission) result = Array.isArray(input.transmission) ? result.in('transmission', input.transmission) : result.ilike('transmission', `%${input.transmission}%`)
   if (input.mileageMin != null) result = result.gte('mileage', input.mileageMin)

@@ -3,6 +3,7 @@ import { ListingPublic } from '@/lib/marketplace'
 import { getFipePrice } from '@/lib/fipe-api'
 import { normalizePlateFinal, parseFipePriceToNumber } from '@/lib/marketplace'
 import { classifyVehicleCategory, classifyByFuelType } from '@/lib/vehicle-category'
+import { applyCityFilter } from '@/lib/city-filter'
 import { applyTruckQueryFilters, expandTruckBodyTypeValues, expandTruckTypeValues } from '@/lib/truck-filters'
 import { normalizeListingImages } from '@/lib/listing-images'
 import {
@@ -447,7 +448,7 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
   if (input.yearModel) tableQuery = tableQuery.eq('year_model', input.yearModel)
    if (input.excludeId) tableQuery = tableQuery.neq('id', input.excludeId)
    if (input.vehicle_type) tableQuery = tableQuery.eq('vehicle_type', input.vehicle_type)
-   if (input.city) tableQuery = Array.isArray(input.city) ? tableQuery.in('city', input.city) : tableQuery.ilike('city', input.city)
+   tableQuery = applyCityFilter(tableQuery, input.city)
    if (input.state) tableQuery = tableQuery.ilike('state', input.state)
    if (input.truckType) {
      const truckTypes = expandTruckTypeValues(input.truckType)

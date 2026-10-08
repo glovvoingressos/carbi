@@ -65,15 +65,24 @@ export async function generateMetadata({
 export default async function CarrosAVendaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ 
-    q?: string; 
-    ordem?: ListingSort; 
+  searchParams: Promise<{
+    q?: string;
+    ordem?: ListingSort;
     pagina?: string;
     brand?: string | string[];
+    model?: string | string[];
     fuel?: string | string[];
     transmission?: string | string[];
     color?: string | string[];
     body_type?: string | string[];
+    optional?: string | string[];
+    city?: string | string[];
+    state?: string;
+    truck_type?: string | string[];
+    truck_body_type?: string | string[];
+    axles?: string | string[];
+    load_capacity_min?: string;
+    load_capacity_max?: string;
     price_min?: string;
     price_max?: string;
     year_min?: string;
@@ -86,21 +95,43 @@ export default async function CarrosAVendaPage({
   const query = (sp.q || '').trim()
   const sort = (sp.ordem || 'recent') as ListingSort
   const page = Math.max(Number(sp.pagina || '1') || 1, 1)
+  // Converte `string | string[]` de searchParams nos tipos do input. Lista
+  // vazia vira `undefined`: `.in(col, [])` casaria com nada.
+  const numberList = (value?: string | string[]) => {
+    const list = (Array.isArray(value) ? value : value ? [value] : [])
+      .map(Number)
+      .filter((entry) => Number.isFinite(entry))
+    return list.length > 0 ? list : undefined
+  }
+  const numberValue = (value?: string) => (value ? Number(value) : undefined)
 
   const [result, filterOptions] = await Promise.all([
     fetchPublicListingsPage({
       q: query || undefined,
       brand: sp.brand,
+      model: sp.model,
       fuel: sp.fuel,
       transmission: sp.transmission,
       color: sp.color,
       bodyType: sp.body_type,
-      priceMin: sp.price_min ? Number(sp.price_min) : undefined,
-      priceMax: sp.price_max ? Number(sp.price_max) : undefined,
-      yearMin: sp.year_min ? Number(sp.year_min) : undefined,
-      yearMax: sp.year_max ? Number(sp.year_max) : undefined,
-      mileageMin: sp.mileage_min ? Number(sp.mileage_min) : undefined,
-      mileageMax: sp.mileage_max ? Number(sp.mileage_max) : undefined,
+      city: sp.city,
+      state: sp.state,
+      optionalItems: sp.optional
+        ? Array.isArray(sp.optional)
+          ? sp.optional
+          : [sp.optional]
+        : undefined,
+      truckType: sp.truck_type,
+      truckBodyType: sp.truck_body_type,
+      axles: numberList(sp.axles),
+      loadCapacityMin: numberValue(sp.load_capacity_min),
+      loadCapacityMax: numberValue(sp.load_capacity_max),
+      priceMin: numberValue(sp.price_min),
+      priceMax: numberValue(sp.price_max),
+      yearMin: numberValue(sp.year_min),
+      yearMax: numberValue(sp.year_max),
+      mileageMin: numberValue(sp.mileage_min),
+      mileageMax: numberValue(sp.mileage_max),
       sort,
       page,
       pageSize: 24,

@@ -469,17 +469,16 @@ export function resolveTruckPreset(slug: string): TruckSeoPreset | null {
     const citySlug = normalized.replace('cidade-', '')
     const cityName = citySlug.replace(/-/g, ' ')
     const known = MAJOR_CITIES.find((city) => city.slug === citySlug)
-    // Exibição usa o nome oficial; o filtro continua no formato ASCII, que é
-    // como a coluna `city` é preenchida na prática.
+    // O filtro aceita as duas grafias (ver city-filter), então exibição e
+    // query usam o nome oficial da cidade.
     const label = known?.name || cityName.replace(/\b\w/g, (match) => match.toUpperCase())
-    const queryLabel = cityName.replace(/\b\w/g, (match) => match.toUpperCase())
     return {
       slug: normalized,
       title: `Caminhões em ${label}`,
       description: `Caminhões à venda em ${label} com atualização constante de preço e disponibilidade.`,
       h1: `Caminhões em ${label}`,
       intro: `Anúncios ativos de caminhões na cidade de ${label}.`,
-      listingQuery: { city: `%${queryLabel}%`, sort: 'recent' },
+      listingQuery: { city: `%${label}%`, sort: 'recent' },
       faq: [
         {
           q: `Comprar caminhão em ${label}: vale a pena ver anúncios locais?`,

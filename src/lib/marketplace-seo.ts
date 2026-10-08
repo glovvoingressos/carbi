@@ -477,8 +477,12 @@ export function resolveSeoPreset(slug: string): MarketplaceSeoPreset | null {
   }
 
   if (normalized.startsWith('cidade-')) {
-    const cityName = normalized.replace('cidade-', '').replace(/-/g, ' ')
-    const titleCity = cityName.replace(/\b\w/g, (match) => match.toUpperCase())
+    const citySlug = normalized.replace('cidade-', '')
+    const cityName = citySlug.replace(/-/g, ' ')
+    // Exibição com o nome oficial; o filtro aceita as duas grafias
+    // (ver city-filter), então não precisa se preocupar com acento aqui.
+    const titleCity = MAJOR_CITIES.find((city) => city.slug === citySlug)?.name
+      || cityName.replace(/\b\w/g, (match) => match.toUpperCase())
     return {
       slug: normalized,
       title: `Carros em ${titleCity}`,
