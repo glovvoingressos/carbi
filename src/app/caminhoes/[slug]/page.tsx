@@ -75,6 +75,7 @@ function parseTruckInput(
   const fuel = readValues(searchParams, 'fuel')
   const color = readValues(searchParams, 'color')
   const truckType = readValues(searchParams, 'truck_type')
+  const truckBodyType = readValues(searchParams, 'truck_body_type')
   const axles = readValues(searchParams, 'axles').map(Number).filter((value) => Number.isFinite(value))
 
   return {
@@ -90,6 +91,7 @@ function parseTruckInput(
     ...(fuel.length > 0 ? { fuel } : {}),
     ...(color.length > 0 ? { color } : {}),
     ...(truckType.length > 0 ? { truckType } : {}),
+    ...(truckBodyType.length > 0 ? { truckBodyType } : {}),
     ...(axles.length > 0 ? { axles } : {}),
     priceMin: readNumber(searchParams, 'price_min') ?? presetQuery.priceMin,
     priceMax: readNumber(searchParams, 'price_max') ?? presetQuery.priceMax,

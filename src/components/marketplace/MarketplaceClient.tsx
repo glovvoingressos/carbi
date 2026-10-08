@@ -11,7 +11,7 @@ import ListingCard from '@/components/marketplace/ListingCard'
 import { ListingPublic } from '@/lib/marketplace'
 import { ListingSort, ListingsPageInput } from '@/lib/marketplace-server'
 import { getFilteredListings, getModelsByBrands } from '@/app/carros-a-venda/actions'
-import { clearTruckListingFilters, serializeTruckListingFilters } from '@/lib/truck-filters'
+import { clearTruckListingFilters, serializeTruckListingFilters, TRUCK_BODY_TYPES, truckBodyTypeLabel, truckTypeLabel } from '@/lib/truck-filters'
 import {
   colorToHex,
   normalizeBodyType,
@@ -192,7 +192,8 @@ export default function MarketplaceClient({
   ])
   const [mileageMin, setMileageMin] = useState<number>(getSearchNumber('mileage_min', typeof defaultFilters?.mileageMin === 'number' ? defaultFilters.mileageMin : 0))
   const [mileageMax, setMileageMax] = useState<number>(getSearchNumber('mileage_max', typeof defaultFilters?.mileageMax === 'number' ? defaultFilters.mileageMax : 300000))
-  const [selectedTruckTypes, setSelectedTruckTypes] = useState<string[]>(getSearchArray('truck_type', defaultFilters?.truckType))
+  const [selectedTruckTypes, setSelectedTruckTypes] = useState<string[]>(() => getSearchArray('truck_type', defaultFilters?.truckType).map(truckTypeLabel))
+  const [selectedTruckBodies, setSelectedTruckBodies] = useState<string[]>(() => getSearchArray('truck_body_type', defaultFilters?.truckBodyType).map(truckBodyTypeLabel))
   const [selectedAxles, setSelectedAxles] = useState<number[]>(getSearchArray('axles', defaultFilters?.axles).map(Number).filter(Number.isFinite))
   const [loadCapacityMin, setLoadCapacityMin] = useState<number>(getSearchNumber('load_capacity_min', typeof defaultFilters?.loadCapacityMin === 'number' ? defaultFilters.loadCapacityMin : 0))
   const [loadCapacityMax, setLoadCapacityMax] = useState<number>(getSearchNumber('load_capacity_max', typeof defaultFilters?.loadCapacityMax === 'number' ? defaultFilters.loadCapacityMax : 100000))
@@ -232,6 +233,7 @@ export default function MarketplaceClient({
        mileageMin: mileageMin > 0 ? mileageMin : undefined,
        mileageMax: mileageMax < 300000 ? mileageMax : undefined,
        truckType: selectedTruckTypes.length > 0 ? selectedTruckTypes : undefined,
+       truckBodyType: selectedTruckBodies.length > 0 ? selectedTruckBodies : undefined,
        axles: selectedAxles.length > 0 ? selectedAxles : undefined,
        loadCapacityMin: loadCapacityMin > 0 ? loadCapacityMin : undefined,
        loadCapacityMax: loadCapacityMax < 100000 ? loadCapacityMax : undefined,
@@ -260,6 +262,7 @@ export default function MarketplaceClient({
      if (input.mileageMin) params.set('mileage_min', input.mileageMin.toString())
      if (input.mileageMax) params.set('mileage_max', input.mileageMax.toString())
      if (Array.isArray(input.truckType)) input.truckType.forEach(value => params.append('truck_type', value))
+     if (Array.isArray(input.truckBodyType)) input.truckBodyType.forEach(value => params.append('truck_body_type', value))
      if (Array.isArray(input.axles)) input.axles.forEach(value => params.append('axles', value.toString()))
      if (input.loadCapacityMin) params.set('load_capacity_min', input.loadCapacityMin.toString())
      if (input.loadCapacityMax) params.set('load_capacity_max', input.loadCapacityMax.toString())
@@ -276,7 +279,7 @@ export default function MarketplaceClient({
     setTotal(result.total)
     setTotalPages(Math.max(1, Math.ceil(result.total / result.pageSize)))
     setIsSearching(false)
-  }, [q, selectedBrands, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, priceRange, yearRange, mileageMin, mileageMax, selectedTruckTypes, selectedAxles, loadCapacityMin, loadCapacityMax, selectedCities, selectedState, sort, currentPage, router, pathname, selectedVehicleType, selectedModels, filterOptions])
+  }, [q, selectedBrands, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, priceRange, yearRange, mileageMin, mileageMax, selectedTruckTypes, selectedTruckBodies, selectedAxles, loadCapacityMin, loadCapacityMax, selectedCities, selectedState, sort, currentPage, router, pathname, selectedVehicleType, selectedModels, filterOptions])
 
   useEffect(() => {
     if (!didRunInitialTextSearch.current) {
@@ -295,7 +298,7 @@ export default function MarketplaceClient({
       return
     }
     updateResults({ page: 1 })
-  }, [selectedBrands, selectedModels, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, selectedVehicleType, selectedTruckTypes, selectedAxles, selectedCities, selectedState])
+  }, [selectedBrands, selectedModels, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, selectedVehicleType, selectedTruckTypes, selectedTruckBodies, selectedAxles, selectedCities, selectedState])
 
   useEffect(() => {
     const handleSearchShortcut = (event: KeyboardEvent) => {
@@ -409,6 +412,11 @@ export default function MarketplaceClient({
            <FilterSection title="Tipo de caminhão">
              <div className="flex flex-wrap gap-1.5">
                {['Truck', 'Toco', 'Bitruck', 'Cavalo mecânico'].map(type => <ToggleButton key={type} active={selectedTruckTypes.includes(type)} onClick={() => toggleItem(selectedTruckTypes, type, setSelectedTruckTypes)}>{type}</ToggleButton>)}
+             </div>
+           </FilterSection>
+           <FilterSection title="Carroceria">
+             <div className="flex flex-wrap gap-1.5">
+               {TRUCK_BODY_TYPES.map(body => <ToggleButton key={body.slug} active={selectedTruckBodies.includes(body.label)} onClick={() => toggleItem(selectedTruckBodies, body.label, setSelectedTruckBodies)}>{body.label}</ToggleButton>)}
              </div>
            </FilterSection>
            <FilterSection title="Eixos">

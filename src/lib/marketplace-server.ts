@@ -3,7 +3,7 @@ import { ListingPublic } from '@/lib/marketplace'
 import { getFipePrice } from '@/lib/fipe-api'
 import { normalizePlateFinal, parseFipePriceToNumber } from '@/lib/marketplace'
 import { classifyVehicleCategory, classifyByFuelType } from '@/lib/vehicle-category'
-import { applyTruckQueryFilters } from '@/lib/truck-filters'
+import { applyTruckQueryFilters, expandTruckBodyTypeValues, expandTruckTypeValues } from '@/lib/truck-filters'
 import { normalizeListingImages } from '@/lib/listing-images'
 import {
   FUEL_OPTIONS,
@@ -49,6 +49,7 @@ type ListingQueryInput = {
   fuel?: string | string[]
   color?: string | string[]
   truckType?: string | string[]
+  truckBodyType?: string | string[]
   axles?: number | number[]
   loadCapacityMin?: number
   loadCapacityMax?: number
@@ -79,6 +80,7 @@ export type ListingsPageInput = {
   mileageMin?: number
   mileageMax?: number
   truckType?: string | string[]
+  truckBodyType?: string | string[]
   axles?: number | number[]
   loadCapacityMin?: number
   loadCapacityMax?: number
@@ -447,7 +449,14 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
    if (input.vehicle_type) tableQuery = tableQuery.eq('vehicle_type', input.vehicle_type)
    if (input.city) tableQuery = Array.isArray(input.city) ? tableQuery.in('city', input.city) : tableQuery.ilike('city', input.city)
    if (input.state) tableQuery = tableQuery.ilike('state', input.state)
-   if (input.truckType) tableQuery = Array.isArray(input.truckType) ? tableQuery.in('truck_type', input.truckType) : tableQuery.ilike('truck_type', `%${input.truckType}%`)
+   if (input.truckType) {
+     const truckTypes = expandTruckTypeValues(input.truckType)
+     if (truckTypes.length > 0) tableQuery = tableQuery.in('truck_type', truckTypes)
+   }
+   if (input.truckBodyType) {
+     const truckBodies = expandTruckBodyTypeValues(input.truckBodyType)
+     if (truckBodies.length > 0) tableQuery = tableQuery.in('truck_body_type', truckBodies)
+   }
    if (input.axles) tableQuery = Array.isArray(input.axles) ? tableQuery.in('axles', input.axles) : tableQuery.eq('axles', input.axles)
    if (typeof input.loadCapacityMin === 'number') tableQuery = tableQuery.gte('load_capacity', input.loadCapacityMin)
    if (typeof input.loadCapacityMax === 'number') tableQuery = tableQuery.lte('load_capacity', input.loadCapacityMax)
@@ -736,6 +745,7 @@ export async function fetchPublicSitemapListingsPage({
 
 export type TruckListingFilters = ListingsPageInput & {
   truckType?: string | string[]
+  truckBodyType?: string | string[]
   axles?: number | number[]
   loadCapacityMin?: number
   loadCapacityMax?: number
