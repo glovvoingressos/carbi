@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { existsSync } from 'node:fs'
+import path from 'node:path'
 import Link from 'next/link'
 import { ArrowRight, BadgeCheck, Gauge, MessageCircle, Ruler, TrendingUp, Truck } from 'lucide-react'
 import ListingCard from '@/components/marketplace/ListingCard'
@@ -16,6 +18,9 @@ import {
 } from '@/lib/truck-seo'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
+
+// Foto da hero: entra sozinha quando existir public/images/caminhao-hero.jpg
+const hasHeroPhoto = existsSync(path.join(process.cwd(), 'public', 'images', 'caminhao-hero.jpg'))
 
 export const metadata: Metadata = {
   title: 'Caminhões à venda: truck, bitruck, cavalo mecânico e toco',
@@ -88,35 +93,39 @@ export default async function TruckHomePage() {
 
         {/* ═══ HERO ═══ */}
         <section className="tk-hero">
-          <div className="tk-hero-copy">
-            <p className="tk-hero-eyebrow">Caminhões</p>
-            <h1 className="tk-hero-title">Do toco ao cavalo mecânico, com preço na mesa.</h1>
+          <div className="tk-hero-top">
+            <span className="tk-novelty">Novidade</span>
+            <span className="tk-hero-kicker">Agora a Carbi também tem área de caminhões</span>
+          </div>
+
+          <h1 className="tk-hero-title">Caminhões à venda, do toco ao cavalo mecânico.</h1>
+
+          <div className="tk-hero-row">
             <p className="tk-hero-sub">
-              Compare ano, quilometragem, eixos e capacidade de carga em cada anúncio, com ficha técnica completa e
-              comparação com a tabela FIPE.
+              Compare ano, quilometragem, eixos e capacidade de carga. Ficha técnica completa e comparação com a tabela FIPE em cada anúncio.
             </p>
+            <Link href="/caminhoes/buscar" className="tk-pill">
+              <span className="tk-pill-circle" aria-hidden="true"><ArrowRight size={18} /></span>
+              Ver caminhões à venda
+            </Link>
+          </div>
 
-            <div className="tk-hero-actions">
-              <Link href="/caminhoes/buscar" className="tk-btn tk-btn-primary">
-                Ver caminhões à venda
-                <ArrowRight size={18} aria-hidden="true" />
-              </Link>
-              <Link href="/anunciar-caminhao" className="tk-btn tk-btn-ghost">
-                Anunciar meu caminhão
-              </Link>
-            </div>
-
-            {stats.length > 0 ? (
-              <div className="tk-hero-stats" role="list">
-                {stats.map((stat) => (
-                  <div key={stat.label} className="tk-hero-stat" role="listitem">
-                    <strong>{stat.value}</strong>
-                    <span>{stat.label}</span>
-                  </div>
-                ))}
-              </div>
+          <div className="tk-hero-media">
+            {hasHeroPhoto ? (
+              <img src="/images/caminhao-hero.jpg" alt="Caminhão branco em rodovia" loading="eager" />
             ) : null}
           </div>
+
+          {stats.length > 0 ? (
+            <div className="tk-hero-stats" role="list">
+              {stats.map((stat) => (
+                <div key={stat.label} className="tk-hero-stat" role="listitem">
+                  <strong>{stat.value}</strong>
+                  <span>{stat.label}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
 
           <div className="tk-hero-cards">
             {TRUCK_CATEGORIES.map((category) => {

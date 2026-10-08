@@ -591,114 +591,134 @@
   line-height: 1.65;
 }
 
-/* ══════════════ Home dos caminhões ══════════════ */
+/* ══════════════ Home dos caminhões (redesenho · novidade) ══════════════ */
 
 .tk-hero {
-  display: grid;
-  gap: 20px;
-  padding: 28px 24px;
-  border-radius: 24px;
-  background: var(--tk-steel);
+  padding: clamp(20px, 4vw, 40px) 0 0;
 }
 
-@media (min-width: 900px) {
-  .tk-hero {
-    grid-template-columns: 1.15fr 0.85fr;
-    align-items: center;
-    gap: 32px;
-    padding: 36px 32px;
-  }
+.tk-hero-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
 }
 
-.tk-hero-eyebrow {
-  margin: 0;
-  color: var(--tk-amber-dark);
+.tk-novelty {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--tk-amber);
+  color: var(--tk-ink);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.tk-hero-title {
-  margin: 8px 0 0;
-  max-width: 20ch;
-  font-family: var(--hh-font), sans-serif;
-  font-size: clamp(40px, 9vw, 66px);
+.tk-hero-kicker {
+  color: var(--tk-muted);
+  font-size: 13px;
   font-weight: 600;
-  line-height: 0.98;
-  letter-spacing: -0.01em;
+}
+
+.tk-hero-title {
+  margin: 20px 0 0;
+  max-width: 14ch;
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(56px, 11vw, 132px);
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
   color: var(--tk-ink);
+}
+
+.tk-hero-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 26px;
 }
 
 .tk-hero-sub {
-  margin: 14px 0 0;
-  max-width: 52ch;
+  margin: 0;
+  max-width: 44ch;
   color: var(--tk-muted);
   font-size: 15px;
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
-.tk-hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 22px;
-}
-
-.tk-btn {
+.tk-pill {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 52px;
-  padding: 0 24px;
-  border: 0;
+  gap: 12px;
+  padding: 6px 22px 6px 6px;
   border-radius: 999px;
+  background: var(--tk-ink);
+  color: #ffffff;
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;
-  cursor: pointer;
   transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
 }
 
-.tk-btn-primary {
-  background: var(--tk-ink);
-  color: #ffffff;
+.tk-pill:hover {
+  transform: translateY(-1px);
+  background: #242c33;
 }
 
-.tk-btn-primary:hover {
+.tk-pill-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
   background: var(--tk-amber);
   color: var(--tk-ink);
-  transform: translateY(-1px);
+  transition: transform 0.25s ease;
 }
 
-.tk-btn-ghost {
-  border: 1.5px solid var(--tk-steel-strong);
-  background: #ffffff;
-  color: var(--tk-ink);
+.tk-pill:hover .tk-pill-circle {
+  transform: translateX(3px);
 }
 
-.tk-btn-ghost:hover {
-  border-color: var(--tk-ink);
-  transform: translateY(-1px);
+.tk-hero-media {
+  position: relative;
+  height: clamp(260px, 44vw, 540px);
+  margin-top: 32px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #e6eaee 0%, #c7cfd6 42%, #4a5058 42%, #353a41 100%);
 }
 
-.tk-btn-amber {
-  background: var(--tk-amber);
-  color: var(--tk-ink);
+.tk-hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.tk-btn-amber:hover {
-  background: #ffffff;
-  color: var(--tk-ink);
-  transform: translateY(-1px);
+/* Rodovia em CSS: faixas âmbar, enquanto não há foto do caminhão */
+.tk-hero-media::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24%;
+  height: 8px;
+  background: repeating-linear-gradient(90deg, var(--tk-amber) 0 96px, transparent 96px 200px);
+  opacity: 0.9;
 }
 
 .tk-hero-stats {
   display: flex;
   flex-wrap: wrap;
   gap: 28px;
-  margin-top: 26px;
+  margin-top: 22px;
 }
 
 .tk-hero-stat strong {
@@ -719,6 +739,13 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+  margin-top: 28px;
+}
+
+@media (min-width: 900px) {
+  .tk-hero-cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .tk-hero-card {
@@ -730,7 +757,7 @@
   min-height: 140px;
   padding: 18px;
   border-radius: 24px;
-  background: #ffffff;
+  background: var(--tk-steel);
   color: var(--tk-ink);
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -767,6 +794,44 @@
   right: 16px;
   bottom: 16px;
   color: var(--tk-ink);
+}
+
+.tk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.tk-btn-primary {
+  background: var(--tk-ink);
+  color: #ffffff;
+}
+
+.tk-btn-primary:hover {
+  background: var(--tk-amber);
+  color: var(--tk-ink);
+  transform: translateY(-1px);
+}
+
+.tk-btn-amber {
+  background: var(--tk-amber);
+  color: var(--tk-ink);
+}
+
+.tk-btn-amber:hover {
+  background: #ffffff;
+  color: var(--tk-ink);
+  transform: translateY(-1px);
 }
 
 /* Seções da home */
