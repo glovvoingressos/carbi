@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { BreadcrumbSchema } from '@/components/seo/JSONLD'
+import { BreadcrumbSchema, FAQSchema } from '@/components/seo/JSONLD'
+import { FAQSection } from '@/components/seo/SEOContentSection'
 import { serializeJsonLd, truckBrandSlug, truckCollectionJsonLd, truckListingMetadata, TRUCK_BRANDS } from '@/lib/truck-seo'
 
 export const metadata: Metadata = {
   ...truckListingMetadata('/caminhoes/marcas'),
   title: 'Caminhões por marca à venda',
-  description: 'Encontre caminhões usados e seminovos por marca: Mercedes-Benz, Volvo, Scania, Volkswagen, Ford e Iveco.',
+  description:
+    'Encontre caminhões usados e seminovos por marca: Mercedes-Benz, Volvo, Scania, Volkswagen, Ford e Iveco. Compare preço, ano, km e capacidade.',
   alternates: { canonical: '/caminhoes/marcas' },
 }
 
@@ -18,6 +20,25 @@ const BRAND_COPY: Record<string, string> = {
   Ford: 'Modelos de entrada e médios, com boa oferta de peças no mercado.',
   Iveco: 'Caminhões leves, médios e pesados para diferentes tipos de carga.',
 }
+
+const BRAND_FAQ = [
+  {
+    q: 'Como escolher a marca do caminhão usado?',
+    a: 'Comece pelo trabalho que o veículo vai fazer: tipo de carroceria, capacidade de carga e distância percorrida. Depois compare preço, disponibilidade de peças e assistência na região onde o caminhão vai circular.',
+  },
+  {
+    q: 'Qual a melhor marca de caminhão para longa distância?',
+    a: 'Cavalos mecânicos e trucks de cabine com beliche dominam as rotas longas. Entre os anúncios da Carbi você filtra por categoria, eixos e capacidade para comparar os modelos disponíveis em cada marca.',
+  },
+  {
+    q: 'Consigo comparar caminhões de marcas diferentes?',
+    a: 'Sim. Cada anúncio mostra preço, ano, quilometragem, capacidade de carga e comparação com a tabela FIPE, o que permite comparar modelos de marcas diferentes com as mesmas referências.',
+  },
+  {
+    q: 'Anunciar caminhão de qualquer marca é grátis?',
+    a: 'Sim. O anúncio é gratuito para qualquer marca e categoria, com ficha técnica completa, fotos e chat interno para negociar.',
+  },
+]
 
 export default function TruckBrandsPage() {
   const jsonLd = truckCollectionJsonLd({ url: '/caminhoes/marcas', name: 'Caminhões por marca', listings: [] })
@@ -33,6 +54,7 @@ export default function TruckBrandsPage() {
           ]}
         />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
+        <FAQSchema items={BRAND_FAQ} />
 
         <section className="cbi-hero">
           <div className="cbi-hero-eyebrow">Caminhões</div>
@@ -57,10 +79,17 @@ export default function TruckBrandsPage() {
           <p className="truck-hub-text">
             Escolha a marca para comparar preço, ano, quilometragem, capacidade e localização dos anúncios ativos. Você também
             pode <Link className="underline" href="/caminhoes/buscar">ver todos os caminhões</Link> e filtrar por categoria,
-            como <Link className="underline" href="/caminhoes/cavalo-mecanico">cavalos mecânicos</Link> e{' '}
-            <Link className="underline" href="/caminhoes/bitruck">bitrucks</Link>.
+            como <Link className="underline" href="/caminhoes/cavalo-mecanico">cavalos mecânicos</Link>,{' '}
+            <Link className="underline" href="/caminhoes/bitruck">bitrucks</Link>,{' '}
+            <Link className="underline" href="/caminhoes/truck">trucks</Link> e{' '}
+            <Link className="underline" href="/caminhoes/toco">tocos</Link>, ou por carroceria —{' '}
+            <Link className="underline" href="/caminhoes/caminhoes-bau">baú</Link>,{' '}
+            <Link className="underline" href="/caminhoes/caminhoes-sider">sider</Link> e{' '}
+            <Link className="underline" href="/caminhoes/caminhoes-graneleiro">graneleiro</Link>.
           </p>
         </section>
+
+        <FAQSection items={BRAND_FAQ} />
       </div>
     </main>
   )

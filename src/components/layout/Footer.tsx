@@ -22,6 +22,14 @@ export default function Footer() {
             <Link href="/carros/eletricos">Elétricos</Link>
           </div>
           <div className="ref-footer-col">
+            <h5>Caminhões</h5>
+            <Link href="/caminhoes">Caminhões à venda</Link>
+            <Link href="/caminhoes/cavalo-mecanico">Cavalos mecânicos</Link>
+            <Link href="/caminhoes/marcas">Marcas de caminhão</Link>
+            <Link href="/caminhoes/categorias">Categorias</Link>
+            <Link href="/vender-caminhao">Anunciar caminhão</Link>
+          </div>
+          <div className="ref-footer-col">
             <h5>Vender</h5>
             <Link href="/anunciar-carro">Anunciar grátis</Link>
             <Link href="/vender-carro">Venda direta</Link>

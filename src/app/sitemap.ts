@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-import { MARKETPLACE_SEO_SLUGS, MAJOR_CITIES, buildTruckSeoPaths } from '@/lib/marketplace-seo'
+import { MARKETPLACE_SEO_SLUGS, MAJOR_CITIES } from '@/lib/marketplace-seo'
 import { TRUCK_SEO_SLUGS, TRUCK_BRANDS, TRUCK_YEAR_SLUGS, truckBrandSlug } from '@/lib/truck-seo'
 import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import { slugifyBrand } from '@/lib/brand-utils'
@@ -22,6 +22,7 @@ const CORE_PAGES: Array<{ path: string; priority: number; freq: 'daily' | 'weekl
   { path: '/vender-carro-bh', priority: 0.85, freq: 'weekly' },
   { path: '/vender-carro-belo-horizonte', priority: 0.85, freq: 'weekly' },
   { path: '/vender-carro-rapido', priority: 0.9, freq: 'weekly' },
+  { path: '/vender-caminhao', priority: 0.95, freq: 'weekly' },
   { path: '/carros-usados-bh', priority: 0.85, freq: 'weekly' },
   { path: '/marcas', priority: 0.8, freq: 'weekly' },
   { path: '/qual-carro', priority: 0.8, freq: 'weekly' },
@@ -105,12 +106,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
-  // Hub de marcas de caminhão (as categorias já entram como presets de SEO abaixo)
-  for (const path of buildTruckSeoPaths().brands.slice(1)) {
-    entries.push({ url: `${SITE_URL}${path}`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 })
-  }
-
   // Páginas de aterrissagem de SEO de caminhão (mesmo modelo de /carros/[slug])
+  // Inclui marca-* e cidade-*; as categorias já entram como presets.
   for (const slug of TRUCK_SEO_SLUGS) {
     entries.push({
       url: `${SITE_URL}/caminhoes/${slug}`,

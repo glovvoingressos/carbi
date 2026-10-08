@@ -2137,7 +2137,7 @@ p {
 .ref-footer-brand .logo { display: flex; align-items: center; text-decoration: none; margin-bottom: 16px; line-height: 0; }
 .ref-footer-brand p { font-family: var(--font-sans); font-size: 14px; color: rgba(255,255,255,.5); line-height: 1.7; max-width: 280px; }
 .ref-footer-verified { font-family: var(--font-heading); display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; font-size: 12px; color: var(--chartreuse); }
-.ref-footer-cols { display: flex; gap: 60px; }
+.ref-footer-cols { display: flex; flex-wrap: wrap; gap: 60px 60px; row-gap: 32px; }
 .ref-footer-col h5 { font-family: var(--font-heading); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,.35); margin-bottom: 20px; }
 .ref-footer-col a { font-family: var(--font-sans); display: block; color: rgba(255,255,255,.65); text-decoration: none; font-size: 14px; margin-bottom: 12px; transition: color .15s; }
 .ref-footer-col a:hover { color: var(--white); }
