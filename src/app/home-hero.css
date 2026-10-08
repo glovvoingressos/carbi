@@ -855,3 +855,73 @@
 .cb-build-card.cb-build-card-featured.cb-build-card-dark .cb-build-cta {
   color: #111111;
 }
+
+/* ══════════════════════════════════════════════
+   Cabeçalho da lista de anúncios
+   ("Os anúncios mais procurados desta semana" + "Ver todos os carros" + ordenação)
+   O seletor .cb-wrap aumenta a especificidade para vencer os ajustes de 23px
+   que o globals.css aplica em .cb-head h2 até 760px.
+   ══════════════════════════════════════════════ */
+.cb-wrap .cb-head h2 {
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(40px, 9vw, 64px);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  color: #111111;
+}
+
+.cb-wrap .cb-head-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1.5px solid #dcdcd8;
+  border-radius: 999px;
+  color: #111111;
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.cb-wrap .cb-head-link:hover {
+  border-color: #111111;
+  background: #f8f8f8;
+}
+
+/* "Ordenar por" */
+#home-listing-sort-label {
+  color: #5f5f5c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Select de ordenação na mesma pílula cinza dos campos da home */
+#home-listing-sort {
+  height: 48px;
+  min-height: 48px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: #efefec;
+  color: #111111;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+#home-listing-sort:hover {
+  background: #e6e6e3;
+}
+
+#home-listing-sort:focus-visible {
+  border-color: #111111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-wrap .cb-head-link,
+  #home-listing-sort {
+    transition: none;
+  }
+}

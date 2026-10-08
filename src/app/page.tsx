@@ -126,7 +126,7 @@ export default async function HomePage() {
       <HomeFeaturedListing listing={featuredListing} />
 
       {/* ═══ LISTINGS TABLE ═══ */}
-      <section className="cb-section-pad">
+      <section className={`cb-section-pad ${heroFont.variable}`}>
         <div className="cb-wrap">
           <div className="cb-head">
             <div>
