@@ -12,6 +12,14 @@ import type { PlacaApiResponse } from '@/lib/integrations/placaapi/types'
 import PlateInput from '@/components/marketplace/PlateInput'
 import ListingStepper from '@/components/marketplace/ListingStepper'
 import {
+  ACCOUNT_INITIAL,
+  ACCOUNT_INPUT_IDS,
+  formatCPF,
+  formatPhone,
+  getAccountErrors as getAccountErrorsShared,
+  type AccountField,
+} from '@/components/marketplace/account-fields'
+import {
   LISTING_ALLOWED_TYPES,
   LISTING_MAX_IMAGES,
   LISTING_MAX_IMAGE_SIZE_MB,
@@ -181,35 +189,6 @@ const INITIAL_STATE: FormState = {
   truck_category: '',
   structured_data: {},
 
-}
-
-const ACCOUNT_INITIAL = { name: '', phone: '', cpf: '', email: '', password: '', confirmPassword: '' }
-
-function formatCPF(v: string) {
-  const d = v.replace(/\D/g, '').slice(0, 11)
-  return d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
-}
-
-function formatPhone(v: string) {
-  const d = v.replace(/\D/g, '').slice(0, 11)
-  return d.length <= 10
-    ? d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2')
-    : d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2')
-}
-
-function isValidCPF(cpf: string) {
-  const d = cpf.replace(/\D/g, '')
-  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false
-  let s = 0
-  for (let i = 0; i < 9; i++) s += parseInt(d[i]) * (10 - i)
-  let r = (s * 10) % 11
-  if (r === 10) r = 0
-  if (r !== parseInt(d[9])) return false
-  s = 0
-  for (let i = 0; i < 10; i++) s += parseInt(d[i]) * (11 - i)
-  r = (s * 10) % 11
-  if (r === 10) r = 0
-  return r === parseInt(d[10])
 }
 
 const EMPTY_TECHNICAL: TechnicalSnapshot = {
@@ -959,30 +938,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     setListingSubStep(2)
   }
 
-  const getAccountErrors = (): Array<{ key: keyof typeof ACCOUNT_INITIAL; message: string }> => {
-    const errors: Array<{ key: keyof typeof ACCOUNT_INITIAL; message: string }> = []
-    if (account.name.trim().length < 3) errors.push({ key: 'name', message: 'Informe seu nome completo.' })
-    if (account.phone.replace(/\D/g, '').length < 10) errors.push({ key: 'phone', message: 'Informe um telefone válido.' })
-    if (!isValidCPF(account.cpf)) errors.push({ key: 'cpf', message: 'Informe um CPF válido.' })
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(account.email.trim())) errors.push({ key: 'email', message: 'Informe um e-mail válido.' })
-    if (
-      account.password.length < 8 ||
-      !/[A-Z]/.test(account.password) ||
-      !/\d/.test(account.password) ||
-      !/[^A-Za-z0-9]/.test(account.password)
-    ) errors.push({ key: 'password', message: 'A senha deve ter 8+ caracteres, com letra maiúscula, número e símbolo.' })
-    if (account.password !== account.confirmPassword) errors.push({ key: 'confirmPassword', message: 'As senhas não coincidem.' })
-    return errors
-  }
-
-  const ACCOUNT_INPUT_IDS: Record<keyof typeof ACCOUNT_INITIAL, string> = {
-    name: 'account-name',
-    phone: 'account-phone',
-    cpf: 'account-cpf',
-    email: 'account-email',
-    password: 'account-password',
-    confirmPassword: 'account-confirm',
-  }
+  const getAccountErrors = (): Array<{ key: AccountField; message: string }> => getAccountErrorsShared(account)
 
   const handleSubmit = async () => {
     if (saving) return

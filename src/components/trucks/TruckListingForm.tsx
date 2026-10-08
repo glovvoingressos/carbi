@@ -1,11 +1,21 @@
 'use client'
 
-import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { AlertCircle, ArrowRight, Camera, Check, Loader2, X } from 'lucide-react'
-import AuthCard from '@/components/marketplace/AuthCard'
 import ListingStepper from '@/components/marketplace/ListingStepper'
 import PlateInput from '@/components/marketplace/PlateInput'
+import {
+  ACCOUNT_INITIAL,
+  ACCOUNT_INPUT_IDS,
+  formatCPF,
+  formatPhone,
+  getAccountErrors,
+  type AccountErrors,
+  type AccountField,
+  type AccountForm,
+} from '@/components/marketplace/account-fields'
 import { normalizePlateFinal } from '@/lib/marketplace'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import { TRUCK_CATEGORIES } from '@/lib/truck-seo'
@@ -125,11 +135,52 @@ export default function TruckListingForm() {
   const [formError, setFormError] = useState<string | null>(null)
   const [details, setDetails] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
-  const [needsAuth, setNeedsAuth] = useState(false)
+  // Sem conta: a etapa 3 vira revisão e a etapa 4 é o cadastro.
+  // Enquanto a sessão não for confirmada, já assume que falta a conta.
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const [account, setAccount] = useState<AccountForm>(ACCOUNT_INITIAL)
+  const [accountErrors, setAccountErrors] = useState<AccountErrors>({})
+  const [accountEmailExists, setAccountEmailExists] = useState(false)
+
+  const needsAccount = isAuthenticated !== true
+
+  useEffect(() => {
+    if (!isSupabaseBrowserConfigured()) {
+      setIsAuthenticated(false)
+      return
+    }
+
+    let unsubscribe: (() => void) | null = null
+    let active = true
+
+    const boot = async () => {
+      const supabase = getSupabaseBrowserClient()
+      const { data } = await supabase.auth.getSession().catch(() => ({ data: { session: null } }))
+      if (active) setIsAuthenticated(!!data.session)
+
+      const { data: authData } = supabase.auth.onAuthStateChange((_event: string, session: { access_token?: string } | null) => {
+        if (active) setIsAuthenticated(!!session)
+      })
+      unsubscribe = () => authData.subscription.unsubscribe()
+    }
+
+    void boot()
+
+    return () => {
+      active = false
+      unsubscribe?.()
+    }
+  }, [])
 
   const set = (field: keyof TruckForm) => (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [field]: event.target.value }))
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }))
+  }
+
+  const setAccountField = (field: AccountField, value: string) => {
+    setAccount((prev) => ({ ...prev, [field]: value }))
+    setAccountEmailExists(false)
+    if (accountErrors[field]) setAccountErrors((prev) => ({ ...prev, [field]: undefined }))
   }
 
   const goTo = (next: number) => {
@@ -242,6 +293,46 @@ export default function TruckListingForm() {
     }
   }
 
+  /** Cria a conta e entra. Retorna a mensagem de erro, ou null em sucesso. */
+  const createAccount = async (): Promise<string | null> => {
+    const found = getAccountErrors(account)
+    if (found.length > 0) {
+      const mapped: AccountErrors = Object.fromEntries(found.map((item) => [item.key, item.message]))
+      setAccountErrors(mapped)
+      window.setTimeout(() => document.getElementById(ACCOUNT_INPUT_IDS[found[0].key])?.focus(), 0)
+      return found[0].message
+    }
+    setAccountErrors({})
+
+    const signupRes = await fetch('/api/auth/signup-publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: account.email.trim().toLowerCase(),
+        password: account.password,
+        full_name: account.name.trim(),
+        phone: account.phone.replace(/\D/g, ''),
+        cpf: account.cpf.replace(/\D/g, ''),
+      }),
+    })
+    if (signupRes.status === 409) {
+      setAccountEmailExists(true)
+      return 'Este e-mail já está cadastrado. Faça login para publicar seu anúncio.'
+    }
+    if (!signupRes.ok) {
+      const body = await signupRes.json().catch(() => ({}))
+      return body?.error || 'Não foi possível criar sua conta.'
+    }
+
+    const { error: signInError } = await getSupabaseBrowserClient().auth.signInWithPassword({
+      email: account.email.trim().toLowerCase(),
+      password: account.password,
+    })
+    if (signInError) return 'Conta criada, mas não foi possível entrar automaticamente. Faça login para publicar.'
+    setIsAuthenticated(true)
+    return null
+  }
+
   const publish = async () => {
     setFormError(null)
     setDetails([])
@@ -256,7 +347,9 @@ export default function TruckListingForm() {
       const supabase = getSupabaseBrowserClient()
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.access_token || !session.user?.id) {
-        setNeedsAuth(true)
+        setIsAuthenticated(false)
+        setStep(4)
+        setFormError('Entre ou crie sua conta para publicar. Seus dados do anúncio continuam preenchidos.')
         return
       }
       const headers = { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' }
@@ -320,16 +413,41 @@ export default function TruckListingForm() {
     }
   }
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
-    if (step === 3) void publish()
-    else handleNext()
+    if (saving) return
+    if (step < 3) {
+      handleNext()
+      return
+    }
+    if (step === 3 && needsAccount) {
+      goTo(4)
+      return
+    }
+
+    setSaving(true)
+    try {
+      if (needsAccount) {
+        const accountError = await createAccount()
+        if (accountError) {
+          setFormError(accountError)
+          return
+        }
+      }
+      await publish()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
     <>
       <form className="space-y-6 w-full pb-4" onSubmit={handleSubmit} aria-busy={saving} noValidate>
-      <ListingStepper currentStep={step} onStepChange={(target) => { if (target < step) goTo(target) }} />
+      <ListingStepper
+        currentStep={step}
+        showAccountStep={needsAccount || step === 4}
+        onStepChange={(target) => { if (target < step) goTo(target) }}
+      />
 
       {step === 1 ? (
         <div className="space-y-6">
@@ -477,8 +595,12 @@ export default function TruckListingForm() {
       {step === 3 ? (
         <div className="space-y-6">
           <div>
-            <h2 className="tfp-section-title">Confira e publique</h2>
-            <p className="tfp-section-sub">Veja como o anúncio vai aparecer antes de publicar.</p>
+            <h2 className="tfp-section-title">{needsAccount ? 'Confira antes de continuar' : 'Confira e publique'}</h2>
+            <p className="tfp-section-sub">
+              {needsAccount
+                ? 'Revise os dados do caminhão. Na próxima etapa você cria sua conta e publica.'
+                : 'Veja como o anúncio vai aparecer antes de publicar.'}
+            </p>
           </div>
 
           <div className="fingen-flow-substep-card p-3 sm:p-5">
@@ -504,6 +626,139 @@ export default function TruckListingForm() {
         </div>
       ) : null}
 
+      {step === 4 ? (
+        <div className="space-y-6">
+          <div>
+            <h2 className="tfp-section-title">Crie sua conta</h2>
+            <p className="tfp-section-sub">Última etapa: seus dados do anúncio ficam guardados e a publicação é imediata.</p>
+          </div>
+
+          <div className="fingen-flow-substep-card p-3 sm:p-5">
+            {accountEmailExists ? (
+              <div className="rounded-xl p-4 bg-[#FEF2F2] border border-[#FECACA] space-y-3">
+                <p className="text-sm text-[#B91C1C] font-medium">
+                  Este e-mail já está cadastrado. Entre na sua conta para publicar.
+                </p>
+                <Link
+                  href="/entrar?redirect=/caminhoes/anunciar"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#1A1A1A] text-white text-sm font-semibold px-5 py-2.5 hover:bg-[#2D2D2D]"
+                >
+                  Entrar na minha conta
+                </Link>
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-medium text-[#767676]" htmlFor="account-name">Nome completo</label>
+                  <input
+                    id="account-name"
+                    className="fingen-flow-input mt-1"
+                    placeholder="Seu nome completo"
+                    autoComplete="name"
+                    value={account.name}
+                    onChange={(e) => setAccountField('name', e.target.value)}
+                    aria-invalid={accountErrors.name ? true : undefined}
+                    aria-describedby={accountErrors.name ? 'account-name-error' : undefined}
+                  />
+                  {accountErrors.name ? <p id="account-name-error" className="listing-field-error">{accountErrors.name}</p> : null}
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-[#767676]" htmlFor="account-phone">Telefone</label>
+                  <input
+                    id="account-phone"
+                    className="fingen-flow-input mt-1"
+                    placeholder="(00) 00000-0000"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    value={account.phone}
+                    onChange={(e) => setAccountField('phone', formatPhone(e.target.value))}
+                    aria-invalid={accountErrors.phone ? true : undefined}
+                    aria-describedby={accountErrors.phone ? 'account-phone-error' : undefined}
+                  />
+                  {accountErrors.phone ? <p id="account-phone-error" className="listing-field-error">{accountErrors.phone}</p> : null}
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-[#767676]" htmlFor="account-cpf">CPF</label>
+                  <input
+                    id="account-cpf"
+                    className="fingen-flow-input mt-1"
+                    placeholder="000.000.000-00"
+                    maxLength={14}
+                    autoComplete="off"
+                    value={account.cpf}
+                    onChange={(e) => setAccountField('cpf', formatCPF(e.target.value))}
+                    aria-invalid={accountErrors.cpf ? true : undefined}
+                    aria-describedby={accountErrors.cpf ? 'account-cpf-error' : undefined}
+                  />
+                  {accountErrors.cpf ? <p id="account-cpf-error" className="listing-field-error">{accountErrors.cpf}</p> : null}
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-medium text-[#767676]" htmlFor="account-email">E-mail</label>
+                  <input
+                    id="account-email"
+                    type="email"
+                    className="fingen-flow-input mt-1"
+                    placeholder="voce@email.com"
+                    autoComplete="email"
+                    value={account.email}
+                    onChange={(e) => setAccountField('email', e.target.value)}
+                    aria-invalid={accountErrors.email ? true : undefined}
+                    aria-describedby={accountErrors.email ? 'account-email-error' : undefined}
+                  />
+                  {accountErrors.email ? <p id="account-email-error" className="listing-field-error">{accountErrors.email}</p> : null}
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-[#767676]" htmlFor="account-password">Senha</label>
+                  <input
+                    id="account-password"
+                    type="password"
+                    className="fingen-flow-input mt-1"
+                    placeholder="Crie uma senha"
+                    autoComplete="new-password"
+                    value={account.password}
+                    onChange={(e) => setAccountField('password', e.target.value)}
+                    aria-invalid={accountErrors.password ? true : undefined}
+                    aria-describedby={accountErrors.password ? 'account-password-error' : undefined}
+                  />
+                  {accountErrors.password ? <p id="account-password-error" className="listing-field-error">{accountErrors.password}</p> : null}
+                  <p className="mt-1 text-[11px] leading-relaxed text-[#767676]">Use 8+ caracteres, com uma letra maiúscula, um número e um símbolo.</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-[#767676]" htmlFor="account-confirm">Confirmar senha</label>
+                  <input
+                    id="account-confirm"
+                    type="password"
+                    className="fingen-flow-input mt-1"
+                    placeholder="Repita a senha"
+                    autoComplete="new-password"
+                    value={account.confirmPassword}
+                    onChange={(e) => setAccountField('confirmPassword', e.target.value)}
+                    aria-invalid={accountErrors.confirmPassword ? true : undefined}
+                    aria-describedby={accountErrors.confirmPassword ? 'account-confirm-error' : undefined}
+                  />
+                  {accountErrors.confirmPassword ? <p id="account-confirm-error" className="listing-field-error">{accountErrors.confirmPassword}</p> : null}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <p className="text-[13px] text-[#767676]">
+            Já tem conta?{' '}
+            <Link href="/entrar?redirect=/caminhoes/anunciar" className="font-semibold text-[#111] underline underline-offset-2">
+              Entrar
+            </Link>
+          </p>
+        </div>
+      ) : null}
+
+      {/* Erro da publicação/conta: aparece na revisão e na etapa 4. */}
+      {formError && step !== 3 ? (
+        <div className="rounded-2xl border border-[#FECACA] bg-[#FEF2F2] p-4 text-sm text-[#B91C1C]" role="alert">
+          <p className="font-semibold">{formError}</p>
+          {details.length > 0 ? <ul className="mt-2 list-disc pl-5">{details.map((detail) => <li key={detail}>{detail}</li>)}</ul> : null}
+        </div>
+      ) : null}
+
       <div className="mt-10 border-t border-[#EAEAEA] pt-8">
         <div className="flex flex-col-reverse justify-between gap-4 sm:flex-row">
           {step > 1 ? (
@@ -513,26 +768,27 @@ export default function TruckListingForm() {
           ) : <div />}
 
           {step < 3 ? (
-            <button type="submit" className="tfp-btn-primary listing-next-step-button">
+            <button type="submit" className="tfp-btn-primary listing-next-step-button" disabled={saving}>
               Próxima etapa <ArrowRight size={17} aria-hidden="true" />
             </button>
-          ) : !needsAuth ? (
+          ) : step === 3 && needsAccount ? (
+            <button type="submit" className="tfp-btn-primary listing-next-step-button" disabled={saving}>
+              Próxima etapa <ArrowRight size={17} aria-hidden="true" />
+            </button>
+          ) : step === 4 ? (
+            <button type="submit" className="tfp-btn-primary listing-final-submit-button" disabled={saving}>
+              {saving ? <Loader2 size={17} className="animate-spin" aria-hidden="true" /> : <Check size={17} aria-hidden="true" />}
+              {saving ? 'Publicando…' : 'Criar conta e publicar'}
+            </button>
+          ) : (
             <button type="submit" className="tfp-btn-primary listing-final-submit-button" disabled={saving}>
               {saving ? <Loader2 size={17} className="animate-spin" aria-hidden="true" /> : <Check size={17} aria-hidden="true" />}
               {saving ? 'Publicando…' : 'Publicar anúncio grátis'}
             </button>
-          ) : null}
+          )}
         </div>
       </div>
       </form>
-
-      {/* Fora do <form>: o AuthCard renderiza o próprio <form> de login. */}
-      {needsAuth ? (
-        <div className="space-y-3 pt-6">
-          <p className="text-sm text-[#5f5f5c]">Entre ou crie sua conta para publicar. O anúncio continua preenchido.</p>
-          <AuthCard onAuthenticated={() => { setNeedsAuth(false); void publish() }} />
-        </div>
-      ) : null}
     </>
   )
 }

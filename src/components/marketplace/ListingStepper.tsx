@@ -9,18 +9,23 @@ const STEPS = [
   { id: 3, label: 'Revisão', description: 'Confira e publique' },
 ] as const
 
+const ACCOUNT_STEP = { id: 4, label: 'Conta', description: 'Cadastro rápido' } as const
+
 interface ListingStepperProps {
   currentStep: number
   onStepChange: (step: number) => void
+  /** Acrescenta a 4ª etapa (conta), usada quando o usuário não está logado. */
+  showAccountStep?: boolean
 }
 
-export default function ListingStepper({ currentStep, onStepChange }: ListingStepperProps) {
+export default function ListingStepper({ currentStep, onStepChange, showAccountStep = false }: ListingStepperProps) {
   const shouldReduceMotion = useReducedMotion()
+  const steps = showAccountStep ? [...STEPS, ACCOUNT_STEP] : STEPS
 
   return (
     <nav className="listing-stepper" aria-label="Progresso do anúncio">
       <ol className="listing-stepper-row">
-        {STEPS.map((step, index) => {
+        {steps.map((step, index) => {
           const isComplete = currentStep > step.id
           const isActive = currentStep === step.id
           const isLocked = currentStep < step.id
@@ -49,7 +54,7 @@ export default function ListingStepper({ currentStep, onStepChange }: ListingSte
                 </span>
               </button>
 
-              {index < STEPS.length - 1 ? (
+              {index < steps.length - 1 ? (
                 <span className="listing-stepper-connector" aria-hidden="true">
                   <motion.span
                     initial={false}

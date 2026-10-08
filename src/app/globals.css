@@ -1511,7 +1511,9 @@ p {
   .listing-stepper-button { flex-direction: column; gap: 6px; align-items: center; text-align: center; }
   .listing-stepper-copy { justify-items: center; }
   .listing-stepper-copy strong { font-size: 11px; }
-  .listing-stepper-copy small { font-size: 10px; }
+  /* Com 4 etapas cada nó fica ~90px: a descrição precisa quebrar linha
+     para não vazar por cima do vizinho. */
+  .listing-stepper-copy small { font-size: 10px; white-space: normal; text-align: center; }
   .listing-stepper-connector { margin-inline: 6px; margin-top: 15px; }
 }
 
