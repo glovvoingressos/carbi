@@ -111,7 +111,7 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
 
 function ToggleButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" onClick={onClick} className={`cbi-toggle${active ? ' on' : ''}`}>
+    <button type="button" onClick={onClick} aria-pressed={active} className={`cbi-toggle${active ? ' on' : ''}`}>
       {children}
     </button>
   )
@@ -119,7 +119,7 @@ function ToggleButton({ active, onClick, children }: { active: boolean; onClick:
 
 function CheckboxRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
   return (
-    <button type="button" onClick={onChange} className={`cbi-check${checked ? ' on' : ''}`}>
+    <button type="button" role="checkbox" aria-checked={checked} onClick={onChange} className={`cbi-check${checked ? ' on' : ''}`}>
       <span className="box">{checked && <Check className="w-3 h-3 text-white" strokeWidth={3} aria-hidden="true" />}</span>
       {label}
     </button>
@@ -404,6 +404,9 @@ export default function MarketplaceClient({
           <ToggleButton active={selectedVehicleType === 'car'} onClick={() => setSelectedVehicleType(selectedVehicleType === 'car' ? '' : 'car')}>
             Carro
           </ToggleButton>
+          <ToggleButton active={selectedVehicleType === 'truck'} onClick={() => setSelectedVehicleType(selectedVehicleType === 'truck' ? '' : 'truck')}>
+            Caminhão
+          </ToggleButton>
         </div>
       </FilterSection>
 
@@ -538,7 +541,10 @@ export default function MarketplaceClient({
         </FilterSection>
       )}
 
-      {canonicalFilterOptions.bodyTypes.length > 0 && (
+      {/* Em caminhão a coluna body_type é sempre "Caminhão": os rótulos de
+          carro (SUV, Sedã…) só gerariam lista vazia. A carroceria real fica
+          em truck_body_type, no bloco próprio do topo. */}
+      {selectedVehicleType !== 'truck' && canonicalFilterOptions.bodyTypes.length > 0 && (
         <FilterSection title="Carroceria">
           <div className="flex flex-wrap gap-1.5">
             {canonicalFilterOptions.bodyTypes.map(bt => (
