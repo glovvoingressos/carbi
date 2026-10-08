@@ -4,6 +4,8 @@ import MarketplaceClient from '@/components/marketplace/MarketplaceClient'
 import { fetchPublicListingsPage, ListingSort, getFilterOptions } from '@/lib/marketplace-server'
 import { BreadcrumbSchema } from '@/components/seo/JSONLD'
 import { FAQSection } from '@/components/seo/SEOContentSection'
+import { heroFont } from '@/components/home/home-font'
+import './marketplace.css'
 
 export async function generateMetadata({
   searchParams,
@@ -110,7 +112,7 @@ export default async function CarrosAVendaPage({
   const totalPages = Math.max(1, Math.ceil(result.total / result.pageSize))
 
   return (
-    <div className="cbi-page">
+    <div className={`cbi-page ${heroFont.variable}`}>
       <main className="cbi-main">
         <BreadcrumbSchema items={[
           { name: 'Home', url: '/' },
@@ -119,7 +121,6 @@ export default async function CarrosAVendaPage({
 
         {/* Minimalist Hero */}
         <section className="cbi-hero">
-          <div className="cbi-hero-eyebrow">Marketplace</div>
           <h1 className="cbi-hero-title">
             {query ? (
               <>Resultados para <em>&ldquo;{query}&rdquo;</em></>

@@ -1,0 +1,405 @@
+/* Design da home (hero + cards de anúncio) aplicado à página /carros-a-venda.
+   Só UI/UX: fontes, cores, raios, toque e foco — nenhuma lógica de busca/filtro.
+   Escopo em .cbi-page e importado apenas nesta rota: as outras páginas que usam
+   .cbi-page (caminhões, detalhe de anúncio) continuam como estão. */
+
+/* ── Base: fundo branco como a home ── */
+.cbi-page {
+  background: #ffffff;
+  color: #111111;
+}
+
+/* ── Hero ── */
+.cbi-hero {
+  border: 0;
+  background: #f8f8f8;
+}
+
+.cbi-hero::after {
+  background: #f2803f;
+}
+
+.cbi-hero-title {
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(40px, 10vw, 64px);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  color: #111111;
+}
+
+.cbi-hero-title em {
+  color: #f2803f;
+}
+
+.cbi-hero-sub {
+  color: #5a5a5a;
+  font-size: 15px;
+  max-width: 56ch;
+}
+
+/* ── Barra de busca e ordenação: pílula cinza ── */
+.cbi-search input {
+  height: 48px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: #efefec;
+  font-size: 16px; /* evita o zoom automático do iOS */
+  color: #111111;
+}
+
+.cbi-search input::placeholder {
+  color: #8a8a84;
+}
+
+.cbi-search input:focus {
+  border-color: #111111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.16);
+}
+
+.cbi-search svg {
+  color: #76766f;
+  left: 16px;
+}
+
+.cbi-toolbar[data-searching='true'] .cbi-search::after {
+  background: #f2803f;
+}
+
+.cbi-select {
+  height: 48px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: #efefec;
+  font-size: 15px;
+  color: #111111;
+}
+
+.cbi-select:focus {
+  border-color: #111111;
+}
+
+.cbi-filter-btn {
+  height: 48px;
+  border: 1.5px solid #dcdcd8;
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 15px;
+}
+
+.cbi-filter-btn:hover {
+  border-color: #111111;
+}
+
+.cbi-filter-count {
+  background: #f2803f;
+  color: #111111;
+}
+
+/* ── Filtros rápidos: pílula com alvo de toque ── */
+.cbi-quick-label {
+  color: #76766f;
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.cbi-quick-filter {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid #e4e4e1;
+  background: #ffffff;
+  color: #3f3f3c;
+  font-size: 13px;
+}
+
+.cbi-quick-filter:hover {
+  border-color: #111111;
+  color: #111111;
+}
+
+.cbi-quick-filter.is-active {
+  border-color: #111111;
+  background: #111111;
+  color: #ffffff;
+}
+
+/* ── Painel de filtros lateral ── */
+.cbi-side-title {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.cbi-clear {
+  color: #5f5f5c;
+  font-size: 12px;
+}
+
+.cbi-clear:hover {
+  color: #111111;
+}
+
+.cbi-panel {
+  border: 0;
+  border-radius: 24px;
+  background: #f8f8f8;
+  padding: 18px;
+}
+
+.cbi-fsection {
+  border-top-color: #e9e9e6;
+}
+
+.cbi-fsection h4 {
+  color: #5f5f5c;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.cbi-toggle {
+  min-height: 36px;
+  border: 1.5px solid #e4e4e1;
+  background: #ffffff;
+  font-size: 13px;
+  color: #3f3f3c;
+}
+
+.cbi-toggle:hover {
+  border-color: #111111;
+  color: #111111;
+}
+
+.cbi-toggle.on {
+  border-color: #111111;
+  background: #111111;
+  color: #ffffff;
+}
+
+.cbi-check {
+  min-height: 36px;
+  font-size: 14px;
+  color: #3f3f3c;
+}
+
+.cbi-check:hover,
+.cbi-check.on {
+  color: #111111;
+}
+
+.cbi-check .box {
+  width: 18px;
+  height: 18px;
+  border-color: #cfcfca;
+  background: #ffffff;
+}
+
+.cbi-check.on .box {
+  border-color: #111111;
+  background: #111111;
+}
+
+.cbi-field {
+  height: 44px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: #efefec;
+  font-size: 14px;
+}
+
+.cbi-field:focus {
+  border-color: #111111;
+}
+
+.cbi-range {
+  accent-color: #f2803f;
+}
+
+.cbi-rangelabels {
+  color: #76766f;
+}
+
+.cbi-swatch {
+  width: 30px;
+  height: 30px;
+  border-color: #e4e4e1;
+}
+
+.cbi-swatch.on {
+  border-color: #111111;
+}
+
+/* ── Chips de filtro ativo ── */
+.cbi-chip {
+  height: 32px;
+  padding: 0 12px;
+  background: #111111;
+  font-size: 12px;
+}
+
+.cbi-chip:hover {
+  background: #f2803f;
+  color: #111111;
+}
+
+/* ── Cabeçalho dos resultados ── */
+.cbi-count {
+  color: #5a5a5a;
+  font-size: 14px;
+}
+
+.cbi-count b {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: #111111;
+}
+
+.cbi-count-loading {
+  color: #111111;
+}
+
+.cbi-loading-orb {
+  background: #f2803f;
+  box-shadow: 0 0 0 4px rgba(242, 128, 63, 0.25);
+}
+
+/* ── Cards: mesmo fundo cinza dos anúncios da home ── */
+.cbi-card {
+  background: #f8f8f8;
+  border-radius: 24px;
+}
+
+.cbi-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(17, 17, 17, 0.1);
+}
+
+.cbi-card-body {
+  padding: 16px;
+}
+
+.cbi-card-brand {
+  color: #76766f;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.cbi-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111111;
+  line-height: 1.3;
+}
+
+.cbi-card-price {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1;
+  color: #111111;
+}
+
+.cbi-card-specs span {
+  font-size: 12px;
+  color: #5f5f5c;
+}
+
+.cbi-card-specs svg {
+  color: #a2a29e;
+}
+
+.cbi-card-fav {
+  width: 38px;
+  height: 38px;
+}
+
+/* ── Paginação ── */
+.cbi-pager button {
+  width: 44px;
+  height: 44px;
+  border-color: #e4e4e1;
+}
+
+.cbi-pager button:hover:not(:disabled) {
+  border-color: #111111;
+}
+
+.cbi-pager .info {
+  height: 44px;
+  border-color: #e4e4e1;
+  background: #f8f8f8;
+}
+
+/* ── Estado vazio ── */
+.cbi-empty {
+  border: 0;
+  border-radius: 24px;
+  background: #f8f8f8;
+}
+
+.cbi-empty h3 {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.cbi-empty button {
+  min-height: 52px;
+  padding: 0 28px;
+  background: #111111;
+  font-size: 15px;
+}
+
+.cbi-empty button:hover {
+  background: #f2803f;
+  color: #111111;
+}
+
+/* ── FAQ ── */
+.cbi-section .fingen-section-label {
+  color: #f2803f;
+}
+
+.cbi-section .fingen-section-title {
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(32px, 8vw, 44px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.cbi-section .fingen-card-white {
+  background: #f8f8f8;
+  border: 0;
+  border-radius: 24px;
+}
+
+/* O h3 do FAQ tem estilo inline, por isso !important */
+.cbi-section .fingen-card-white h3 {
+  font-family: var(--hh-font), sans-serif !important;
+  font-size: 21px !important;
+  font-weight: 600 !important;
+  color: #111111 !important;
+}
+
+/* ── Foco visível (o antigo era roxo, fora da paleta) ── */
+.cbi-page a:focus-visible,
+.cbi-page button:focus-visible,
+.cbi-page input:focus-visible,
+.cbi-page select:focus-visible {
+  outline: 3px solid #111111;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cbi-page .cbi-card,
+  .cbi-page .cbi-quick-filter,
+  .cbi-page .cbi-hero-title,
+  .cbi-page .cbi-hero-sub {
+    transition: none;
+    animation: none;
+  }
+}
