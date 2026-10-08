@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { ArrowLeft, ShieldCheck } from 'lucide-react'
 import ListingForm from '@/components/marketplace/ListingForm'
 import { heroFont } from '@/components/home/home-font'
-import './flow.css'
+import '@/components/marketplace/listing-flow.css'
 
 export const metadata: Metadata = {
   title: 'Anunciar meu carro',

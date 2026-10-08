@@ -126,7 +126,7 @@ export default async function TruckSearchPage({ searchParams }: { searchParams: 
       <nav className="cbi-nav" aria-label="Navegação de caminhões">
         <Link href="/caminhoes">Home</Link>
         <Link href="/caminhoes/buscar" className="active">Buscar</Link>
-        <Link href="/anunciar-caminhao">Anunciar</Link>
+        <Link href="/caminhoes/anunciar">Anunciar</Link>
       </nav>
     </main>
   )

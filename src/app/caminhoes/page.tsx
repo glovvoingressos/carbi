@@ -163,7 +163,7 @@ export default async function TruckHomePage() {
             <div className="tk-empty">
               <strong>Ainda não há caminhões anunciados.</strong>
               <p>Publique o seu em poucos minutos — é grátis e o anúncio aparece aqui.</p>
-              <Link href="/anunciar-caminhao" className="tk-btn tk-btn-primary">
+              <Link href="/caminhoes/anunciar" className="tk-btn tk-btn-primary">
                 Anunciar meu caminhão
                 <ArrowRight size={18} aria-hidden="true" />
               </Link>
@@ -240,7 +240,7 @@ export default async function TruckHomePage() {
               Ficha técnica, fotos e chat interno. Seu caminhão divulgado para compradores de todo o Brasil.
             </p>
           </div>
-          <Link href="/anunciar-caminhao" className="tk-btn tk-btn-amber">
+          <Link href="/caminhoes/anunciar" className="tk-btn tk-btn-amber">
             Anunciar meu caminhão
             <ArrowRight size={18} aria-hidden="true" />
           </Link>
@@ -250,7 +250,7 @@ export default async function TruckHomePage() {
       <nav className="cbi-nav" aria-label="Navegação de caminhões">
         <Link href="/caminhoes" className="active">Home</Link>
         <Link href="/caminhoes/buscar">Buscar</Link>
-        <Link href="/anunciar-caminhao">Anunciar</Link>
+        <Link href="/caminhoes/anunciar">Anunciar</Link>
       </nav>
     </main>
   )
