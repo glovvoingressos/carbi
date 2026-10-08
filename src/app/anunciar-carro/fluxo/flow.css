@@ -1,0 +1,364 @@
+/* Design da home (hero + cards de anúncio) aplicado ao fluxo de anunciar carro.
+   Só UI/UX: fontes, cores, raios, espaçamento e estados de foco — nenhuma lógica.
+   Escopo em .listing-flow-app e carregado apenas nesta rota (o fluxo de BH não muda).
+   Regras de formulário usam o caminho .listing-flow-main para vencer os overrides
+   antigos que já são escritos como ".listing-flow-app <classe>". */
+
+/* ── Base ── */
+.listing-flow-app {
+  background: #ffffff;
+  color: #111111;
+}
+
+/* ── Cabeçalho ── */
+.listing-flow-header {
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0ee;
+}
+
+.listing-flow-back {
+  min-height: 44px;
+  padding: 0 14px 0 10px;
+  border-radius: 999px;
+  background: #f8f8f8;
+  color: #111111;
+  font-weight: 600;
+}
+
+.listing-flow-back:hover {
+  background: #eeeeec;
+  color: #111111;
+}
+
+.listing-flow-eyebrow {
+  color: #f2803f;
+  font-size: 11px;
+}
+
+.listing-flow-header-copy h1 {
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(24px, 6vw, 34px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.listing-flow-trust {
+  color: #5a5a5a;
+  font-size: 11px;
+}
+
+/* ── Introdução ── */
+.listing-flow-main {
+  width: min(100% - 32px, 760px);
+  padding: 24px 0 72px;
+}
+
+.listing-flow-intro {
+  margin: 0 0 22px;
+  color: #5a5a5a;
+  font-size: 15px;
+  line-height: 1.55;
+  text-align: left;
+}
+
+/* ── Títulos de etapa ── */
+.listing-flow-app .tfp-section-title {
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(36px, 9vw, 54px);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  color: #111111;
+}
+
+.listing-flow-app .tfp-section-sub {
+  max-width: 52ch;
+  margin: 12px 0 0;
+  color: #5a5a5a;
+  font-size: 15px;
+  line-height: 1.55;
+  text-align: left;
+}
+
+/* ── Cartões de sub-etapa: mesmo card dos anúncios ── */
+.listing-flow-app .listing-flow-main .fingen-flow-substep-card {
+  background: #f8f8f8;
+  border: 0;
+  border-radius: 24px;
+  box-shadow: none;
+  padding: 16px;
+}
+
+@media (min-width: 640px) {
+  .listing-flow-app .listing-flow-main .fingen-flow-substep-card {
+    padding: 24px;
+  }
+}
+
+.listing-flow-app .listing-flow-main .fingen-flow-form-card {
+  background: #f8f8f8;
+  border: 0;
+  border-radius: 24px;
+  box-shadow: none;
+}
+
+/* ── Campos: pílula cinza como a busca de placa do hero ──
+   Observação: globals.css tem ".listing-form-ref select/textarea { ... !important }",
+   por isso estas regras também usam !important — é a única forma de vencê-las. */
+.listing-flow-app .listing-flow-main .fingen-flow-input {
+  min-height: 52px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background-color: #efefec;
+  color: #111111;
+  padding: 12px 44px 12px 18px;
+  font-size: 16px; /* 16px evita o zoom automático do iOS */
+}
+
+.listing-flow-app .listing-flow-main .fingen-flow-input::placeholder {
+  color: #8a8a84;
+  opacity: 1;
+}
+
+.listing-flow-app .listing-flow-main select.fingen-flow-input {
+  min-height: 52px !important;
+  border: 1.5px solid transparent !important;
+  border-radius: 999px !important;
+  background: #efefec !important;
+  color: #111111 !important;
+  padding: 12px 44px 12px 18px !important;
+  font-size: 16px !important;
+  background-position: right 18px center !important;
+}
+
+.listing-flow-app .listing-flow-main textarea.fingen-flow-input {
+  min-height: 160px !important;
+  border: 1.5px solid transparent !important;
+  border-radius: 20px !important;
+  background: #efefec !important;
+  background-image: none !important;
+  color: #111111 !important;
+  padding: 16px 18px !important;
+  font-size: 15px !important;
+  line-height: 1.55;
+}
+
+.listing-flow-app .listing-flow-main textarea.fingen-flow-input:focus,
+.listing-flow-app .listing-flow-main textarea.fingen-flow-input:focus-visible {
+  border-color: #111111 !important;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.16) !important;
+}
+
+.listing-flow-app .listing-flow-main select.fingen-flow-input:focus,
+.listing-flow-app .listing-flow-main select.fingen-flow-input:focus-visible {
+  border-color: #111111 !important;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.16) !important;
+}
+
+/* Erro de campo: mantém o anel vermelho e tinge o fundo */
+.listing-flow-app .listing-flow-main .fingen-flow-input[aria-invalid='true'],
+.listing-flow-app .listing-flow-main select.fingen-flow-input[aria-invalid='true'],
+.listing-flow-app .listing-flow-main textarea.fingen-flow-input[aria-invalid='true'] {
+  background-color: #fef2f2 !important;
+  border-color: #f2c4c4 !important;
+  box-shadow: inset 0 0 0 2px #dc2626 !important;
+}
+
+/* Textos longos precisam de corpo maior que o antigo 12px */
+.listing-flow-app .listing-flow-main textarea.listing-description-field,
+.listing-flow-app .listing-flow-main input.listing-optionals-field {
+  font-size: 15px !important;
+  line-height: 1.55;
+}
+
+/* ── Subtítulos dentro do formulário (h3) ──
+   globals.css força Poppins em ".listing-form-ref h3 !important" */
+.listing-flow-app .listing-flow-main h3 {
+  font-family: var(--hh-font), sans-serif !important;
+  font-size: clamp(22px, 5vw, 30px) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.05 !important;
+  color: #111111 !important;
+}
+
+/* ── Contraste ──
+   As etiquetas da revisão usam #999 sobre branco (2.8:1, abaixo do mínimo de 4.5:1) */
+.listing-flow-app .listing-flow-main [class*='#999'] {
+  color: #5f5f5c;
+}
+
+/* ── Rótulos de campo: sem caixa alta, como no hero ── */
+.listing-flow-app .listing-flow-field-label,
+.listing-flow-app .listing-flow-main .fingen-flow-field-label {
+  color: #3f3f3c;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.listing-flow-app .listing-flow-main .listing-field-error {
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ── Selos ── */
+.listing-flow-app .listing-flow-main .fingen-flow-badge-accent {
+  background: #111111;
+  color: #ffffff;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* ── Botões: pílula preta do hero; laranja no hover ── */
+.listing-flow-app .listing-flow-main .fingen-flow-btn-primary,
+.listing-flow-app .listing-flow-main .tfp-btn-primary,
+.listing-flow-app .listing-flow-main .tfp-btn-secondary {
+  min-height: 52px;
+  padding: 0 28px;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.listing-flow-app .listing-flow-main .tfp-btn-primary,
+.listing-flow-app .listing-flow-main .fingen-flow-btn-primary {
+  background: #111111;
+  color: #ffffff;
+}
+
+.listing-flow-app .listing-flow-main .tfp-btn-primary:hover,
+.listing-flow-app .listing-flow-main .fingen-flow-btn-primary:hover {
+  background: #f2803f;
+  color: #111111;
+  box-shadow: 0 10px 24px rgba(242, 128, 63, 0.35);
+}
+
+/* A regra antiga deixa o texto verde-limão na próxima etapa; precisa de mais especificidade */
+.listing-flow-app .listing-flow-main .tfp-btn-primary.listing-next-step-button:not(.listing-final-submit-button) {
+  background: #111111;
+  color: #ffffff;
+}
+
+.listing-flow-app .listing-flow-main .tfp-btn-primary.listing-next-step-button:not(.listing-final-submit-button):hover {
+  background: #f2803f;
+  color: #111111;
+  box-shadow: 0 10px 24px rgba(242, 128, 63, 0.35);
+}
+
+.listing-flow-app .listing-flow-main .tfp-btn-secondary {
+  background: #ffffff;
+  border-color: #dcdcd8;
+  color: #111111;
+}
+
+.listing-flow-app .listing-flow-main .tfp-btn-secondary:hover {
+  background: #f8f8f8;
+  border-color: #111111;
+  color: #111111;
+}
+
+.listing-flow-app .listing-flow-main .tfp-btn-primary:focus-visible,
+.listing-flow-app .listing-flow-main .tfp-btn-secondary:focus-visible,
+.listing-flow-app .listing-flow-main .fingen-flow-btn-primary:focus-visible {
+  outline: 3px solid #111111;
+  outline-offset: 3px;
+}
+
+.listing-flow-app .listing-flow-main .tfp-btn-primary:disabled,
+.listing-flow-app .listing-flow-main .tfp-btn-secondary:disabled,
+.listing-flow-app .listing-flow-main .fingen-flow-btn-primary:disabled {
+  opacity: 0.55;
+}
+
+/* ── Indicador de etapas ── */
+.listing-stepper {
+  padding: 4px 0 8px;
+  border-bottom: 1px solid #f0f0ee;
+}
+
+.listing-stepper-marker {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border: 1.5px solid #e2e2de;
+  background: #ffffff;
+  color: #76766f;
+  font-family: var(--hh-font), sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.listing-stepper-button.is-active .listing-stepper-marker {
+  border-color: #111111;
+  background: #111111;
+  color: #ffffff;
+}
+
+.listing-stepper-button.is-complete .listing-stepper-marker {
+  border-color: #f2803f;
+  background: #f2803f;
+  color: #111111;
+}
+
+.listing-stepper-button:focus-visible {
+  outline: 3px solid #111111;
+  outline-offset: 4px;
+}
+
+.listing-stepper-copy strong {
+  color: #76766f;
+  font-family: var(--hh-font), sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.listing-stepper-button.is-active .listing-stepper-copy strong,
+.listing-stepper-button.is-complete .listing-stepper-copy strong {
+  color: #111111;
+}
+
+.listing-stepper-copy small {
+  color: #8a8a84;
+  font-size: 11px;
+}
+
+.listing-stepper-connector {
+  margin-top: 19px;
+  background: #ececea;
+}
+
+.listing-stepper-connector > span {
+  background: #111111;
+}
+
+/* ── Painel da FIPE: preto como os cards escuros do hero ── */
+.listing-flow-app .listing-flow-main .fingen-flow-fipe-dark-label {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* ── Barra fixa de publicação no celular ── */
+@media (max-width: 639px) {
+  .listing-flow-app .listing-flow-main .tfp-btn-primary {
+    box-shadow: 0 10px 30px rgba(17, 17, 17, 0.22);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listing-flow-app .tfp-btn-primary,
+  .listing-flow-app .tfp-btn-secondary,
+  .listing-flow-app .fingen-flow-btn-primary,
+  .listing-flow-app .fingen-flow-input,
+  .listing-flow-app .fingen-flow-upload-area {
+    transition: none;
+  }
+}

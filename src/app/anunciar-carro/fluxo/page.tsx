@@ -2,6 +2,8 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft, ShieldCheck } from 'lucide-react'
 import ListingForm from '@/components/marketplace/ListingForm'
+import { heroFont } from '@/components/home/home-font'
+import './flow.css'
 
 export const metadata: Metadata = {
   title: 'Anunciar meu carro | Carbi',
@@ -14,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function AnunciarFluxoPage() {
   return (
-    <div className="listing-flow-app">
+    <div className={`listing-flow-app ${heroFont.variable}`}>
       <header className="listing-flow-header">
         <Link href="/carros-a-venda" className="listing-flow-back">
           <ArrowLeft size={18} aria-hidden="true" />
