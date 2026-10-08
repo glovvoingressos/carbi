@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { heroFont } from './home-font'
 
 export type HomeListingSort = 'price_desc' | 'price_asc' | 'year_desc' | 'year_asc' | 'recent'
 
@@ -162,7 +163,7 @@ export default function HomeListings({ listings, fetchError = false }: HomeListi
 
       <div
         id="home-listing-grid"
-        className="cb-listing-cards"
+        className={`cb-listing-cards ${heroFont.variable}`}
         aria-label="Anúncios de veículos"
       >
         {visibleListings.map((listing) => {

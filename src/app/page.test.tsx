@@ -19,11 +19,12 @@ vi.mock('@/components/marketplace/MarketplaceListingImage', () => ({
     <img src={imageUrls?.[0] ?? ''} alt={alt} />
   ),
 }))
+vi.mock('next/font/google', () => ({ Barlow_Condensed: () => ({ variable: '--hh-font' }) }))
+vi.mock('next/image', () => ({ default: ({ alt, src }: { alt: string; src: string }) => <img src={src} alt={alt} /> }))
 vi.mock('@/components/home/ModelComparison', () => ({ default: () => null }))
 vi.mock('@/components/home/RankingsBanner', () => ({ default: () => null }))
 vi.mock('@/components/home/HomeCounters', () => ({ default: () => null }))
 vi.mock('@/components/marketplace/PlateBannerLookup', () => ({ default: () => null }))
-vi.mock('@/components/home/ExploreCarousel', () => ({ default: () => null }))
 vi.mock('@/components/home/HomeListings', () => ({ default: () => null }))
 
 import HomePage from './page'
@@ -43,7 +44,7 @@ describe('HomePage featured seller card', () => {
     render(page)
 
     const card = screen.getByRole('link', { name: /Anuncie grátis em 2 minutos/ })
-    const image = within(card).getByRole('img', { name: 'SUV elétrico OMODA em fundo tecnológico' })
+    const image = within(card).getByRole('img', { name: 'Land Rover Defender Octa azul Tasman, imagem ilustrativa' })
     const copy = within(card).getByText('Anuncie grátis em 2 minutos')
 
     expect(image.compareDocumentPosition(copy) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
@@ -101,6 +102,6 @@ describe('HomePage featured seller card', () => {
     render(page)
 
     expect(screen.queryByRole('heading', { name: 'Comprar' })).toBeNull()
-    expect(screen.getByRole('heading', { name: 'Encontre o seu estilo' })).toBeTruthy()
+    expect(screen.queryByRole('heading', { name: 'Encontre o seu estilo' })).toBeNull()
   })
 })

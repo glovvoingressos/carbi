@@ -8,6 +8,7 @@ import HomeListings from './HomeListings'
 
 const { replace } = vi.hoisted(() => ({ replace: vi.fn() }))
 
+vi.mock('next/font/google', () => ({ Barlow_Condensed: () => ({ variable: '--hh-font' }) }))
 vi.mock('next/link', () => ({
   default: ({ children, href, ...props }: { children: React.ReactNode; href: string }) => (
     <a href={href} {...props}>{children}</a>

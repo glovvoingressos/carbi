@@ -1,141 +1,119 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { ArrowRight, ChevronDown, ChevronUp, Minus } from 'lucide-react'
 import { getMonthlyRankings } from '@/lib/rankings-data'
 import { formatBRL } from '@/data/cars'
-import { ArrowRight, TrendingUp, ChevronUp, ChevronDown } from 'lucide-react'
+import { heroFont } from './home-font'
+import './rankings-banner.css'
 
-function avatarColor(position: number): string {
-  const palette = [
-    'rgba(76, 139, 245, 0.18)',
-    'rgba(125, 111, 245, 0.18)',
-    'rgba(69, 168, 232, 0.18)',
-    'rgba(83, 181, 163, 0.18)',
-    'rgba(217, 112, 171, 0.18)',
-    'rgba(103, 145, 228, 0.18)',
-    'rgba(221, 151, 83, 0.18)',
-    'rgba(148, 163, 184, 0.22)',
-    'rgba(146, 126, 232, 0.18)',
-    'rgba(218, 119, 135, 0.18)',
-  ]
-  return palette[(position - 1) % palette.length]
-}
+const RANKING_PERIOD = 'setembro-2026'
+const MONTH_LABEL = 'Setembro / 2026 · 1ª quinzena'
+const SOURCE_LABEL = 'Fenabrave / Bright Consulting'
 
-function avatarInkColor(position: number): string {
-  const palette = ['#225CB7', '#4C3DB7', '#1F6B98', '#176B5A', '#963F78', '#315EAA', '#915A22', '#465466', '#5B4BA9', '#963D4B']
-  return palette[(position - 1) % palette.length]
+function trendInfo(moved: number) {
+  if (moved > 0) {
+    return { tone: 'up', label: `Subiu ${moved} ${moved === 1 ? 'posição' : 'posições'}`, text: `+${moved}`, Icon: ChevronUp }
+  }
+  if (moved < 0) {
+    const abs = Math.abs(moved)
+    return { tone: 'down', label: `Caiu ${abs} ${abs === 1 ? 'posição' : 'posições'}`, text: `${moved}`, Icon: ChevronDown }
+  }
+  return { tone: 'flat', label: 'Manteve a posição', text: '0', Icon: Minus }
 }
 
 export default async function RankingsBanner() {
-  const rankingPeriod = 'setembro-2026'
-  const topNew = await getMonthlyRankings(rankingPeriod, 'new')
-
+  const topNew = await getMonthlyRankings(RANKING_PERIOD, 'new')
   const top10 = topNew.slice(0, 10)
-  const totalUnits = top10.reduce((sum, c) => sum + c.unitsSold, 0)
-  const monthLabel = 'Setembro / 2026 · 1ª quinzena'
-  const sourceLabel = 'Fenabrave / Bright Consulting'
+  const totalUnits = top10.reduce((sum, car) => sum + car.unitsSold, 0)
 
   return (
-    <section className="cb-section-pad pt-0">
-      <div className="cb-wrap">
-        <div className="cb-top10-card">
-          <div className="cb-top10-head">
-            <div>
-              <div className="cb-top10-feature-media">
-                <Image
-                  src="/assets/cars/fiat-strada-ultra-10-turbo-cvt-2026.png"
-                  alt="Fiat Strada em destaque no ranking de setembro de 2026"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 55vw"
-                  priority
-                />
-              </div>
-              <p className="cb-top10-eyebrow">Top 10 mais vendidos · {monthLabel}</p>
-              <h2 className="cb-top10-title">
-                Os carros mais vendidos do Brasil
-              </h2>
-              <p className="cb-top10-lead">
-                Base de emplacamentos de carros 0 km. Dados parciais da primeira quinzena de setembro de 2026.
-              </p>
-            </div>
-
-            <div className="cb-top10-meta">
-              <div className="cb-top10-meta-stat">
-                <strong>{totalUnits.toLocaleString('pt-BR')}</strong>
-                <span>unidades vendidas</span>
-              </div>
-              <div className="cb-top10-meta-stat">
-                <strong>{top10.length}</strong>
-                <span>modelos no ranking</span>
-              </div>
-            </div>
+    <section className={`rk ${heroFont.variable}`} aria-labelledby="rk-title">
+      <div className="rk-wrap">
+        <article className="rk-card">
+          <div className="rk-media">
+            <Image
+              src="/assets/cars/fiat-strada-ultra-10-turbo-cvt-2026.png"
+              alt="Fiat Strada, destaque do ranking de setembro de 2026"
+              fill
+              sizes="(max-width: 767px) 100vw, (max-width: 1023px) 90vw, 960px"
+            />
           </div>
 
-          <nav className="cb-top10-tabs" aria-label="Explorar rankings">
-            <span className="cb-top10-tab is-active" aria-current="page">
+          <header className="rk-head">
+            <p className="rk-eyebrow">Top 10 mais vendidos · {MONTH_LABEL}</p>
+            <h2 id="rk-title" className="rk-title">Os carros mais vendidos do Brasil</h2>
+            <p className="rk-lead">
+              Emplacamentos de carros 0 km. Dados parciais da primeira quinzena de setembro de 2026.
+            </p>
+            <dl className="rk-stats">
+              <div className="rk-stat">
+                <dt>Unidades vendidas</dt>
+                <dd>{totalUnits.toLocaleString('pt-BR')}</dd>
+              </div>
+              <div className="rk-stat">
+                <dt>Modelos no ranking</dt>
+                <dd>{top10.length}</dd>
+              </div>
+            </dl>
+          </header>
+
+          <nav className="rk-tabs" aria-label="Outros rankings">
+            <a href="#ranking-mais-vendidos" className="rk-tab" aria-current="page">
               Mais vendidos
-              <span className="cb-top10-tab-bar" aria-hidden="true" />
-            </span>
-            <Link href="/carros-mais-vendidos-brasil" className="cb-top10-tab">
-              Ver top 100
+            </a>
+            <Link href="/carros-mais-vendidos-brasil" className="rk-tab">
+              Top 100
             </Link>
-            <Link href="/rankings" className="cb-top10-tab">
+            <Link href="/rankings" className="rk-tab">
               Por estado
             </Link>
           </nav>
 
-          <ol className="cb-top10-list">
+          <ol id="ranking-mais-vendidos" className="rk-list">
             {top10.map((car) => {
               const moved = car.previousPosition != null ? car.previousPosition - car.position : 0
+              const trend = trendInfo(moved)
+              const TrendIcon = trend.Icon
               return (
-                <li key={car.slug} className="cb-top10-row">
-                  <span
-                    className="cb-top10-avatar"
-                    aria-hidden="true"
-                    style={{
-                      background: avatarColor(car.position),
-                      color: avatarInkColor(car.position),
-                    }}
-                  >
-                    #{car.position}
+                <li key={car.slug} className="rk-row">
+                  <span className="rk-pos">
+                    <span className="sr-only">Posição </span>
+                    {car.position}
                   </span>
-                  <div className="cb-top10-row-body">
-                    <div className="cb-top10-row-top">
-                      <strong className="cb-top10-row-name">
-                        {car.brand} {car.model}
-                      </strong>
-                      <span className="cb-top10-row-cat">{car.category}</span>
+
+                  <div className="rk-main">
+                    <div className="rk-line">
+                      <p className="rk-name">
+                        <span className="rk-brand">{car.brand}</span> {car.model}
+                      </p>
+                      {moved !== 0 ? (
+                        <p className={`rk-trend rk-trend-${trend.tone}`}>
+                          <span className="sr-only">{trend.label}</span>
+                          <TrendIcon size={13} aria-hidden="true" />
+                          <span aria-hidden="true">{trend.text}</span>
+                        </p>
+                      ) : null}
                     </div>
-                    <div className="cb-top10-row-meta">
-                      <span className="cb-top10-row-units">
-                        <strong>{car.unitsSold.toLocaleString('pt-BR')}</strong> un
-                      </span>
-                      <span className="cb-top10-row-dot" aria-hidden="true" />
-                      <span className="cb-top10-row-share">{car.marketSharePercentage.toFixed(1)}% share</span>
-                      <span className="cb-top10-row-dot" aria-hidden="true" />
-                      <span className="cb-top10-row-price">a partir de {formatBRL(car.startingPriceBrl)}</span>
-                    </div>
-                  </div>
-                  <div className={`cb-top10-trend ${moved > 0 ? 'is-up' : moved < 0 ? 'is-down' : 'is-flat'}`} aria-label={
-                    moved > 0 ? `Subiu ${moved} posições` : moved < 0 ? `Caiu ${Math.abs(moved)} posições` : 'Manteve posição'
-                  }>
-                    {moved > 0 ? <ChevronUp size={14} /> : moved < 0 ? <ChevronDown size={14} /> : <span aria-hidden="true">—</span>}
-                    <span>{moved > 0 ? `+${moved}` : moved < 0 ? moved : '0'}</span>
+                    <p className="rk-cat">{car.category}</p>
+                    <p className="rk-meta">
+                      <span><strong>{car.unitsSold.toLocaleString('pt-BR')}</strong> un.</span>
+                      <span>{car.marketSharePercentage.toFixed(1).replace('.', ',')}%</span>
+                      <span>desde {formatBRL(car.startingPriceBrl)}</span>
+                    </p>
                   </div>
                 </li>
               )
             })}
           </ol>
 
-          <div className="cb-top10-foot">
-            <Link href="/carros-mais-vendidos-brasil" className="cb-btn cb-btn-lime cb-btn-arrow">
+          <footer className="rk-foot">
+            <Link href="/carros-mais-vendidos-brasil" className="rk-cta">
               Ver ranking completo
-              <ArrowRight size={18} />
+              <ArrowRight size={18} aria-hidden="true" />
             </Link>
-            <span className="cb-top10-foot-note">
-              <TrendingUp size={14} aria-hidden="true" /> Fonte: {sourceLabel} · {monthLabel}.
-            </span>
-          </div>
-        </div>
+            <p className="rk-source">Fonte: {SOURCE_LABEL} · {MONTH_LABEL}.</p>
+          </footer>
+        </article>
       </div>
     </section>
   )

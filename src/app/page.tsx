@@ -10,10 +10,10 @@ import ModelComparison from '@/components/home/ModelComparison'
 import RankingsBanner from '@/components/home/RankingsBanner'
 import HomeCounters from '@/components/home/HomeCounters'
 import PlateBannerLookup from '@/components/marketplace/PlateBannerLookup'
-import ExploreCarousel from '@/components/home/ExploreCarousel'
-import HeroRotatingTitle from '@/components/home/HeroRotatingTitle'
 import HomeListings from '@/components/home/HomeListings'
 import HomeFeaturedListing, { type HomeFeaturedListingData } from '@/components/home/HomeFeaturedListing'
+import HomeHero from '@/components/home/HomeHero'
+import { heroFont } from '@/components/home/home-font'
 
 export const dynamic = 'force-dynamic'
 
@@ -102,73 +102,21 @@ export default async function HomePage() {
   const comparisonCars = cars.filter((c) => c.isPopular).slice(0, 2).map(mapCar)
   const allComparisonCars = cars.map(mapCar)
 
-  const categories = [
-    { label: 'SUVs', filter: 'SUV', img: '/categories/suv.jpg', badge: 'Mais procurados' },
-    { label: 'Elétricos', filter: 'Elétrico', img: '/categories/eletrico.jpg', badge: 'Zero emissão' },
-    { label: 'Picapes', filter: 'Pickup', img: '/categories/pickup.jpg', badge: 'Robustez total' },
-    { label: 'Esportivos', filter: 'Esportivo', img: '/categories/esportivo.jpg', badge: 'Pura performance' },
-    { label: 'Sedans', filter: 'sedan', img: '/categories/sedan.jpg', badge: 'Conforto e espaço' },
-    { label: 'Hatches', filter: 'hatch', img: '/categories/hatch.jpg', badge: 'Ágeis na cidade' },
-    { label: 'Híbridos', filter: 'híbrido', img: '/categories/hibrido.jpg', badge: 'Eficiência total' },
-    { label: 'Executivos', filter: 'executivo', img: '/categories/executivo.jpg', badge: 'Requisitados' },
-    { label: 'Acessíveis', filter: 'acessível', img: '/categories/acessivel.jpg', badge: 'Até R$ 60 mil' },
-    { label: 'Luxo', filter: 'luxo', img: '/categories/luxo.jpg', badge: 'Alto padrão' },
-  ]
-
   return (
     <div className="cb-page">
       {/* ═══ HERO ═══ */}
-      <section className="cb-hero">
-        <div className="cb-wrap">
-          <div className="cb-hero-grid">
-            <div className="cb-hero-copy">
-              <HeroRotatingTitle />
-              <p className="cb-hero-lead">
-                Anuncie grátis, compare com a FIPE e negocie direto com o vendedor.
-                Informações do anúncio, chat interno e opções de seminovos para comparar com calma.
-              </p>
+      <HomeHero
+        listingCount={listings.length}
+        cityCount={new Set(listings.map((l) => l.city).filter(Boolean)).size}
+        brandCount={new Set(listings.map((l) => l.brand).filter(Boolean)).size}
+      />
 
-              <div className="cb-hero-cta-row">
-                <Link href="/carros-a-venda" className="cb-btn cb-btn-lime cb-btn-arrow">
-                  Ver estoque completo
-                  <ArrowRight size={18} />
-                </Link>
-                <Link href="/anunciar-carro" className="cb-btn cb-btn-ghost cb-btn-arrow">
-                  <Plus size={18} />
-                  Anunciar grátis
-                </Link>
-              </div>
-
-              <div className="cb-hero-avatars">
-                <div className="cb-avatar-stack">
-                  {['/categories/suv.jpg', '/categories/sedan.jpg', '/categories/hatch.jpg'].map((src) => (
-                    <img key={src} src={src} alt="" className="cb-avatar" loading="lazy" />
-                  ))}
-                  <div className="cb-avatar-more">+8</div>
-                </div>
-                <p>
-                  <strong>Dados reais</strong> para decidir com confiança
-                </p>
-              </div>
-            </div>
-
-            <div className="cb-hero-visual">
-              <img
-                src="/images/Porsche 911 GT3 RS | Speed Art Motion Blur Photography.jpg"
-                alt="Porsche 911 GT3 RS em destaque na Carbi"
-                width={960}
-                height={816}
-                fetchPriority="high"
-              />
-            </div>
-          </div>
-
-          <HomeCounters cityCount={cities.length} />
-        </div>
-      </section>
+      <div className="cb-wrap">
+        <HomeCounters cityCount={cities.length} />
+      </div>
 
       {/* ═══ PLATE LOOKUP ═══ */}
-      <section className="cb-section-pad cb-promo-before-listings">
+      <section id="pesquise-placa" className={`cb-section-pad cb-promo-before-listings ${heroFont.variable}`}>
         <div className="cb-wrap">
           <PlateBannerLookup />
         </div>
@@ -195,19 +143,9 @@ export default async function HomePage() {
       </section>
 
       {/* ═══ MODEL COMPARISON ═══ */}
-      <ModelComparison cars={comparisonCars} allCars={allComparisonCars} />
-
-      {/* ═══ EXPLORE BY STYLE ═══ */}
-      <section className="cb-section-pad cb-explore-section">
-        <div className="cb-wrap">
-          <div className="cb-explore-head">
-            <div>
-              <p className="cb-eyebrow">Explore por estilo</p>
-              <h2>Encontre o seu estilo</h2>
-            </div>
-          </div>
-
-          <ExploreCarousel categories={categories} />
+      <section className={`hh-compare-section ${heroFont.variable}`}>
+        <div className="hh-compare">
+          <ModelComparison cars={comparisonCars} allCars={allComparisonCars} />
         </div>
       </section>
 
@@ -215,7 +153,6 @@ export default async function HomePage() {
       <section className="cb-section-pad cb-process-section">
         <div className="cb-wrap cb-process-grid">
           <div>
-            <p className="cb-eyebrow">Como funciona</p>
             <h2 className="cb-process-title" style={{ fontFamily: 'var(--cb-head)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1, margin: '0 0 12px' }}>
               Do jeito mais simples
             </h2>
@@ -259,8 +196,8 @@ export default async function HomePage() {
             <Link href="/anunciar-carro" className="cb-build-card cb-build-card-dark cb-build-card-featured">
               <div className="cb-build-card-featured-visual">
                 <img
-                  src="/assets/cars/build-card-omoda-electric.jpg"
-                  alt="SUV elétrico OMODA em fundo tecnológico"
+                  src="/images/defender-octa-tasman-blue.jpg"
+                  alt="Land Rover Defender Octa azul Tasman, imagem ilustrativa"
                   loading="lazy"
                   decoding="async"
                 />
