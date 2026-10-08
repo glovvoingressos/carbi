@@ -45,11 +45,25 @@ const SORT_OPTIONS: Array<{ value: ListingSort; label: string }> = [
   { value: 'year_desc', label: 'Mais novos' },
 ]
 
-const QUICK_FILTERS = [
-  { id: 'suv', label: 'SUVs', kind: 'bodyType' as const, value: 'SUV' },
-  { id: 'price', label: 'Até R$ 80 mil', kind: 'price' as const, value: 80000 },
-  { id: 'automatic', label: 'Automáticos', kind: 'transmission' as const, value: 'Automático' },
-  { id: 'electric', label: 'Elétricos', kind: 'fuel' as const, value: 'Elétrico' },
+type QuickFilter = {
+  id: string
+  label: string
+  kind: 'bodyType' | 'price' | 'transmission' | 'fuel'
+  value: string | number
+}
+
+const QUICK_FILTERS: QuickFilter[] = [
+  { id: 'suv', label: 'SUVs', kind: 'bodyType', value: 'SUV' },
+  { id: 'price', label: 'Até R$ 80 mil', kind: 'price', value: 80000 },
+  { id: 'automatic', label: 'Automáticos', kind: 'transmission', value: 'Automático' },
+  { id: 'electric', label: 'Elétricos', kind: 'fuel', value: 'Elétrico' },
+]
+
+// Caminhão tem atalhos próprios: preço e diesel fazem sentido, SUV/elétrico não.
+const TRUCK_QUICK_FILTERS: QuickFilter[] = [
+  { id: 'truck-price-150', label: 'Até R$ 150 mil', kind: 'price', value: 150000 },
+  { id: 'truck-price-300', label: 'Até R$ 300 mil', kind: 'price', value: 300000 },
+  { id: 'truck-diesel', label: 'Diesel', kind: 'fuel', value: 'Diesel' },
 ]
 
 type FilterValueNormalizer = (value: string | null | undefined) => string
@@ -342,25 +356,28 @@ export default function MarketplaceClient({
     else setter([...list, item])
   }
 
-  const availableQuickFilters = useMemo(() => QUICK_FILTERS.filter((filter) => {
-    if (filter.kind === 'bodyType') return canonicalFilterOptions.bodyTypes.includes(filter.value)
-    if (filter.kind === 'transmission') return canonicalFilterOptions.transmissions.includes(filter.value)
-    if (filter.kind === 'fuel') return canonicalFilterOptions.fuels.includes(filter.value)
-    return true
-  }), [canonicalFilterOptions])
+  const isTruckMarketplace = (selectedVehicleType || defaultFilters?.vehicle_type) === 'truck'
+  const quickFilterSource = isTruckMarketplace ? TRUCK_QUICK_FILTERS : QUICK_FILTERS
 
-  const isQuickFilterActive = (filter: typeof QUICK_FILTERS[number]) => {
-    if (filter.kind === 'bodyType') return selectedBodyTypes.includes(filter.value)
-    if (filter.kind === 'transmission') return selectedTransmissions.includes(filter.value)
-    if (filter.kind === 'fuel') return selectedFuels.includes(filter.value)
-    return priceRange[0] === 0 && priceRange[1] === filter.value
+  const availableQuickFilters = useMemo(() => quickFilterSource.filter((filter) => {
+    if (filter.kind === 'bodyType') return canonicalFilterOptions.bodyTypes.includes(String(filter.value))
+    if (filter.kind === 'transmission') return canonicalFilterOptions.transmissions.includes(String(filter.value))
+    if (filter.kind === 'fuel') return canonicalFilterOptions.fuels.includes(String(filter.value))
+    return true
+  }), [canonicalFilterOptions, quickFilterSource])
+
+  const isQuickFilterActive = (filter: QuickFilter) => {
+    if (filter.kind === 'bodyType') return selectedBodyTypes.includes(String(filter.value))
+    if (filter.kind === 'transmission') return selectedTransmissions.includes(String(filter.value))
+    if (filter.kind === 'fuel') return selectedFuels.includes(String(filter.value))
+    return priceRange[0] === 0 && priceRange[1] === Number(filter.value)
   }
 
-  const toggleQuickFilter = (filter: typeof QUICK_FILTERS[number]) => {
-    if (filter.kind === 'bodyType') toggleItem(selectedBodyTypes, filter.value, setSelectedBodyTypes)
-    if (filter.kind === 'transmission') toggleItem(selectedTransmissions, filter.value, setSelectedTransmissions)
-    if (filter.kind === 'fuel') toggleItem(selectedFuels, filter.value, setSelectedFuels)
-    if (filter.kind === 'price') setPriceRange(isQuickFilterActive(filter) ? [0, 1000000] : [0, filter.value])
+  const toggleQuickFilter = (filter: QuickFilter) => {
+    if (filter.kind === 'bodyType') toggleItem(selectedBodyTypes, String(filter.value), setSelectedBodyTypes)
+    if (filter.kind === 'transmission') toggleItem(selectedTransmissions, String(filter.value), setSelectedTransmissions)
+    if (filter.kind === 'fuel') toggleItem(selectedFuels, String(filter.value), setSelectedFuels)
+    if (filter.kind === 'price') setPriceRange(isQuickFilterActive(filter) ? [0, 1000000] : [0, Number(filter.value)])
   }
 
   const activeChips = useMemo(() => {
