@@ -406,6 +406,74 @@
   font-family: var(--hh-font), sans-serif;
 }
 
+/* Resultado da consulta: o painel é branco agora, mas as regras em globals.css
+   foram escritas para fundo escuro (texto branco e lima). Reescritas aqui. */
+#pesquise-placa .cb-plate-result-heading {
+  color: var(--hh-black);
+}
+
+#pesquise-placa .cb-plate-result-heading svg {
+  color: #f2803f;
+}
+
+#pesquise-placa .cb-plate-result-main strong {
+  color: var(--hh-black);
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 600;
+}
+
+#pesquise-placa .cb-plate-result-main span {
+  color: #5a5a5a;
+  font-size: 13px;
+}
+
+#pesquise-placa .cb-plate-result-price small,
+#pesquise-placa .cb-plate-result-details small {
+  color: #5f5f5c;
+}
+
+#pesquise-placa .cb-plate-result-price b {
+  color: var(--hh-black);
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 600;
+  line-height: 1;
+}
+
+#pesquise-placa .cb-plate-result-details span {
+  background: #f1f1ef;
+  border-radius: 14px;
+  color: var(--hh-black);
+  font-size: 14px;
+}
+
+#pesquise-placa .cb-plate-result-actions button:first-child {
+  min-height: 50px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--hh-black);
+  color: #ffffff;
+  font-family: var(--hh-font), sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#pesquise-placa .cb-plate-result-actions button:first-child:hover {
+  background: #f2803f;
+  color: var(--hh-black);
+}
+
+#pesquise-placa .cb-plate-result-actions button:last-child {
+  color: #5f5f5c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#pesquise-placa .cb-plate-result-actions button:last-child:hover {
+  color: var(--hh-black);
+}
+
 /* Anúncio em destaque, no mesmo padrão claro do hero */
 .hf {
   --hh-black: #111111;
