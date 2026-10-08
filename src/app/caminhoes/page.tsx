@@ -143,15 +143,6 @@ export default async function TruckHomePage() {
           </div>
         </section>
 
-        {/* ═══ ATALHOS ═══ */}
-        <nav className="truck-links" aria-label="Atalhos de caminhões">
-          {TRUCK_QUICK_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} className="truck-link">
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
         {/* ═══ ANÚNCIOS ═══ */}
         <section className="tk-section">
           <div className="tk-section-head">
