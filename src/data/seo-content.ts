@@ -60,5 +60,28 @@ export const SEO_DATA = {
       { q: 'Qual a vantagem de vender online?', a: 'A economia de tempo é gigante. Você não precisa levar o carro em agências; o comprador interessado vem até você após filtrar pela nossa plataforma.' },
       { q: 'Como saber o valor real do meu carro?', a: 'Utilizamos a base da Tabela FIPE atualizada mensalmente para te dar um norte preciso sobre o valor de mercado do seu veículo.' }
     ]
+  },
+  venderCaminhao: {
+    title: 'Vender caminhão: anuncie grátis e venda rápido',
+    description: 'Anuncie seu caminhão grátis na Carbi. Consulte a placa, preencha a ficha técnica de caminhão (eixos, PBT, CMT e carroceria) e negocie pelo chat interno.',
+    h1: 'Anuncie seu caminhão grátis e venda rápido',
+    subtitle: 'Ficha técnica completa, consulta por placa, comparação com a tabela FIPE e chat interno — sem custo para publicar.',
+    benefits: [
+      { icon: 'Zap', title: 'Cadastro em poucos passos', description: 'A consulta pela placa já preenche marca, modelo, ano e versão. Você só completa o que é específico do caminhão.' },
+      { icon: 'ShieldCheck', title: 'Ficha técnica de caminhão', description: 'Tipo, eixos, capacidade de carga, PBT, CMT, carroceria e cabine — os dados que o comprador procura antes de ligar.' },
+      { icon: 'MessageSquare', title: 'Negociação sem expor telefone', description: 'O comprador fala com você pelo chat interno e você decide quando compartilhar contato.' },
+    ],
+    steps: [
+      { title: 'Consulte a placa', description: 'Informe a placa do caminhão para recuperar marca, modelo, ano e versão e começar com a ficha preenchida.' },
+      { title: 'Complete a ficha', description: 'Adicione eixos, capacidade de carga, PBT, CMT, carroceria, cabine e as fotos reais do veículo.' },
+      { title: 'Publique e negocie', description: 'Compare seu preço com a tabela FIPE, publique gratuitamente e responda compradores pelo chat.' },
+    ],
+    faqs: [
+      { q: 'Anunciar caminhão na Carbi tem alguma taxa?', a: 'Não. Publicar o anúncio é gratuito: você preenche a ficha técnica, adiciona fotos e publica. A negociação acontece pelo chat da plataforma.' },
+      { q: 'Quais dados de caminhão o anúncio pede?', a: 'Além de marca, modelo, ano e quilometragem, pedimos o tipo de caminhão (truck, toco, bitruck ou cavalo mecânico), número de eixos, capacidade de carga, PBT, CMT, carroceria e cabine.' },
+      { q: 'A consulta pela placa funciona para caminhão?', a: 'Sim. A busca pela placa retorna marca, modelo, ano e versão para preencher o anúncio em poucos passos.' },
+      { q: 'Meu telefone fica exposto no anúncio?', a: 'Não. A conversa acontece no chat interno, então você compartilha dados de contato apenas quando se sentir confortável.' },
+      { q: 'Preciso criar conta antes de começar?', a: 'Não. Você preenche os dados do caminhão primeiro e cria a conta no último passo, na hora de publicar.' },
+    ],
   }
 }

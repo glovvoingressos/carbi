@@ -1081,6 +1081,169 @@
   line-height: 1.55;
 }
 
+/* ══════════════ Landing institucional · /vender-caminhao ══════════════ */
+
+.tk-sell-hero {
+  position: relative;
+  overflow: hidden;
+  margin-top: 8px;
+  padding: 34px 24px;
+  border-radius: 26px;
+  background: var(--tk-ink);
+  color: #ffffff;
+}
+
+.tk-sell-hero::after {
+  content: '';
+  position: absolute;
+  right: -80px;
+  top: -80px;
+  width: 240px;
+  height: 240px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(245, 165, 36, 0.34) 0%, rgba(245, 165, 36, 0) 70%);
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .tk-sell-hero {
+    padding: 56px 48px;
+  }
+}
+
+.tk-sell-kicker {
+  position: relative;
+  z-index: 1;
+  color: var(--tk-amber);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.tk-sell-title {
+  position: relative;
+  z-index: 1;
+  margin: 14px 0 0;
+  max-width: 17ch;
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(38px, 8vw, 66px);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+.tk-sell-lead {
+  position: relative;
+  z-index: 1;
+  margin: 16px 0 0;
+  max-width: 58ch;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.tk-sell-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.tk-btn-outline {
+  background: transparent;
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.3);
+}
+
+.tk-btn-outline:hover {
+  background: #ffffff;
+  color: var(--tk-ink);
+}
+
+.tk-sell-checks {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tk-sell-checks li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tk-sell-checks svg {
+  flex: none;
+  color: var(--tk-amber);
+}
+
+.tk-sell-steps {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .tk-sell-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.tk-sell-step {
+  padding: 22px;
+  border-radius: 22px;
+  background: var(--tk-steel);
+}
+
+.tk-sell-step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--tk-amber);
+  color: var(--tk-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tk-sell-step h3 {
+  margin: 14px 0 0;
+  font-family: var(--hh-font), sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--tk-ink);
+}
+
+.tk-sell-step p {
+  margin: 8px 0 0;
+  color: var(--tk-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tk-btn,
+  .truck-link {
+    transition: none;
+  }
+}
+
 /* ── Foco visível ── */
 .truck-site a:focus-visible,
 .truck-site button:focus-visible,
