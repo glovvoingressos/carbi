@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { MARKETPLACE_SEO_SLUGS, MAJOR_CITIES, buildTruckSeoPaths } from '@/lib/marketplace-seo'
+import { TRUCK_SEO_SLUGS, TRUCK_BRANDS, TRUCK_YEAR_SLUGS, truckBrandSlug } from '@/lib/truck-seo'
 import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import { slugifyBrand } from '@/lib/brand-utils'
 import { getRankingSitemapPaths } from '@/lib/rankings-seo'
@@ -105,6 +106,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const path of buildTruckSeoPaths().brands.slice(1).concat(buildTruckSeoPaths().categories.slice(1))) {
     entries.push({ url: `${SITE_URL}${path}`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 })
+  }
+
+  // Páginas de aterrissagem de SEO de caminhão (mesmo modelo de /carros/[slug])
+  for (const slug of TRUCK_SEO_SLUGS) {
+    entries.push({
+      url: `${SITE_URL}/caminhoes/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.85,
+    })
+  }
+
+  for (const brand of TRUCK_BRANDS) {
+    entries.push({
+      url: `${SITE_URL}/caminhoes/marca-${truckBrandSlug(brand)}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    })
+  }
+
+  for (const city of MAJOR_CITIES) {
+    entries.push({
+      url: `${SITE_URL}/caminhoes/cidade-${city.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    })
+  }
+
+  for (const slug of TRUCK_YEAR_SLUGS) {
+    entries.push({
+      url: `${SITE_URL}/caminhoes/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    })
   }
 
   for (const brand of uniqueBrands) {
