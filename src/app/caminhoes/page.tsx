@@ -200,44 +200,6 @@ export default async function TruckHomePage() {
           </div>
         </section>
 
-        {/* ═══ CATEGORIAS ═══ */}
-        <section className="tk-section">
-          <div className="tk-section-head">
-            <h2 className="tk-section-title">Navegue por categoria</h2>
-            <Link href="/caminhoes/categorias" className="tk-section-link">
-              Ver categorias
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
-          <div className="truck-hub-grid">
-            {TRUCK_CATEGORIES.map((category) => (
-              <Link key={category.slug} href={`/caminhoes/${category.slug}`} className="truck-hub-card">
-                <h2>{category.name}</h2>
-                <span className="truck-hub-cta">Ver anúncios</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* ═══ MARCAS ═══ */}
-        <section className="tk-section">
-          <div className="tk-section-head">
-            <h2 className="tk-section-title">Caminhões por marca</h2>
-            <Link href="/caminhoes/marcas" className="tk-section-link">
-              Ver marcas
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
-          <div className="tk-brands">
-            {TRUCK_BRANDS.map((brand) => (
-              <Link key={brand} href={`/caminhoes/marca-${truckBrandSlug(brand)}`} className="tk-brand">
-                {brand}
-                <ArrowRight size={15} aria-hidden="true" />
-              </Link>
-            ))}
-          </div>
-        </section>
-
         {/* ═══ FAQ ═══ */}
         <FAQSchema items={TRUCK_FAQ} />
         <FAQSection items={TRUCK_FAQ} />
