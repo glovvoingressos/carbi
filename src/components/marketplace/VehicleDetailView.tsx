@@ -222,7 +222,8 @@ export default function VehicleDetailView({
                 <div className="fingen-detail-price-fipe">
                   <span>FIPE {formatBRL(fipePrice)}</span>
                   {dealPercentLabel && (
-                    <span className="fingen-detail-price-badge">
+                    <span className={`fingen-detail-price-badge ${diffValue !== null && diffValue <= 0 ? 'is-good' : 'is-bad'}`}>
+                      {diffValue !== null && diffValue <= 0 ? <TrendingDown size={12} /> : <TrendingUp size={12} />}
                       {dealPercentLabel}
                     </span>
                   )}
@@ -258,7 +259,7 @@ export default function VehicleDetailView({
         {fipePrice && (
           <section className="fingen-detail-card-dark">
             <div className="fingen-detail-dark-header">
-              <h3 style={{ color: '#FFFFFF' }}>Comparativo FIPE</h3>
+              <h3>Comparativo FIPE</h3>
               <span className={`fingen-detail-dark-badge ${comparison.status === 'below' ? 'success' : ''}`}>
                 {fipeStatus}
               </span>

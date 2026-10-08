@@ -9,6 +9,8 @@ import { getListingVehicleId, getPublicListingBySlug, getRelatedListings, getSel
 import { getVehicleEnrichmentForPublic } from '@/lib/vehicle-enrichment-server'
 import VehicleDetailView from '@/components/marketplace/VehicleDetailView'
 import { BreadcrumbSchema, VehicleSchema } from '@/components/seo/JSONLD'
+import { heroFont } from '@/components/home/home-font'
+import './detail.css'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -85,7 +87,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   const sellerInfo = await getSellerInfo(listing.user_id)
 
   return (
-    <main className="fingen-shell">
+    <main className={`fingen-shell anuncio-page ${heroFont.variable}`}>
       <div className="fingen-shell-content">
         <VehicleSchema vehicle={listing} />
         <BreadcrumbSchema

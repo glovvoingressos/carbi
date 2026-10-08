@@ -1,0 +1,640 @@
+/* ============================================================
+   Página de anúncio (/anuncios/[slug]) no design da home
+   Barlow Condensed nos títulos, cards #f8f8f8 com raio 24,
+   pílulas pretas, laranja #f2803f nos acentos.
+
+   Só UI/UX: nada aqui muda dados, o comparativo FIPE, o histórico
+   FIPE ou a navegação — apenas aparência, movimento e foco.
+   Escopo .anuncio-page (carregado só nesta rota, então a página de
+   anúncio de caminhão e a página de tráfego pago não mudam).
+   ============================================================ */
+
+.anuncio-page {
+  background: #ffffff;
+  padding-bottom: 110px; /* espaço da barra fixa no celular */
+  /* Cards da FIPE (comparativo e histórico) em verde oliva claro.
+     As variáveis abaixo alimentam o gráfico; o padrão escuro continua valendo
+     para a página de anúncio de caminhão, que não carrega este arquivo. */
+  --fipe-track: #ffffff;
+  --fipe-muted: #5c6046;
+  --fipe-footer-bg: #ffffff;
+  --fipe-footer-text: #55583f;
+  --fipe-empty: #5c6046;
+  --fipe-bar-text: #ffffff;
+  --fipe-bar-text-latest: #111111;
+  --fipe-radius: 999px;
+  --fipe-footer-radius: 16px;
+}
+
+@media (min-width: 768px) {
+  .anuncio-page {
+    padding-bottom: 56px;
+  }
+}
+
+/* ── Breadcrumb ── */
+.anuncio-page .fingen-breadcrumb {
+  padding-top: 20px;
+  color: #5f5f5c;
+  font-size: 13px;
+}
+
+.anuncio-page .fingen-breadcrumb a {
+  color: #5f5f5c;
+  font-weight: 500;
+}
+
+.anuncio-page .fingen-breadcrumb a:hover {
+  color: #111111;
+}
+
+.anuncio-page .fingen-breadcrumb span:last-child {
+  color: #111111;
+  font-weight: 600;
+}
+
+/* ── Ações do topo (voltar / favoritar / compartilhar) ── */
+.anuncio-page .fingen-detail-header {
+  padding: 16px;
+}
+
+.anuncio-page .fingen-detail-back,
+.anuncio-page .fingen-detail-action-btn {
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid #e4e4e1;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  color: #111111;
+  box-shadow: 0 2px 8px rgba(17, 17, 17, 0.06);
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.anuncio-page .fingen-detail-back svg,
+.anuncio-page .fingen-detail-action-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.anuncio-page .fingen-detail-back:hover,
+.anuncio-page .fingen-detail-action-btn:hover {
+  border-color: #111111;
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.anuncio-page .fingen-detail-back:active,
+.anuncio-page .fingen-detail-action-btn:active {
+  transform: scale(0.94);
+}
+
+/* Favoritado: o coração ganha a cor de destaque (:has é melhoria progressiva) */
+.anuncio-page .fingen-detail-action-btn:has(.fill-current) {
+  background: #f2803f;
+  border-color: #f2803f;
+  color: #111111;
+}
+
+/* ── Galeria ── */
+.anuncio-page .ref-ad-gallery {
+  background: #f8f8f8;
+  border-radius: 24px;
+}
+
+.anuncio-page .ref-ad-gallery-main {
+  border-radius: 24px;
+  background: #efefec;
+}
+
+.anuncio-page .ref-ad-gallery-arrow {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.94);
+  color: #111111;
+  box-shadow: 0 4px 14px rgba(17, 17, 17, 0.14);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.anuncio-page .ref-ad-gallery-arrow svg {
+  width: 20px;
+  height: 20px;
+}
+
+.anuncio-page .ref-ad-gallery-arrow:hover {
+  background: #ffffff;
+  transform: translateY(-50%) scale(1.06);
+}
+
+.anuncio-page .ref-ad-gallery-count {
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.74);
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+}
+
+.anuncio-page .ref-ad-gallery-thumbs {
+  gap: 10px;
+  padding: 12px 0 0;
+}
+
+.anuncio-page .ref-ad-thumb {
+  width: 84px;
+  height: 62px;
+  border-radius: 14px;
+  opacity: 1;
+  background: #efefec;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.anuncio-page .ref-ad-thumb:hover {
+  transform: translateY(-2px);
+}
+
+.anuncio-page .ref-ad-thumb.active {
+  border-color: #111111;
+}
+
+/* Zoom suave na foto principal (só onde há mouse) */
+@media (hover: hover) {
+  .anuncio-page .ref-ad-gallery-zoom img {
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .anuncio-page .ref-ad-gallery-zoom:hover img {
+    transform: scale(1.03);
+  }
+}
+
+/* ── Card de preço ── */
+.anuncio-page .fingen-detail-price-card {
+  background: #f8f8f8;
+  border-radius: 24px;
+  padding: 22px;
+}
+
+.anuncio-page .fingen-detail-price-make {
+  color: #76766f;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.anuncio-page .fingen-detail-price-title {
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(30px, 6vw, 44px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+}
+
+.anuncio-page .fingen-detail-price-sub {
+  color: #5a5a5a;
+  font-size: 14px;
+}
+
+.anuncio-page .fingen-detail-seller-inline {
+  color: #5f5f5c;
+  font-size: 13px;
+}
+
+.anuncio-page .fingen-detail-seller-inline strong {
+  color: #111111;
+}
+
+.anuncio-page .fingen-detail-price-main {
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(38px, 8vw, 54px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.anuncio-page .fingen-detail-price-fipe {
+  color: #5f5f5c;
+  font-size: 13px;
+}
+
+.anuncio-page .fingen-detail-price-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #efefec;
+  color: #3f3f3c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Mesma semântica de cor dos cards da home */
+.anuncio-page .fingen-detail-price-badge.is-good {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.anuncio-page .fingen-detail-price-badge.is-bad {
+  background: #ffe4e6;
+  color: #9f1239;
+}
+
+.anuncio-page .fingen-detail-specs-row {
+  gap: 8px;
+}
+
+.anuncio-page .fingen-detail-specs-row span {
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #3f3f3c;
+  font-size: 12px;
+}
+
+.anuncio-page .fingen-detail-location {
+  color: #5f5f5c;
+  font-size: 13px;
+}
+
+/* ── Botões de contato (pílula preta, laranja no hover) ── */
+.anuncio-page .btn.btn-primary {
+  min-height: 52px;
+  border-radius: 999px;
+  background: #111111;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(17, 17, 17, 0.16);
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.anuncio-page .btn.btn-primary:hover {
+  background: #f2803f;
+  color: #111111;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(242, 128, 63, 0.32);
+}
+
+.anuncio-page .btn.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.anuncio-page .btn.btn-primary:disabled {
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Cards da FIPE (comparativo e histórico): verde oliva claro ── */
+.anuncio-page .fingen-detail-card-dark {
+  padding: 22px;
+  border-radius: 24px;
+  background: #e9edd9;
+  color: #111111;
+}
+
+.anuncio-page .fingen-detail-dark-header h3 {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #111111;
+}
+
+.anuncio-page .fingen-detail-dark-badge {
+  border-radius: 999px;
+  background: #ffffff;
+  color: #3f3f3c;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.anuncio-page .fingen-detail-dark-badge.success {
+  background: #cbead8;
+  color: #0b4a34;
+}
+
+.anuncio-page .fingen-detail-dark-value {
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(30px, 6vw, 42px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: #111111;
+}
+
+.anuncio-page .fingen-detail-dark-label {
+  color: #5f5f5c;
+}
+
+.anuncio-page .fingen-detail-dark-diff span {
+  background: #ffffff;
+}
+
+.anuncio-page .fingen-detail-dark-diff .positive {
+  background: #cbead8;
+  color: #0b4a34;
+}
+
+.anuncio-page .fingen-detail-dark-diff .negative {
+  background: #ffdede;
+  color: #98122f;
+}
+
+/* ── Cards claros ── */
+.anuncio-page .fingen-detail-card {
+  padding: 20px;
+  border: 0;
+  border-radius: 24px;
+  background: #f8f8f8;
+}
+
+.anuncio-page .fingen-detail-card-title {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+}
+
+.anuncio-page .fingen-detail-specs-grid {
+  gap: 10px;
+}
+
+.anuncio-page .fingen-detail-spec-item {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.anuncio-page .fingen-detail-spec-label {
+  color: #76766f;
+  font-size: 12px;
+}
+
+.anuncio-page .fingen-detail-spec-value {
+  color: #111111;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.anuncio-page .fingen-detail-optional-item {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #3f3f3c;
+  font-size: 13px;
+}
+
+.anuncio-page .fingen-detail-optional-item svg {
+  color: #f2803f;
+}
+
+.anuncio-page .fingen-detail-description {
+  color: #3f3f3c;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.anuncio-page .fingen-detail-safety-item {
+  padding: 14px;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #3f3f3c;
+}
+
+.anuncio-page .fingen-detail-safety-item svg {
+  flex: none;
+  color: #f2803f;
+}
+
+.anuncio-page .fingen-detail-seller-avatar {
+  width: 56px;
+  height: 56px;
+  background: #efefec;
+  color: #111111;
+  font-family: var(--hh-font), sans-serif;
+  font-size: 22px;
+}
+
+.anuncio-page .fingen-detail-seller-name {
+  color: #111111;
+  font-size: 16px;
+}
+
+.anuncio-page .fingen-detail-seller-type {
+  color: #5f5f5c;
+}
+
+.anuncio-page .fingen-detail-seller-stats strong {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.anuncio-page .fingen-detail-seller-stats span {
+  color: #76766f;
+}
+
+.anuncio-page .fingen-detail-share-btn {
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1.5px solid #e4e4e1;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111111;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.anuncio-page .fingen-detail-share-btn:hover {
+  border-color: #111111;
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.anuncio-page .fingen-detail-report {
+  border: 1.5px solid #ececea;
+  border-radius: 999px;
+  color: #5f5f5c;
+  font-weight: 600;
+}
+
+/* ── Similares ── */
+.anuncio-page .fingen-detail-section-header h3 {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.anuncio-page .fingen-detail-section-header a {
+  color: #5f5f5c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.anuncio-page .fingen-detail-section-header a:hover {
+  color: #111111;
+}
+
+.anuncio-page .fingen-detail-similar-grid {
+  scroll-snap-type: x mandatory;
+}
+
+.anuncio-page .fingen-detail-similar-card {
+  scroll-snap-align: start;
+  background: #f8f8f8;
+  border: 0;
+  border-radius: 24px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.anuncio-page .fingen-detail-similar-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(17, 17, 17, 0.1);
+}
+
+.anuncio-page .fingen-detail-similar-img {
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+  background: #efefec;
+}
+
+.anuncio-page .fingen-detail-similar-img img {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.anuncio-page .fingen-detail-similar-card:hover .fingen-detail-similar-img img {
+  transform: scale(1.05);
+}
+
+.anuncio-page .fingen-detail-similar-brand {
+  color: #76766f;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.anuncio-page .fingen-detail-similar-name {
+  color: #111111;
+  font-size: 15px;
+}
+
+.anuncio-page .fingen-detail-similar-price {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.anuncio-page .fingen-detail-similar-meta {
+  color: #5f5f5c;
+}
+
+/* ── Barra fixa do celular ── */
+.anuncio-page .fingen-detail-mobile-bar {
+  background: rgba(255, 255, 255, 0.92);
+  border-top: 1px solid #f0f0ee;
+  backdrop-filter: blur(12px);
+}
+
+.anuncio-page .fingen-detail-mobile-price strong {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.anuncio-page .fingen-detail-mobile-price span {
+  color: #76766f;
+}
+
+/* ── Foco visível em toda a página ── */
+.anuncio-page a:focus-visible,
+.anuncio-page button:focus-visible {
+  outline: 3px solid #111111;
+  outline-offset: 3px;
+}
+
+/* ══════════════════════════════════════════════
+   Movimento: entradas em cascata e micro-interações.
+   Só opacity/transform — nada de layout ou JS extra.
+   ══════════════════════════════════════════════ */
+@keyframes anuncio-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes anuncio-bar-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.anuncio-page .fingen-detail-price-card {
+  animation: anuncio-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anuncio-page .fingen-detail-cta {
+  animation: anuncio-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
+}
+
+.anuncio-page .fingen-detail-rest > * {
+  animation: anuncio-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anuncio-page .fingen-detail-rest > *:nth-child(1) { animation-delay: 0.04s; }
+.anuncio-page .fingen-detail-rest > *:nth-child(2) { animation-delay: 0.08s; }
+.anuncio-page .fingen-detail-rest > *:nth-child(3) { animation-delay: 0.12s; }
+.anuncio-page .fingen-detail-rest > *:nth-child(4) { animation-delay: 0.16s; }
+.anuncio-page .fingen-detail-rest > *:nth-child(5) { animation-delay: 0.2s; }
+.anuncio-page .fingen-detail-rest > *:nth-child(6) { animation-delay: 0.24s; }
+.anuncio-page .fingen-detail-rest > *:nth-child(7) { animation-delay: 0.28s; }
+.anuncio-page .fingen-detail-rest > *:nth-child(8) { animation-delay: 0.32s; }
+
+.anuncio-page .fingen-detail-similar-section {
+  animation: anuncio-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.anuncio-page .fingen-detail-mobile-bar {
+  animation: anuncio-bar-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* O selo de preço dá um "pop" ao aparecer */
+.anuncio-page .fingen-detail-price-badge {
+  animation: anuncio-rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anuncio-page .fingen-detail-price-card,
+  .anuncio-page .fingen-detail-cta,
+  .anuncio-page .fingen-detail-rest > *,
+  .anuncio-page .fingen-detail-similar-section,
+  .anuncio-page .fingen-detail-mobile-bar,
+  .anuncio-page .fingen-detail-price-badge,
+  .anuncio-page .ref-ad-gallery-zoom img,
+  .anuncio-page .fingen-detail-similar-img img,
+  .anuncio-page .fingen-detail-similar-card,
+  .anuncio-page .ref-ad-thumb,
+  .anuncio-page .ref-ad-gallery-arrow,
+  .anuncio-page .fingen-detail-back,
+  .anuncio-page .fingen-detail-action-btn,
+  .anuncio-page .fingen-detail-share-btn,
+  .anuncio-page .btn.btn-primary {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .anuncio-page .ref-ad-gallery-zoom:hover img,
+  .anuncio-page .fingen-detail-similar-card:hover .fingen-detail-similar-img img {
+    transform: none;
+  }
+}

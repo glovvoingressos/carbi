@@ -49,7 +49,7 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
     return (
       <section className="fingen-detail-card-dark">
         <div className="flex items-center justify-center py-6">
-          <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'rgba(255,255,255,0.4)' }} />
+          <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--fipe-empty, rgba(255,255,255,0.4))' }} />
         </div>
       </section>
     )
@@ -62,9 +62,9 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
   return (
     <section className="fingen-detail-card-dark">
       <div className="fingen-detail-dark-header">
-        <h3 style={{ color: '#FFFFFF' }}>Histórico FIPE</h3>
+        <h3>Histórico FIPE</h3>
         {data.length > 0 ? (
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>últimos {data.length} registros</span>
+          <span style={{ fontSize: 11, color: 'var(--fipe-muted, rgba(255,255,255,0.4))' }}>últimos {data.length} registros</span>
         ) : null}
       </div>
 
@@ -82,7 +82,7 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
                   width: 82,
                   flexShrink: 0,
                   fontSize: 11,
-                  color: 'rgba(255,255,255,0.5)',
+                  color: 'var(--fipe-muted, rgba(255,255,255,0.5))',
                   textAlign: 'right',
                 }}>
                   {d.month}
@@ -90,8 +90,8 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
                 <div style={{
                   flex: 1,
                   height: 30,
-                  background: 'rgba(255,255,255,0.05)',
-                  borderRadius: 6,
+                  background: 'var(--fipe-track, rgba(255,255,255,0.05))',
+                  borderRadius: 'var(--fipe-radius, 6px)',
                   overflow: 'hidden',
                 }}>
                   <div
@@ -100,7 +100,7 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
                       height: '100%',
                       width: `${barPct + 20}%`,
                       background: `linear-gradient(90deg, ${isLatest ? '#D4F576' : barColor}, ${isLatest ? '#E8FF7A' : barColor})`,
-                      borderRadius: 6,
+                      borderRadius: 'var(--fipe-radius, 6px)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'flex-end',
@@ -112,7 +112,7 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
                     <span style={{
                       fontSize: 11,
                       fontWeight: 700,
-                      color: isLatest ? '#1A1A1A' : '#fff',
+                      color: isLatest ? 'var(--fipe-bar-text-latest, #1A1A1A)' : 'var(--fipe-bar-text, #fff)',
                     }}>
                       {d.price}
                     </span>
@@ -125,13 +125,13 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
           <div style={{
             marginTop: 12,
             padding: '10px 12px',
-            background: 'rgba(255,255,255,0.04)',
-            borderRadius: 8,
+            background: 'var(--fipe-footer-bg, rgba(255,255,255,0.04))',
+            borderRadius: 'var(--fipe-footer-radius, 8px)',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
             fontSize: 12,
-            color: 'rgba(255,255,255,0.55)',
+            color: 'var(--fipe-footer-text, rgba(255,255,255,0.55))',
           }}>
             <TrendingDown size={14} />
             Variação de {formatBRL(minPrice)} a {formatBRL(maxPrice)}
@@ -145,7 +145,7 @@ export default function FipeHistoryChart({ brand, model, version, year, currentF
           gap: 8,
           padding: '20px 0',
           fontSize: 13,
-          color: 'rgba(255,255,255,0.4)',
+          color: 'var(--fipe-empty, rgba(255,255,255,0.4))',
         }}>
           Histórico FIPE indisponível para este veículo
         </div>
