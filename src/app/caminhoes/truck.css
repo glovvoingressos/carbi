@@ -597,6 +597,21 @@
   padding: clamp(20px, 4vw, 40px) 0 0;
 }
 
+/* ── Mobile-first: empilha texto sobre a foto ── */
+.tk-hero-grid {
+  display: grid;
+  gap: 28px;
+}
+
+/* ≥900px: texto à esquerda, foto à direita */
+@media (min-width: 900px) {
+  .tk-hero-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+    gap: clamp(28px, 4vw, 56px);
+    align-items: center;
+  }
+}
+
 .tk-hero-top {
   display: flex;
   flex-wrap: wrap;
@@ -632,6 +647,15 @@
   line-height: 0.92;
   letter-spacing: -0.02em;
   color: var(--tk-ink);
+}
+
+/* Em duas colunas o título tem metade da largura: recua para caber
+   sem quebrar em linhas curtas demais */
+@media (min-width: 900px) {
+  .tk-hero-title {
+    font-size: clamp(52px, 5.6vw, 84px);
+    max-width: 13ch;
+  }
 }
 
 .tk-hero-row {
@@ -688,11 +712,18 @@
 
 .tk-hero-media {
   position: relative;
-  height: clamp(260px, 44vw, 540px);
-  margin-top: 32px;
+  /* Mobile mantém a faixa horizontal; no grid de 2 colunas o aspecto
+     fica mais próximo do retrato para acompanhar a altura do texto */
+  height: clamp(240px, 56vw, 340px);
   overflow: hidden;
   border-radius: 28px;
   background: linear-gradient(180deg, #e6eaee 0%, #c7cfd6 42%, #4a5058 42%, #353a41 100%);
+}
+
+@media (min-width: 900px) {
+  .tk-hero-media {
+    height: clamp(360px, 42vw, 520px);
+  }
 }
 
 .tk-hero-media img {

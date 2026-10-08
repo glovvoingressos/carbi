@@ -93,34 +93,38 @@ export default async function TruckHomePage() {
 
         {/* ═══ HERO ═══ */}
         <section className="tk-hero">
-          <div className="tk-hero-top">
-            <span className="tk-novelty">Novidade</span>
-            <span className="tk-hero-kicker">Agora a Carbi também tem área de caminhões</span>
-          </div>
+          <div className="tk-hero-grid">
+            <div className="tk-hero-text">
+              <div className="tk-hero-top">
+                <span className="tk-novelty">Novidade</span>
+                <span className="tk-hero-kicker">Agora a Carbi também tem área de caminhões</span>
+              </div>
 
-          <h1 className="tk-hero-title">Caminhões à venda, do toco ao cavalo mecânico.</h1>
+              <h1 className="tk-hero-title">Caminhões à venda, do toco ao cavalo mecânico.</h1>
 
-          <div className="tk-hero-row">
-            <p className="tk-hero-sub">
-              Compare ano, quilometragem, eixos e capacidade de carga. Ficha técnica completa e comparação com a tabela FIPE em cada anúncio.
-            </p>
-            <Link href="/caminhoes/buscar" className="tk-pill">
-              <span className="tk-pill-circle" aria-hidden="true"><ArrowRight size={18} /></span>
-              Ver caminhões à venda
-            </Link>
-          </div>
+              <div className="tk-hero-row">
+                <p className="tk-hero-sub">
+                  Compare ano, quilometragem, eixos e capacidade de carga. Ficha técnica completa e comparação com a tabela FIPE em cada anúncio.
+                </p>
+                <Link href="/caminhoes/buscar" className="tk-pill">
+                  <span className="tk-pill-circle" aria-hidden="true"><ArrowRight size={18} /></span>
+                  Ver caminhões à venda
+                </Link>
+              </div>
+            </div>
 
-          <div className={hasHeroPhoto ? 'tk-hero-media has-photo' : 'tk-hero-media'}>
-            {hasHeroPhoto ? (
-              <img
-                src="/images/caminhao-hero.jpg"
-                alt="Caminhão Scania em rodovia na Islândia"
-                width={736}
-                height={417}
-                loading="eager"
-                fetchPriority="high"
-              />
-            ) : null}
+            <div className={hasHeroPhoto ? 'tk-hero-media has-photo' : 'tk-hero-media'}>
+              {hasHeroPhoto ? (
+                <img
+                  src="/images/caminhao-hero.jpg"
+                  alt="Caminhão Scania em rodovia na Islândia"
+                  width={736}
+                  height={417}
+                  loading="eager"
+                  fetchPriority="high"
+                />
+              ) : null}
+            </div>
           </div>
 
           {stats.length > 0 ? (
