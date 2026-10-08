@@ -158,9 +158,9 @@ export default async function TruckSeoPage({
         />
       </div>
       <nav className="cbi-nav" aria-label="Navegação de caminhões">
-        <Link href="/">Home</Link>
-        <Link href="/caminhoes" className="active">Buscar</Link>
-        <Link href="/anunciar-caminhao">Anunciar caminhão</Link>
+        <Link href="/caminhoes">Home</Link>
+        <Link href="/caminhoes/buscar" className="active">Buscar</Link>
+        <Link href="/anunciar-caminhao">Anunciar</Link>
       </nav>
     </main>
   )

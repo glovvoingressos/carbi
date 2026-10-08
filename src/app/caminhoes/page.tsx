@@ -1,56 +1,84 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import MarketplaceClient from '@/components/marketplace/MarketplaceClient'
+import { ArrowRight, BadgeCheck, Gauge, MessageCircle, Ruler, TrendingUp, Truck } from 'lucide-react'
+import ListingCard from '@/components/marketplace/ListingCard'
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo/JSONLD'
 import { FAQSection } from '@/components/seo/SEOContentSection'
-import { fetchPublicTruckListingsPage, getFilterOptions, type ListingSort } from '@/lib/marketplace-server'
-import { TRUCK_CATEGORIES, TRUCK_FAQ, TRUCK_QUICK_LINKS, serializeJsonLd, truckBrowseJsonLd, truckListingMetadata } from '@/lib/truck-seo'
+import { fetchPublicTruckListingsPage } from '@/lib/marketplace-server'
+import {
+  TRUCK_BRANDS,
+  TRUCK_CATEGORIES,
+  TRUCK_FAQ,
+  TRUCK_QUICK_LINKS,
+  serializeJsonLd,
+  truckBrandSlug,
+  truckBrowseJsonLd,
+} from '@/lib/truck-seo'
 
-export const metadata: Metadata = truckListingMetadata()
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 
-type Params = { q?: string; ordem?: ListingSort; pagina?: string; brand?: string | string[]; model?: string | string[]; transmission?: string | string[]; fuel?: string | string[]; color?: string | string[]; body_type?: string | string[]; city?: string | string[]; state?: string; truck_type?: string | string[]; axles?: string | string[]; mileage_min?: string; mileage_max?: string; price_min?: string; price_max?: string; year_min?: string; year_max?: string; load_capacity_min?: string; load_capacity_max?: string }
+export const metadata: Metadata = {
+  title: 'Caminhões à venda: truck, bitruck, cavalo mecânico e toco',
+  description:
+    'Caminhões usados e seminovos com ficha técnica completa: eixos, PBT, capacidade de carga e comparação com a tabela FIPE. Anuncie grátis na Carbi.',
+  keywords: ['caminhões à venda', 'caminhão usado', 'cavalo mecânico', 'bitruck', 'truck', 'toco', 'comprar caminhão'],
+  alternates: { canonical: '/caminhoes' },
+  openGraph: {
+    title: 'Caminhões à venda: truck, bitruck, cavalo mecânico e toco | Carbi',
+    description: 'Caminhões usados e seminovos com ficha técnica completa e comparação FIPE.',
+    url: '/caminhoes',
+    type: 'website',
+  },
+}
 
-export default async function TrucksPage({ searchParams }: { searchParams: Promise<Params> }) {
-  const sp = await searchParams
-  const page = Math.max(Number(sp.pagina || 1) || 1, 1)
-  const [result, filterOptions] = await Promise.all([
-    fetchPublicTruckListingsPage({
-      q: sp.q,
-      brand: sp.brand,
-      model: sp.model,
-      transmission: sp.transmission,
-      fuel: sp.fuel,
-      color: sp.color,
-      bodyType: sp.body_type,
-      city: sp.city,
-      state: sp.state,
-      truckType: sp.truck_type,
-      axles: Array.isArray(sp.axles) ? sp.axles.map(Number) : sp.axles ? Number(sp.axles) : undefined,
-      mileageMin: sp.mileage_min ? Number(sp.mileage_min) : undefined,
-      mileageMax: sp.mileage_max ? Number(sp.mileage_max) : undefined,
-      priceMin: sp.price_min ? Number(sp.price_min) : undefined,
-      priceMax: sp.price_max ? Number(sp.price_max) : undefined,
-      yearMin: sp.year_min ? Number(sp.year_min) : undefined,
-      yearMax: sp.year_max ? Number(sp.year_max) : undefined,
-      loadCapacityMin: sp.load_capacity_min ? Number(sp.load_capacity_min) : undefined,
-      loadCapacityMax: sp.load_capacity_max ? Number(sp.load_capacity_max) : undefined,
-      sort: sp.ordem || 'recent',
-      page,
-      pageSize: 24,
-    }),
-    getFilterOptions(),
-  ])
+const CATEGORY_ICONS: Record<string, typeof Truck> = {
+  truck: Truck,
+  bitruck: Truck,
+  'cavalo-mecanico': Truck,
+  toco: Truck,
+}
 
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
+const ADVANTAGES = [
+  {
+    icon: Ruler,
+    title: 'Ficha técnica completa',
+    text: 'Eixos, PBT, CMT, capacidade de carga e carroceria em cada anúncio.',
+  },
+  {
+    icon: TrendingUp,
+    title: 'Preço comparado com a FIPE',
+    text: 'Veja se o valor pedido está justo antes de fechar negócio.',
+  },
+  {
+    icon: MessageCircle,
+    title: 'Chat interno',
+    text: 'Negocie pelo chat da Carbi sem expor seu telefone.',
+  },
+  {
+    icon: BadgeCheck,
+    title: 'Anúncio grátis',
+    text: 'Publique seu caminhão sem custo e alcance compradores de todo o Brasil.',
+  },
+]
+
+export default async function TruckHomePage() {
+  const featured = await fetchPublicTruckListingsPage({ sort: 'recent', page: 1, pageSize: 8 })
+
   const browseJsonLd = truckBrowseJsonLd({
     name: 'Caminhões à venda',
-    description: 'Caminhões usados e seminovos anunciados na Carbi, com comparação FIPE e ficha técnica.',
+    description: 'Caminhões usados e seminovos com ficha técnica completa e comparação FIPE.',
     url: `${SITE_URL}/caminhoes`,
     items: [
       ...TRUCK_CATEGORIES.map((category) => ({ name: category.name, url: `${SITE_URL}/caminhoes/${category.slug}` })),
-      ...TRUCK_QUICK_LINKS.map((link) => ({ name: link.label, url: `${SITE_URL}${link.href}` })),
+      ...TRUCK_BRANDS.map((brand) => ({ name: `Caminhões ${brand}`, url: `${SITE_URL}/caminhoes/marca-${truckBrandSlug(brand)}` })),
     ],
   })
+
+  const stats = [
+    { value: featured.total, label: 'caminhões anunciados' },
+    { value: TRUCK_BRANDS.length, label: 'marcas' },
+    { value: TRUCK_CATEGORIES.length, label: 'categorias' },
+  ].filter((stat) => stat.value > 0)
 
   return (
     <main className="cbi-page">
@@ -58,64 +86,171 @@ export default async function TrucksPage({ searchParams }: { searchParams: Promi
         <BreadcrumbSchema items={[{ name: 'Home', url: '/' }, { name: 'Caminhões à venda', url: '/caminhoes' }]} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(browseJsonLd) }} />
 
-        <section className="cbi-hero">
-          <div className="cbi-hero-eyebrow">Caminhões</div>
-          <h1 className="cbi-hero-title">Caminhões à venda</h1>
-          <p className="cbi-hero-sub">
-            {result.total > 0
-              ? `${result.total} caminhões ativos. Compare preço, ano, eixos e capacidade de carga com a tabela FIPE.`
-              : 'Caminhões usados e seminovos com ficha técnica completa, capacidade de carga e comparação FIPE.'}
-          </p>
+        {/* ═══ HERO ═══ */}
+        <section className="tk-hero">
+          <div className="tk-hero-copy">
+            <p className="tk-hero-eyebrow">Caminhões</p>
+            <h1 className="tk-hero-title">Do toco ao cavalo mecânico, com preço na mesa.</h1>
+            <p className="tk-hero-sub">
+              Compare ano, quilometragem, eixos e capacidade de carga em cada anúncio, com ficha técnica completa e
+              comparação com a tabela FIPE.
+            </p>
+
+            <div className="tk-hero-actions">
+              <Link href="/caminhoes/buscar" className="tk-btn tk-btn-primary">
+                Ver caminhões à venda
+                <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+              <Link href="/anunciar-caminhao" className="tk-btn tk-btn-ghost">
+                Anunciar meu caminhão
+              </Link>
+            </div>
+
+            {stats.length > 0 ? (
+              <div className="tk-hero-stats" role="list">
+                {stats.map((stat) => (
+                  <div key={stat.label} className="tk-hero-stat" role="listitem">
+                    <strong>{stat.value}</strong>
+                    <span>{stat.label}</span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="tk-hero-cards">
+            {TRUCK_CATEGORIES.map((category) => {
+              const Icon = CATEGORY_ICONS[category.slug] || Truck
+              return (
+                <Link key={category.slug} href={`/caminhoes/${category.slug}`} className="tk-hero-card">
+                  <span className="tk-hero-card-icon" aria-hidden="true">
+                    <Icon size={20} />
+                  </span>
+                  <span className="tk-hero-card-title">{category.name}</span>
+                  <ArrowRight className="tk-hero-card-arrow" size={20} aria-hidden="true" />
+                </Link>
+              )
+            })}
+          </div>
         </section>
 
+        {/* ═══ ATALHOS ═══ */}
         <nav className="truck-links" aria-label="Atalhos de caminhões">
           {TRUCK_QUICK_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className="truck-link">
               {link.label}
             </Link>
           ))}
-          <Link href="/caminhoes/categorias" className="truck-link">Todas as categorias</Link>
-          <Link href="/caminhoes/marcas" className="truck-link">Todas as marcas</Link>
         </nav>
 
-        <MarketplaceClient
-          initialListings={result.items}
-          initialTotal={result.total}
-          initialPage={page}
-          initialTotalPages={Math.max(1, Math.ceil(result.total / result.pageSize))}
-          defaultFilters={{
-            vehicle_type: 'truck',
-            q: sp.q,
-            brand: sp.brand,
-            model: sp.model,
-            fuel: sp.fuel,
-            color: sp.color,
-            bodyType: sp.body_type,
-            city: sp.city,
-            state: sp.state,
-            transmission: sp.transmission,
-            mileageMin: sp.mileage_min ? Number(sp.mileage_min) : undefined,
-            mileageMax: sp.mileage_max ? Number(sp.mileage_max) : undefined,
-            priceMin: sp.price_min ? Number(sp.price_min) : undefined,
-            priceMax: sp.price_max ? Number(sp.price_max) : undefined,
-            yearMin: sp.year_min ? Number(sp.year_min) : undefined,
-            yearMax: sp.year_max ? Number(sp.year_max) : undefined,
-            truckType: sp.truck_type,
-            axles: Array.isArray(sp.axles) ? sp.axles.map(Number) : sp.axles ? Number(sp.axles) : undefined,
-            loadCapacityMin: sp.load_capacity_min ? Number(sp.load_capacity_min) : undefined,
-            loadCapacityMax: sp.load_capacity_max ? Number(sp.load_capacity_max) : undefined,
-          }}
-          filterOptions={filterOptions}
-        />
+        {/* ═══ ANÚNCIOS ═══ */}
+        <section className="tk-section">
+          <div className="tk-section-head">
+            <h2 className="tk-section-title">Caminhões anunciados agora</h2>
+            <Link href="/caminhoes/buscar" className="tk-section-link">
+              Ver todos os caminhões
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
 
+          {featured.items.length > 0 ? (
+            <div className="tk-listings">
+              {featured.items.map((listing, index) => (
+                <ListingCard key={listing.id} listing={listing} index={index} />
+              ))}
+            </div>
+          ) : (
+            <div className="tk-empty">
+              <strong>Ainda não há caminhões anunciados.</strong>
+              <p>Publique o seu em poucos minutos — é grátis e o anúncio aparece aqui.</p>
+              <Link href="/anunciar-caminhao" className="tk-btn tk-btn-primary">
+                Anunciar meu caminhão
+                <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+            </div>
+          )}
+        </section>
+
+        {/* ═══ VANTAGENS ═══ */}
+        <section className="tk-section">
+          <div className="tk-section-head">
+            <h2 className="tk-section-title">Por que negociar caminhão na Carbi</h2>
+          </div>
+          <div className="tk-advantages">
+            {ADVANTAGES.map((advantage) => (
+              <div key={advantage.title} className="tk-advantage">
+                <span className="tk-advantage-icon" aria-hidden="true">
+                  <advantage.icon size={20} />
+                </span>
+                <h3>{advantage.title}</h3>
+                <p>{advantage.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══ CATEGORIAS ═══ */}
+        <section className="tk-section">
+          <div className="tk-section-head">
+            <h2 className="tk-section-title">Navegue por categoria</h2>
+            <Link href="/caminhoes/categorias" className="tk-section-link">
+              Ver categorias
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="truck-hub-grid">
+            {TRUCK_CATEGORIES.map((category) => (
+              <Link key={category.slug} href={`/caminhoes/${category.slug}`} className="truck-hub-card">
+                <h2>{category.name}</h2>
+                <span className="truck-hub-cta">Ver anúncios</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══ MARCAS ═══ */}
+        <section className="tk-section">
+          <div className="tk-section-head">
+            <h2 className="tk-section-title">Caminhões por marca</h2>
+            <Link href="/caminhoes/marcas" className="tk-section-link">
+              Ver marcas
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="tk-brands">
+            {TRUCK_BRANDS.map((brand) => (
+              <Link key={brand} href={`/caminhoes/marca-${truckBrandSlug(brand)}`} className="tk-brand">
+                {brand}
+                <ArrowRight size={15} aria-hidden="true" />
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══ FAQ ═══ */}
         <FAQSchema items={TRUCK_FAQ} />
         <FAQSection items={TRUCK_FAQ} />
+
+        {/* ═══ CTA FINAL ═══ */}
+        <section className="tk-cta">
+          <div>
+            <p className="tk-cta-eyebrow">Carbi caminhões</p>
+            <h2 className="tk-cta-title">Anuncie seu caminhão grátis</h2>
+            <p className="tk-cta-text">
+              Ficha técnica, fotos e chat interno. Seu caminhão divulgado para compradores de todo o Brasil.
+            </p>
+          </div>
+          <Link href="/anunciar-caminhao" className="tk-btn tk-btn-amber">
+            Anunciar meu caminhão
+            <ArrowRight size={18} aria-hidden="true" />
+          </Link>
+        </section>
       </div>
 
       <nav className="cbi-nav" aria-label="Navegação de caminhões">
-        <Link href="/">Home</Link>
-        <Link href="/caminhoes" className="active">Buscar</Link>
-        <Link href="/anunciar-caminhao">Anunciar caminhão</Link>
+        <Link href="/caminhoes" className="active">Home</Link>
+        <Link href="/caminhoes/buscar">Buscar</Link>
+        <Link href="/anunciar-caminhao">Anunciar</Link>
       </nav>
     </main>
   )

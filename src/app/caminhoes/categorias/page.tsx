@@ -54,7 +54,7 @@ export default function TruckCategoriesPage() {
           <h2 className="truck-hub-title">Qual categoria de caminhão escolher?</h2>
           <p className="truck-hub-text">
             Compare capacidade de carga, eixos e carroceria nos anúncios antes de decidir. Para uma busca ampla,{' '}
-            <Link className="underline" href="/caminhoes">acesse o marketplace de caminhões</Link> e refine os resultados
+            <Link className="underline" href="/caminhoes/buscar">acesse o marketplace de caminhões</Link> e refine os resultados
             por preço, ano e estado.
           </p>
         </section>

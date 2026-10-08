@@ -591,6 +591,361 @@
   line-height: 1.65;
 }
 
+/* ══════════════ Home dos caminhões ══════════════ */
+
+.tk-hero {
+  display: grid;
+  gap: 20px;
+  padding: 28px 24px;
+  border-radius: 24px;
+  background: var(--tk-steel);
+}
+
+@media (min-width: 900px) {
+  .tk-hero {
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items: center;
+    gap: 32px;
+    padding: 36px 32px;
+  }
+}
+
+.tk-hero-eyebrow {
+  margin: 0;
+  color: var(--tk-amber-dark);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.tk-hero-title {
+  margin: 8px 0 0;
+  max-width: 20ch;
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(40px, 9vw, 66px);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  color: var(--tk-ink);
+}
+
+.tk-hero-sub {
+  margin: 14px 0 0;
+  max-width: 52ch;
+  color: var(--tk-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.tk-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.tk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.tk-btn-primary {
+  background: var(--tk-ink);
+  color: #ffffff;
+}
+
+.tk-btn-primary:hover {
+  background: var(--tk-amber);
+  color: var(--tk-ink);
+  transform: translateY(-1px);
+}
+
+.tk-btn-ghost {
+  border: 1.5px solid var(--tk-steel-strong);
+  background: #ffffff;
+  color: var(--tk-ink);
+}
+
+.tk-btn-ghost:hover {
+  border-color: var(--tk-ink);
+  transform: translateY(-1px);
+}
+
+.tk-btn-amber {
+  background: var(--tk-amber);
+  color: var(--tk-ink);
+}
+
+.tk-btn-amber:hover {
+  background: #ffffff;
+  color: var(--tk-ink);
+  transform: translateY(-1px);
+}
+
+.tk-hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin-top: 26px;
+}
+
+.tk-hero-stat strong {
+  display: block;
+  font-family: var(--hh-font), sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--tk-ink);
+}
+
+.tk-hero-stat span {
+  color: var(--tk-muted);
+  font-size: 12px;
+}
+
+.tk-hero-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tk-hero-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  min-height: 140px;
+  padding: 18px;
+  border-radius: 24px;
+  background: #ffffff;
+  color: var(--tk-ink);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tk-hero-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(16, 20, 24, 0.12);
+}
+
+.tk-hero-card-icon {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--tk-amber);
+  color: var(--tk-ink);
+}
+
+.tk-hero-card-title {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.05;
+}
+
+.tk-hero-card-arrow {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  color: var(--tk-ink);
+}
+
+/* Seções da home */
+.tk-section {
+  margin-top: 40px;
+}
+
+.tk-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tk-section-title {
+  margin: 0;
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(30px, 6vw, 44px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--tk-ink);
+}
+
+.tk-section-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--tk-muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tk-section-link:hover {
+  color: var(--tk-ink);
+}
+
+.tk-listings {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.tk-empty {
+  padding: 32px 24px;
+  border-radius: 24px;
+  background: var(--tk-steel);
+  text-align: center;
+}
+
+.tk-empty strong {
+  display: block;
+  font-family: var(--hh-font), sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--tk-ink);
+}
+
+.tk-empty p {
+  margin: 8px auto 18px;
+  max-width: 44ch;
+  color: var(--tk-muted);
+  font-size: 14px;
+}
+
+.tk-advantages {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.tk-advantage {
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--tk-steel);
+}
+
+.tk-advantage-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: var(--tk-amber);
+  color: var(--tk-ink);
+}
+
+.tk-advantage h3 {
+  margin: 0 0 6px;
+  font-family: var(--hh-font), sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--tk-ink);
+}
+
+.tk-advantage p {
+  margin: 0;
+  color: var(--tk-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.tk-brands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tk-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--tk-steel);
+  color: var(--tk-ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.tk-brand:hover {
+  background: var(--tk-amber);
+  transform: translateY(-1px);
+}
+
+.tk-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 40px;
+  padding: 28px 24px;
+  border-radius: 24px;
+  background: var(--tk-ink);
+}
+
+@media (min-width: 768px) {
+  .tk-cta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 32px;
+  }
+}
+
+.tk-cta-eyebrow {
+  margin: 0;
+  color: var(--tk-amber);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.tk-cta-title {
+  margin: 8px 0 0;
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(32px, 7vw, 46px);
+  font-weight: 600;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.tk-cta-text {
+  margin: 10px 0 0;
+  max-width: 46ch;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
 /* ── Foco visível ── */
 .truck-site a:focus-visible,
 .truck-site button:focus-visible,

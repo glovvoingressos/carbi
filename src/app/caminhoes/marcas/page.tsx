@@ -56,7 +56,7 @@ export default function TruckBrandsPage() {
           <h2 className="truck-hub-title">Como encontrar um caminhão usado por marca?</h2>
           <p className="truck-hub-text">
             Escolha a marca para comparar preço, ano, quilometragem, capacidade e localização dos anúncios ativos. Você também
-            pode <Link className="underline" href="/caminhoes">ver todos os caminhões</Link> e filtrar por categoria,
+            pode <Link className="underline" href="/caminhoes/buscar">ver todos os caminhões</Link> e filtrar por categoria,
             como <Link className="underline" href="/caminhoes/cavalo-mecanico">cavalos mecânicos</Link> e{' '}
             <Link className="underline" href="/caminhoes/bitruck">bitrucks</Link>.
           </p>
