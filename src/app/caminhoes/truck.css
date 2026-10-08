@@ -1,0 +1,609 @@
+/* ============================================================
+   Área de caminhões — identidade "aço + âmbar"
+   Mesma fonte (Barlow Condensed) do resto do site, mas com paleta,
+   cards e micro-interações próprias: é como se fosse outro site.
+
+   Escopo .truck-site (aplicado pelo layout de /caminhoes), então
+   nada aqui afeta /carros-a-venda, a home ou os anúncios de carro.
+   ============================================================ */
+
+.truck-site {
+  --tk-amber: #f5a524;
+  --tk-amber-dark: #d98c0f;
+  --tk-ink: #101418;
+  --tk-steel: #eef0f2;
+  --tk-steel-strong: #dde2e6;
+  --tk-muted: #55606a;
+
+  /* Gráfico do histórico FIPE na página de anúncio de caminhão */
+  --fipe-track: #ffffff;
+  --fipe-muted: #55606a;
+  --fipe-footer-bg: #ffffff;
+  --fipe-footer-text: #4a545d;
+  --fipe-empty: #55606a;
+  --fipe-bar-text: #ffffff;
+  --fipe-bar-text-latest: #101418;
+  --fipe-radius: 999px;
+  --fipe-footer-radius: 16px;
+}
+
+/* ── Base do marketplace ── */
+.truck-site .cbi-page {
+  background: #ffffff;
+  color: var(--tk-ink);
+}
+
+/* ── Hero ── */
+.truck-site .cbi-hero {
+  border: 0;
+  background: var(--tk-steel);
+}
+
+.truck-site .cbi-hero::after {
+  background: var(--tk-amber);
+}
+
+.truck-site .cbi-hero-eyebrow {
+  color: var(--tk-amber-dark);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+
+.truck-site .cbi-hero-title {
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(40px, 10vw, 64px);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  color: var(--tk-ink);
+}
+
+.truck-site .cbi-hero-title em {
+  color: var(--tk-amber-dark);
+}
+
+.truck-site .cbi-hero-sub {
+  color: var(--tk-muted);
+  font-size: 15px;
+  max-width: 56ch;
+}
+
+/* ── Busca, ordenação e filtros: pílula de aço ── */
+.truck-site .cbi-search input {
+  height: 48px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: var(--tk-steel);
+  color: var(--tk-ink);
+  font-size: 16px;
+}
+
+.truck-site .cbi-search input::placeholder {
+  color: #7c8791;
+}
+
+.truck-site .cbi-search input:focus {
+  border-color: var(--tk-ink);
+  box-shadow: 0 0 0 3px rgba(16, 20, 24, 0.16);
+}
+
+.truck-site .cbi-search svg {
+  color: var(--tk-muted);
+  left: 16px;
+}
+
+.truck-site .cbi-toolbar[data-searching='true'] .cbi-search::after {
+  background: var(--tk-amber);
+}
+
+.truck-site .cbi-select {
+  height: 48px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: var(--tk-steel);
+  color: var(--tk-ink);
+  font-size: 15px;
+}
+
+.truck-site .cbi-select:focus {
+  border-color: var(--tk-ink);
+}
+
+.truck-site .cbi-filter-btn {
+  height: 48px;
+  border: 1.5px solid var(--tk-steel-strong);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--tk-ink);
+  font-size: 15px;
+}
+
+.truck-site .cbi-filter-btn:hover {
+  border-color: var(--tk-ink);
+}
+
+.truck-site .cbi-filter-count {
+  background: var(--tk-amber);
+  color: var(--tk-ink);
+}
+
+/* ── Atalhos ── */
+.truck-site .cbi-quick-label {
+  color: var(--tk-muted);
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.truck-site .cbi-quick-filter {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid var(--tk-steel-strong);
+  background: #ffffff;
+  color: #3b464f;
+  font-size: 13px;
+}
+
+.truck-site .cbi-quick-filter:hover {
+  border-color: var(--tk-ink);
+  color: var(--tk-ink);
+}
+
+.truck-site .cbi-quick-filter.is-active {
+  border-color: var(--tk-ink);
+  background: var(--tk-ink);
+  color: var(--tk-amber);
+}
+
+/* ── Painel lateral de filtros ── */
+.truck-site .cbi-side-title {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.truck-site .cbi-clear {
+  color: var(--tk-muted);
+  font-size: 12px;
+}
+
+.truck-site .cbi-clear:hover {
+  color: var(--tk-ink);
+}
+
+.truck-site .cbi-panel {
+  border: 0;
+  border-radius: 24px;
+  background: var(--tk-steel);
+  padding: 18px;
+}
+
+.truck-site .cbi-fsection {
+  border-top-color: var(--tk-steel-strong);
+}
+
+.truck-site .cbi-fsection h4 {
+  color: var(--tk-muted);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.truck-site .cbi-toggle {
+  min-height: 36px;
+  border: 1.5px solid var(--tk-steel-strong);
+  background: #ffffff;
+  color: #3b464f;
+  font-size: 13px;
+}
+
+.truck-site .cbi-toggle:hover {
+  border-color: var(--tk-ink);
+  color: var(--tk-ink);
+}
+
+.truck-site .cbi-toggle.on {
+  border-color: var(--tk-ink);
+  background: var(--tk-ink);
+  color: var(--tk-amber);
+}
+
+.truck-site .cbi-check {
+  min-height: 36px;
+  color: #3b464f;
+  font-size: 14px;
+}
+
+.truck-site .cbi-check:hover,
+.truck-site .cbi-check.on {
+  color: var(--tk-ink);
+}
+
+.truck-site .cbi-check .box {
+  width: 18px;
+  height: 18px;
+  border-color: #c3cbd2;
+  background: #ffffff;
+}
+
+.truck-site .cbi-check.on .box {
+  border-color: var(--tk-ink);
+  background: var(--tk-ink);
+}
+
+.truck-site .cbi-field {
+  height: 44px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: var(--tk-steel);
+  color: var(--tk-ink);
+  font-size: 14px;
+}
+
+.truck-site .cbi-field:focus {
+  border-color: var(--tk-ink);
+}
+
+.truck-site .cbi-range {
+  accent-color: var(--tk-amber-dark);
+}
+
+.truck-site .cbi-rangelabels {
+  color: var(--tk-muted);
+}
+
+.truck-site .cbi-swatch {
+  width: 30px;
+  height: 30px;
+  border-color: var(--tk-steel-strong);
+}
+
+.truck-site .cbi-swatch.on {
+  border-color: var(--tk-ink);
+}
+
+/* ── Chips de filtro ativo ── */
+.truck-site .cbi-chip {
+  height: 32px;
+  padding: 0 12px;
+  background: var(--tk-ink);
+  color: var(--tk-amber);
+  font-size: 12px;
+}
+
+.truck-site .cbi-chip:hover {
+  background: var(--tk-amber);
+  color: var(--tk-ink);
+}
+
+/* ── Resultados ── */
+.truck-site .cbi-count {
+  color: var(--tk-muted);
+  font-size: 14px;
+}
+
+.truck-site .cbi-count b {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--tk-ink);
+}
+
+.truck-site .cbi-loading-orb {
+  background: var(--tk-amber);
+  box-shadow: 0 0 0 4px rgba(245, 165, 36, 0.25);
+}
+
+/* ── Cards de caminhão ── */
+.truck-site .cbi-card {
+  background: var(--tk-steel);
+  border-radius: 24px;
+}
+
+.truck-site .cbi-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(16, 20, 24, 0.12);
+}
+
+.truck-site .cbi-card-brand {
+  color: var(--tk-muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.truck-site .cbi-card-title {
+  color: var(--tk-ink);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.truck-site .cbi-card-price {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--tk-ink);
+}
+
+.truck-site .cbi-card-specs span {
+  color: var(--tk-muted);
+  font-size: 12px;
+}
+
+.truck-site .cbi-card-fav {
+  width: 38px;
+  height: 38px;
+}
+
+/* Selo de preço: âmbar em vez do verde dos carros */
+.truck-site .cb-listing-fipe-inline.is-good {
+  background: #fdf0d5;
+  color: #7a4d05;
+}
+
+/* ── Paginação ── */
+.truck-site .cbi-pager button {
+  width: 44px;
+  height: 44px;
+  border-color: var(--tk-steel-strong);
+}
+
+.truck-site .cbi-pager button:hover:not(:disabled) {
+  border-color: var(--tk-ink);
+}
+
+.truck-site .cbi-pager .info {
+  height: 44px;
+  border-color: var(--tk-steel-strong);
+  background: var(--tk-steel);
+  color: var(--tk-ink);
+}
+
+/* ── Estado vazio ── */
+.truck-site .cbi-empty {
+  border: 0;
+  border-radius: 24px;
+  background: var(--tk-steel);
+}
+
+.truck-site .cbi-empty h3 {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--tk-ink);
+}
+
+.truck-site .cbi-empty button {
+  min-height: 52px;
+  padding: 0 28px;
+  background: var(--tk-ink);
+  color: var(--tk-amber);
+  font-size: 15px;
+}
+
+.truck-site .cbi-empty button:hover {
+  background: var(--tk-amber);
+  color: var(--tk-ink);
+}
+
+/* ── Seções de conteúdo/FAQ ── */
+.truck-site .fingen-section-label {
+  color: var(--tk-amber-dark);
+}
+
+.truck-site .fingen-section-title {
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(32px, 8vw, 44px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.truck-site .fingen-card-white {
+  background: var(--tk-steel);
+  border: 0;
+  border-radius: 24px;
+}
+
+.truck-site .fingen-card-white h3 {
+  font-family: var(--hh-font), sans-serif !important;
+  font-size: 21px !important;
+  font-weight: 600 !important;
+  color: var(--tk-ink) !important;
+}
+
+/* ── Navegação inferior ── */
+.truck-site .cbi-nav .active {
+  color: var(--tk-amber-dark);
+}
+
+/* ── Página de anúncio de caminhão ── */
+.truck-site .vehicle-detail-page {
+  background: #ffffff;
+  --fipe-track: #ffffff;
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-price-card,
+.truck-site .vehicle-detail-page .fingen-detail-card,
+.truck-site .vehicle-detail-page .fingen-detail-similar-card {
+  background: var(--tk-steel);
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-card-dark {
+  background: var(--tk-steel);
+  color: var(--tk-ink);
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-dark-header h3,
+.truck-site .vehicle-detail-page .fingen-detail-dark-value {
+  color: var(--tk-ink);
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-dark-label {
+  color: var(--tk-muted);
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-dark-badge {
+  background: #ffffff;
+  color: #3b464f;
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-dark-badge.success {
+  background: #fdf0d5;
+  color: #7a4d05;
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-dark-diff span {
+  background: #ffffff;
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-dark-diff .positive {
+  background: #fdf0d5;
+  color: #7a4d05;
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-dark-diff .negative {
+  background: #ffe4e6;
+  color: #98122f;
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-price-badge.is-good {
+  background: #fdf0d5;
+  color: #7a4d05;
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-price-badge.is-bad {
+  background: #ffe4e6;
+  color: #98122f;
+}
+
+.truck-site .vehicle-detail-page .fingen-detail-optional-item svg,
+.truck-site .vehicle-detail-page .fingen-detail-safety-item svg {
+  color: var(--tk-amber-dark);
+}
+
+.truck-site .vehicle-detail-page .btn.btn-primary {
+  background: var(--tk-ink);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(16, 20, 24, 0.18);
+}
+
+.truck-site .vehicle-detail-page .btn.btn-primary:hover {
+  background: var(--tk-amber);
+  color: var(--tk-ink);
+}
+
+.truck-site .vehicle-detail-page .ref-ad-thumb.active {
+  border-color: var(--tk-amber);
+}
+
+/* ── Atalhos (links de SEO) ── */
+.truck-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 22px;
+}
+
+.truck-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid var(--tk-steel-strong);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #3b464f;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.truck-link:hover {
+  border-color: var(--tk-ink);
+  color: var(--tk-ink);
+  transform: translateY(-1px);
+}
+
+/* ── Hubs (marcas, categorias) ── */
+.truck-hub-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.truck-hub-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  border-radius: 24px;
+  background: var(--tk-steel);
+  color: var(--tk-ink);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.truck-hub-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(16, 20, 24, 0.12);
+  background: var(--tk-steel-strong);
+}
+
+.truck-hub-card h2 {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+.truck-hub-card p {
+  color: var(--tk-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.truck-hub-cta {
+  margin-top: auto;
+  padding-top: 6px;
+  color: #7a4d05;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.truck-hub-title {
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(28px, 6vw, 38px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--tk-ink);
+}
+
+.truck-hub-text {
+  margin-top: 12px;
+  max-width: 68ch;
+  color: var(--tk-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* ── Foco visível ── */
+.truck-site a:focus-visible,
+.truck-site button:focus-visible,
+.truck-site input:focus-visible,
+.truck-site select:focus-visible {
+  outline: 3px solid var(--tk-ink);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .truck-site .cbi-card,
+  .truck-site .cbi-quick-filter,
+  .truck-site .cbi-card img {
+    transition: none;
+  }
+}
