@@ -150,16 +150,15 @@ export default async function HomePage() {
       </section>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <section className="cb-section-pad cb-process-section">
+      <section className={`cb-section-pad cb-process-section ${heroFont.variable}`}>
         <div className="cb-wrap cb-process-grid">
           <div>
-            <h2 className="cb-process-title" style={{ fontFamily: 'var(--cb-head)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1, margin: '0 0 12px' }}>
-              Do jeito mais simples
-            </h2>
-            <p className="cb-process-intro" style={{ lineHeight: 1.6, color: 'var(--cb-ink-soft)', margin: '0 0 24px', maxWidth: '46ch' }}>
+            <h2 className="cb-process-title">Do jeito mais simples</h2>
+            <p className="cb-process-intro">
               Do primeiro filtro à negociação, todo o processo pensado para você economizar tempo e comparar melhor.
             </p>
 
+            <div className="cb-process-steps">
             <div className="cb-process-step">
               <div className="cb-step-num">01</div>
               <div className="cb-step-body">
@@ -180,6 +179,7 @@ export default async function HomePage() {
                 <h3>Fechou o negócio</h3>
                 <p>Compare as informações, consulte a FIPE e negocie com mais clareza antes de fechar.</p>
               </div>
+            </div>
             </div>
           </div>
 
