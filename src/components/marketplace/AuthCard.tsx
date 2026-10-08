@@ -175,7 +175,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
         router.refresh()
       } else if (mode === 'signup') {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
-        const redirectUrl = `${siteUrl}/auth/callback?redirect=${encodeURIComponent(safeRedirectTo)}`
+        const redirectUrl = `${siteUrl}/auth/confirm?redirect=${encodeURIComponent(safeRedirectTo)}`
         const { data, error: signUpError } = await supabase.auth.signUp({
           email, password,
           options: {
@@ -215,19 +215,11 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
             return
           }
         }
-        let welcomeSent = false
-        try {
-          const res = await fetch('/api/auth/welcome', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, name: fullName }),
-          })
-          welcomeSent = res.ok
-          if (!welcomeSent) {
-            const text = await res.text().catch(() => '')
-            console.error('Welcome email endpoint failed:', res.status, text)
-          }
-        } catch (e) { console.error('Welcome email fetch failed:', e) }
+        if (data.session) {
+          try {
+            await fetch('/api/auth/welcome', { method: 'POST' })
+          } catch (e) { console.error('Welcome email fetch failed:', e) }
+        }
         setMessage(data.session ? 'Conta criada com sucesso!' : 'Conta criada! Confirme seu e-mail para continuar. Verifique também a pasta de spam.')
         if (data.session) {
           onAuthenticated?.()

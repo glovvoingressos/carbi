@@ -1,331 +1,158 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useEffect, useState, type ReactNode } from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'motion/react'
-import {
-  LayoutDashboard, Car, MessageCircle, Bell, Settings,
-  LogOut, User, Heart, ChevronRight, Search, X, Plus,
-  BarChart3, TrendingUp, Eye, Star, Shield
-} from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { ArrowUpRight, Bell, Car, ChevronDown, Heart, LayoutDashboard, LogOut, Menu, MessageCircle, Plus, Search, Settings, SlidersHorizontal, User, X, type LucideIcon } from 'lucide-react'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
+import './member-workspace.css'
 
-const navItems = [
-  { href: '/minha-conta', label: 'Dashboard', icon: LayoutDashboard, description: 'Visão geral' },
-  { href: '/minha-conta/anuncios', label: 'Anúncios', icon: Car, description: 'Gerenciar veículos' },
-  { href: '/minha-conta/conversas', label: 'Mensagens', icon: MessageCircle, description: 'Chat com compradores' },
-  { href: '/minha-conta/favoritos', label: 'Favoritos', icon: Heart, description: 'Veículos salvos' },
-  { href: '/minha-conta/buscas', label: 'Minhas buscas', icon: Search, description: 'Procure Meu Carro' },
-  { href: '/minha-conta/notificacoes', label: 'Alertas', icon: Bell, description: 'Notificações' },
-  { href: '/minha-conta/configuracoes', label: 'Configurações', icon: Settings, description: 'Conta e preferências' },
-]
-
-const ease = [0.23, 1, 0.32, 1] as const
-
+export interface AccountWorkspaceListing {
+  id: string; title: string; brand: string; model: string; price: number; status: string
+  year: number | null; year_model?: number | null; mileage?: number | null
+  view_count?: number | null; created_at: string; slug: string
+  images?: { public_url: string; is_primary?: boolean; sort_order?: number }[] | null
+}
 interface AccountLayoutProps {
-  children: React.ReactNode
+  children: ReactNode
   user: { email: string; fullName: string; avatarUrl: string; phone?: string }
-  stats?: { label: string; value: string | number; icon: any }[]
+  stats?: { label: string; value: string | number; icon?: LucideIcon }[]
+  listings?: AccountWorkspaceListing[]
+  listingsError?: string | null
+  onListingsRetry?: () => void
+  loading?: boolean
+}
+const navigation = [
+  { href: '/minha-conta', label: 'Visão geral', icon: LayoutDashboard },
+  { href: '/minha-conta/anuncios', label: 'Meus anúncios', icon: Car },
+  { href: '/minha-conta/conversas', label: 'Conversas', icon: MessageCircle },
+  { href: '/minha-conta/favoritos', label: 'Favoritos', icon: Heart },
+  { href: '/minha-conta/buscas', label: 'Minhas buscas', icon: Search },
+  { href: '/minha-conta/notificacoes', label: 'Notificações', icon: Bell },
+  { href: '/minha-conta/configuracoes', label: 'Configurações', icon: Settings },
+]
+const tabs = [
+  { href: '/minha-conta', label: 'Resumo' },
+  { href: '/minha-conta/anuncios', label: 'Anúncios' },
+  { href: '/minha-conta/conversas', label: 'Conversas' },
+  { href: '/minha-conta?tab=perfil', label: 'Meu perfil' },
+  { href: '/minha-conta/configuracoes', label: 'Preferências' },
+]
+const statusLabels: Record<string, string> = { active: 'Publicado', paused: 'Pausado', sold: 'Vendido', archived: 'Arquivado', draft: 'Rascunho', pending: 'Em análise' }
+
+function Avatar({ user, className = '' }: { user: AccountLayoutProps['user']; className?: string }) {
+  const [failedSource, setFailedSource] = useState<string | null>(null)
+  return <span className={`mw-avatar ${className}`}>{user.avatarUrl && failedSource !== user.avatarUrl ? <img src={user.avatarUrl} alt="" decoding="async" onError={() => setFailedSource(user.avatarUrl)} /> : <span>{user.fullName?.trim().charAt(0).toUpperCase() || <User size={20} />}</span>}</span>
 }
 
-export default function AccountLayout({ children, user, stats = [] }: AccountLayoutProps) {
+function VehicleThumbnail({ src }: { src?: string }) {
+  const [failedSource, setFailedSource] = useState<string | null>(null)
+  return <span className="mw-vehicle-photo">{src && failedSource !== src ? <img src={src} alt="" loading="lazy" decoding="async" onError={() => setFailedSource(src)} /> : <Car size={20} />}</span>
+}
+
+function Workspace({ children, user, stats, listings, listingsError, onListingsRetry, loading = false }: AccountLayoutProps) {
   const pathname = usePathname()
+  const params = useSearchParams()
   const router = useRouter()
+  const [remoteListings, setRemoteListings] = useState<AccountWorkspaceListing[]>([])
+  const [portfolioLoading, setPortfolioLoading] = useState(listings === undefined)
+  const [portfolioError, setPortfolioError] = useState(false)
+  const [retry, setRetry] = useState(0)
+  const [dialog, setDialog] = useState<'search' | 'menu' | 'account' | null>(null)
+  const [query, setQuery] = useState('')
   const [loggingOut, setLoggingOut] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [logoutError, setLogoutError] = useState('')
+  const vehicles = listings ?? remoteListings
+  const selected = params.get('vehicle')
+  const profile = params.get('tab') === 'perfil'
+  const isActive = (href: string) => href === '/minha-conta' ? pathname === href : pathname.startsWith(href)
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000)
-    return () => clearInterval(timer)
-  }, [])
-
-  const isActive = (href: string) =>
-    href === '/minha-conta' ? pathname === href : pathname.startsWith(href)
-
-  const handleLogout = async () => {
-    if (!confirm('Tem certeza que deseja sair da conta?')) return
-    setLoggingOut(true)
-    try {
-      await getSupabaseBrowserClient().auth.signOut()
-      router.replace('/')
-    } catch {
-      setLoggingOut(false)
+    if (listings !== undefined || loading) return
+    const controller = new AbortController()
+    void (async () => {
+      try {
+        const { data, error } = await getSupabaseBrowserClient().auth.getSession()
+        if (error || !data.session) throw new Error('Sessão indisponível')
+        const response = await fetch('/api/marketplace/my-listings', { headers: { Authorization: `Bearer ${data.session.access_token}` }, signal: controller.signal })
+        if (!response.ok) throw new Error('Não foi possível carregar os anúncios')
+        const result: unknown = await response.json()
+        if (!Array.isArray(result)) throw new Error('Resposta inválida')
+        if (!controller.signal.aborted) setRemoteListings(result)
+      } catch {
+        if (!controller.signal.aborted) setPortfolioError(true)
+      } finally {
+        if (!controller.signal.aborted) setPortfolioLoading(false)
+      }
+    })()
+    return () => controller.abort()
+  }, [listings, loading, retry])
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); setDialog(value => value === 'search' ? null : 'search') }
     }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+  const selectVehicleHref = (id: string) => `/minha-conta?${new URLSearchParams({ vehicle: id })}`
+  const retryPortfolio = () => {
+    if (onListingsRetry) { onListingsRetry(); return }
+    setPortfolioLoading(true)
+    setPortfolioError(false)
+    setRetry(value => value + 1)
   }
-
-  const getGreeting = () => {
-    const hour = currentTime.getHours()
-    if (hour < 12) return 'Bom dia'
-    if (hour < 18) return 'Boa tarde'
-    return 'Boa noite'
+  const logout = async () => {
+    setLoggingOut(true); setLogoutError('')
+    try {
+      const { error } = await getSupabaseBrowserClient().auth.signOut()
+      if (error) throw error
+      router.replace('/'); router.refresh()
+    } catch { setLogoutError('Não foi possível sair. Tente novamente.'); setLoggingOut(false) }
   }
-
-  return (
-    <div className="member-shell min-h-dvh text-[14px] md:text-[15px] text-[#0A0A0A]">
-      <header className="account-header sticky top-0 z-50 border-b bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[1500px] items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 items-center gap-4">
-            <Link href="/" className="flex shrink-0 items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#00A36A]">
-                <span className="text-[14px] font-bold text-[#0A0A0A]">C</span>
-              </div>
-              <div className="hidden leading-none sm:block">
-                <span className="block text-[14px] font-bold tracking-[-0.04em] md:text-[15px]">carbi.</span>
-                <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5C5C66]">member space</span>
-              </div>
-            </Link>
-
-            <button
-              onClick={() => setSearchOpen(true)}
-              aria-label="Buscar na sua conta"
-              className="account-search-button hidden min-w-0 items-center gap-2 rounded-full px-4 py-2.5 text-sm transition-colors md:flex lg:ml-4 lg:w-72"
-            >
-              <Search className="h-4 w-4 shrink-0" />
-              <span className="truncate">Buscar anúncios, veículos...</span>
-              <kbd className="ml-auto shrink-0 rounded-md bg-white px-1.5 py-0.5 text-[10px] font-mono text-[#5C5C66]">⌘K</kbd>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => router.push('/minha-conta/anuncios')}
-              className="account-primary-action hidden items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold transition-transform hover:-translate-y-0.5 sm:flex"
-            >
-              <Plus className="h-4 w-4" />
-              Novo anúncio
-            </button>
-            <button
-              aria-label="Notificações"
-              onClick={() => router.push('/minha-conta/notificacoes')}
-              className="account-icon-button relative flex h-10 w-10 items-center justify-center rounded-full border bg-white text-black transition-colors"
-            >
-              <Bell className="h-4 w-4" strokeWidth={1.8} />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#B8FF00] ring-2 ring-white" />
-            </button>
-            <div className="mx-1 hidden h-6 w-px bg-black/10 sm:block" />
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="account-profile-toggle flex items-center gap-2 rounded-full p-1 transition-colors"
-              aria-label={sidebarOpen ? 'Fechar menu da conta' : 'Abrir menu da conta'}
-              aria-expanded={sidebarOpen}
-              aria-controls="account-user-menu"
-            >
-              <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-[#00A36A]">
-                {user.avatarUrl ? <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" /> : <User className="h-4 w-4 text-[#0A0A0A]" strokeWidth={2} />}
-              </div>
-              <span className="hidden max-w-24 truncate pr-2 text-sm font-semibold sm:block">{user.fullName?.split(' ')[0] || 'Usuário'}</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <nav className="account-bottom-nav safe-area-pb fixed inset-x-0 bottom-0 z-50 border-t bg-white/95 backdrop-blur-xl lg:hidden" aria-label="Navegação da conta">
-        <div className="flex items-center justify-around px-2 py-2">
-          {navItems.slice(0, 5).map((item) => {
-            const active = isActive(item.href)
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? 'page' : undefined}
-                className={`flex min-w-0 flex-col items-center gap-1 rounded-full px-3 py-2 transition-all ${active ? 'bg-[#00A36A] text-[#0A0A0A]' : 'text-[#5C5C66]'}`}
-              >
-                <item.icon className={`h-5 w-5 ${active ? 'text-[#B8FF00]' : 'text-[#5C5C66]'}`} strokeWidth={active ? 2.4 : 1.75} />
-                <span className={`text-[10px] ${active ? 'font-bold' : 'font-medium'}`}>{item.label}</span>
-              </Link>
-            )
-          })}
-        </div>
-      </nav>
-
-      <div className="mx-auto max-w-[1500px]">
-        <div className="lg:grid lg:min-h-[calc(100vh-64px)] lg:grid-cols-[248px_minmax(0,1fr)]">
-          <aside className="account-sidebar hidden border-r bg-white/60 p-4 lg:block">
-            <div className="sticky top-24 space-y-5">
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease }}
-                className="account-user-card rounded-[24px] p-4 text-white"
-              >
-                <div className="mb-5 flex items-start justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#B8FF00] text-[#0A0A0A]">
-                    {user.avatarUrl ? <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" /> : <User className="h-5 w-5" strokeWidth={2} />}
-                  </div>
-                  <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#B8FF00]">Carbi ID</span>
-                </div>
-                <p className="truncate text-[14px] font-bold md:text-[15px]">{user.fullName || 'Usuário'}</p>
-                <p className="mt-1 truncate text-xs text-white/70">{user.email}</p>
-                <div className="mt-5 flex items-center justify-between border-t border-white/20 pt-3 text-[10px] uppercase tracking-[0.14em] text-white/70">
-                  <span>Conta ativa</span>
-                  <span className="h-2 w-2 rounded-full bg-[#B8FF00]" />
-                </div>
-              </motion.div>
-
-              <nav className="account-side-nav space-y-1.5" aria-label="Menu da conta">
-                {navItems.map((item, index) => {
-                  const active = isActive(item.href)
-                  return (
-                    <motion.div key={item.href} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: index * 0.05, ease }}>
-                      <Link
-                        href={item.href}
-                        aria-current={active ? 'page' : undefined}
-                        className={`group flex items-center gap-3 rounded-[16px] px-3 py-3 transition-all ${active ? 'bg-[#00A36A] text-[#0A0A0A]' : 'text-[#3F3F47] hover:bg-black/[0.04] hover:text-[#0A0A0A]'}`}
-                      >
-                        <item.icon className={`h-4 w-4 shrink-0 ${active ? 'text-[#0A0A0A]' : 'text-[#5C5C66] group-hover:text-[#0A0A0A]'}`} strokeWidth={active ? 2.4 : 1.75} />
-                        <div className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-semibold">{item.label}</span>
-                          <span className={`block truncate text-[11px] ${active ? 'text-[#304000]' : 'text-[#5C5C66]'}`}>{item.description}</span>
-                        </div>
-                        {active && <ChevronRight className="h-4 w-4 shrink-0" />}
-                      </Link>
-                    </motion.div>
-                  )
-                })}
-              </nav>
-
-              <div className="border-t border-black/[0.06] pt-3">
-                <button type="button" onClick={handleLogout} disabled={loggingOut} className="flex w-full items-center gap-3 rounded-[16px] px-3 py-3 text-sm font-medium text-[#5C5C66] transition-colors hover:bg-[#FFF0EE] hover:text-[#D94A3A] disabled:opacity-50">
-                  <LogOut className="h-4 w-4" strokeWidth={1.75} />
-                  {loggingOut ? 'Saindo...' : 'Sair da conta'}
-                </button>
-              </div>
-            </div>
-          </aside>
-
-          <main className="account-main min-w-0 px-3 py-4 pb-28 sm:px-6 sm:py-6 lg:px-8 lg:py-8 lg:pb-8">
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="min-w-0">
-              {children}
-            </motion.div>
-          </main>
-        </div>
+  const metricValues = stats?.length ? stats.slice(0, 4) : [
+    { label: 'Anúncios', value: vehicles.length },
+    { label: 'Publicados', value: vehicles.filter(v => v.status === 'active').length },
+    { label: 'Pausados', value: vehicles.filter(v => v.status === 'paused').length },
+    { label: 'Vendidos', value: vehicles.filter(v => v.status === 'sold').length },
+  ]
+  const metricsUnavailable = loading || (!stats?.length && !!listingsError) || (listings === undefined && (portfolioLoading || portfolioError))
+  const normalizedQuery = query.trim().toLocaleLowerCase('pt-BR')
+  const matches = (text: string) => text.toLocaleLowerCase('pt-BR').includes(normalizedQuery)
+  const portfolio = <>
+    <div className="mw-metrics" aria-label="Resumo da conta" aria-busy={metricsUnavailable}>{metricValues.map((metric, index) => <div className={`mw-metric mw-metric-${index}`} key={metric.label}><span className="mw-metric-label"><span className="mw-metric-dot" />{metric.label}</span><strong>{metricsUnavailable ? '—' : metric.value}</strong></div>)}</div>
+    <div className="mw-portfolio-title"><h2>Meus anúncios</h2><Link href="/minha-conta/anuncios" aria-label="Gerenciar todos os anúncios"><ArrowUpRight size={17} /></Link></div>
+    <div className="mw-vehicle-list">
+      {loading || (listings === undefined && portfolioLoading) ? <p className="mw-sidebar-note" role="status">Carregando seus veículos…</p> : listingsError || (portfolioError && listings === undefined) ? <div className="mw-sidebar-note" role="alert">{listingsError || 'Não foi possível carregar.'}<button type="button" onClick={retryPortfolio}>Tentar novamente</button></div> : vehicles.length === 0 ? <div className="mw-sidebar-note">Seu próximo anúncio começa aqui.<Link href="/anunciar-carro">Anunciar meu carro <Plus size={14} /></Link></div> : vehicles.map(vehicle => {
+        const photo = [...(vehicle.images ?? [])].sort((a, b) => Number(!!b.is_primary) - Number(!!a.is_primary) || (a.sort_order ?? 0) - (b.sort_order ?? 0))[0]?.public_url
+        const active = selected === vehicle.id || (!selected && pathname === '/minha-conta' && !profile && vehicle === vehicles[0])
+        return <Link key={vehicle.id} href={selectVehicleHref(vehicle.id)} className={`mw-vehicle ${active ? 'is-selected' : ''}`} aria-current={active ? 'true' : undefined} onClick={() => setDialog(null)}><span className="mw-vehicle-top"><VehicleThumbnail src={photo} /><span className="mw-vehicle-name"><strong>{vehicle.title || `${vehicle.brand} ${vehicle.model}`}</strong><small>{vehicle.brand} · {vehicle.year_model ?? vehicle.year ?? 'Ano não informado'}</small></span><ArrowUpRight size={13} /></span><span className="mw-vehicle-bottom"><span>{statusLabels[vehicle.status] ?? 'Em preparação'}</span><strong>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(vehicle.price)}</strong></span></Link>
+      })}
+    </div><Link href="/anunciar-carro" className="mw-sidebar-create"><Plus size={16} />Novo anúncio</Link>
+  </>
+  return <div className="member-shell mw-workspace">
+    <a className="mw-skip" href="#member-content">Ir para o conteúdo</a>
+    <aside className="mw-sidebar" aria-label="Navegação e veículos"><div className="mw-rail"><Link href="/" className="mw-brand" aria-label="Carbi — voltar para o site"><Car size={32} strokeWidth={1.5} /></Link><nav aria-label="Menu principal">{navigation.map(item => <Link key={item.href} href={item.href} aria-label={item.label} title={item.label} className={`mw-rail-link ${isActive(item.href) ? 'is-active' : ''}`} aria-current={isActive(item.href) ? 'page' : undefined}><item.icon size={19} strokeWidth={1.7} /></Link>)}</nav><div className="mw-rail-end"><button type="button" className="mw-rail-link" aria-label="Buscar na conta" title="Buscar na conta" onClick={() => setDialog('search')}><Search size={19} /></button><button type="button" className="mw-avatar-control" aria-label="Abrir opções da conta" onClick={() => setDialog('account')}><Avatar user={user} /></button></div></div><div className="mw-portfolio">{portfolio}</div></aside>
+    <div className="mw-stage">
+      <div className="mw-mobile-bar"><Link href="/" className="mw-mobile-brand">carbi.</Link><span>Minha conta</span><button type="button" aria-label="Abrir navegação e meus veículos" onClick={() => setDialog('menu')}><Menu size={21} /></button></div>
+      <div className="mw-head">
+      <header className="mw-profile-header"><Link href="/minha-conta?tab=perfil" className="mw-profile-photo" aria-label="Editar meu perfil"><Avatar user={user} /></Link><div className="mw-profile-copy"><h1>{user.fullName || 'Minha conta'}</h1><div className="mw-contact-details"><span>{user.email || 'Seu espaço na Carbi'}</span>{user.phone && <span>{user.phone}</span>}</div><div className="mw-quick-actions"><Link href="/anunciar-carro" aria-label="Criar anúncio" title="Criar anúncio"><Plus size={18} /></Link><Link href="/minha-conta/conversas" aria-label="Abrir conversas" title="Abrir conversas"><MessageCircle size={17} /></Link><Link href="/minha-conta/notificacoes" aria-label="Abrir notificações" title="Abrir notificações"><Bell size={17} /></Link><Link href="/minha-conta?tab=perfil" aria-label="Editar perfil" title="Editar perfil"><User size={17} /></Link><button type="button" aria-label="Buscar na minha conta" title="Buscar na minha conta (⌘K)" onClick={() => setDialog('search')}><Search size={17} /></button></div></div><button type="button" className="mw-account-switch" onClick={() => setDialog('account')}><Avatar user={user} /><span>Conta pessoal<strong>{user.fullName?.split(' ')[0] || 'Minha conta'}</strong></span><ChevronDown size={16} /></button></header>
+      <nav className="mw-tabs" aria-label="Seções da conta">{tabs.map(tab => {
+        const active = tab.href.includes('?') ? pathname === '/minha-conta' && profile : isActive(tab.href) && (tab.href !== '/minha-conta' || !profile)
+        return <Link key={tab.href} href={tab.href} className={active ? 'is-active' : ''} aria-current={active ? 'page' : undefined}>{tab.label}</Link>
+      })}<Link href="/minha-conta/configuracoes" className="mw-tabs-settings" aria-label="Configurações"><SlidersHorizontal size={17} /></Link></nav>
       </div>
-
-      {/* Search Modal */}
-      <AnimatePresence>
-        {searchOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-start justify-center pt-[20vh]"
-            onClick={() => setSearchOpen(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              transition={{ duration: 0.2, ease }}
-              className="w-full max-w-xl mx-4 overflow-hidden rounded-[28px] border border-black/[0.06] bg-white shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-3 border-b border-black/[0.06] px-5 py-4">
-                <Search className="h-5 w-5 text-[#5C5C66]" />
-                <input
-                  autoFocus
-                  type="text"
-                  aria-label="Buscar anúncios e configurações"
-                  placeholder="Buscar anúncios, configurações..."
-                  className="flex-1 text-[14px] md:text-[15px] text-[#0A0A0A] placeholder-[#6A6A74] focus:outline-none"
-                />
-                <button aria-label="Fechar busca" onClick={() => setSearchOpen(false)} className="rounded-full p-1.5 transition-colors hover:bg-[#F1F1F6]">
-                  <X className="h-5 w-5 text-[#5C5C66]" />
-                </button>
-              </div>
-              <div className="p-4">
-                <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#5C5C66]">Acesso rápido</p>
-                <div className="space-y-2">
-                  {navItems.slice(0, 4).map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setSearchOpen(false)}
-                      className="flex items-center gap-3 rounded-[16px] px-4 py-3 transition-colors hover:bg-[#F1F1F6]"
-                    >
-                      <item.icon className="h-5 w-5 text-[#5C5C66]" strokeWidth={1.75} />
-                      <div>
-                        <span className="text-sm font-medium text-[#0A0A0A]">{item.label}</span>
-                        <span className="ml-2 text-xs text-[#5C5C66]">{item.description}</span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* User Menu Dropdown */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[90]"
-              onClick={() => setSidebarOpen(false)}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              transition={{ duration: 0.15, ease }}
-              id="account-user-menu"
-              role="dialog"
-              aria-label="Menu da conta"
-              className="account-user-menu fixed right-4 top-16 z-[95] w-72 overflow-hidden rounded-[24px] border bg-white shadow-2xl sm:right-8"
-            >
-              <div className="border-b border-black/[0.06] p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#00A36A]">
-                    {user.avatarUrl ? (
-                      <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <User className="h-5 w-5 text-[#0A0A0A]" strokeWidth={2} />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#0A0A0A]">{user.fullName || 'Usuário'}</p>
-                    <p className="text-xs text-[#5C5C66]">{user.email}</p>
-                    {user.phone ? <p className="text-xs text-[#5C5C66]">{user.phone}</p> : null}
-                  </div>
-                </div>
-              </div>
-              <div className="p-2">
-                <Link
-                  href="/minha-conta"
-                  onClick={() => setSidebarOpen(false)}
-                  className="flex items-center gap-3 rounded-[16px] px-4 py-2.5 transition-colors hover:bg-[#F1F1F6]"
-                >
-                  <User className="h-4 w-4 text-[#5C5C66]" strokeWidth={1.75} />
-                  <span className="text-sm text-[#3F3F47]">Meu perfil</span>
-                </Link>
-                <Link
-                  href="/minha-conta/configuracoes"
-                  onClick={() => setSidebarOpen(false)}
-                  className="flex items-center gap-3 rounded-[16px] px-4 py-2.5 transition-colors hover:bg-[#F1F1F6]"
-                >
-                  <Settings className="h-4 w-4 text-[#5C5C66]" strokeWidth={1.75} />
-                  <span className="text-sm text-[#3F3F47]">Configurações</span>
-                </Link>
-                <div className="my-2 border-t border-black/[0.06]" />
-                <button
-                  onClick={() => { setSidebarOpen(false); handleLogout() }}
-                  className="flex w-full items-center gap-3 rounded-[16px] px-4 py-2.5 text-[#D94A3A] transition-colors hover:bg-[#FFF0EE]"
-                >
-                  <LogOut className="w-4 h-4" strokeWidth={1.75} />
-                  <span className="text-sm font-medium">Sair da conta</span>
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <main id="member-content" className="mw-content" tabIndex={-1}>{children}</main>
     </div>
-  )
+    <nav className="mw-mobile-nav" aria-label="Navegação móvel">{[...navigation.slice(0, 3), { href: '/minha-conta/buscas', label: 'Buscas', icon: Search }, { href: '/minha-conta?tab=perfil', label: 'Perfil', icon: User }].map(item => {
+      const active = item.href.includes('?') ? pathname === '/minha-conta' && profile : isActive(item.href) && (item.href !== '/minha-conta' || !profile)
+      return <Link key={item.href} href={item.href} aria-current={active ? 'page' : undefined}><item.icon size={20} /><span>{item.label === 'Visão geral' ? 'Resumo' : item.label === 'Meus anúncios' ? 'Anúncios' : item.label}</span></Link>
+    })}</nav>
+    <Dialog open={dialog !== null} onOpenChange={open => { if (!open) setDialog(null) }}><DialogContent className={`mw-dialog ${dialog === 'menu' ? 'mw-menu-dialog' : ''}`} showCloseButton={false}><DialogClose className="mw-dialog-close" aria-label="Fechar"><X size={19} /></DialogClose><DialogTitle>{dialog === 'search' ? 'Buscar na minha conta' : dialog === 'menu' ? 'Seu espaço Carbi' : 'Minha conta'}</DialogTitle><DialogDescription>{dialog === 'search' ? 'Encontre um veículo ou acesse uma seção.' : dialog === 'menu' ? 'Navegue pela conta e acompanhe seus veículos.' : 'Perfil, preferências e acesso ao site.'}</DialogDescription>
+      {dialog === 'search' ? <><label className="mw-search-field"><Search size={18} /><input autoFocus type="search" placeholder="Veículo ou seção da conta" aria-label="Buscar veículo ou seção da conta" value={query} onChange={event => setQuery(event.target.value)} /></label><div className="mw-search-results">{navigation.filter(item => matches(item.label)).map(item => <Link href={item.href} key={item.href} onClick={() => setDialog(null)}><item.icon size={18} /><span>{item.label}</span><ArrowUpRight size={15} /></Link>)}{vehicles.filter(vehicle => matches(`${vehicle.title} ${vehicle.brand} ${vehicle.model}`)).map(vehicle => <Link key={vehicle.id} href={selectVehicleHref(vehicle.id)} onClick={() => setDialog(null)}><Car size={18} /><span>{vehicle.title || `${vehicle.brand} ${vehicle.model}`}</span><ArrowUpRight size={15} /></Link>)}{!navigation.some(item => matches(item.label)) && !vehicles.some(vehicle => matches(`${vehicle.title} ${vehicle.brand} ${vehicle.model}`)) && <p role="status">Nada encontrado. Tente outro nome ou modelo.</p>}</div></> : dialog === 'menu' ? <><nav className="mw-menu-links" aria-label="Seções">{navigation.map(item => <Link href={item.href} key={item.href} onClick={() => setDialog(null)}><item.icon size={18} />{item.label}</Link>)}</nav><div className="mw-menu-portfolio">{portfolio}</div></> : <div className="mw-account-menu"><Avatar user={user} /><p>{user.fullName || 'Minha conta'}<small>{user.email}</small></p><Link href="/minha-conta?tab=perfil" onClick={() => setDialog(null)}><User size={18} />Editar meu perfil</Link><Link href="/minha-conta/configuracoes" onClick={() => setDialog(null)}><Settings size={18} />Conta e segurança</Link><Link href="/contato" onClick={() => setDialog(null)}><MessageCircle size={18} />Falar com a Carbi</Link><Link href="/" onClick={() => setDialog(null)}><ArrowUpRight size={18} />Voltar para o site</Link><button type="button" disabled={loggingOut} onClick={logout}><LogOut size={18} />{loggingOut ? 'Saindo…' : 'Sair da conta'}</button>{logoutError && <p role="alert" className="mw-logout-error">{logoutError}</p>}</div>}
+    </DialogContent></Dialog>
+  </div>
+}
+export default function AccountLayout(props: AccountLayoutProps) {
+  return <Suspense fallback={<div className="member-shell mw-workspace mw-initial-loading" role="status">Carregando sua conta…</div>}><Workspace {...props} /></Suspense>
 }

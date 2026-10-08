@@ -27,6 +27,7 @@ export default function ClientShell({ children }: { children: React.ReactNode })
   }, [])
 
   useEffect(() => {
+    if (pathname === '/minha-conta' || pathname.startsWith('/minha-conta/')) return
     const observer = observeElements()
     const mutationObserver = new MutationObserver(() => observeElements())
     mutationObserver.observe(document.body, { childList: true, subtree: true })
@@ -40,6 +41,10 @@ export default function ClientShell({ children }: { children: React.ReactNode })
 
   if (isListingFlow) {
     return <main className="listing-flow-shell">{children}</main>
+  }
+
+  if (pathname === '/minha-conta' || pathname.startsWith('/minha-conta/')) {
+    return <div className="account-app-shell">{children}</div>
   }
 
   return (

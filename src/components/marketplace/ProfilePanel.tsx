@@ -1,382 +1,222 @@
 'use client'
 
-import { ChangeEvent, useEffect, useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
-import { User, Mail, Phone, Lock, Camera, Save, Loader2, ChevronDown, AlertTriangle, Eye, EyeOff, Check, Shield, CreditCard } from 'lucide-react'
+import { ChangeEvent, FormEvent, useCallback, useEffect, useId, useRef, useState } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
+import { Button } from '@base-ui/react/button'
+import { Input } from '@base-ui/react/input'
+import { AlertTriangle, ArrowUpRight, Camera, Check, ChevronDown, Eye, EyeOff, Loader2, Lock, Mail, Save, Shield, User } from 'lucide-react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
+import './member-profile.css'
 
-const formatPhone = (v: string) => {
-  const d = v.replace(/\D/g, '').slice(0, 11)
-  return d.length <= 10
-    ? d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2')
-    : d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2')
+const formatPhone = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 11)
+  return digits.length <= 10
+    ? digits.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2')
+    : digits.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2')
 }
-
-const formatCPF = (v: string) => v.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
-
+const formatCPF = (value: string) => value.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
 type ToastFn = (type: 'success' | 'error', message: string) => void
 
-/* ─── Avatar Section ─── */
-function AvatarSection({ avatarUrl, fullName, email, userId, onAvatarChange, uploading, onUploadingChange }: {
-  avatarUrl: string; fullName: string; email: string; userId: string
-  onAvatarChange: (url: string) => void; uploading: boolean; onUploadingChange: (v: boolean) => void
+function AvatarSection({ avatarUrl, userId, uploading, onAvatarChange, onUploadingChange, toast }: {
+  avatarUrl: string; userId: string; uploading: boolean
+  onAvatarChange: (url: string) => void; onUploadingChange: (value: boolean) => void; toast: ToastFn
 }) {
-  const upload = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const inputRef = useRef<HTMLInputElement>(null)
+  const inputId = useId()
+  const upload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const input = event.currentTarget
+    const file = input.files?.[0]
     if (!file || !userId) return
     onUploadingChange(true)
     try {
-      const sb = getSupabaseBrowserClient()
-      const { data: { session } } = await sb.auth.getSession()
-      if (!session) {
-        console.error('No session for avatar upload')
-        return
-      }
-      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-      const path = `${userId}/avatar.${ext}`
-      const { error } = await sb.storage.from('profile-avatars').upload(path, file, { upsert: true, contentType: file.type })
-      if (error) {
-        console.error('Avatar upload error:', error)
-        throw error
-      }
-      const { data } = sb.storage.from('profile-avatars').getPublicUrl(path)
+      const supabase = getSupabaseBrowserClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Sessão expirada. Faça login novamente para alterar a foto.')
+      const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+      const { error } = await supabase.storage.from('profile-avatars').upload(`${userId}/avatar.${extension}`, file, { upsert: true, contentType: file.type })
+      if (error) throw error
+      const { data } = supabase.storage.from('profile-avatars').getPublicUrl(`${userId}/avatar.${extension}`)
+      const { error: updateError } = await supabase.from('users').update({ avatar_url: data.publicUrl }).eq('id', userId).select()
+      if (updateError) throw updateError
       onAvatarChange(data.publicUrl)
-
-      // Update avatar_url in users table
-      const { data: updateData, error: updateError } = await sb.from('users').update({ avatar_url: data.publicUrl }).eq('id', userId).select()
-      if (updateError) {
-        console.error('Avatar URL update error details:', {
-          message: updateError.message,
-          details: updateError.details,
-          hint: updateError.hint,
-          code: updateError.code
-        })
-        // Don't throw here - avatar was uploaded successfully
-      } else {
-        console.log('Avatar URL updated successfully:', updateData)
-      }
-      e.target.value = ''
-    } catch (e) {
-      console.error('Avatar upload failed:', e)
+      toast('success', 'Foto atualizada com sucesso!')
+    } catch (error) {
+      toast('error', error instanceof Error ? error.message : 'Não foi possível atualizar a foto. Tente novamente.')
     } finally {
+      input.value = ''
       onUploadingChange(false)
     }
   }
 
   return (
-    <div className="account-profile-card bg-white rounded-2xl border overflow-hidden">
-      {/* Cover */}
-      <div className="account-profile-cover relative h-32" aria-hidden="true" />
-      
-      {/* Profile Info */}
-      <div className="px-6 pb-6">
-        <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12 relative z-10">
-          <div className="relative group">
-            <div className="w-24 h-24 rounded-2xl overflow-hidden bg-white border-4 border-white shadow-lg">
-              {avatarUrl
-                ? <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                : <div className="w-full h-full flex items-center justify-center bg-[#00A36A]"><User className="w-10 h-10 text-[#0A0A0A]" strokeWidth={1.5} /></div>}
-            </div>
-            <label htmlFor="avatar-upload" className="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
-              <Camera className="w-6 h-6 text-white" strokeWidth={1.75} />
-              <span className="sr-only">Alterar foto</span>
-              <input id="avatar-upload" type="file" className="hidden" accept="image/png,image/jpeg,image/webp" onChange={upload} />
-            </label>
-            {uploading && (
-              <div className="absolute inset-0 rounded-2xl bg-black/50 flex items-center justify-center">
-                <Loader2 className="w-6 h-6 text-white animate-spin" />
-              </div>
-            )}
-          </div>
-          
-          <div className="flex-1 pb-1">
-            <h1 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A]">{fullName || 'Seu nome'}</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{email}</p>
-          </div>
-
-          <label htmlFor="avatar-upload" className="account-profile-photo-action inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer shrink-0">
-            <Camera className="w-4 h-4" />
-            Alterar foto
-          </label>
-        </div>
+    <div className="mp-photo-row" aria-busy={uploading}>
+      <div className="mp-photo">
+        {avatarUrl ? <Image src={avatarUrl} alt="Sua foto de perfil" width={56} height={56} unoptimized /> : <User aria-hidden="true" />}
       </div>
+      <div className="mp-photo-copy">
+        <h3>Foto do perfil</h3>
+        <p>Escolha uma imagem JPG, PNG ou WebP.</p>
+      </div>
+      <input ref={inputRef} id={inputId} type="file" hidden accept="image/png,image/jpeg,image/webp" onChange={upload} disabled={uploading} aria-label="Selecionar foto do perfil" />
+      <Button type="button" className="mp-button mp-button-secondary" disabled={uploading} onClick={() => inputRef.current?.click()}>
+        {uploading ? <Loader2 className="mp-spin" aria-hidden="true" /> : <Camera aria-hidden="true" />}
+        {uploading ? 'Enviando…' : 'Alterar foto'}
+      </Button>
     </div>
   )
 }
 
-/* ─── Personal Info ─── */
-function PersonalInfo({ fullName, email, phone, cpf, onNameChange, onPhoneChange }: {
-  fullName: string; email: string; phone: string; cpf: string
-  onNameChange: (v: string) => void; onPhoneChange: (v: string) => void
-}) {
-  return (
-    <div className="account-profile-card bg-white rounded-2xl border p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-          <User className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
-        </div>
-        <div>
-          <h3 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A]">Informações pessoais</h3>
-          <p className="text-xs text-gray-500">Atualize seus dados de contato</p>
-        </div>
-      </div>
-      
-      <div className="space-y-5">
-        <div>
-          <label htmlFor="profile-name" className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Nome completo</label>
-          <input
-            id="profile-name"
-            type="text"
-            value={fullName} 
-            onChange={(e) => onNameChange(e.target.value)} 
-            placeholder="Seu nome" 
-            className="w-full h-12 px-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all" 
-          />
-        </div>
-        <div>
-          <label htmlFor="profile-email" className="text-sm font-semibold text-[#1A1A1A] mb-2 block">E-mail</label>
-          <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input id="profile-email" value={email} disabled className="w-full h-12 pl-11 pr-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-gray-500 cursor-not-allowed" />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="profile-cpf" className="text-sm font-semibold text-[#1A1A1A] mb-2 block">CPF</label>
-          <div className="relative">
-            <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              id="profile-cpf"
-              value={formatCPF(cpf)} 
-              disabled 
-              placeholder="000.000.000-00" 
-              maxLength={14} 
-              className="w-full h-12 pl-11 pr-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-gray-500 cursor-not-allowed" 
-            />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="profile-phone" className="text-sm font-semibold text-[#1A1A1A] mb-2 block">Telefone / WhatsApp</label>
-          <div className="relative">
-            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              id="profile-phone"
-              type="tel"
-              value={phone} 
-              onChange={(e) => onPhoneChange(formatPhone(e.target.value))} 
-              placeholder="(00) 00000-0000" 
-              inputMode="tel" 
-              maxLength={15} 
-              className="w-full h-12 pl-11 pr-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all" 
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ─── Security ─── */
-function SecuritySection({ userId, toast }: { userId: string; toast: ToastFn }) {
-  const [open, setOpen] = useState(false)
-  const [newPw, setNewPw] = useState('')
-  const [confirmPw, setConfirmPw] = useState('')
+function SecuritySection({ email, toast }: { email: string; toast: ToastFn }) {
+  const id = useId()
+  const [newEmail, setNewEmail] = useState('')
+  const [emailSaving, setEmailSaving] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [saving, setSaving] = useState(false)
-  const [showNewPw, setShowNewPw] = useState(false)
-  const [showConfirmPw, setShowConfirmPw] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const passwordDetails = useRef<HTMLDetailsElement>(null)
+  const mismatch = Boolean(confirmPassword && newPassword !== confirmPassword)
 
-  const changePw = async () => {
-    if (newPw !== confirmPw || newPw.length < 8) return
+  const changeEmail = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (emailSaving || !newEmail.trim() || newEmail.trim().toLowerCase() === email.toLowerCase()) return
+    setEmailSaving(true)
+    try {
+      const { error } = await getSupabaseBrowserClient().auth.updateUser({ email: newEmail.trim() })
+      if (error) throw error
+      toast('success', 'Solicitação enviada. Confira seus e-mails para confirmar a alteração.')
+      setNewEmail('')
+    } catch (error) {
+      toast('error', error instanceof Error ? error.message : 'Não foi possível alterar o e-mail. Tente novamente.')
+    } finally { setEmailSaving(false) }
+  }
+
+  const resetPassword = () => {
+    setNewPassword(''); setConfirmPassword(''); setShowPassword(false); setShowConfirmation(false)
+    if (passwordDetails.current) {
+      passwordDetails.current.open = false
+      passwordDetails.current.querySelector('summary')?.focus()
+    }
+  }
+
+  const changePassword = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (saving || newPassword !== confirmPassword || newPassword.length < 8) return
     setSaving(true)
     try {
-      const { error } = await getSupabaseBrowserClient().auth.updateUser({ password: newPw })
+      const { error } = await getSupabaseBrowserClient().auth.updateUser({ password: newPassword })
       if (error) throw error
       toast('success', 'Senha alterada com sucesso!')
-      setOpen(false); setNewPw(''); setConfirmPw('')
-    } catch (e) { toast('error', e instanceof Error ? e.message : 'Erro ao alterar senha.') }
-    finally { setSaving(false) }
+      resetPassword()
+    } catch (error) {
+      toast('error', error instanceof Error ? error.message : 'Erro ao alterar senha. Tente novamente.')
+    } finally { setSaving(false) }
   }
 
   return (
-    <div className="account-profile-card bg-white rounded-2xl border p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#16855C]/10 flex items-center justify-center">
-          <Shield className="w-5 h-5 text-[#16855C]" strokeWidth={1.75} />
-        </div>
-        <div>
-        <h3 className="text-[14px] md:text-[15px] font-bold text-[#1A1A1A]">Segurança</h3>
-          <p className="text-xs text-gray-500">Proteja sua conta</p>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls="change-password-panel"
-        className="w-full flex items-center justify-between p-4 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm font-medium text-[#1A1A1A] hover:bg-gray-100 transition-colors"
-        onClick={() => setOpen(!open)}
-      >
-        <span className="flex items-center gap-3">
-          <Lock className="w-4 h-4 text-gray-400" strokeWidth={1.75} />
-          Alterar minha senha
-        </span>
-        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronDown className="w-4 h-4 text-gray-400" strokeWidth={1.75} />
-        </motion.span>
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
-            id="change-password-panel"
-            className="overflow-hidden"
-          >
-            <div className="pt-5 space-y-4">
-              <div className="relative">
-                <label htmlFor="new-password" className="sr-only">Nova senha</label>
-                <input
-                  id="new-password"
-                  type={showNewPw ? 'text' : 'password'}
-                  value={newPw}
-                  onChange={(e) => setNewPw(e.target.value)}
-                  placeholder="Nova senha (mín. 8 caracteres)"
-                  className="w-full h-12 px-4 pr-12 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all"
-                />
-                <button type="button" aria-label={showNewPw ? 'Ocultar nova senha' : 'Mostrar nova senha'} className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-[#1A1A1A] transition-colors" onClick={() => setShowNewPw(!showNewPw)}>
-                  {showNewPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+    <section className="mp-surface mp-security" aria-labelledby={`${id}-heading`}>
+      <header className="mp-panel-heading">
+        <div><h2 id={`${id}-heading`}>Acesso e segurança</h2><p>Gerencie o e-mail de acesso e sua senha.</p></div>
+        <Shield className="mp-heading-icon" aria-hidden="true" />
+      </header>
+      <details className="mp-disclosure">
+        <summary><Mail aria-hidden="true" /><span><strong>Alterar e-mail</strong><small>{email || 'E-mail de acesso'}</small></span><ChevronDown className="mp-chevron" aria-hidden="true" /></summary>
+        <form className="mp-details-body" onSubmit={changeEmail} aria-busy={emailSaving}>
+          <div className="mp-field">
+            <label htmlFor={`${id}-email`}>Novo e-mail</label>
+            <Input id={`${id}-email`} className="mp-input" type="email" autoComplete="email" required value={newEmail} onChange={event => setNewEmail(event.target.value)} disabled={emailSaving} aria-describedby={`${id}-email-hint`} placeholder="voce@exemplo.com" />
+            <p id={`${id}-email-hint`} className="mp-helper">O e-mail de acesso só muda após a confirmação por e-mail.</p>
+          </div>
+          <div className="mp-actions">
+            <Button type="submit" className="mp-button mp-button-primary" disabled={emailSaving || !newEmail.trim() || newEmail.trim().toLowerCase() === email.toLowerCase()}>
+              {emailSaving ? <Loader2 className="mp-spin" aria-hidden="true" /> : <Mail aria-hidden="true" />}
+              {emailSaving ? 'Enviando…' : 'Confirmar novo e-mail'}
+            </Button>
+          </div>
+        </form>
+      </details>
+      <details className="mp-disclosure" ref={passwordDetails}>
+        <summary><Lock aria-hidden="true" /><span><strong>Alterar senha</strong><small>Escolha uma senha com pelo menos 8 caracteres.</small></span><ChevronDown className="mp-chevron" aria-hidden="true" /></summary>
+        <form className="mp-details-body" onSubmit={changePassword} aria-busy={saving}>
+          <div className="mp-fields">
+            <div className="mp-field">
+              <label htmlFor={`${id}-password`}>Nova senha</label>
+              <div className="mp-password-input">
+                <Input id={`${id}-password`} className="mp-input" type={showPassword ? 'text' : 'password'} autoComplete="new-password" required minLength={8} value={newPassword} onChange={event => setNewPassword(event.target.value)} disabled={saving} aria-describedby={`${id}-password-hint`} />
+                <Button type="button" className="mp-reveal" aria-label={showPassword ? 'Ocultar nova senha' : 'Mostrar nova senha'} aria-pressed={showPassword} onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}</Button>
               </div>
-              <div className="relative">
-                <label htmlFor="confirm-password" className="sr-only">Confirmar nova senha</label>
-                <input
-                  id="confirm-password"
-                  type={showConfirmPw ? 'text' : 'password'}
-                  value={confirmPw}
-                  onChange={(e) => setConfirmPw(e.target.value)}
-                  placeholder="Confirmar nova senha"
-                  className="w-full h-12 px-4 pr-12 rounded-xl bg-[#F8F9FA] border border-gray-200 text-sm text-[#1A1A1A] placeholder-gray-400 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all"
-                />
-                <button type="button" aria-label={showConfirmPw ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'} className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-[#1A1A1A] transition-colors" onClick={() => setShowConfirmPw(!showConfirmPw)}>
-                  {showConfirmPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-              {newPw && confirmPw && newPw !== confirmPw && (
-                <p className="text-sm font-medium text-[#DC2626]">As senhas não coincidem.</p>
-              )}
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-semibold transition-colors disabled:opacity-40"
-                  style={{ backgroundColor: '#16855C' }}
-                  onClick={changePw}
-                  disabled={saving || newPw.length < 8 || newPw !== confirmPw}
-                >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  Salvar senha
-                </button>
-                <button
-                  type="button"
-                  className="px-5 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
-                  onClick={() => { setOpen(false); setNewPw(''); setConfirmPw('') }}
-                >
-                  Cancelar
-                </button>
-              </div>
+              <p className="mp-helper" id={`${id}-password-hint`}>Mínimo de 8 caracteres.</p>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+            <div className="mp-field">
+              <label htmlFor={`${id}-confirmation`}>Confirmar nova senha</label>
+              <div className="mp-password-input">
+                <Input id={`${id}-confirmation`} className="mp-input" type={showConfirmation ? 'text' : 'password'} autoComplete="new-password" required minLength={8} value={confirmPassword} onChange={event => setConfirmPassword(event.target.value)} disabled={saving} aria-invalid={mismatch} aria-describedby={mismatch ? `${id}-mismatch` : undefined} />
+                <Button type="button" className="mp-reveal" aria-label={showConfirmation ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'} aria-pressed={showConfirmation} onClick={() => setShowConfirmation(!showConfirmation)}>{showConfirmation ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}</Button>
+              </div>
+              {mismatch && <p id={`${id}-mismatch`} className="mp-field-error" role="status">As senhas não coincidem.</p>}
+            </div>
+          </div>
+          <div className="mp-actions">
+            <Button type="submit" className="mp-button mp-button-primary" disabled={saving || newPassword.length < 8 || newPassword !== confirmPassword}>
+              {saving ? <Loader2 className="mp-spin" aria-hidden="true" /> : <Check aria-hidden="true" />}{saving ? 'Salvando…' : 'Salvar senha'}
+            </Button>
+            <Button type="button" className="mp-button mp-button-secondary" onClick={resetPassword} disabled={saving}>Cancelar</Button>
+          </div>
+        </form>
+      </details>
+    </section>
   )
 }
 
-/* ─── Danger Zone ─── */
 function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
-  const [show, setShow] = useState(false)
-  const [delText, setDelText] = useState('')
+  const id = useId()
+  const detailsRef = useRef<HTMLDetailsElement>(null)
+  const [confirmation, setConfirmation] = useState('')
   const [deleting, setDeleting] = useState(false)
-
-  const deleteAccount = async () => {
+  const deleteAccount = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (confirmation !== 'EXCLUIR' || deleting) return
     setDeleting(true)
     try {
-      const sb = getSupabaseBrowserClient()
-      await sb.from('users').delete().eq('id', userId)
-      await sb.auth.signOut()
+      const supabase = getSupabaseBrowserClient()
+      const { error } = await supabase.from('users').delete().eq('id', userId)
+      if (error) throw error
+      const { error: signOutError } = await supabase.auth.signOut()
+      if (signOutError) throw signOutError
       window.location.href = '/'
-    } catch (e) { toast('error', e instanceof Error ? e.message : 'Erro ao excluir conta.'); setDeleting(false) }
+    } catch (error) {
+      toast('error', error instanceof Error ? error.message : 'Erro ao excluir conta. Tente novamente.')
+      setDeleting(false)
+    }
   }
-
   return (
-    <div className="account-danger-card bg-white rounded-2xl border border-[#DC2626]/20 p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-[#DC2626]/10 flex items-center justify-center">
-          <AlertTriangle className="w-5 h-5 text-[#DC2626]" strokeWidth={1.75} />
+    <details className="mp-surface mp-disclosure mp-danger" ref={detailsRef}>
+      <summary><AlertTriangle aria-hidden="true" /><span><strong>Excluir minha conta</strong><small>Revise esta ação antes de confirmar.</small></span><ChevronDown className="mp-chevron" aria-hidden="true" /></summary>
+      <form className="mp-details-body" onSubmit={deleteAccount} aria-busy={deleting}>
+        <p className="mp-danger-copy">A exclusão da conta é permanente. Se deseja apenas sair, use a opção de sair da conta.</p>
+        <div className="mp-field">
+          <label htmlFor={`${id}-delete`}>Digite EXCLUIR para confirmar</label>
+          <Input id={`${id}-delete`} className="mp-input" value={confirmation} onChange={event => setConfirmation(event.target.value)} autoComplete="off" disabled={deleting} required />
         </div>
-        <div>
-          <h3 className="text-[14px] md:text-[15px] font-bold text-[#DC2626]">Zona de perigo</h3>
-          <p className="text-xs text-gray-500">Ações irreversíveis</p>
+        <div className="mp-actions">
+          <Button type="submit" className="mp-button mp-button-danger" disabled={confirmation !== 'EXCLUIR' || deleting}>{deleting ? <Loader2 className="mp-spin" aria-hidden="true" /> : <AlertTriangle aria-hidden="true" />}{deleting ? 'Excluindo…' : 'Confirmar exclusão'}</Button>
+          <Button type="button" className="mp-button mp-button-secondary" disabled={deleting} onClick={() => { setConfirmation(''); if (detailsRef.current) { detailsRef.current.open = false; detailsRef.current.querySelector('summary')?.focus() } }}>Cancelar</Button>
         </div>
-      </div>
-      
-      <p className="text-sm text-gray-600 mb-5">Excluir sua conta é permanente. Todos os seus anúncios, dados e histórico serão removidos para sempre.</p>
-      
-      {!show ? (
-        <button
-          type="button"
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-[#DC2626] text-[#DC2626] text-sm font-semibold hover:bg-[#DC2626]/5 transition-colors"
-          onClick={() => setShow(true)}
-        >
-          <AlertTriangle className="w-4 h-4" />
-          Excluir minha conta
-        </button>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
-        >
-          <div className="p-4 rounded-xl bg-[#DC2626]/5 border border-[#DC2626]/20">
-            <p className="text-sm font-semibold text-[#DC2626] mb-2">Digite &quot;EXCLUIR&quot; para confirmar:</p>
-            <label htmlFor="confirm-delete" className="sr-only">Digite EXCLUIR para confirmar</label>
-            <input
-              id="confirm-delete"
-              value={delText}
-              onChange={(e) => setDelText(e.target.value)}
-              placeholder='EXCLUIR'
-              className="w-full h-12 px-4 rounded-xl bg-white border border-[#DC2626]/30 text-sm font-mono font-bold text-[#DC2626] placeholder-gray-400 focus:outline-none focus:border-[#DC2626] focus:ring-2 focus:ring-[#DC2626]/10 transition-all"
-            />
-          </div>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#DC2626] text-white text-sm font-semibold hover:bg-[#DC2626]/90 transition-colors disabled:opacity-40 shadow-sm"
-              onClick={deleteAccount}
-              disabled={delText !== 'EXCLUIR' || deleting}
-            >
-              {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />}
-              {deleting ? 'Excluindo...' : 'Confirmar exclusão'}
-            </button>
-            <button
-              type="button"
-              className="px-5 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
-              onClick={() => { setShow(false); setDelText('') }}
-            >
-              Cancelar
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </div>
+      </form>
+    </details>
   )
 }
 
-/* ─── Main Profile Panel ─── */
-export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: () => void }) {
+export default function ProfilePanel({ onProfileUpdate, mode = 'profile' }: {
+  onProfileUpdate?: () => void; mode?: 'profile' | 'security'
+}) {
+  const id = useId()
   const supabaseReady = isSupabaseBrowserConfigured()
   const [loading, setLoading] = useState(true)
+  const [profileLoading, setProfileLoading] = useState(mode === 'profile')
   const [userId, setUserId] = useState<string | null>(null)
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
@@ -385,153 +225,128 @@ export default function ProfilePanel({ onProfileUpdate }: { onProfileUpdate?: ()
   const [avatarUrl, setAvatarUrl] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [profileError, setProfileError] = useState(false)
+  const [retry, setRetry] = useState(0)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const showToast = useCallback<ToastFn>((type, message) => setToast({ type, message }), [])
 
   useEffect(() => {
     if (!supabaseReady) return
-    let unsub: (() => void) | null = null
+    let active = true
+    const supabase = getSupabaseBrowserClient()
+    const { data } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
+      if (!active) return
+      setUserId(session?.user.id || null)
+      setEmail(session?.user.email || '')
+    })
     const boot = async () => {
-      const sb = getSupabaseBrowserClient()
-      const { data: { session } } = await sb.auth.getSession()
-      if (session?.user) { setUserId(session.user.id); setEmail(session.user.email || '') }
-      const { data } = sb.auth.onAuthStateChange((_e: string, s: { user?: { id?: string; email?: string } } | null) => { setUserId(s?.user?.id || null); setEmail(s?.user?.email || '') })
-      unsub = () => data.subscription.unsubscribe()
-      setLoading(false)
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (!active) return
+        if (error) throw error
+        setUserId(session?.user.id || null)
+        setEmail(session?.user.email || '')
+      } catch {
+        if (active) showToast('error', 'Não foi possível carregar a conta. Atualize a página para tentar novamente.')
+      } finally { if (active) setLoading(false) }
     }
     void boot()
-    return () => unsub?.()
-  }, [supabaseReady])
+    return () => { active = false; data.subscription.unsubscribe() }
+  }, [supabaseReady, showToast])
 
-   useEffect(() => {
-    if (!userId || !supabaseReady) return
+  useEffect(() => {
+    if (!userId || !supabaseReady || mode === 'security') return
+    let active = true
     const load = async () => {
+      setProfileLoading(true)
+      setProfileError(false)
       try {
-        const { data, error } = await getSupabaseBrowserClient()
-          .from('users').select('id,email,full_name,avatar_url,phone,cpf')
-          .eq('id', userId).maybeSingle()
-        if (error) {
-          console.error('Error loading user profile:', error)
-          return
-        }
-        if (data) {
-          setFullName(data.full_name || '')
-          setAvatarUrl(data.avatar_url || '')
-          setPhone(data.phone || '')
-          setCpf(data.cpf || '')
-        }
-      } catch (e) {
-        console.error('Failed to load profile:', e)
-      }
+        const { data, error } = await getSupabaseBrowserClient().from('users').select('id,email,full_name,avatar_url,phone,cpf').eq('id', userId).maybeSingle()
+        if (error) throw error
+        if (!active) return
+        setFullName(data?.full_name || '')
+        setAvatarUrl(data?.avatar_url || '')
+        setPhone(formatPhone(data?.phone || ''))
+        setCpf(data?.cpf || '')
+      } catch {
+        if (active) { setProfileError(true); showToast('error', 'Não foi possível carregar seus dados. Tente novamente.') }
+      } finally { if (active) setProfileLoading(false) }
     }
     void load()
-  }, [userId, supabaseReady])
+    return () => { active = false }
+  }, [userId, supabaseReady, mode, retry, showToast])
 
-  const showToast = useCallback((type: 'success' | 'error', message: string) => {
-    setToast({ type, message }); setTimeout(() => setToast(null), 3500)
-  }, [])
-
-  const saveProfile = async () => {
-    if (!userId || !supabaseReady) {
-      showToast('error', 'Usuário não autenticado.')
-      return
-    }
+  const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!userId || !supabaseReady || saving || uploading || profileError) return
     setSaving(true)
     try {
-      const sb = getSupabaseBrowserClient()
-      const { data: { session } } = await sb.auth.getSession()
-      if (!session) {
-        showToast('error', 'Sessão expirada. Faça login novamente.')
-        return
-      }
-
-      // Prepare update data - only send non-null values
-      const updateData: { full_name?: string | null; phone?: string | null; cpf?: string | null } = {}
-      if (fullName.trim()) {
-        updateData.full_name = fullName.trim()
-      }
-      if (phone.replace(/\D/g, '')) {
-        updateData.phone = phone.replace(/\D/g, '')
-      }
-      if (cpf.replace(/\D/g, '')) {
-        updateData.cpf = cpf.replace(/\D/g, '')
-      }
-
-      console.log('Updating profile with:', { userId, updateData })
-
-      const { data, error } = await sb.from('users').update(updateData).eq('id', userId).select()
-
-      if (error) {
-        console.error('Supabase update error details:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        })
-        throw new Error(error.message || 'Erro ao salvar perfil')
-      }
-
-      console.log('Profile updated successfully:', data)
+      const supabase = getSupabaseBrowserClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Sessão expirada. Faça login novamente.')
+      const updateData: { full_name?: string; phone?: string; cpf?: string } = {}
+      if (fullName.trim()) updateData.full_name = fullName.trim()
+      if (phone.replace(/\D/g, '')) updateData.phone = phone.replace(/\D/g, '')
+      if (cpf.replace(/\D/g, '')) updateData.cpf = cpf.replace(/\D/g, '')
+      const { error } = await supabase.from('users').update(updateData).eq('id', userId).select()
+      if (error) throw error
       showToast('success', 'Perfil atualizado com sucesso!')
       onProfileUpdate?.()
-    } catch (e) {
-      console.error('Save profile error:', e)
-      showToast('error', e instanceof Error ? e.message : 'Erro ao salvar perfil.')
-    } finally {
-      setSaving(false)
-    }
+    } catch (error) {
+      showToast('error', error instanceof Error ? error.message : 'Erro ao salvar perfil. Tente novamente.')
+    } finally { setSaving(false) }
   }
 
-  if (loading) return (
-    <div className="account-loading space-y-6" aria-busy="true">
-      <span className="sr-only" role="status">Carregando seu perfil…</span>
-      <div className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
-      <div className="h-64 bg-gray-100 rounded-2xl animate-pulse" />
-      <div className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
+  if (!supabaseReady || (!loading && !userId)) return (
+    <div className="mp-surface mp-empty" role={toast ? 'alert' : 'status'}>
+      <p>{toast?.message || 'Entre na sua conta para gerenciar seus dados.'}</p>
+      <Link className="mp-text-link" href="/entrar?redirect=/minha-conta">Entrar na conta <ArrowUpRight aria-hidden="true" /></Link>
+    </div>
+  )
+  if (loading || (mode === 'profile' && profileLoading)) return (
+    <div className="mp-loading" aria-busy="true" role="status" aria-label="Carregando seu perfil">
+      <div className="mp-skeleton mp-skeleton-photo" /><div className="mp-skeleton mp-skeleton-fields" />
     </div>
   )
   if (!userId) return null
 
+  const feedback = toast && (
+    <div className={`mp-feedback mp-feedback-${toast.type}`} role={toast.type === 'error' ? 'alert' : 'status'} aria-atomic="true">
+      {toast.type === 'success' ? <Check aria-hidden="true" /> : <AlertTriangle aria-hidden="true" />}<span>{toast.message}</span>
+      <Button type="button" className="mp-feedback-dismiss" onClick={() => setToast(null)} aria-label="Fechar mensagem">Fechar</Button>
+    </div>
+  )
+
+  if (mode === 'security') return <div className="mp-stack">{feedback}<SecuritySection email={email} toast={showToast} /><DangerZone userId={userId} toast={showToast} /></div>
+
   return (
-    <section className="account-profile space-y-6">
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: -16, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -16, scale: 0.95 }}
-            role="status"
-            aria-live="polite"
-            className={`fixed top-20 right-4 z-50 px-5 py-3 rounded-xl text-sm font-semibold shadow-xl max-w-[calc(100vw-32px)] flex items-center gap-2 ${
-              toast.type === 'success' ? 'bg-[#16855C] text-white' : 'bg-[#DC2626] text-white'
-            }`}
-          >
-            {toast.type === 'success' ? <Check className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
-            {toast.message}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AvatarSection avatarUrl={avatarUrl} fullName={fullName} email={email} userId={userId} onAvatarChange={setAvatarUrl} uploading={uploading} onUploadingChange={setUploading} />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PersonalInfo fullName={fullName} email={email} phone={phone} cpf={cpf} onNameChange={setFullName} onPhoneChange={setPhone} />
-        <SecuritySection userId={userId} toast={showToast} />
+    <section className="mp-profile" aria-label="Editar perfil">
+      {feedback}
+      <div className="mp-workspace">
+        <div className="mp-stack">
+          <section className="mp-surface" aria-labelledby={`${id}-personal`}>
+            <header className="mp-panel-heading"><div><h2 id={`${id}-personal`}>Meu perfil</h2><p>Sua foto e seus dados de contato.</p></div><User className="mp-heading-icon" aria-hidden="true" /></header>
+            {profileError ? <div className="mp-empty"><p>Seus dados não foram carregados.</p><Button type="button" className="mp-button mp-button-secondary" onClick={() => { setToast(null); setRetry(value => value + 1) }}>Tentar novamente</Button></div> : <>
+              <AvatarSection avatarUrl={avatarUrl} userId={userId} uploading={uploading} onUploadingChange={setUploading} toast={showToast} onAvatarChange={url => { setAvatarUrl(url); onProfileUpdate?.() }} />
+              <form className="mp-personal-form" onSubmit={saveProfile} aria-busy={saving}>
+                <div className="mp-fields">
+                  <div className="mp-field"><label htmlFor={`${id}-name`}>Nome completo</label><Input className="mp-input" id={`${id}-name`} autoComplete="name" value={fullName} onChange={event => setFullName(event.target.value)} placeholder="Seu nome" disabled={saving} /></div>
+                  <div className="mp-field"><label htmlFor={`${id}-phone`}>Telefone / WhatsApp</label><Input className="mp-input" id={`${id}-phone`} type="tel" inputMode="tel" autoComplete="tel-national" maxLength={15} value={phone} onChange={event => setPhone(formatPhone(event.target.value))} placeholder="(00) 00000-0000" disabled={saving} /></div>
+                  <div className="mp-field"><label htmlFor={`${id}-email`}>E-mail de acesso</label><Input className="mp-input" id={`${id}-email`} type="email" value={email} readOnly aria-describedby={`${id}-email-hint`} /><p className="mp-helper" id={`${id}-email-hint`}>Para alterar, abra “Alterar e-mail” abaixo.</p></div>
+                  <div className="mp-field"><label htmlFor={`${id}-cpf`}>CPF</label><Input className="mp-input" id={`${id}-cpf`} value={formatCPF(cpf)} readOnly placeholder="Não informado" aria-describedby={`${id}-cpf-hint`} /><p className="mp-helper" id={`${id}-cpf-hint`}>Documento informado no cadastro.</p></div>
+                </div>
+                <footer className="mp-form-footer"><p>Salve depois de editar seus dados.</p><Button type="submit" className="mp-button mp-button-primary" disabled={saving || uploading}>{saving ? <Loader2 className="mp-spin" aria-hidden="true" /> : <Save aria-hidden="true" />}{saving ? 'Salvando…' : 'Salvar alterações'}</Button></footer>
+              </form>
+            </>}
+          </section>
+          <SecuritySection email={email} toast={showToast} />
+          <DangerZone userId={userId} toast={showToast} />
+        </div>
+        <aside className="mp-aside" aria-label="Sobre seu perfil">
+          <div className="mp-note mp-note-green"><h2>Seus contatos</h2><p>Mantenha nome e telefone atualizados para suas negociações.</p><Link href="/minha-conta/conversas" className="mp-text-link">Abrir conversas <ArrowUpRight aria-hidden="true" /></Link></div>
+          <div className="mp-note mp-note-lavender"><h2>Sobre seus dados</h2><p>Consulte como seus dados são tratados na política de privacidade.</p><Link href="/privacidade" className="mp-text-link">Ler política <ArrowUpRight aria-hidden="true" /></Link></div>
+        </aside>
       </div>
-
-      <div className="pt-4">
-        <button
-          type="button"
-          className="account-profile-save w-full py-4 rounded-xl text-white text-[14px] md:text-[15px] font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-2"
-          style={{ backgroundColor: '#16855C', boxShadow: '0 4px 12px rgba(22,133,92,0.25)' }}
-          onClick={saveProfile}
-          disabled={saving || uploading}
-        >
-          {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-          {saving ? 'Salvando...' : 'Salvar alterações'}
-        </button>
-      </div>
-
-      <DangerZone userId={userId} toast={showToast} />
     </section>
   )
 }

@@ -1,15 +1,16 @@
 'use client'
 
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import { Loader2, Save, Upload, Trash2, Check, AlertCircle, Image as ImageIcon, GripVertical, Star, X, Search, Car, Plus, Filter, Grid, List, Eye, TrendingUp, BarChart3 } from 'lucide-react'
-import { motion, AnimatePresence, Reorder } from 'motion/react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Loader2, Save, Upload, Trash2, Check, AlertCircle, Image as ImageIcon, GripVertical, Star, X, Search, Car, Plus, Eye, TrendingUp, BarChart3 } from 'lucide-react'
+import { motion, Reorder } from 'motion/react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import { LISTING_ALLOWED_TYPES, LISTING_MAX_IMAGES, LISTING_MAX_IMAGE_SIZE_MB, normalizePlateFinal, parseMoneyInputToNumber, parseBrazilianInt, formatBrazilianInt } from '@/lib/marketplace'
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from './MarketplaceListingImage'
 import PlateInput from './PlateInput'
+import './member-tools.css'
 import {
   FUEL_OPTIONS,
   TRANSMISSION_OPTIONS,
@@ -22,8 +23,6 @@ interface DashboardListing { id: string; slug: string; title: string; descriptio
 interface UploadImageItem { id: string; file?: File; previewUrl: string; isExisting: boolean; originalImage?: DashboardImage; is_primary: boolean; sort_order: number }
 
 const authH = (t: string) => ({ Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' })
-
-const ease = [0.23, 1, 0.32, 1] as const
 
 // Price formatting helpers
 const formatPriceDisplay = (value: number | string): string => {
@@ -68,10 +67,10 @@ function StatusBadge({ status, isSelected = false }: { status: string; isSelecte
       return { backgroundColor: 'rgba(0,0,0,0.12)', color: '#0A0A0A' }
     }
     switch (status) {
-      case 'active': return { backgroundColor: 'rgba(184,255,0,0.18)', color: '#4D6900' }
-      case 'paused': return { backgroundColor: 'rgba(245,158,11,0.1)', color: '#F59E0B' }
+      case 'active': return { backgroundColor: '#edf3d2', color: '#465222' }
+      case 'paused': return { backgroundColor: '#fff2db', color: '#795212' }
       case 'sold': return { backgroundColor: '#F3F4F6', color: '#6B7280' }
-      default: return { backgroundColor: 'rgba(184,255,0,0.18)', color: '#4D6900' }
+      default: return { backgroundColor: '#eee8fa', color: '#574477' }
     }
   }
 
@@ -89,10 +88,10 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
   isUploading: boolean; pendingUploads: number; imageError: string | null; isDirty: boolean
 }) {
   return (
-    <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
+    <div className="member-tools-panel">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-4 sm:mb-5">
         <div className="flex items-start gap-3 min-w-0">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-10 sm:w-10">
+          <div className="member-tools-section-icon">
             <ImageIcon className="h-4 w-4 text-[#0A0A0A] sm:h-5 sm:w-5" strokeWidth={1.75} />
           </div>
           <div className="min-w-0">
@@ -105,18 +104,18 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
             <Upload className="w-4 h-4" /> Adicionar
             <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { onAdd(e.target.files); e.target.value = '' }} />
           </label>
-          <button onClick={onSync} disabled={!isDirty || isUploading} className="flex h-10 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#00A36A] px-5 text-sm font-semibold text-[#0A0A0A] transition-colors hover:bg-[#008E5D] disabled:cursor-not-allowed disabled:bg-[#DDE9E4] disabled:text-[#557066] lg:flex-none">
+          <button onClick={onSync} disabled={!isDirty || isUploading} className="member-tools-button member-tools-button-lavender">
             {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Salvar
           </button>
         </div>
       </div>
 
       <div
-        className={`rounded-[22px] border-2 border-dashed transition-[border-color,background-color] ${isDragging ? 'border-[#B8FF00] bg-[#B8FF00]/10' : 'border-black/10 bg-[#F1F1F6]'}`}
+        className={`rounded-[16px] border-2 border-dashed transition-[border-color,background-color] ${isDragging ? 'border-[#deef70] bg-[#deef70]/10' : 'border-black/10 bg-[#F1F1F6]'}`}
         onDragEnter={onDragEnter} onDragLeave={onDragLeave} onDragOver={onDragOver} onDrop={onDrop}
       >
         {(isUploading || pendingUploads > 0) && (
-          <div className="m-4 flex items-center gap-2 rounded-[16px] bg-[#B8FF00]/15 px-4 py-3 text-sm text-[#4D6900]">
+          <div className="m-4 flex items-center gap-2 rounded-[16px] bg-[#deef70]/15 px-4 py-3 text-sm text-[#4D6900]">
             <Loader2 className="w-4 h-4 animate-spin" />
             {isUploading ? 'Enviando fotos...' : `${pendingUploads} foto(s) prontas para salvar`}
           </div>
@@ -128,7 +127,7 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
         )}
 
         {images.length === 0 ? (
-          <label className="block cursor-pointer p-12 text-center transition-colors hover:bg-gray-100 rounded-2xl">
+          <label className="block cursor-pointer p-5 sm:p-8 text-center transition-colors hover:bg-gray-100 rounded-2xl">
             <ImageIcon className="mx-auto mb-4 h-12 w-12 text-gray-300" />
             <p className="text-[14px] font-semibold text-[#0A0A0A] md:text-[15px]">Arraste fotos ou clique para selecionar</p>
             <p className="mt-2 text-sm text-[#5C5C66]">JPG, PNG ou WEBP · até {LISTING_MAX_IMAGES} imagens · máx {LISTING_MAX_IMAGE_SIZE_MB}MB cada</p>
@@ -139,19 +138,19 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
             {images.map((img) => (
               <Reorder.Item key={img.id} value={img} className="relative aspect-[4/3] rounded-xl overflow-hidden group cursor-grab active:cursor-grabbing bg-gray-100">
                 <img src={img.previewUrl} className="w-full h-full object-cover select-none" alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
+                <div className="member-tools-photo-controls absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex flex-col justify-between p-3">
                   <div className="flex justify-between">
                     <div className="bg-white/90 p-1.5 rounded-lg"><GripVertical className="w-4 h-4 text-gray-600" /></div>
                     <button type="button" onClick={() => onRemove(img.id)} aria-label="Remover foto" className="w-8 h-8 bg-[#DC2626] text-white rounded-full flex items-center justify-center hover:bg-[#DC2626]/90 transition-colors">
                       <X className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </div>
-                  <button onClick={() => onSetPrimary(img.id)} className={`w-full rounded-full py-2 text-xs font-semibold transition-colors ${img.is_primary ? 'bg-[#B8FF00] text-[#0A0A0A]' : 'bg-white text-[#0A0A0A]'}`}>
+                  <button onClick={() => onSetPrimary(img.id)} className={`w-full rounded-full py-2 text-xs font-semibold transition-colors ${img.is_primary ? 'bg-[#deef70] text-[#0A0A0A]' : 'bg-white text-[#0A0A0A]'}`}>
                     {img.is_primary ? '✓ Capa' : 'Definir como capa'}
                   </button>
                 </div>
                 {img.is_primary && (
-                  <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-[#B8FF00] px-2.5 py-1 text-[10px] font-semibold text-[#0A0A0A]">
+                  <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-[#deef70] px-2.5 py-1 text-[10px] font-semibold text-[#0A0A0A]">
                     <Star className="w-3 h-3 fill-current" /> Capa
                   </div>
                 )}
@@ -171,18 +170,13 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
 function ListingCard({ listing, isSelected, onSelect }: { listing: DashboardListing; isSelected: boolean; onSelect: () => void }) {
   return (
     <motion.button
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
       onClick={onSelect}
-      className="w-full rounded-[22px] border p-3 text-left transition-[background-color,border-color,box-shadow,transform]"
-      style={{
-        backgroundColor: isSelected ? '#00A36A' : '#FFFFFF',
-        borderColor: isSelected ? '#00A36A' : 'rgba(0,0,0,0.08)',
-        boxShadow: isSelected ? '0 12px 24px rgba(0,0,0,0.12)' : undefined
-      }}
+      type="button"
+      aria-pressed={isSelected}
+      className="member-tools-listing"
     >
       <div className="flex gap-3">
-        <div className="h-12 w-16 shrink-0 overflow-hidden rounded-[14px]" style={{ backgroundColor: isSelected ? '#B8FF00' : '#F1F1F6' }}>
+        <div className="h-12 w-16 shrink-0 overflow-hidden rounded-[12px] bg-[#eeeeec]">
           <MarketplaceListingImage brand={listing.brand} model={listing.model} year={listing.year_model} imageUrls={listing.images?.map((img) => img.public_url) || []} alt={listing.title} className="h-full w-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
@@ -221,45 +215,31 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
     setErrors(next)
   }, [errors, setFormData, setIsDirty, setErrors])
 
-  const ic = (f: string, x = '') => `w-full h-11 sm:h-12 px-3 sm:px-4 rounded-[16px] bg-[#F1F1F6] border border-black/[0.06] text-sm text-[#0A0A0A] placeholder-[#6A6A74] focus-visible:outline-none focus-visible:border-[#B8FF00] focus-visible:ring-2 focus-visible:ring-[#B8FF00]/20 transition-[border-color,box-shadow] ${x} ${errors[f] ? '!border-[#D94A3A] !text-[#D94A3A]' : ''}`
+  const ic = (f: string, x = '') => `member-tools-field ${x} ${errors[f] ? 'member-tools-field-error' : ''}`
 
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="member-tools-editor">
       {/* Toolbar */}
-      <div className="flex flex-col gap-4 rounded-[28px] bg-[#00A36A] p-5 text-[#0A0A0A] sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:p-6">
-        <div aria-live="polite" className={`flex min-h-10 min-w-0 items-center gap-3 whitespace-nowrap text-sm font-semibold ${saveStatus === 'saving' ? 'text-[#5B3800]' : saveStatus === 'saved' ? 'text-[#0A0A0A]' : saveStatus === 'error' ? 'text-[#8B1E16]' : 'text-[#0A0A0A]'}`}>
+      <div className="member-tools-action-strip">
+        <div aria-live="polite" className={`member-tools-save-state ${saveStatus === 'error' ? 'member-tools-save-error' : ''}`}>
           {saveStatus === 'saving' ? <Loader2 className="h-4 w-4 animate-spin" /> : saveStatus === 'saved' ? <Check className="h-4 w-4" /> : saveStatus === 'error' ? <AlertCircle className="h-4 w-4" /> : <div className="h-2 w-2 rounded-full bg-[#0A0A0A]" />}
-          {saveStatus === 'saving' ? 'Salvando alterações...' : saveStatus === 'saved' ? 'Alterações salvas' : saveStatus === 'error' ? 'Erro ao salvar' : 'Todas alterações salvas'}
+          {saveStatus === 'saving' ? 'Salvando alterações...' : saveStatus === 'saved' ? 'Alterações salvas' : saveStatus === 'error' ? 'Erro ao salvar' : isDirty ? 'Alterações pendentes' : 'Todas alterações salvas'}
         </div>
-        <div className="flex w-full items-center gap-3 sm:w-auto">
-          <button onClick={onDelete} disabled={isDeleting} className="flex h-12 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-black/25 px-5 text-sm font-semibold text-[#0A0A0A] transition-colors hover:bg-black/10 disabled:cursor-not-allowed disabled:border-black/15 disabled:text-black/45 sm:min-w-36 sm:flex-none">
+        <div className="member-tools-actions">
+          <button onClick={onDelete} disabled={isDeleting} className="member-tools-button member-tools-button-quiet">
             {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Excluir
           </button>
-          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="flex h-12 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#B8FF00] px-8 text-sm font-bold text-[#0A0A0A] transition-colors hover:bg-[#A9EE00] disabled:cursor-not-allowed disabled:bg-[#DCE5B6] disabled:text-[#4D6900] sm:min-w-48 sm:flex-none">
+          <button onClick={onSave} disabled={!isDirty || saveStatus === 'saving'} className="member-tools-button member-tools-button-dark">
             <Save className="h-4 w-4" /> Salvar anúncio
           </button>
         </div>
       </div>
 
-      {/* Stats Header */}
-      <div className="flex flex-col gap-4 rounded-[28px] bg-[#00A36A] p-4 text-[#0A0A0A] sm:flex-row sm:items-center sm:justify-between sm:p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4 sm:gap-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-12 sm:w-12">
-                <Eye className="h-5 w-5 text-[#0A0A0A] sm:h-6 sm:w-6" strokeWidth={1.75} />
-              </div>
-              <div>
-                <span className="block text-[14px] font-bold leading-none text-[#0A0A0A] md:text-[15px]">{(listing.view_count || 0).toLocaleString('pt-BR')}</span>
-                <span className="mt-1 block text-[11px] text-black/70">visualizações</span>
-              </div>
-            </div>
-          </div>
-          <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-black/25 px-3 py-2 text-xs font-semibold text-[#0A0A0A] transition-colors hover:bg-black/10 md:px-5 md:py-2.5 md:text-sm">
-            Ver ao vivo →
-          </a>
-        </div>
+      <div className="member-tools-editor-context">
+        <div className="member-tools-editor-title"><h3 className="member-tools-panel-heading">{listing.title}</h3><StatusBadge status={listing.status} /></div>
+        <span className="member-tools-views"><Eye size={14} /> {(listing.view_count || 0).toLocaleString('pt-BR')} visualizações</span>
+        <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="member-tools-live-link">Ver ao vivo →</a>
       </div>
 
       {/* Plate Input */}
@@ -298,9 +278,9 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       }} />
 
       {/* Basic Info */}
-      <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
+      <div className="member-tools-panel">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-10 sm:w-10">
+          <div className="member-tools-section-icon">
             <Car className="h-4 w-4 text-[#0A0A0A] sm:h-5 sm:w-5" strokeWidth={1.75} />
           </div>
           <div>
@@ -333,9 +313,9 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       </div>
 
       {/* Price & Location */}
-      <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
+      <div className="member-tools-panel">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-10 sm:w-10">
+          <div className="member-tools-section-icon">
             <TrendingUp className="h-4 w-4 text-[#0A0A0A] sm:h-5 sm:w-5" strokeWidth={1.75} />
           </div>
           <div>
@@ -377,9 +357,9 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       </div>
 
       {/* Specs */}
-      <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
+      <div className="member-tools-panel">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-10 sm:w-10">
+          <div className="member-tools-section-icon">
             <BarChart3 className="h-4 w-4 text-[#0A0A0A] sm:h-5 sm:w-5" strokeWidth={1.75} />
           </div>
           <div>
@@ -418,7 +398,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
           </div>
         </div>
          {formData.vehicle_type === 'truck' && (
-           <div className="mt-4 grid grid-cols-1 gap-4 rounded-[18px] bg-[#B8FF00]/15 p-4 min-[480px]:grid-cols-2 sm:grid-cols-3">
+           <div className="mt-4 grid grid-cols-1 gap-4 rounded-[18px] bg-[#deef70]/15 p-4 min-[480px]:grid-cols-2 sm:grid-cols-3">
              {([['truck_type', 'Tipo de caminhão'], ['load_capacity', 'Capacidade (kg)'], ['axles', 'Eixos'], ['truck_body_type', 'Carroceria']] as const).map(([field, label]) => (
                <div key={field}><label className="text-sm font-semibold text-[#1A1A1A] mb-2 block">{label}</label><input type={field === 'load_capacity' || field === 'axles' ? 'number' : 'text'} className={ic(field)} value={formData[field] ?? ''} onChange={(e) => update(field, field === 'load_capacity' || field === 'axles' ? parseBrazilianInt(e.target.value) : e.target.value)} /></div>
              ))}
@@ -431,9 +411,9 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
       </div>
 
       {/* Description */}
-      <div className="rounded-[28px] border border-black/[0.06] bg-white p-4 sm:p-6">
+      <div className="member-tools-panel">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[#B8FF00] sm:h-10 sm:w-10">
+          <div className="member-tools-section-icon">
               <span className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Aa</span>
           </div>
           <div>
@@ -442,7 +422,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
           </div>
         </div>
         <textarea
-          className={`min-h-[140px] w-full resize-y rounded-[18px] border border-black/[0.06] bg-[#F1F1F6] p-4 text-sm leading-relaxed text-[#0A0A0A] placeholder-[#6A6A74] transition-[border-color,box-shadow] focus-visible:border-[#B8FF00] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8FF00]/20 ${errors.description ? '!border-[#D94A3A] !text-[#D94A3A]' : ''}`}
+          className={`member-tools-field member-tools-description ${errors.description ? 'member-tools-field-error' : ''}`}
           value={formData.description || ''}
           onChange={(e) => update('description', e.target.value)}
           placeholder="Descreva o estado de conservação, revisões feitas, opcionais e diferenciais do veículo..."
@@ -462,15 +442,18 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
 // ── Main Dashboard ─────────────────────────────────────
 export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'car' | 'truck' } = {}) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const vehicleFromQuery = searchParams.get('vehicle')
+  const appliedVehicleQuery = useRef<string | null | undefined>(undefined)
   const supabaseReady = isSupabaseBrowserConfigured()
   const [sessionReady, setSessionReady] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [listings, setListings] = useState<DashboardListing[]>([])
   const [selectedId, setSelectedId] = useState('')
   const [loadingListings, setLoadingListings] = useState(false)
+  const [listingsLoaded, setListingsLoaded] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
   const [formData, setFormData] = useState<Partial<DashboardListing>>({})
   const [localImages, setLocalImages] = useState<UploadImageItem[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -487,6 +470,9 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
   const localImgRef = useRef<UploadImageItem[]>([])
   const dragC = useRef(0)
   const selected = useMemo(() => listings.find((l) => l.id === selectedId) || null, [listings, selectedId])
+  const selectedRef = useRef(selected)
+
+  useEffect(() => { selectedRef.current = selected }, [selected])
 
   // Auth
   useEffect(() => {
@@ -499,29 +485,47 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
     void boot(); return () => { unsub?.() }
   }, [supabaseReady])
 
-  const loadListings = useCallback(async (selectFirst = false) => {
+  const loadListings = useCallback(async () => {
      if (!supabaseReady) return; setLoadingListings(true); setGlobalError(null)
-     try { const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); if (!session?.access_token) { setGlobalError('Faça login.'); return }; const res = await fetch('/api/marketplace/my-listings', { headers: authH(session.access_token) }); const p = await res.json().catch(() => []); if (!res.ok) throw new Error(p.error || 'Falha ao carregar.'); const list = Array.isArray(p) ? (p as (DashboardListing & { vehicle_type?: string })[]) : []; const filteredList = vehicleType ? list.filter((item) => item.vehicle_type === vehicleType) : list; const normalizedList = filteredList.map((item) => ({ ...item, transmission: canonicalTransmission(item.transmission), fuel: canonicalFuel(item.fuel) })); setListings(normalizedList); if (selectFirst && normalizedList.length > 0) setSelectedId(normalizedList[0].id) }
+     try { const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); if (!session?.access_token) { setGlobalError('Faça login.'); return }; const res = await fetch('/api/marketplace/my-listings', { headers: authH(session.access_token) }); const p = await res.json().catch(() => []); if (!res.ok) throw new Error(p.error || 'Falha ao carregar.'); const list = Array.isArray(p) ? (p as (DashboardListing & { vehicle_type?: string })[]) : []; const filteredList = vehicleType ? list.filter((item) => item.vehicle_type === vehicleType) : list; const normalizedList = filteredList.map((item) => ({ ...item, transmission: canonicalTransmission(item.transmission), fuel: canonicalFuel(item.fuel) })); setListings(normalizedList); setListingsLoaded(true) }
      catch (err) { setGlobalError(err instanceof Error ? err.message : 'Falha ao carregar.') } finally { setLoadingListings(false) }
   }, [supabaseReady, vehicleType])
 
   useEffect(() => {
     if (!isAuthenticated) return
-    const timer = setTimeout(() => { void loadListings(true) }, 0)
+    const timer = setTimeout(() => { void loadListings() }, 0)
     return () => clearTimeout(timer)
   }, [isAuthenticated, loadListings])
 
+  const selectListing = useCallback((id: string) => {
+    if (id === selectedId) return
+    if (isDirty && !window.confirm('Há alterações não salvas. Deseja trocar de anúncio e descartá-las?')) return
+    if (syncTimer.current) clearTimeout(syncTimer.current)
+    setSelectedId(id)
+  }, [selectedId, isDirty])
+
+  // Consume each URL request once, so refreshing data or editing never resets selection.
+  useEffect(() => {
+    if (!listingsLoaded || loadingListings || appliedVehicleQuery.current === vehicleFromQuery) return
+    appliedVehicleQuery.current = vehicleFromQuery
+    const requested = listings.find((item) => item.id === vehicleFromQuery)
+    const fallback = listings.find((item) => item.id === selectedId) || listings[0]
+    selectListing(requested?.id || fallback?.id || '')
+  }, [vehicleFromQuery, listingsLoaded, loadingListings, listings, selectedId, selectListing])
+
   // Sync form
   useEffect(() => {
-    if (!selected) return
-    localImages.forEach((img) => { if (!img.isExisting) URL.revokeObjectURL(img.previewUrl) })
+    if (!selectedId) return
+    localImgRef.current.forEach((img) => { if (!img.isExisting) URL.revokeObjectURL(img.previewUrl) })
     const timer = setTimeout(() => {
-      setFormData({ title: selected.title, description: selected.description, vehicle_type: selected.vehicle_type, price: selected.price, vin: selected.vin || '', status: selected.status, mileage: selected.mileage, brand: selected.brand, model: selected.model, version: selected.version, year: selected.year, year_model: selected.year_model, transmission: canonicalTransmission(selected.transmission), fuel: canonicalFuel(selected.fuel), color: selected.color, body_type: selected.body_type, city: selected.city, state: selected.state, optional_items: selected.optional_items || [], engine: selected.engine, horsepower: selected.horsepower, doors: selected.doors, plate_final: normalizePlateFinal(selected.plate_final), truck_type: selected.truck_type, load_capacity: selected.load_capacity, axles: selected.axles, truck_body_type: selected.truck_body_type, structured_data: selected.structured_data || null })
-      setLocalImages((selected.images || []).map((img) => ({ id: img.id, previewUrl: img.public_url, isExisting: true, originalImage: img, is_primary: img.is_primary, sort_order: img.sort_order })).sort((a, b) => a.sort_order - b.sort_order))
+      const listing = selectedRef.current
+      if (!listing || listing.id !== selectedId) return
+      setFormData({ title: listing.title, description: listing.description, vehicle_type: listing.vehicle_type, price: listing.price, vin: listing.vin || '', status: listing.status, mileage: listing.mileage, brand: listing.brand, model: listing.model, version: listing.version, year: listing.year, year_model: listing.year_model, transmission: canonicalTransmission(listing.transmission), fuel: canonicalFuel(listing.fuel), color: listing.color, body_type: listing.body_type, city: listing.city, state: listing.state, optional_items: listing.optional_items || [], engine: listing.engine, horsepower: listing.horsepower, doors: listing.doors, plate_final: normalizePlateFinal(listing.plate_final), truck_type: listing.truck_type, load_capacity: listing.load_capacity, axles: listing.axles, truck_body_type: listing.truck_body_type, structured_data: listing.structured_data || null })
+      setLocalImages((listing.images || []).map((img) => ({ id: img.id, previewUrl: img.public_url, isExisting: true, originalImage: img, is_primary: img.is_primary, sort_order: img.sort_order })).sort((a, b) => a.sort_order - b.sort_order))
       setIsDirty(false); setSaveStatus('idle'); setErrors({})
     }, 0)
     return () => clearTimeout(timer)
-  }, [selected?.id])
+  }, [selectedId])
 
   useEffect(() => { localImgRef.current = localImages }, [localImages])
 
@@ -540,10 +544,23 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
     } catch (err) { setSaveStatus('error'); setGlobalError(err instanceof Error ? err.message : 'Falha ao salvar.') }
   }, [selected, isDirty, errors, formData])
 
-  useEffect(() => { if (!isDirty) return; const t = setTimeout(() => { void saveListing() }, 2000); return () => clearTimeout(t) }, [formData])
+  useEffect(() => { if (!isDirty) return; const t = setTimeout(() => { void saveListing() }, 2000); return () => clearTimeout(t) }, [saveListing, isDirty])
+
+  const syncImages = useCallback(async (snap: UploadImageItem[] = localImgRef.current) => {
+    if (!selected || isUploading) return; setIsUploading(true); setGlobalError(null); setImageError(null)
+    try {
+      const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); if (!session?.access_token || !session.user) throw new Error('Sessão expirada.')
+      const final: any[] = []; for (let i = 0; i < snap.length; i++) { const item = snap[i]; if (item.isExisting && item.originalImage) { final.push({ ...item.originalImage, sort_order: i, is_primary: i === 0 }); continue }; if (!item.file) continue; const nm = item.file.name.replace(/[^a-zA-Z0-9_.-]/g, '-'); const path = `${session.user.id}/${selected.id}/${String(i + 1).padStart(2, '0')}-${Date.now()}-${nm}`; const { error: ue } = await sb.storage.from('vehicle-listings').upload(path, item.file, { upsert: false, contentType: item.file.type }); if (ue) { setLocalImages((p) => p.filter((img) => img.id !== item.id)); throw new Error(`Upload falhou: ${ue.message}`) }; const { data: ud } = sb.storage.from('vehicle-listings').getPublicUrl(path); final.push({ storage_path: path, public_url: ud.publicUrl, sort_order: i, is_primary: i === 0 }); setPendingUploads((p) => Math.max(0, p - 1)) }
+      const res = await fetch(`/api/marketplace/listings/${selected.id}/images`, { method: 'POST', headers: authH(session.access_token), body: JSON.stringify({ images: final }) }); if (!res.ok) { const p = await res.json().catch(() => ({})); throw new Error(p.error || 'Falha ao salvar fotos') }
+      setSaveStatus('saved'); setIsDirty(false); setPendingUploads(0); await loadListings()
+    } catch (err) { const msg = err instanceof Error ? err.message : 'Erro ao atualizar fotos'; setGlobalError(msg); setImageError(msg) } finally { setIsUploading(false) }
+  }, [selected, isUploading, loadListings])
 
   // Images
-  function schedSync(snap: UploadImageItem[] = localImgRef.current) { if (syncTimer.current) clearTimeout(syncTimer.current); syncTimer.current = setTimeout(() => { void syncImages(snap) }, 700) }
+  const schedSync = useCallback((snap: UploadImageItem[] = localImgRef.current) => {
+    if (syncTimer.current) clearTimeout(syncTimer.current)
+    syncTimer.current = setTimeout(() => { void syncImages(snap) }, 700)
+  }, [syncImages])
 
   const handleImageSelect = useCallback((fileList: FileList | null) => {
     if (!fileList?.length) return; const next = [...localImgRef.current]; const ok: File[] = []; const rej: { name: string; reason: string }[] = []
@@ -552,22 +569,12 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
     if (rej.length > 0) { setImageError(rej.map((r) => `${r.name}: ${r.reason}`).join(' · ')); setTimeout(() => setImageError(null), 6000) }
   }, [schedSync])
 
-  const removeImage = useCallback((id: string) => { setLocalImages((prev) => { const n = prev.filter((img) => img.id !== id).map((img, i) => ({ ...img, sort_order: i, is_primary: i === 0 })); localImgRef.current = n; return n }); setIsDirty(true); schedSync() }, [])
+  const removeImage = useCallback((id: string) => { setLocalImages((prev) => { const n = prev.filter((img) => img.id !== id).map((img, i) => ({ ...img, sort_order: i, is_primary: i === 0 })); localImgRef.current = n; return n }); setIsDirty(true); schedSync() }, [schedSync])
 
-  const setPrimary = useCallback((id: string) => { setLocalImages((prev) => { const t = prev.find((img) => img.id === id); if (!t) return prev; const n = [t, ...prev.filter((img) => img.id !== id)].map((img, i) => ({ ...img, sort_order: i, is_primary: i === 0 })); localImgRef.current = n; return n }); setIsDirty(true); schedSync() }, [])
+  const setPrimary = useCallback((id: string) => { setLocalImages((prev) => { const t = prev.find((img) => img.id === id); if (!t) return prev; const n = [t, ...prev.filter((img) => img.id !== id)].map((img, i) => ({ ...img, sort_order: i, is_primary: i === 0 })); localImgRef.current = n; return n }); setIsDirty(true); schedSync() }, [schedSync])
 
   const handlePhotosDrag = useCallback((e: React.DragEvent, enter: boolean) => { e.preventDefault(); e.stopPropagation(); if (enter) { dragC.current += 1; if (dragC.current === 1) setIsDraggingPhotos(true) } else { dragC.current = Math.max(0, dragC.current - 1); if (dragC.current === 0) setIsDraggingPhotos(false) } }, [])
   const handlePhotosDrop = useCallback((e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); dragC.current = 0; setIsDraggingPhotos(false); if (e.dataTransfer.files?.length) handleImageSelect(e.dataTransfer.files) }, [handleImageSelect])
-
-  async function syncImages(snap: UploadImageItem[] = localImgRef.current) {
-    if (!selected || isUploading) return; setIsUploading(true); setGlobalError(null); setImageError(null)
-    try {
-      const sb = getSupabaseBrowserClient(); const { data: { session } } = await sb.auth.getSession(); if (!session?.access_token || !session.user) throw new Error('Sessão expirada.')
-      const final: any[] = []; for (let i = 0; i < snap.length; i++) { const item = snap[i]; if (item.isExisting && item.originalImage) { final.push({ ...item.originalImage, sort_order: i, is_primary: i === 0 }); continue }; if (!item.file) continue; const nm = item.file.name.replace(/[^a-zA-Z0-9_.-]/g, '-'); const path = `${session.user.id}/${selected.id}/${String(i + 1).padStart(2, '0')}-${Date.now()}-${nm}`; const { error: ue } = await sb.storage.from('vehicle-listings').upload(path, item.file, { upsert: false, contentType: item.file.type }); if (ue) { setLocalImages((p) => p.filter((img) => img.id !== item.id)); throw new Error(`Upload falhou: ${ue.message}`) }; const { data: ud } = sb.storage.from('vehicle-listings').getPublicUrl(path); final.push({ storage_path: path, public_url: ud.publicUrl, sort_order: i, is_primary: i === 0 }); setPendingUploads((p) => Math.max(0, p - 1)) }
-      const res = await fetch(`/api/marketplace/listings/${selected.id}/images`, { method: 'POST', headers: authH(session.access_token), body: JSON.stringify({ images: final }) }); if (!res.ok) { const p = await res.json().catch(() => ({})); throw new Error(p.error || 'Falha ao salvar fotos') }
-      setSaveStatus('saved'); setIsDirty(false); setPendingUploads(0); await loadListings()
-    } catch (err) { const msg = err instanceof Error ? err.message : 'Erro ao atualizar fotos'; setGlobalError(msg); setImageError(msg) } finally { setIsUploading(false) }
-  }
 
   const handleDelete = useCallback(async () => {
     if (!selected) return; if (!window.confirm('Excluir este anúncio permanentemente?')) return; setIsDeleting(true)
@@ -594,58 +601,27 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
   })
 
   return (
-    <div className="min-w-0 space-y-6">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-[32px] bg-[#00A36A] p-5 text-[#0A0A0A] md:p-8">
-        <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[#B8FF00]/30 blur-3xl" />
-        <div className="relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#0A0A0A]">Member inventory</p>
-              <h1 className="text-[14px] font-bold tracking-tight text-[#0A0A0A] md:text-[15px]">Meus anúncios</h1>
-              <p className="mt-2 font-medium text-[#0A0A0A]">{listings.length} anúncio{listings.length !== 1 ? 's' : ''} encontrado{listings.length !== 1 ? 's' : ''}</p>
-            </div>
-            <button
-              onClick={() => router.push('/anunciar-carro')}
-              className="inline-flex items-center gap-2 rounded-full bg-[#B8FF00] px-6 py-3 text-sm font-bold text-[#0A0A0A] transition-transform hover:-translate-y-0.5 hover:bg-[#A9EE00]"
-            >
-              <Plus className="w-5 h-5" />
-              Novo anúncio
-            </button>
-          </div>
-
-          {/* Stats */}
-          <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-4">
-            <div className="rounded-[18px] border border-black/10 bg-white/80 p-3 sm:p-4">
-              <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{listings.length}</p>
-              <p className="mt-1 text-[10px] font-semibold text-[#0A0A0A] md:text-xs">Total</p>
-            </div>
-            <div className="rounded-[18px] border border-black/10 bg-white/80 p-3 sm:p-4">
-              <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{listings.filter(l => l.status === 'active').length}</p>
-              <p className="mt-1 text-[10px] font-semibold text-[#0A0A0A] md:text-xs">Ativos</p>
-            </div>
-            <div className="rounded-[18px] border border-black/10 bg-white/80 p-3 sm:p-4">
-              <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{listings.reduce((sum, l) => sum + (l.view_count || 0), 0)}</p>
-              <p className="mt-1 text-[10px] font-semibold text-[#0A0A0A] md:text-xs">Visualizações</p>
-            </div>
-          </div>
+    <div className="member-tools-root">
+      <div className="member-tools-toolbar">
+        <div className="member-tools-toolbar-title">
+          <h2 className="member-tools-heading">Meus anúncios</h2>
+          <span className="member-tools-count">{listings.length} anúncio{listings.length !== 1 ? 's' : ''}</span>
         </div>
+        <button onClick={() => router.push('/anunciar-carro')} className="member-tools-button member-tools-button-lime">
+          <Plus size={16} /> Novo anúncio
+        </button>
       </div>
 
       {/* Filters */}
-      <div className="rounded-[28px] border border-black/[0.06] bg-white p-3 sm:p-4">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+      <div className="member-tools-filters">
+        <div className="member-tools-filter-row">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#5C5C66]" />
-            <input className="h-12 w-full rounded-full border border-black/[0.06] bg-[#F1F1F6] pl-12 pr-4 text-sm text-[#0A0A0A] placeholder-[#6A6A74] transition-[border-color,box-shadow] focus-visible:border-[#B8FF00] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8FF00]/20" placeholder="Buscar anúncio..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            <input aria-label="Buscar anúncio" className="member-tools-search-input" placeholder="Buscar anúncio..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           </div>
           <div className="flex gap-2 overflow-x-auto">
             {(['all', 'active', 'paused', 'sold'] as const).map((s) => (
-              <button key={s} onClick={() => setStatusFilter(s)} className="whitespace-nowrap rounded-full border px-4 py-2.5 text-sm font-semibold transition-colors" style={{
-                backgroundColor: statusFilter === s ? '#00A36A' : '#F1F1F6',
-                color: statusFilter === s ? '#B8FF00' : '#55555D',
-                borderColor: statusFilter === s ? '#00A36A' : 'rgba(0,0,0,0.06)'
-              }}>
+              <button key={s} onClick={() => setStatusFilter(s)} aria-pressed={statusFilter === s} className="member-tools-filter">
                 {s === 'all' ? 'Todos' : s === 'active' ? 'Ativos' : s === 'paused' ? 'Pausados' : 'Vendidos'}
               </button>
             ))}
@@ -653,23 +629,23 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
         </div>
       </div>
 
-      <div className="xl:grid xl:grid-cols-[320px_minmax(0,1fr)] xl:gap-8 items-start">
+      <div className="member-tools-listings-layout">
         {/* Listings List */}
-        <div className="space-y-3 xl:sticky xl:top-24 mb-6 xl:mb-0">
+        <aside className="member-tools-listing-sidebar" aria-label="Seus anúncios">
           {loadingListings ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => <div key={i} className="h-28 bg-gray-100 rounded-2xl animate-pulse" />)}
             </div>
           ) : filteredListings.length === 0 ? (
-            <div className="rounded-[28px] border border-black/[0.06] bg-white p-12 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-[20px] bg-[#B8FF00]">
+            <div className="member-tools-empty member-tools-panel">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-[20px] bg-[#deef70]">
                 <Car className="h-8 w-8 text-[#0A0A0A]" />
               </div>
-              <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Nenhum anúncio</p>
-              <p className="mb-6 mt-2 text-sm text-[#5C5C66]">Crie seu primeiro anúncio para começar a vender.</p>
+              <p className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">{listings.length ? 'Nenhum resultado' : 'Nenhum anúncio'}</p>
+              <p className="mb-6 mt-2 text-sm text-[#5C5C66]">{listings.length ? 'Tente outro título ou status para encontrar seu anúncio.' : 'Crie seu primeiro anúncio para começar a vender.'}</p>
               <button
                 onClick={() => router.push('/anunciar-carro')}
-                className="inline-flex items-center gap-2 rounded-full bg-[#00A36A] px-6 py-3 text-sm font-bold text-[#0A0A0A] transition-colors hover:bg-[#008E5D]"
+                className="member-tools-button member-tools-button-lime"
               >
                 <Plus className="w-4 h-4" /> Criar anúncio
               </button>
@@ -681,24 +657,17 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
                   key={l.id}
                   listing={l}
                   isSelected={selectedId === l.id}
-                  onSelect={() => setSelectedId(l.id)}
+                  onSelect={() => selectListing(l.id)}
                 />
               ))}
             </div>
           )}
-        </div>
+        </aside>
 
         {/* Editor */}
-        <main>
-          <AnimatePresence mode="wait">
+        <section className="member-tools-editor-region" aria-label="Editar anúncio">
             {selected ? (
-              <motion.div
-                key={selected.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.3, ease }}
-              >
+              <div key={selected.id}>
                 <ListingEditor
                   listing={selected}
                   formData={formData}
@@ -726,22 +695,17 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
                   onDragOver={(e) => { e.preventDefault(); e.stopPropagation() }}
                   onDrop={handlePhotosDrop}
                 />
-              </motion.div>
+              </div>
             ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="rounded-[28px] border border-black/[0.06] bg-white p-16 text-center"
-              >
-                <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[24px] bg-[#B8FF00]">
+              <div className="member-tools-empty member-tools-panel">
+                <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[24px] bg-[#deef70]">
                   <Car className="h-10 w-10 text-[#0A0A0A]" />
                 </div>
                 <h2 className="text-[14px] font-bold text-[#0A0A0A] md:text-[15px]">Selecione um anúncio</h2>
                 <p className="mx-auto mt-2 max-w-[300px] text-sm text-[#5C5C66]">Escolha um dos seus veículos para editar detalhes, fotos e preço.</p>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
-        </main>
+        </section>
       </div>
 
       {/* Error Toast */}
@@ -755,7 +719,6 @@ export default function MyListingsDashboard({ vehicleType }: { vehicleType?: 'ca
         </div>
       )}
 
-      <style>{`.custom-scrollbar::-webkit-scrollbar{width:4px;height:4px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(0,0,0,.05);border-radius:10px}@media(max-width:1024px){.no-scrollbar-mobile::-webkit-scrollbar{display:none}.no-scrollbar-mobile{-ms-overflow-style:none;scrollbar-width:none}}`}</style>
     </div>
   )
 }

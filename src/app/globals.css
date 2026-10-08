@@ -1040,6 +1040,8 @@ p {
   --account-green-deep: #0A5943;
   --account-lime: #D4F576;
   --account-lavender: #ECEBFA;
+  min-height: 100dvh;
+  overflow-x: clip;
   padding-top: calc(17px + 65px);
   background-color: var(--account-canvas);
   color: var(--account-ink);
@@ -1096,6 +1098,12 @@ p {
   border-color: var(--account-line);
 }
 
+.member-shell .account-bottom-nav a {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+}
+
 .member-shell .account-bottom-nav a[aria-current='page'] {
   background: var(--account-green);
   color: #FFFFFF;
@@ -1130,6 +1138,10 @@ p {
 
 .member-shell .account-side-nav a[aria-current='page'] svg {
   color: var(--account-lime);
+}
+
+.member-shell .account-side-nav a[aria-current='page'] span:last-of-type {
+  color: rgba(255, 255, 255, 0.82) !important;
 }
 
 .member-shell .account-side-nav a:not([aria-current='page']):hover {
