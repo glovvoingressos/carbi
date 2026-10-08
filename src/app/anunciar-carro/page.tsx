@@ -1,15 +1,16 @@
 import type { Metadata } from 'next'
-import SEOPageClient from '@/components/seo/SEOPageClient'
-import { SEO_DATA } from '@/data/seo-content'
+import AnnouncementLanding from '@/components/seo/AnnouncementLanding'
+
+const description = 'Crie seu anúncio de carro grátis na Carbi. Informe os dados do veículo, inclua fotos e converse com pessoas interessadas.'
 
 export const metadata: Metadata = {
   title: 'Anunciar carro grátis | Venda seu carro na Carbi',
-  description: SEO_DATA.anunciar.description,
+  description,
   keywords: ['anunciar carro', 'anunciar carro grátis', 'vender carro online', 'vender carro rápido'],
   alternates: { canonical: '/anunciar-carro' },
   openGraph: {
     title: 'Anunciar carro grátis | Venda seu carro na Carbi',
-    description: SEO_DATA.anunciar.description,
+    description,
     url: '/anunciar-carro',
     type: 'website',
   },
@@ -17,5 +18,5 @@ export const metadata: Metadata = {
 }
 
 export default function AnunciarCarroPage() {
-  return <SEOPageClient data={SEO_DATA.anunciar} ctaHref="/anunciar-carro/fluxo" />
+  return <AnnouncementLanding />
 }
