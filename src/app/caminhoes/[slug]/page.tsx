@@ -2,10 +2,19 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import MarketplaceClient from '@/components/marketplace/MarketplaceClient'
-import { BreadcrumbSchema } from '@/components/seo/JSONLD'
+import { BreadcrumbSchema, FAQSchema } from '@/components/seo/JSONLD'
+import { FAQSection } from '@/components/seo/SEOContentSection'
 import { fetchPublicTruckListingsPage, getFilterOptions, type ListingSort, type TruckListingFilters } from '@/lib/marketplace-server'
 import { ALLOWED_SORTS } from '@/lib/marketplace-seo'
-import { getAllTruckSeoParams, resolveTruckPreset, serializeJsonLd, truckCollectionJsonLd, truckPresetMetadata } from '@/lib/truck-seo'
+import {
+  getAllTruckSeoParams,
+  resolveTruckPreset,
+  serializeJsonLd,
+  truckCollectionJsonLd,
+  truckPresetFaq,
+  truckPresetMetadata,
+  TRUCK_QUICK_LINKS,
+} from '@/lib/truck-seo'
 
 export const dynamicParams = true
 
@@ -124,6 +133,7 @@ export default async function TruckSeoPage({
   ])
 
   const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'}/caminhoes/${preset.slug}`
+  const faq = truckPresetFaq(preset)
 
   return (
     <main className="cbi-page">
@@ -143,6 +153,7 @@ export default async function TruckSeoPage({
             ),
           }}
         />
+        <FAQSchema items={faq} />
 
         <section className="cbi-hero">
           <div className="cbi-hero-eyebrow">Caminhões</div>
@@ -158,6 +169,26 @@ export default async function TruckSeoPage({
           defaultFilters={{ ...preset.listingQuery, vehicle_type: 'truck' }}
           filterOptions={filterOptions}
         />
+
+        <FAQSection items={faq} />
+
+        <section className="fingen-section">
+          <div className="fingen-shell-content" style={{ maxWidth: '720px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div className="fingen-section-label">Continue explorando</div>
+              <h2 className="fingen-section-title" style={{ marginTop: '8px' }}>Outras buscas de caminhão</h2>
+            </div>
+            <nav className="truck-links" aria-label="Outras buscas de caminhão">
+              {TRUCK_QUICK_LINKS.map((link) => (
+                <Link key={link.href} href={link.href} className="truck-link">{link.label}</Link>
+              ))}
+              <Link href="/caminhoes/marcas" className="truck-link">Marcas</Link>
+              <Link href="/caminhoes/categorias" className="truck-link">Categorias</Link>
+              <Link href="/caminhoes/buscar" className="truck-link">Todos os caminhões</Link>
+              <Link href="/vender-caminhao" className="truck-link">Anunciar grátis</Link>
+            </nav>
+          </div>
+        </section>
       </div>
       <nav className="cbi-nav" aria-label="Navegação de caminhões">
         <Link href="/caminhoes">Home</Link>

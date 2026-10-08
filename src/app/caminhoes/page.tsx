@@ -200,6 +200,21 @@ export default async function TruckHomePage() {
           </div>
         </section>
 
+        {/* ═══ ATALHOS ═══ */}
+        <section className="tk-section" aria-label="Atalhos de caminhão">
+          <div className="tk-section-head">
+            <h2 className="tk-section-title">Explore os caminhões</h2>
+          </div>
+          <nav className="truck-links" aria-label="Páginas de caminhões">
+            <Link href="/caminhoes/marcas" className="truck-link">Marcas de caminhão</Link>
+            <Link href="/caminhoes/categorias" className="truck-link">Categorias</Link>
+            <Link href="/caminhoes/cavalo-mecanico" className="truck-link">Cavalos mecânicos</Link>
+            <Link href="/caminhoes/caminhoes-bau" className="truck-link">Carroceria baú</Link>
+            <Link href="/caminhoes/anunciar-gratis" className="truck-link">Anunciar grátis</Link>
+            <Link href="/vender-caminhao" className="truck-link">Vender caminhão</Link>
+          </nav>
+        </section>
+
         {/* ═══ FAQ ═══ */}
         <FAQSchema items={TRUCK_FAQ} />
         <FAQSection items={TRUCK_FAQ} />
