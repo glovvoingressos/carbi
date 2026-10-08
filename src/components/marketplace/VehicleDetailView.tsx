@@ -32,6 +32,7 @@ import MarketplaceListingImage from './MarketplaceListingImage'
 import ConfirmModal from '@/components/animations/ConfirmModal'
 import Tooltip from '@/components/animations/Tooltip'
 import { parseDescription } from '@/lib/format-description'
+import './vehicle-detail.css'
 
 interface VehicleDetailViewProps {
   listing: ListingPublic
