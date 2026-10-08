@@ -2,13 +2,16 @@ import { mapPlacaApiResponse, type PlacaApiResponse, type PlacaLookupResult } fr
 import { getFipePrice } from '@/lib/fipe-api'
 
 const PLACA_API_BASE = 'https://wdapi2.com.br/consulta'
-const PLACA_API_TOKEN = process.env.PLACA_API_TOKEN || '55fd95285b8689b5c643b902c6c82beb'
+const PLACA_API_TOKEN = process.env.PLACA_API_TOKEN
 
 export async function lookupPlate(plate: string): Promise<PlacaLookupResult> {
   try {
     const cleanPlate = plate.replace(/[^A-Za-z0-9]/g, '').toUpperCase()
     if (cleanPlate.length !== 7) {
       return { success: false, error: 'Placa deve ter 7 caracteres (ABC1D23 ou ABC1234)' }
+    }
+    if (!PLACA_API_TOKEN) {
+      return { success: false, error: 'Consulta de placa não configurada no servidor.' }
     }
 
     const response = await fetch(`${PLACA_API_BASE}/${cleanPlate}/${PLACA_API_TOKEN}`)
