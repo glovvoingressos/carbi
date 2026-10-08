@@ -14,7 +14,7 @@ export async function generateMetadata({
   const name = stateData?.stateName || estado
 
   return {
-    title: `Carros mais vendidos em ${name} (Julho 2026) | Carbi`,
+    title: `Carros mais vendidos em ${name} (Julho 2026)`,
     description: `Ranking de vendas e emplacamentos de carros novos e usados no estado de ${name} em Julho/2026 com dados FIPE.`,
     alternates: { canonical: `/carros-mais-vendidos/${estado}` },
   }

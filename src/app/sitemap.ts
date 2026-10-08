@@ -12,6 +12,7 @@ const CORE_PAGES: Array<{ path: string; priority: number; freq: 'daily' | 'weekl
   { path: '/', priority: 1.0, freq: 'daily' },
   { path: '/carros-a-venda', priority: 1.0, freq: 'daily' },
   { path: '/caminhoes', priority: 1.0, freq: 'daily' },
+  { path: '/caminhoes/buscar', priority: 0.9, freq: 'daily' },
   { path: '/caminhoes/marcas', priority: 0.85, freq: 'weekly' },
   { path: '/caminhoes/categorias', priority: 0.85, freq: 'weekly' },
   { path: '/anunciar-carro', priority: 0.95, freq: 'weekly' },
@@ -104,7 +105,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
-  for (const path of buildTruckSeoPaths().brands.slice(1).concat(buildTruckSeoPaths().categories.slice(1))) {
+  // Hub de marcas de caminhão (as categorias já entram como presets de SEO abaixo)
+  for (const path of buildTruckSeoPaths().brands.slice(1)) {
     entries.push({ url: `${SITE_URL}${path}`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 })
   }
 

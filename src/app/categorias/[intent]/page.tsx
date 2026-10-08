@@ -94,7 +94,7 @@ export async function generateMetadata({ params }: { params: Promise<{ intent: s
   if (!data) return { title: 'Não Encontrado' }
 
   return {
-    title: `${data.title} | Carbi`,
+    title: `${data.title}`,
     description: data.desc,
     keywords: [data.h1, 'carros à venda', 'seminovos à venda', 'carros usados'],
     alternates: {

@@ -5,7 +5,7 @@ import RankingsHubView from '@/components/rankings/RankingsHubView'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Os 100 Carros mais vendidos no Brasil em Julho de 2026 | Carbi',
+  title: 'Os 100 Carros mais vendidos no Brasil em Julho de 2026',
   description: 'Ranking oficial dos 100 carros 0km e seminovos mais vendidos no Brasil em Julho/2026. Preços FIPE, comparativos e ofertas disponíveis.',
   keywords: [
     'carros mais vendidos',

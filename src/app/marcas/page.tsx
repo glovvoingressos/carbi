@@ -6,7 +6,7 @@ import { BreadcrumbSchema } from '@/components/seo/JSONLD'
 import { fetchPublicListingsPage } from '@/lib/marketplace-server'
 
 export const metadata: Metadata = {
-  title: 'Marcas de carros à venda | Carbi',
+  title: 'Marcas de carros à venda',
   description: 'Veja marcas de carros com anúncios reais, dados técnicos e opções seminovas à venda em uma vitrine organizada.',
   keywords: ['marcas de carros', 'carros à venda', 'seminovos à venda', 'carros usados', 'comprar carro'],
   alternates: {

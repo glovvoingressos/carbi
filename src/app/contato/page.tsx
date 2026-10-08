@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Mail, MessageCircle, ShieldCheck, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Contato | Carbi',
+  title: 'Contato',
   description: 'Fale com a equipe Carbi. Atendimento para compradores e vendedores, suporte, parcerias e imprensa.',
   alternates: { canonical: '/contato' },
   openGraph: {

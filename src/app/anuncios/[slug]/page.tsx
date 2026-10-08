@@ -23,7 +23,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     .filter(Boolean)
     .join(' ')
   const price = formatBRL(Number(listing.price))
-  const listingTitle = `${listingName} por ${price} em ${listing.city} | Carbi`
+  const listingTitle = `${listingName} por ${price} em ${listing.city}`
+  // O template do layout já adiciona "| Carbi"; OG/Twitter não passam por ele.
+  const listingSocialTitle = `${listingTitle} | Carbi`
   const listingDescription = truncateDescription(
     `${listingName} por ${price} em ${listing.city}/${listing.state}. Veja preço, ${listing.mileage.toLocaleString('pt-BR')} km, ${listing.transmission}, ${listing.fuel} e comparação com a Tabela FIPE na Carbi.`,
   )
@@ -42,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       canonical: `/anuncios/${listing.slug}`,
     },
     openGraph: {
-      title: listingTitle,
+      title: listingSocialTitle,
       description: listingDescription,
       url: `/anuncios/${listing.slug}`,
       type: 'website',
@@ -50,7 +52,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: imageUrl ? 'summary_large_image' : 'summary',
-      title: listingTitle,
+      title: listingSocialTitle,
       description: listingDescription,
       ...(imageUrl ? { images: [imageUrl] } : {}),
     },

@@ -15,7 +15,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   )
 
   return {
-    title: 'Rankings de carros à venda | Carbi',
+    title: 'Rankings de carros à venda',
     description: 'Compare carros à venda por custo-benefício, economia, família, segurança, desempenho e tecnologia na Carbi.',
     alternates: { canonical: '/rankings' },
     robots: hasParameters ? { index: false, follow: true } : { index: true, follow: true },

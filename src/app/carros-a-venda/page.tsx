@@ -46,7 +46,7 @@ export async function generateMetadata({
     sp.mileage_max,
   )
   return {
-    title: query ? `Carros à venda: ${query} | Carbi` : 'Carros à venda, seminovos e usados | Carbi',
+    title: query ? `Carros à venda: ${query}` : 'Carros à venda, seminovos e usados',
     description: 'Encontre carros à venda, seminovos e usados com preços reais, comparação FIPE e chat interno seguro na Carbi.',
     keywords: ['carros à venda', 'seminovos à venda', 'carros usados', 'comprar carro', 'carro seminovo', 'anunciar carro grátis'],
     alternates: { canonical: '/carros-a-venda' },

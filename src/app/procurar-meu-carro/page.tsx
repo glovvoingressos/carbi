@@ -4,7 +4,7 @@ import ProcurarMeuCarroWizard from '@/components/buyer/ProcurarMeuCarroWizard'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Procure meu carro | Carbi',
+  title: 'Procure meu carro',
   description:
     'Diga o que você procura e o Carbi acompanha os anúncios disponíveis, procurando oportunidades compatíveis com o que você procura.',
   alternates: { canonical: '/procurar-meu-carro' },

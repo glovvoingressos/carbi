@@ -9,7 +9,7 @@ const data = {
 }
 
 export const metadata: Metadata = {
-  title: 'Anunciar Seminovo | Venda seu carro seminovo com valorização | Carbi',
+  title: 'Anunciar Seminovo | Venda seu carro seminovo com valorização',
   description: 'Anuncie seu carro seminovo na Carbi. Destaque para procedência, garantia e estado de conservação. Venda rápida e segura.',
   keywords: ['anunciar seminovo', 'anunciar carro grátis', 'seminovos à venda', 'vender seminovo', 'carro seminovo'],
   alternates: {

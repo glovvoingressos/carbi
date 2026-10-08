@@ -12,7 +12,7 @@ export async function generateMetadata({
   const { periodo } = await params
   const label = periodo.replace('-', ' ').toUpperCase()
   return {
-    title: `Carros mais vendidos no Brasil - ${label} | Carbi`,
+    title: `Carros mais vendidos no Brasil - ${label}`,
     description: `Ranking de vendas de veículos 0km e seminovos em ${label}. Confira o TOP 100 com dados FIPE e emplacamentos.`,
     alternates: { canonical: `/carros-mais-vendidos-brasil/${periodo}` },
   }

@@ -7,7 +7,7 @@ import { buildLoginRedirect } from '@/lib/auth-redirect'
 import { getSupabaseServerClientWithCookies, isSupabaseConfigured } from '@/lib/supabase-server'
 
 export const metadata: Metadata = {
-  title: 'Anunciar meu carro | Carbi',
+  title: 'Anunciar meu carro',
   description: 'Publique seu anúncio gratuitamente, com até 10 fotos e chat interno seguro.',
   robots: {
     index: false,

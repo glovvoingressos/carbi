@@ -9,7 +9,7 @@ const data = {
 }
 
 export const metadata: Metadata = {
-  title: 'Vender Carro em Belo Horizonte | Anuncie Grátis | Carbi',
+  title: 'Vender Carro em Belo Horizonte | Anuncie Grátis',
   description: 'Procurando como vender carro em Belo Horizonte? A Carbi conecta você a milhares de compradores interessados em BH. Venda rápida e segura.',
   alternates: {
     canonical: '/vender-carro-belo-horizonte',

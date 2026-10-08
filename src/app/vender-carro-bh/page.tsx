@@ -18,7 +18,7 @@ const data = {
 }
 
 export const metadata: Metadata = {
-  title: 'Vender Carro em BH | Melhor Avaliação e Venda Rápida | Carbi',
+  title: 'Vender Carro em BH | Melhor Avaliação e Venda Rápida',
   description: 'Quer vender seu carro em Belo Horizonte? Anuncie na Carbi e venda rápido para compradores reais de BH. Sem comissões, com segurança e preço justo.',
   keywords: ['vender carro bh', 'vender carro belo horizonte', 'seminovos bh', 'carros usados bh', 'anunciar carro grátis'],
   alternates: {

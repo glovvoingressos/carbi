@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Política de Privacidade | Carbi',
+  title: 'Política de Privacidade',
   description: 'Como a Carbi coleta, usa e protege seus dados pessoais. Direitos do titular e contato com o DPO.',
   alternates: { canonical: '/privacidade' },
   openGraph: {

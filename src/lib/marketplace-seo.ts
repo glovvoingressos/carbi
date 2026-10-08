@@ -12,7 +12,7 @@ export type MarketplaceSeoPreset = {
 export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
   {
     slug: 'ate-20-mil',
-    title: 'Carros até R$ 20 mil | Carbi',
+    title: 'Carros até R$ 20 mil',
     description: 'Anúncios de carros até R$ 20 mil com preços atualizados e dados reais. Encontre seminovos baratos.',
     h1: 'Carros até R$ 20 mil',
     intro: 'Explore anúncios ativos com teto de R$ 20 mil para comparar oportunidades reais.',
@@ -20,7 +20,7 @@ export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'ate-30-mil',
-    title: 'Carros até R$ 30 mil | Carbi',
+    title: 'Carros até R$ 30 mil',
     description: 'Veja opções de carros até R$ 30 mil em anúncios atualizados diariamente. Seminovos com melhor custo-benefício.',
     h1: 'Carros até R$ 30 mil',
     intro: 'Seleção atualizada com anúncios reais para quem busca carros nessa faixa de preço.',
@@ -28,7 +28,7 @@ export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'ate-40-mil',
-    title: 'Carros até R$ 40 mil | Carbi',
+    title: 'Carros até R$ 40 mil',
     description: 'Encontre carros até R$ 40 mil anunciados na Carbi com transparência e comparação FIPE.',
     h1: 'Carros até R$ 40 mil',
     intro: 'Navegue por anúncios de carros até R$ 40 mil com dados atualizados.',
@@ -36,7 +36,7 @@ export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'ate-50-mil',
-    title: 'Carros até R$ 50 mil | Carbi',
+    title: 'Carros até R$ 50 mil',
     description: 'Anúncios de carros até R$ 50 mil com preços atualizados e dados reais.',
     h1: 'Carros até R$ 50 mil',
     intro: 'Explore anúncios ativos com teto de R$ 50 mil para comparar oportunidades reais.',
@@ -44,7 +44,7 @@ export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'ate-60-mil',
-    title: 'Carros até R$ 60 mil | Carbi',
+    title: 'Carros até R$ 60 mil',
     description: 'Carros anunciados até R$ 60 mil na Carbi. Compare preços, km e ano dos seminovos.',
     h1: 'Carros até R$ 60 mil',
     intro: 'Descubra anúncios ativos com valor até R$ 60 mil e encontre o carro ideal.',
@@ -52,7 +52,7 @@ export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'ate-80-mil',
-    title: 'Carros até R$ 80 mil | Carbi',
+    title: 'Carros até R$ 80 mil',
     description: 'Veja opções de carros até R$ 80 mil em anúncios atualizados diariamente.',
     h1: 'Carros até R$ 80 mil',
     intro: 'Seleção atualizada com anúncios reais para quem está pesquisando carros nessa faixa de preço.',
@@ -60,7 +60,7 @@ export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'ate-100-mil',
-    title: 'Carros até R$ 100 mil | Carbi',
+    title: 'Carros até R$ 100 mil',
     description: 'Anúncios de carros até R$ 100 mil na Carbi. SUVs, sedans e hatches seminovos.',
     h1: 'Carros até R$ 100 mil',
     intro: 'Explore carros seminovos até R$ 100 mil com dados de FIPE e fotos reais.',
@@ -68,7 +68,7 @@ export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'ate-150-mil',
-    title: 'Carros até R$ 150 mil | Carbi',
+    title: 'Carros até R$ 150 mil',
     description: 'Carros seminovos até R$ 150 mil anunciados na Carbi. Modelos premium e completos.',
     h1: 'Carros até R$ 150 mil',
     intro: 'Navegue pelos melhores seminovos até R$ 150 mil na plataforma.',
@@ -76,7 +76,7 @@ export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'de-50-a-80-mil',
-    title: 'Carros de R$ 50 a R$ 80 mil | Carbi',
+    title: 'Carros de R$ 50 a R$ 80 mil',
     description: 'Carros na faixa de R$ 50 mil a R$ 80 mil anunciados na Carbi com preços reais.',
     h1: 'Carros de R$ 50 mil a R$ 80 mil',
     intro: 'Descubra seminovos na faixa entre R$ 50 mil e R$ 80 mil.',
@@ -84,7 +84,7 @@ export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'de-80-a-120-mil',
-    title: 'Carros de R$ 80 a R$ 120 mil | Carbi',
+    title: 'Carros de R$ 80 a R$ 120 mil',
     description: 'Carros seminovos entre R$ 80 mil e R$ 120 mil. Encontre seu próximo veículo.',
     h1: 'Carros de R$ 80 mil a R$ 120 mil',
     intro: 'Os melhores seminovos na faixa de R$ 80 mil a R$ 120 mil.',
@@ -92,7 +92,7 @@ export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'acima-de-100-mil',
-    title: 'Carros acima de R$ 100 mil | Carbi',
+    title: 'Carros acima de R$ 100 mil',
     description: 'Carros seminovos acima de R$ 100 mil. Modelos premium, SUVs de luxo e mais.',
     h1: 'Carros acima de R$ 100 mil',
     intro: 'Veja os seminovos mais premium anunciados na Carbi.',
@@ -103,7 +103,7 @@ export const PRICE_RANGE_PRESETS: MarketplaceSeoPreset[] = [
 export const BODY_TYPE_PRESETS: MarketplaceSeoPreset[] = [
   {
     slug: 'suv',
-    title: 'SUVs à venda | Carbi',
+    title: 'SUVs à venda',
     description: 'Anúncios de SUVs com preços, quilometragem e ano/modelo atualizados.',
     h1: 'SUVs à venda',
     intro: 'Descubra SUVs publicados na plataforma e acompanhe oportunidades por preço e ano.',
@@ -111,7 +111,7 @@ export const BODY_TYPE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'sedan',
-    title: 'Sedans à venda | Carbi',
+    title: 'Sedans à venda',
     description: 'Sedans seminovos anunciados na Carbi. Compare preços e versões.',
     h1: 'Sedans à venda',
     intro: 'Os melhores sedans seminovos anunciados na plataforma.',
@@ -119,7 +119,7 @@ export const BODY_TYPE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'hatch',
-    title: 'Hatchers à venda | Carbi',
+    title: 'Hatchers à venda',
     description: 'Carros hatch seminovos anunciados na Carbi. Compactos e econômicos.',
     h1: 'Hatchers à venda',
     intro: 'Descubra hatchers seminovos com o melhor custo-benefício.',
@@ -127,7 +127,7 @@ export const BODY_TYPE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'picape',
-    title: 'Picapes à venda | Carbi',
+    title: 'Picapes à venda',
     description: 'Picapes seminovas anunciadas na Carbi. Compare preços e versões.',
     h1: 'Picapes à venda',
     intro: 'Encontre picapes seminovas anunciadas na plataforma.',
@@ -135,7 +135,7 @@ export const BODY_TYPE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'eletricos',
-    title: 'Carros elétricos à venda | Carbi',
+    title: 'Carros elétricos à venda',
     description: 'Carros elétricos seminovos anunciados na Carbi. Sustentabilidade e economia.',
     h1: 'Carros elétricos à venda',
     intro: 'Explore carros elétricos seminovos na plataforma.',
@@ -143,7 +143,7 @@ export const BODY_TYPE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'hibridos',
-    title: 'Carros híbridos à venda | Carbi',
+    title: 'Carros híbridos à venda',
     description: 'Carros híbridos seminovos anunciados na Carbi. Economia e tecnologia.',
     h1: 'Carros híbridos à venda',
     intro: 'Descubra carros híbridos seminovos anunciados na plataforma.',
@@ -154,7 +154,7 @@ export const BODY_TYPE_PRESETS: MarketplaceSeoPreset[] = [
 export const TRANSMISSION_PRESETS: MarketplaceSeoPreset[] = [
   {
     slug: 'automaticos',
-    title: 'Carros automáticos à venda | Carbi',
+    title: 'Carros automáticos à venda',
     description: 'Carros automáticos em anúncios reais com filtros de preço, km e ano.',
     h1: 'Carros automáticos à venda',
     intro: 'Lista de anúncios ativos para quem prefere câmbio automático.',
@@ -162,7 +162,7 @@ export const TRANSMISSION_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'manuais',
-    title: 'Carros manuais à venda | Carbi',
+    title: 'Carros manuais à venda',
     description: 'Carros com câmbio manual anunciados na Carbi. Mais econômicos e tradicionais.',
     h1: 'Carros manuais à venda',
     intro: 'Encontre carros com câmbio manual anunciados na plataforma.',
@@ -173,7 +173,7 @@ export const TRANSMISSION_PRESETS: MarketplaceSeoPreset[] = [
 export const FUEL_TYPE_PRESETS: MarketplaceSeoPreset[] = [
   {
     slug: 'flex',
-    title: 'Carros flex à venda | Carbi',
+    title: 'Carros flex à venda',
     description: 'Carros flex (álcool e gasolina) seminovos anunciados na Carbi.',
     h1: 'Carros flex à venda',
     intro: 'Veja carros flex seminovos anunciados na plataforma.',
@@ -181,7 +181,7 @@ export const FUEL_TYPE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'gasolina',
-    title: 'Carros a gasolina à venda | Carbi',
+    title: 'Carros a gasolina à venda',
     description: 'Carros a gasolina seminovos anunciados na Carbi com preços atualizados.',
     h1: 'Carros a gasolina à venda',
     intro: 'Encontre carros a gasolina seminovos anunciados na plataforma.',
@@ -189,7 +189,7 @@ export const FUEL_TYPE_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'diesel',
-    title: 'Carros a diesel à venda | Carbi',
+    title: 'Carros a diesel à venda',
     description: 'Carros a diesel seminovos anunciados na Carbi. Picapes e veículos pesados.',
     h1: 'Carros a diesel à venda',
     intro: 'Explore carros a diesel seminovos anunciados na plataforma.',
@@ -200,7 +200,7 @@ export const FUEL_TYPE_PRESETS: MarketplaceSeoPreset[] = [
 export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   {
     slug: 'suv-ate-80-mil',
-    title: 'SUVs até R$ 80 mil | Carbi',
+    title: 'SUVs até R$ 80 mil',
     description: 'SUVs anunciados até R$ 80 mil com dados reais de preço e quilometragem.',
     h1: 'SUVs até R$ 80 mil',
     intro: 'Navegue por anúncios de SUVs nessa faixa de preço com ordenação inteligente.',
@@ -208,7 +208,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'suv-ate-100-mil',
-    title: 'SUVs até R$ 100 mil | Carbi',
+    title: 'SUVs até R$ 100 mil',
     description: 'SUVs seminovos até R$ 100 mil anunciados na Carbi. Compare preços e versões.',
     h1: 'SUVs até R$ 100 mil',
     intro: 'Os melhores SUVs seminovos até R$ 100 mil na plataforma.',
@@ -216,7 +216,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'suv-ate-50-mil',
-    title: 'SUVs até R$ 50 mil | Carbi',
+    title: 'SUVs até R$ 50 mil',
     description: 'SUVs seminovos até R$ 50 mil anunciados na Carbi. Os mais baratos do mercado.',
     h1: 'SUVs até R$ 50 mil',
     intro: 'SUVs seminovos com ótimo custo-benefício até R$ 50 mil.',
@@ -224,7 +224,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'sedan-ate-50-mil',
-    title: 'Sedans até R$ 50 mil | Carbi',
+    title: 'Sedans até R$ 50 mil',
     description: 'Sedans seminovos até R$ 50 mil anunciados na Carbi. Conforto por pouco.',
     h1: 'Sedans até R$ 50 mil',
     intro: 'Os melhores sedans seminovos até R$ 50 mil na plataforma.',
@@ -232,7 +232,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'sedan-ate-80-mil',
-    title: 'Sedans até R$ 80 mil | Carbi',
+    title: 'Sedans até R$ 80 mil',
     description: 'Sedans seminovos até R$ 80 mil anunciados na Carbi.',
     h1: 'Sedans até R$ 80 mil',
     intro: 'Sedans seminovos de qualidade até R$ 80 mil.',
@@ -240,7 +240,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'hatch-ate-50-mil',
-    title: 'Hatchers até R$ 50 mil | Carbi',
+    title: 'Hatchers até R$ 50 mil',
     description: 'Hatchers seminovos até R$ 50 mil anunciados na Carbi.',
     h1: 'Hatchers até R$ 50 mil',
     intro: 'Hatchers seminovos econômicos até R$ 50 mil.',
@@ -248,7 +248,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'picape-ate-80-mil',
-    title: 'Picapes até R$ 80 mil | Carbi',
+    title: 'Picapes até R$ 80 mil',
     description: 'Picapes seminovas até R$ 80 mil anunciadas na Carbi.',
     h1: 'Picapes até R$ 80 mil',
     intro: 'Picapes seminovas com ótimo custo-benefício até R$ 80 mil.',
@@ -256,7 +256,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'picape-ate-120-mil',
-    title: 'Picapes até R$ 120 mil | Carbi',
+    title: 'Picapes até R$ 120 mil',
     description: 'Picapes seminovas até R$ 120 mil anunciadas na Carbi.',
     h1: 'Picapes até R$ 120 mil',
     intro: 'Picapes seminovas robustas até R$ 120 mil.',
@@ -264,7 +264,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'automaticos-ate-50-mil',
-    title: 'Carros automáticos até R$ 50 mil | Carbi',
+    title: 'Carros automáticos até R$ 50 mil',
     description: 'Carros automáticos seminovos até R$ 50 mil anunciados na Carbi.',
     h1: 'Carros automáticos até R$ 50 mil',
     intro: 'Carros com câmbio automático seminovos até R$ 50 mil.',
@@ -272,7 +272,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'automaticos-ate-80-mil',
-    title: 'Carros automáticos até R$ 80 mil | Carbi',
+    title: 'Carros automáticos até R$ 80 mil',
     description: 'Carros automáticos seminovos até R$ 80 mil anunciados na Carbi.',
     h1: 'Carros automáticos até R$ 80 mil',
     intro: 'Carros automáticos seminovos de qualidade até R$ 80 mil.',
@@ -280,7 +280,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'suv-automatico',
-    title: 'SUVs automáticos à venda | Carbi',
+    title: 'SUVs automáticos à venda',
     description: 'SUVs com câmbio automático seminovos anunciados na Carbi.',
     h1: 'SUVs automáticos à venda',
     intro: 'SUVs com câmbio automático seminovos na plataforma.',
@@ -288,7 +288,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'sedan-automatico',
-    title: 'Sedans automáticos à venda | Carbi',
+    title: 'Sedans automáticos à venda',
     description: 'Sedans com câmbio automático seminovos anunciados na Carbi.',
     h1: 'Sedans automáticos à venda',
     intro: 'Sedans com câmbio automático seminovos na plataforma.',
@@ -296,7 +296,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'seminovos-ate-50-mil',
-    title: 'Seminovos até R$ 50 mil | Carbi',
+    title: 'Seminovos até R$ 50 mil',
     description: 'Seminovos até R$ 50 mil anunciados na Carbi com fotos reais e FIPE.',
     h1: 'Seminovos até R$ 50 mil',
     intro: 'Os melhores seminovos até R$ 50 mil anunciados na plataforma.',
@@ -304,7 +304,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'seminovos-ate-80-mil',
-    title: 'Seminovos até R$ 80 mil | Carbi',
+    title: 'Seminovos até R$ 80 mil',
     description: 'Seminovos até R$ 80 mil anunciados na Carbi. Encontre seu próximo carro.',
     h1: 'Seminovos até R$ 80 mil',
     intro: 'Seminovos de qualidade até R$ 80 mil anunciados na plataforma.',
@@ -315,7 +315,7 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
 export const TOPIC_PRESETS: MarketplaceSeoPreset[] = [
   {
     slug: 'anunciar-gratis',
-    title: 'Anunciar carro grátis | Carbi',
+    title: 'Anunciar carro grátis',
     description: 'Publique seu carro grátis na Carbi com fotos reais, chat interno e comparação FIPE.',
     h1: 'Anunciar carro grátis',
     intro: 'Fluxo rápido para publicar seu veículo sem custo e alcançar compradores reais.',
@@ -323,7 +323,7 @@ export const TOPIC_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'seminovos-a-venda',
-    title: 'Seminovos à venda | Carbi',
+    title: 'Seminovos à venda',
     description: 'Veja seminovos à venda com preço, fotos quadradas e comparação FIPE atualizada.',
     h1: 'Seminovos à venda',
     intro: 'Descubra seminovos reais em destaque, com filtros e ordenação por intenção de compra.',
@@ -331,7 +331,7 @@ export const TOPIC_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'carros-usados',
-    title: 'Carros usados à venda | Carbi',
+    title: 'Carros usados à venda',
     description: 'Encontre carros usados à venda com transparência, preço real e anúncios ativos.',
     h1: 'Carros usados à venda',
     intro: 'Seleção de carros usados para quem busca compra direta com mais confiança.',
@@ -339,7 +339,7 @@ export const TOPIC_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'mais-baratos',
-    title: 'Carros mais baratos à venda | Carbi',
+    title: 'Carros mais baratos à venda',
     description: 'Veja os anúncios com menor preço na plataforma em ordem crescente.',
     h1: 'Carros mais baratos',
     intro: 'Ordenação por menor preço para facilitar a descoberta das melhores opções.',
@@ -347,7 +347,7 @@ export const TOPIC_PRESETS: MarketplaceSeoPreset[] = [
   },
   {
     slug: 'mais-recentes',
-    title: 'Carros recém-anunciados | Carbi',
+    title: 'Carros recém-anunciados',
     description: 'Acompanhe os anúncios mais recentes de carros com atualização em tempo real.',
     h1: 'Carros recém-anunciados',
     intro: 'Atualização frequente de anúncios para quem gosta de acompanhar novidades.',
@@ -468,7 +468,7 @@ export function resolveSeoPreset(slug: string): MarketplaceSeoPreset | null {
     const titleBrand = brandName.replace(/\b\w/g, (match) => match.toUpperCase())
     return {
       slug: normalized,
-      title: `Carros ${titleBrand} à venda | Carbi`,
+      title: `Carros ${titleBrand} à venda`,
       description: `Explore anúncios ativos da marca ${titleBrand} com preços e quilometragem atualizados.`,
       h1: `Carros ${titleBrand} à venda`,
       intro: `Anúncios reais da marca ${titleBrand} para quem quer acompanhar preços e oportunidades.`,
@@ -481,7 +481,7 @@ export function resolveSeoPreset(slug: string): MarketplaceSeoPreset | null {
     const titleCity = cityName.replace(/\b\w/g, (match) => match.toUpperCase())
     return {
       slug: normalized,
-      title: `Carros em ${titleCity} | Carbi`,
+      title: `Carros em ${titleCity}`,
       description: `Veja anúncios de carros em ${titleCity} com atualização constante de preço e disponibilidade.`,
       h1: `Carros em ${titleCity}`,
       intro: `Explore os anúncios ativos na cidade de ${titleCity} com foco em descoberta e comparação.`,
@@ -494,7 +494,7 @@ export function resolveSeoPreset(slug: string): MarketplaceSeoPreset | null {
     if (/^\d{4}$/.test(year)) {
       return {
         slug: normalized,
-        title: `Carros ${year} à venda | Carbi`,
+        title: `Carros ${year} à venda`,
         description: `Carros do ano ${year} seminovos anunciados na Carbi. Compare preços e versões.`,
         h1: `Carros ${year} à venda`,
         intro: `Anúncios de carros do ano ${year} publicados na plataforma.`,

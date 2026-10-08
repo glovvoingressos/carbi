@@ -7,7 +7,7 @@ import ListingCard from '@/components/marketplace/ListingCard'
 import { fetchPublicListingsPage } from '@/lib/marketplace-server'
 
 export const metadata: Metadata = {
-  title: 'Carros Usados em BH (Belo Horizonte) | Compra e Venda | Carbi',
+  title: 'Carros Usados em BH (Belo Horizonte) | Compra e Venda',
   description: 'Procurando carros usados e seminovos em Belo Horizonte (BH)? Encontre anúncios reais, compare valores atualizados e faça um negócio seguro.',
   keywords: ['carros usados bh', 'comprar carro belo horizonte', 'seminovos bh', 'loja de carros bh', 'veículos usados'],
   alternates: {

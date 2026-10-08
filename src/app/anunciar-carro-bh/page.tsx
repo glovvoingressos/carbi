@@ -3,7 +3,7 @@ import SEOPageClient from '@/components/seo/SEOPageClient'
 import { Zap, ShieldCheck, MapPin, MessageCircle, Star, BadgeCheck } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Anunciar Carro em BH: Venda rápido em Belo Horizonte | Carbi',
+  title: 'Anunciar Carro em BH: Venda rápido em Belo Horizonte',
   description: 'O melhor lugar para anunciar seu carro em BH. Venda seu seminovo ou usado em Belo Horizonte com segurança, preço FIPE e sem pagar comissões abusivas.',
   keywords: ['anunciar carro bh', 'vender carro belo horizonte', 'carros usados bh', 'seminovos bh', 'onde vender carro em bh'],
   alternates: {

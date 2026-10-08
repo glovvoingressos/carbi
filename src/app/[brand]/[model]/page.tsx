@@ -44,7 +44,9 @@ export async function generateMetadata({
 
   if (!car) return { title: 'Carro não encontrado' }
   const modelName = `${car.brand} ${car.model}`
-  const title = `${modelName}: preço, versões e ficha técnica | Carbi`
+  const title = `${modelName}: preço, versões e ficha técnica`
+  // O template do layout já adiciona "| Carbi"; OG/Twitter não passam por ele.
+  const socialTitle = `${title} | Carbi`
   const description = `${modelName} à venda: consulte preço FIPE, versões, consumo, ficha técnica e anúncios de carros usados e seminovos na Carbi.`
   const hasVariantParameters = Boolean(sp.year?.trim() || sp.version?.trim())
 
@@ -57,7 +59,7 @@ export async function generateMetadata({
     },
     robots: hasVariantParameters ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
-      title,
+      title: socialTitle,
       description,
       url: `/${resolved.brand}/${resolved.model}`,
       type: 'website',

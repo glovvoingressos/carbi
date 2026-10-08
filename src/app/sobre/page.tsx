@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { ShieldCheck, MessageCircle, BarChart3, Heart, ArrowRight, Check } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Sobre o Carbi | Carbi',
+  title: 'Sobre o Carbi',
   description: 'O Carbi é um marketplace automotivo brasileiro feito para vender e comprar carros com dados reais, comparação FIPE e chat interno.',
   alternates: { canonical: '/sobre' },
   openGraph: {

@@ -5,7 +5,7 @@ import { heroFont } from '@/components/home/home-font'
 import './auth.css'
 
 export const metadata: Metadata = {
-  title: 'Criar conta ou Entrar | Carbi',
+  title: 'Criar conta ou Entrar',
   robots: {
     index: false,
     follow: false,

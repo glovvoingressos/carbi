@@ -6,7 +6,7 @@ import { heroFont } from '@/components/home/home-font'
 import './flow.css'
 
 export const metadata: Metadata = {
-  title: 'Anunciar meu carro | Carbi',
+  title: 'Anunciar meu carro',
   description: 'Publique seu anúncio gratuitamente em todo o Brasil, com até 10 fotos e chat interno seguro.',
   robots: {
     index: false,

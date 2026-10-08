@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Termos de Uso | Carbi',
+  title: 'Termos de Uso',
   description: 'Termos e condições de uso da plataforma Carbi — marketplace de veículos com anúncios e chat interno.',
   alternates: { canonical: '/termos' },
   openGraph: {

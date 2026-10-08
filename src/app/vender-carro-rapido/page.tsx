@@ -9,7 +9,7 @@ const data = {
 }
 
 export const metadata: Metadata = {
-  title: 'Vender Carro Rápido | Como vender seu veículo em poucos dias | Carbi',
+  title: 'Vender Carro Rápido | Como vender seu veículo em poucos dias',
   description: 'Quer vender seu carro rápido? Siga nossas dicas, use nossa plataforma e venda seu veículo para compradores reais em tempo recorde.',
   keywords: ['vender carro rápido', 'anunciar carro grátis', 'vender carro', 'seminovos à venda', 'carros usados'],
   alternates: {

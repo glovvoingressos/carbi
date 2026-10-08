@@ -17,10 +17,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { periodo, slug } = await params
   const detail = await getModelRankingDetail(periodo, slug)
-  if (!detail) return { title: 'Modelo não encontrado | Carbi' }
+  if (!detail) return { title: 'Modelo não encontrado' }
 
   return {
-    title: `${detail.brand} ${detail.modelName} - Vendas e Preço FIPE em ${periodo} | Carbi`,
+    title: `${detail.brand} ${detail.modelName} - Vendas e Preço FIPE em ${periodo}`,
     description: `Saiba tudo sobre as vendas do ${detail.brand} ${detail.modelName} no Brasil em ${periodo}. Posição no ranking, unidades vendidas e comparação FIPE.`,
     alternates: { canonical: `/carros-mais-vendidos-brasil/${periodo}/${slug}` },
   }

@@ -11,7 +11,7 @@ import { ArrowRight, BellRing, Calendar, Gauge, MapPin } from 'lucide-react'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Minha busca | Carbi',
+  title: 'Minha busca',
   description: 'Acompanhe sua busca no Carbi e as oportunidades compatíveis que encontramos para você.',
 }
 

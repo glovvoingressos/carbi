@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import ListingForm from '@/components/marketplace/ListingForm'
 
 export const metadata: Metadata = {
-  title: 'Anunciar caminhão | Carbi',
+  title: 'Anunciar caminhão',
   description: 'Publique seu anúncio de caminhão gratuitamente.',
   robots: { index: false, follow: false },
 }

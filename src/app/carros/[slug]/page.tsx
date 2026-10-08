@@ -40,7 +40,7 @@ export async function generateMetadata({
   const preset = resolveSeoPreset(slug)
   if (!preset) {
     return {
-      title: 'Carros à venda | Carbi',
+      title: 'Carros à venda',
       description: 'Explore anúncios ativos com filtros inteligentes e dados reais.',
     }
   }
