@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 import AuthCard from '@/components/marketplace/AuthCard'
 import { getSafeRedirectPath } from '@/lib/auth-redirect'
+import { heroFont } from '@/components/home/home-font'
+import './auth.css'
 
 export const metadata: Metadata = {
   title: 'Criar conta ou Entrar | Carbi',
@@ -15,34 +17,17 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const safeRedirectTo = getSafeRedirectPath(redirectTo)
 
   return (
-    <div className="auth-page-shell">
+    <div className={`auth-page-shell ${heroFont.variable}`}>
+      <h1 className="sr-only">Criar conta ou entrar na Carbi</h1>
       <div className="auth-page-grid">
-        <section className="auth-hero-content">
+        <section className="auth-hero-content" aria-hidden="true">
           <div className="auth-hero-image-wrap">
             <img
               src="/images/porsche-hero.jpg"
-              alt="Porsche 911 GT3 em movimento"
+              alt=""
               className="auth-hero-image"
               loading="eager"
             />
-          </div>
-          <h1 className="auth-hero-title">Anuncie carros grátis em minutos.</h1>
-          <p className="auth-hero-copy">
-            Cadastro rápido com FIPE integrada, chat interno e divulgação gratuita para seus anúncios.
-          </p>
-          <div className="auth-hero-points">
-            <div className="auth-hero-point">
-              <strong>Publicação rápida</strong>
-              <span>Anuncie em menos de 2 minutos.</span>
-            </div>
-            <div className="auth-hero-point">
-              <strong>FIPE integrada</strong>
-              <span>Preço de referência verificado.</span>
-            </div>
-            <div className="auth-hero-point">
-              <strong>Divulgação gratuita</strong>
-              <span>Seus anúncios divulgados sem custo adicional.</span>
-            </div>
           </div>
         </section>
 

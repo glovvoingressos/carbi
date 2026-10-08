@@ -1,0 +1,337 @@
+/* Design da home (hero + cards de anúncio) aplicado às páginas de entrada e
+   criação de conta (/entrar — /cadastro redireciona para cá).
+   Só UI/UX: fontes, cores, raios, toque e foco — nenhuma mudança de lógica.
+
+   Escopo: TODAS as regras usam .auth-page-shell, porque .profile-page-shell
+   divide os seletores antigos do shell no globals.css e não pode ser afetado.
+   Também cobre só a instância da página: o AuthCard usado em modais (chat,
+   oferta, conversas) fica fora do shell e mantém o visual atual. */
+
+/* ── Base: fundo branco como a home ── */
+.auth-page-shell {
+  background: #ffffff;
+  color: #111111;
+  padding: 24px 16px 72px;
+}
+
+@media (min-width: 1001px) {
+  .auth-page-shell {
+    padding: 40px 32px 96px;
+  }
+}
+
+/* ── Imagem à esquerda, formulário à direita ── */
+.auth-page-grid {
+  align-items: stretch;
+}
+
+.auth-hero-content {
+  display: flex;
+  min-width: 0;
+}
+
+.auth-page-shell .auth-hero-image-wrap {
+  flex: 1;
+  height: 200px; /* celular: banner compacto no topo */
+  margin: 0;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.auth-page-shell .auth-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Acima de 768px vira lado a lado. O seletor com .auth-page-shell (0,2,0) é
+   necessário para vencer a regra de 1 coluna que o globals.css mantém até 1000px. */
+@media (min-width: 768px) {
+  .auth-page-shell .auth-page-grid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+
+  /* A imagem acompanha a altura do formulário */
+  .auth-page-shell .auth-hero-image-wrap {
+    height: auto;
+    min-height: 520px;
+  }
+}
+
+/* ── Cartão do formulário ── */
+.auth-page-shell .auth-card {
+  max-width: 480px;
+  background: #f8f8f8;
+  border: 0;
+  border-radius: 24px;
+  box-shadow: none;
+  padding: 24px;
+  color: #111111;
+  font-size: 15px;
+}
+
+@media (min-width: 768px) {
+  .auth-page-shell .auth-card {
+    padding: 32px;
+  }
+}
+
+.auth-page-shell .auth-card h2 {
+  color: #111111;
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(34px, 8vw, 46px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.auth-page-shell .auth-card h2 + p {
+  margin-top: 10px;
+  color: #5a5a5a;
+  font-size: 15px;
+}
+
+.auth-page-shell .auth-card h3 {
+  color: #111111;
+  font-family: var(--hh-font), sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ── Rótulos de campo: sem caixa alta, como no hero ── */
+.auth-page-shell .auth-card label {
+  color: #3f3f3c;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* ── Campos: pílula cinza como a busca de placa ── */
+.auth-page-shell .auth-card input {
+  height: 52px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: #efefec;
+  color: #111111;
+  font-size: 16px; /* 16px evita o zoom automático do iOS */
+  padding-left: 44px;
+  padding-right: 44px;
+}
+
+.auth-page-shell .auth-card input::placeholder {
+  color: #8a8a84;
+  opacity: 1;
+}
+
+/* No celular, fonte menor nos campos (o espaço é curto: dois campos por linha) */
+@media (max-width: 767px) {
+  .auth-page-shell .auth-card input {
+    font-size: 14px;
+  }
+}
+
+.auth-page-shell .auth-card input:focus,
+.auth-page-shell .auth-card input:focus-visible {
+  border-color: #111111;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.16);
+}
+
+/* Erro de campo: mantém o anel vermelho e tinge o fundo */
+.auth-page-shell .auth-card input.border-red-400 {
+  background: #fef2f2;
+  border-color: #dc2626;
+}
+
+/* Ícone dentro do campo (primeiro filho do wrapper .relative) */
+.auth-page-shell .auth-card .relative > svg {
+  color: #76766f;
+}
+
+.auth-page-shell .auth-card .relative:focus-within > svg {
+  color: #111111;
+}
+
+/* Botão de mostrar/ocultar senha */
+.auth-page-shell .auth-card .relative button {
+  color: #76766f;
+}
+
+.auth-page-shell .auth-card .relative button:hover {
+  color: #111111;
+}
+
+.auth-page-shell .auth-card button:focus-visible,
+.auth-page-shell .auth-card a:focus-visible {
+  outline: 3px solid #111111;
+  outline-offset: 3px;
+}
+
+/* ── Botão principal: pílula preta do hero; laranja no hover ── */
+.auth-page-shell .auth-card .auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 52px;
+  margin-top: 20px;
+  border: 0;
+  border-radius: 999px;
+  background: #111111;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.auth-page-shell .auth-card .auth-btn:hover {
+  background: #f2803f;
+  color: #111111;
+}
+
+.auth-page-shell .auth-card .auth-btn:disabled {
+  opacity: 0.55;
+}
+
+/* ── Indicador de etapas do cadastro ── */
+.auth-page-shell .auth-step-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  font-family: var(--hh-font), sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.auth-page-shell .auth-step-dot.is-active {
+  background: #111111;
+  border-color: #111111;
+  color: #ffffff;
+}
+
+.auth-page-shell .auth-step-dot.is-done {
+  background: #f2803f;
+  border-color: #f2803f;
+  color: #111111;
+}
+
+.auth-page-shell .auth-step-dot.is-idle {
+  background: #ffffff;
+  border-color: #e2e2de;
+  color: #76766f;
+}
+
+.auth-page-shell .auth-step-line {
+  height: 3px;
+  background: #ececea;
+}
+
+.auth-page-shell .auth-step-line.is-done {
+  background: #111111;
+}
+
+/* Voltar (passo 2) */
+.auth-page-shell .auth-back {
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid #e2e2de;
+  background: #ffffff;
+  color: #111111;
+}
+
+.auth-page-shell .auth-back:hover {
+  background: #f2803f;
+  border-color: #f2803f;
+}
+
+/* ── Checklist de senha ── */
+.auth-page-shell .auth-check {
+  color: #5f5f5c;
+  font-size: 13px;
+}
+
+.auth-page-shell .auth-check.is-met {
+  color: #111111;
+}
+
+.auth-page-shell .auth-check-dot {
+  background: #ffffff;
+  border: 1px solid #e2e2de;
+  color: #8a8a84;
+}
+
+.auth-page-shell .auth-check-dot.is-met {
+  background: #111111;
+  border-color: #111111;
+  color: #ffffff;
+}
+
+@media (max-width: 420px) {
+  .auth-page-shell .auth-checklist {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Banner de erro/sucesso: mesma linguagem dos cards ── */
+.auth-page-shell .auth-card .auth-banner {
+  border-radius: 16px;
+  font-size: 13px;
+}
+
+/* ── Links e rodapé do cartão ── */
+.auth-page-shell .auth-link {
+  color: #5f5f5c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.auth-page-shell .auth-link:hover {
+  color: #111111;
+}
+
+.auth-page-shell .auth-divider {
+  border-color: #ececea;
+}
+
+.auth-page-shell .auth-switch {
+  color: #5f5f5c;
+  font-size: 14px;
+}
+
+.auth-page-shell .auth-switch:hover {
+  color: #111111;
+}
+
+.auth-page-shell .auth-switch span {
+  color: #111111;
+  font-weight: 600;
+}
+
+.auth-page-shell .auth-terms {
+  color: #5f5f5c;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.auth-page-shell .auth-terms a {
+  color: #111111;
+}
+
+.auth-page-shell .auth-terms a:hover {
+  color: #f2803f;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-page-shell .auth-card,
+  .auth-page-shell .auth-btn,
+  .auth-page-shell .auth-step-dot,
+  .auth-page-shell .auth-step-line {
+    transition: none;
+  }
+}

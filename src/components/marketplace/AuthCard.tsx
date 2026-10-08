@@ -86,10 +86,10 @@ function PasswordChecklist({ password }: { password: string }) {
     { label: 'Pelo menos 1 caractere especial', met: /[^A-Za-z0-9]/.test(password) },
   ]
   return (
-    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-2">
+    <div className="auth-checklist grid grid-cols-2 gap-x-3 gap-y-1.5 mt-2">
       {rules.map((r) => (
-        <div key={r.label} className={`flex items-center gap-1.5 text-xs ${r.met ? 'text-emerald-600' : 'text-gray-400'}`}>
-          <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${r.met ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100'}`}>
+        <div key={r.label} className={`auth-check flex items-center gap-1.5 text-xs ${r.met ? 'is-met text-emerald-600' : 'text-gray-400'}`}>
+          <div className={`auth-check-dot w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${r.met ? 'is-met bg-emerald-100 text-emerald-600' : 'bg-gray-100'}`}>
             {r.met ? <Check size={10} strokeWidth={3} /> : '○'}
           </div>
           {r.label}
@@ -102,7 +102,7 @@ function PasswordChecklist({ password }: { password: string }) {
 function ErrorBanner({ error }: { error: string | null }) {
   if (!error) return null
   return (
-    <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
+    <div className="auth-banner p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
       <AlertCircle size={16} className="text-[var(--color-danger)] mt-0.5 shrink-0" />
       <p className="text-sm text-[var(--color-danger)]">{error}</p>
     </div>
@@ -112,7 +112,7 @@ function ErrorBanner({ error }: { error: string | null }) {
 function SuccessBanner({ message }: { message: string | null }) {
   if (!message) return null
   return (
-    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2">
+    <div className="auth-banner p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2">
       <Check size={16} className="text-emerald-500 mt-0.5 shrink-0" />
       <p className="text-sm text-emerald-600">{message}</p>
     </div>
@@ -237,7 +237,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
   }
 
   return (
-    <div className="w-full max-w-md mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-8 md:p-10 text-[14px] md:text-[15px]">
+    <div className="auth-card w-full max-w-md mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-8 md:p-10 text-[14px] md:text-[15px]">
       <AnimatePresence mode="wait">
         {/* ─── LOGIN ─── */}
         {mode === 'login' && (
@@ -246,7 +246,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
             <p className="mt-1.5 text-sm text-gray-500">Acesse para gerenciar seus anúncios e conversas.</p>
 
             {!supabaseReady && (
-              <div className="mt-5 p-3 bg-red-50 border border-red-200 rounded-xl">
+              <div className="auth-banner mt-5 p-3 bg-red-50 border border-red-200 rounded-xl">
                 <p className="text-sm text-[var(--color-danger)]">Serviço de login indisponível no momento.</p>
               </div>
             )}
@@ -257,7 +257,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
             </div>
 
             <div className="flex items-center justify-end mt-3">
-              <button type="button" onClick={() => switchMode('forgot')} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              <button type="button" onClick={() => switchMode('forgot')} className="auth-link text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
                 Esqueceu a senha?
               </button>
             </div>
@@ -266,17 +266,17 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
             <SuccessBanner message={message} />
 
             <button type="submit" disabled={loading || !supabaseReady}
-              className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 active:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+              className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 active:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all auth-btn">
               {loading ? <Loader2 size={16} className="animate-spin" /> : <>Entrar <ArrowRight size={16} /></>}
             </button>
 
-            <div className="mt-6 pt-5 border-t border-gray-100 text-center">
-              <button type="button" onClick={() => switchMode('signup')} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <div className="auth-divider mt-6 pt-5 border-t border-gray-100 text-center">
+              <button type="button" onClick={() => switchMode('signup')} className="auth-switch text-sm text-gray-500 hover:text-gray-900 transition-colors">
                 Não tem conta? <span className="font-medium text-gray-900">Criar conta</span>
               </button>
             </div>
 
-            <p className="mt-5 text-[11px] text-gray-400 text-center">
+            <p className="auth-terms mt-5 text-[11px] text-gray-400 text-center">
               Ao continuar, você concorda com nossos{' '}
               <Link href="#" className="underline underline-offset-2 hover:text-gray-900 transition-colors">Termos</Link> e{' '}
               <Link href="#" className="underline underline-offset-2 hover:text-gray-900 transition-colors">Privacidade</Link>.
@@ -291,12 +291,12 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
             <p className="mt-1.5 text-sm text-gray-500">Cadastro gratuito em dois passos.</p>
 
             {/* Step indicator */}
-            <div className="flex items-center gap-3 mt-5 mb-6">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${step === 2 ? 'bg-emerald-500 text-white' : 'bg-gray-900 text-white'}`}>
+            <div className="auth-step flex items-center gap-3 mt-5 mb-6">
+              <div className={`auth-step-dot ${step === 2 ? 'is-done bg-emerald-500 text-white' : 'is-active bg-gray-900 text-white'}`}>
                 {step === 2 ? <Check size={14} strokeWidth={2.5} /> : '1'}
               </div>
-              <div className={`h-0.5 flex-1 rounded-full transition-all duration-300 ${step === 2 ? 'bg-emerald-500' : 'bg-gray-200'}`} />
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${step === 2 ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-400'}`}>2</div>
+              <div className={`auth-step-line h-0.5 flex-1 rounded-full transition-all duration-300 ${step === 2 ? 'is-done bg-emerald-500' : 'bg-gray-200'}`} />
+              <div className={`auth-step-dot ${step === 2 ? 'is-active bg-gray-900 text-white' : 'is-idle bg-gray-100 text-gray-400'}`}>2</div>
             </div>
 
             <AnimatePresence mode="wait">
@@ -315,7 +315,7 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
               {step === 2 && (
                 <motion.div key="step2" {...fade} className="space-y-4">
                   <div className="flex items-center gap-3 mb-1">
-                    <button type="button" onClick={() => setStep(1)} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+                    <button type="button" onClick={() => setStep(1)} className="auth-back w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
                       <ArrowRight size={14} className="text-gray-600 rotate-180" />
                     </button>
                     <div>
@@ -338,24 +338,24 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
               step === 1 ? (
                 <button type="button" disabled={!step1Valid}
                   onClick={() => { setError(null); setStep(2) }}
-                  className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  className="auth-btn w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
                   Continuar <ArrowRight size={16} />
                 </button>
               ) : (
                 <button type="submit" disabled={loading || !email || !passwordValid || !passwordsMatch}
-                  className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  className="auth-btn w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
                   {loading ? <Loader2 size={16} className="animate-spin" /> : <>Criar conta <ArrowRight size={16} /></>}
                 </button>
               )
             )}
 
-            <div className="mt-6 pt-5 border-t border-gray-100 text-center">
-              <button type="button" onClick={() => switchMode('login')} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <div className="auth-divider mt-6 pt-5 border-t border-gray-100 text-center">
+              <button type="button" onClick={() => switchMode('login')} className="auth-switch text-sm text-gray-500 hover:text-gray-900 transition-colors">
                 Já tem conta? <span className="font-medium text-gray-900">Entrar</span>
               </button>
             </div>
 
-            <p className="mt-5 text-[11px] text-gray-400 text-center">
+            <p className="auth-terms mt-5 text-[11px] text-gray-400 text-center">
               Ao continuar, você concorda com nossos{' '}
               <Link href="#" className="underline underline-offset-2 hover:text-gray-900 transition-colors">Termos</Link> e{' '}
               <Link href="#" className="underline underline-offset-2 hover:text-gray-900 transition-colors">Privacidade</Link>.
@@ -377,12 +377,12 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
             <SuccessBanner message={message} />
 
             <button type="submit" disabled={loading || !supabaseReady}
-              className="w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+              className="auth-btn w-full mt-5 h-11 rounded-xl bg-gray-900 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
               {loading ? <Loader2 size={16} className="animate-spin" /> : <>Enviar link por e-mail <ArrowRight size={16} /></>}
             </button>
 
-            <div className="mt-6 pt-5 border-t border-gray-100 text-center">
-              <button type="button" onClick={() => switchMode('login')} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <div className="auth-divider mt-6 pt-5 border-t border-gray-100 text-center">
+              <button type="button" onClick={() => switchMode('login')} className="auth-switch text-sm text-gray-500 hover:text-gray-900 transition-colors">
                 Voltar ao <span className="font-medium text-gray-900">login</span>
               </button>
             </div>
