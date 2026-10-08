@@ -1,21 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { sendWelcomeEmail } from '@/lib/email'
+import { NextResponse } from 'next/server'
+import { getSupabaseServerClientWithCookies } from '@/lib/supabase-server'
+import { sendWelcomeEmailOnce } from '@/lib/welcome-email'
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const body = await request.json()
-    const { email, name } = body
+    const supabase = await getSupabaseServerClientWithCookies()
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
 
-    if (!email) {
-      return NextResponse.json({ error: 'Email é obrigatório' }, { status: 400 })
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Usuário não autenticado' }, { status: 401 })
     }
 
-    const result = await sendWelcomeEmail({
-      userEmail: email,
-      userName: name || 'Parceiro',
+    const result = await sendWelcomeEmailOnce({
+      id: user.id,
+      email: user.email,
+      name: user.user_metadata?.full_name as string | undefined,
     })
 
-    return NextResponse.json(result)
+    return NextResponse.json(result, { status: result.success ? 200 : 500 })
   } catch (error) {
     console.error('Error sending welcome email:', error)
     return NextResponse.json({ error: 'Erro ao enviar e-mail' }, { status: 500 })

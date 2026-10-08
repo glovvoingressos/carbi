@@ -18,6 +18,12 @@ export default function AuthCallbackPage() {
         if (code) {
           const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
           if (exchangeError) throw exchangeError
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            try {
+              await fetch('/api/auth/welcome', { method: 'POST' })
+            } catch (e) { console.error('Welcome email failed:', e) }
+          }
           window.history.replaceState({}, document.title, `${window.location.pathname}?redirect=${encodeURIComponent(redirectTo)}`)
         }
 
@@ -46,11 +52,7 @@ export default function AuthCallbackPage() {
                  console.error('Upsert profile on callback failed:', e)
                }
               try {
-                await fetch('/api/auth/welcome', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ email: user.email, name: user.user_metadata?.full_name || user.email?.split('@')[0] }),
-                })
+                await fetch('/api/auth/welcome', { method: 'POST' })
               } catch (e) { console.error('Welcome email failed:', e) }
             }
             return router.replace(redirectTo)

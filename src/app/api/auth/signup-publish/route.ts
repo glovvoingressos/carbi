@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase-server'
-import { sendWelcomeEmail } from '@/lib/email'
+import { sendWelcomeEmailOnce } from '@/lib/welcome-email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,10 +49,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (data?.user) {
-      void sendWelcomeEmail({
-        userEmail: email,
-        userName: fullName,
-      }).catch((err) => console.error('[signup-publish] welcome email failed', err))
+      void sendWelcomeEmailOnce({ id: data.user.id, email, name: fullName })
+        .catch((err) => console.error('[signup-publish] welcome email failed', err))
     }
 
     return NextResponse.json({ ok: true, email })
