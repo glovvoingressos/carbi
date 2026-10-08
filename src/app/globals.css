@@ -10063,7 +10063,7 @@ p {
 .cbi-search input {
   width: 100%;
   height: 42px;
-  padding: 0 14px 0 40px;
+  padding: 0 42px 0 40px;
   border: 1px solid #E6E6E2;
   border-radius: 12px;
   background: #fff;
@@ -10076,11 +10076,29 @@ p {
 @media (min-width: 640px) {
   .cbi-search input {
     height: 44px;
-    padding: 0 16px 0 42px;
+    padding: 0 46px 0 42px;
   }
 }
 
 .cbi-search input::placeholder { color: #B6B6B2; }
+.cbi-search-key {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #E6E6E2;
+  border-radius: 6px;
+  background: #FAFAF8;
+  color: #8A8A85;
+  font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  pointer-events: none;
+}
+@media (max-width: 639px) { .cbi-search-key { display: none; } }
 .cbi-search input:focus { border-color: #1A1A1A; box-shadow: 0 0 0 3px rgba(26,26,26,0.04); }
 .cbi-search:focus-within {
   transform: translateY(-1px);
@@ -10161,6 +10179,54 @@ p {
 }
 
 .cbi-filter-btn:hover { border-color: #1A1A1A; }
+.cbi-filter-count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #D4F576;
+  color: #1A1A1A;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Quick filters: a low-friction starting point for an interactive search. */
+.cbi-quick-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  margin: -2px 0 16px;
+  padding: 2px 1px 3px;
+  scrollbar-width: none;
+}
+.cbi-quick-filters::-webkit-scrollbar { display: none; }
+.cbi-quick-label {
+  flex: none;
+  color: #8A8A85;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.cbi-quick-filter {
+  flex: none;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #E6E6E2;
+  border-radius: 999px;
+  background: #fff;
+  color: #4A4A46;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+.cbi-quick-filter:hover { border-color: #1A1A1A; color: #1A1A1A; transform: translateY(-1px); }
+.cbi-quick-filter.is-active { border-color: #D4F576; background: #D4F576; color: #1A1A1A; }
 
 /* Body grid */
 .cbi-body { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start; }
@@ -10303,12 +10369,33 @@ p {
 }
 .cbi-card-fav:hover { background: #fff; }
 .cbi-card-fav.on { color: #E5484D; }
+.cbi-card-reveal {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(26, 26, 26, 0.9);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0;
+  transform: translateY(7px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+.cbi-card:hover .cbi-card-reveal,
+.cbi-card:focus-visible .cbi-card-reveal { opacity: 1; transform: translateY(0); }
 .cbi-card-body { padding: 12px 14px 14px; }
 
 @media (min-width: 640px) {
   .cbi-card-body { padding: 16px; }
 }
-.cbi-card-brand { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #A2A29E; }
+.cbi-card-brand { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6F6F6F; }
 .cbi-card-title { font-size: 14px; font-weight: 600; color: #1A1A1A; margin-top: 2px; line-height: 1.25; }
 .cbi-card-price { font-size: 16px; font-weight: 700; color: #1A1A1A; margin-top: 8px; }
 .cbi-card-specs { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 9px; }
@@ -10324,11 +10411,13 @@ p {
   .cbi-card { opacity: 1; }
   .cbi-card-media img, .cbi-card-media > div { transition: none; }
   .cbi-card:hover { transform: none; }
+  .cbi-card-reveal { transition: none; }
 }
 
 .cbi-search input:focus-visible,
 .cbi-select:focus-visible,
 .cbi-filter-btn:focus-visible,
+.cbi-quick-filter:focus-visible,
 .cbi-toggle:focus-visible,
 .cbi-check:focus-visible,
 .cbi-chip:focus-visible,

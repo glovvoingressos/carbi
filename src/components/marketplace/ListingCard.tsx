@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Heart, TrendingUp, Gauge, Calendar, MapPin } from 'lucide-react'
+import { Heart, TrendingUp, Gauge, Calendar, MapPin, ArrowUpRight } from 'lucide-react'
 import { ListingPublic } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from './MarketplaceListingImage'
@@ -48,6 +48,10 @@ export default function ListingCard({ listing, priority = false, index = 0 }: { 
         >
           <Heart size={16} className={favorited ? 'fill-current' : ''} />
         </button>
+        <span className="cbi-card-reveal" aria-hidden="true">
+          Ver detalhes
+          <ArrowUpRight size={14} strokeWidth={2.2} />
+        </span>
       </div>
       <div className="cbi-card-body">
         <div className="cbi-card-brand">{listing.brand}</div>

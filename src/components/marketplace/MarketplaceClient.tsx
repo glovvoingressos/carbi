@@ -45,6 +45,13 @@ const SORT_OPTIONS: Array<{ value: ListingSort; label: string }> = [
   { value: 'year_desc', label: 'Mais novos' },
 ]
 
+const QUICK_FILTERS = [
+  { id: 'suv', label: 'SUVs', kind: 'bodyType' as const, value: 'SUV' },
+  { id: 'price', label: 'Até R$ 80 mil', kind: 'price' as const, value: 80000 },
+  { id: 'automatic', label: 'Automáticos', kind: 'transmission' as const, value: 'Automático' },
+  { id: 'electric', label: 'Elétricos', kind: 'fuel' as const, value: 'Elétrico' },
+]
+
 type FilterValueNormalizer = (value: string | null | undefined) => string
 
 const normalizeBrand = (value: string | null | undefined) =>
@@ -123,6 +130,7 @@ export default function MarketplaceClient({
   const [showFilters, setShowFilters] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
   const prefersReducedMotion = useReducedMotion()
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const didRunInitialTextSearch = useRef(false)
   const didRunInitialFilterSearch = useRef(false)
 
@@ -276,6 +284,23 @@ export default function MarketplaceClient({
   }, [selectedBrands, selectedModels, selectedFuels, selectedTransmissions, selectedColors, selectedBodyTypes, selectedOptionals, selectedVehicleType, selectedTruckTypes, selectedAxles, selectedCities, selectedState])
 
   useEffect(() => {
+    const handleSearchShortcut = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null
+      const tagName = target?.tagName
+      if (event.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(tagName || '')) {
+        event.preventDefault()
+        searchInputRef.current?.focus()
+      }
+      if (event.key === 'Escape' && document.activeElement === searchInputRef.current) {
+        searchInputRef.current?.blur()
+      }
+    }
+
+    window.addEventListener('keydown', handleSearchShortcut)
+    return () => window.removeEventListener('keydown', handleSearchShortcut)
+  }, [])
+
+  useEffect(() => {
     async function loadModels() {
       if (selectedBrands.length > 0) {
         const models = await getModelsByBrands(selectedBrands)
@@ -315,6 +340,27 @@ export default function MarketplaceClient({
   const toggleItem = (list: string[], item: string, setter: (val: string[]) => void) => {
     if (list.includes(item)) setter(list.filter(i => i !== item))
     else setter([...list, item])
+  }
+
+  const availableQuickFilters = useMemo(() => QUICK_FILTERS.filter((filter) => {
+    if (filter.kind === 'bodyType') return canonicalFilterOptions.bodyTypes.includes(filter.value)
+    if (filter.kind === 'transmission') return canonicalFilterOptions.transmissions.includes(filter.value)
+    if (filter.kind === 'fuel') return canonicalFilterOptions.fuels.includes(filter.value)
+    return true
+  }), [canonicalFilterOptions])
+
+  const isQuickFilterActive = (filter: typeof QUICK_FILTERS[number]) => {
+    if (filter.kind === 'bodyType') return selectedBodyTypes.includes(filter.value)
+    if (filter.kind === 'transmission') return selectedTransmissions.includes(filter.value)
+    if (filter.kind === 'fuel') return selectedFuels.includes(filter.value)
+    return priceRange[0] === 0 && priceRange[1] === filter.value
+  }
+
+  const toggleQuickFilter = (filter: typeof QUICK_FILTERS[number]) => {
+    if (filter.kind === 'bodyType') toggleItem(selectedBodyTypes, filter.value, setSelectedBodyTypes)
+    if (filter.kind === 'transmission') toggleItem(selectedTransmissions, filter.value, setSelectedTransmissions)
+    if (filter.kind === 'fuel') toggleItem(selectedFuels, filter.value, setSelectedFuels)
+    if (filter.kind === 'price') setPriceRange(isQuickFilterActive(filter) ? [0, 1000000] : [0, filter.value])
   }
 
   const activeChips = useMemo(() => {
@@ -526,17 +572,23 @@ export default function MarketplaceClient({
           <div className="cbi-search">
             <Search strokeWidth={1.75} />
             <input
+              ref={searchInputRef}
               type="text"
               value={q}
               onChange={e => setQ(e.target.value)}
-              placeholder="Buscar por marca, modelo ou versão..."
+              name="q"
+              autoComplete="off"
+              placeholder="Buscar por marca, modelo ou versão…"
               aria-label="Buscar anúncios"
+              aria-keyshortcuts="/"
               aria-busy={isSearching}
             />
+            <kbd className="cbi-search-key" aria-hidden="true">/</kbd>
           </div>
           <button onClick={() => setShowFilters(true)} className="cbi-filter-btn lg:hidden" aria-label="Abrir filtros">
             <SlidersHorizontal className="w-4 h-4" strokeWidth={1.75} />
             Filtros
+            {activeChips.length > 0 && <span className="cbi-filter-count">{activeChips.length}</span>}
           </button>
           <div className="cbi-select-wrap hidden lg:block">
             <select value={sort} onChange={e => setSort(e.target.value as ListingSort)} className="cbi-select" aria-label="Ordenar anúncios">
@@ -545,6 +597,26 @@ export default function MarketplaceClient({
             <ChevronDown strokeWidth={1.75} />
           </div>
         </div>
+
+        {availableQuickFilters.length > 0 && (
+          <div className="cbi-quick-filters" aria-label="Filtros rápidos">
+            <span className="cbi-quick-label">Atalhos</span>
+            {availableQuickFilters.map((filter) => {
+              const active = isQuickFilterActive(filter)
+              return (
+                <button
+                  key={filter.id}
+                  type="button"
+                  className={`cbi-quick-filter${active ? ' is-active' : ''}`}
+                  aria-pressed={active}
+                  onClick={() => toggleQuickFilter(filter)}
+                >
+                  {filter.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {/* Active chips */}
         {activeChips.length > 0 && (
@@ -648,14 +720,14 @@ export default function MarketplaceClient({
               style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100 }}
             />
             <motion.div
-              initial={{ y: '100%' }}
+              initial={prefersReducedMotion ? false : { y: '100%' }}
               animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 250 }}
+              exit={prefersReducedMotion ? undefined : { y: '100%' }}
+              transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', damping: 30, stiffness: 250 }}
               role="dialog"
               aria-modal="true"
               aria-labelledby="mobile-filters-title"
-              style={{ position: 'fixed', insetInline: 0, bottom: 0, zIndex: 101, display: 'flex', flexDirection: 'column', maxHeight: '90vh', background: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28 }}
+              style={{ position: 'fixed', insetInline: 0, bottom: 0, zIndex: 101, display: 'flex', flexDirection: 'column', maxHeight: '90vh', background: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28, overscrollBehavior: 'contain' }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderBottom: '1px solid #F2F2EF' }}>
                 <h3 id="mobile-filters-title" style={{ fontSize: 16, fontWeight: 700 }}>Filtros</h3>
