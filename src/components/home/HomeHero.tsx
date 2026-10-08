@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, MessageCircle, TrendingUp } from 'lucide-react'
+import { ArrowRight, MessageCircle, TrendingUp, Truck } from 'lucide-react'
 import { heroFont } from './home-font'
 import '../../app/home-hero.css'
 
@@ -47,6 +47,13 @@ export default function HomeHero({ listingCount, cityCount, brandCount }: HomeHe
                 <MessageCircle size={14} aria-hidden="true" /> Negocie sem expor seu telefone
               </span>
             </div>
+
+            <Link href="/caminhoes" className="hh-card hh-card-truck">
+              <span className="hh-card-icon" aria-hidden="true"><Truck size={18} /></span>
+              <span className="hh-card-title">Caminhões à venda</span>
+              <span className="hh-card-sub">Truck, bitruck, cavalo mecânico e toco</span>
+              <ArrowRight className="hh-card-arrow" size={22} aria-hidden="true" />
+            </Link>
           </div>
         </div>
 

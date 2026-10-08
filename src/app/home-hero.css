@@ -105,6 +105,23 @@
   justify-content: flex-end;
 }
 
+/* Porta de entrada da área de caminhões (identidade aço + âmbar) */
+.hh-card-truck {
+  grid-column: 1 / -1;
+  min-height: 150px;
+  background: #eef0f2;
+  border: 1.5px solid #f5a524;
+}
+
+.hh-card-truck .hh-card-icon {
+  background: #f5a524;
+  color: #101418;
+}
+
+.hh-card-truck .hh-card-arrow {
+  color: #101418;
+}
+
 .hh-card-icon {
   position: absolute;
   top: 22px;
