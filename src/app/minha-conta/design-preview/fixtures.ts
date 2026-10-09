@@ -38,7 +38,10 @@ export const previewListings: AccountWorkspaceListing[] = [
     year_model: 2021,
     mileage: 42300,
     view_count: 348,
-    created_at: '2026-09-28T14:05:00.000Z',
+    // Mais recente que as conversas de propósito: o painel de atividade
+    // retem 3 eventos, então sem um anúncio recente nunca aparecia a variante
+    // "Anúncio criado" e eu não conseguia conferir o marcador lima dela.
+    created_at: '2026-10-09T10:05:00.000Z',
     slug: 'honda-civic-exl-2020',
     images: [{ public_url: photos.civic, is_primary: true, sort_order: 0 }],
   },

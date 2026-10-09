@@ -36,7 +36,9 @@
 .member-overview-timeline > li:last-child { padding-bottom: 0; }
 .member-overview-timeline > li:not(:last-child)::before { content: ''; position: absolute; top: 34px; bottom: 4px; left: 16px; width: 1px; background: #e6e6e8; }
 .member-overview-event-icon { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; width: 33px; height: 33px; flex: 0 0 auto; margin-top: 7px; border-radius: 50%; }
-.member-overview-event-icon--listing { background: #d8efee; color: #255a57; }
+/* Lima para anúncio, lilás para conversa: os dois acentos do contrato.
+   Era #d8efee/#255a57 — um terceiro acento que não aparece em mais lugar nenhum. */
+.member-overview-event-icon--listing { background: var(--overview-lime, #deef70); color: #243410; }
 .member-overview-event-icon--conversation { background: #e9e1ff; color: #594382; }
 .member-overview-event { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; padding: 10px 12px; border-radius: 12px; background: #f7f7f8; }
 .member-overview-event:hover { background: #eeeeef; }
@@ -112,10 +114,15 @@
 @media (max-width: 480px) {
   .member-overview-event { gap: 8px; padding: 10px; }
   .member-overview-timeline > li { gap: 10px; }
-  .member-overview-event-meta { font-size: 9px; }
-  .member-overview-row-arrow { display: none; }
   .member-overview-conversation { gap: 10px; }
   .member-overview-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* O código da conta já levava alvos a 44px em pointer:coarse
+   (.mw-portfolio-title a, .mw-dialog-close) — os controles do painel ficaram para trás. */
+@media (pointer: coarse) {
+  .member-overview-icon-link { width: 44px; height: 44px; }
+  .member-overview-text-link { min-height: 44px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

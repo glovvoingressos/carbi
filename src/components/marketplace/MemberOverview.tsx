@@ -5,6 +5,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowUpRight, Car, Check, Eye, MessageCircle, Plus, RotateCcw } from 'lucide-react'
 import type { AccountWorkspaceListing } from './AccountLayout'
+import { LISTING_STATUS_LABELS as statusLabels } from './listing-status'
 import { Button } from '@/components/ui/button'
 import { formatBRL } from '@/data/cars'
 import './member-overview.css'
@@ -42,7 +43,6 @@ interface MemberOverviewProps {
   onRetry: () => void
 }
 
-const statusLabels: Record<string, string> = { active: 'Ativo', paused: 'Pausado', sold: 'Vendido', archived: 'Arquivado', draft: 'Rascunho' }
 const numberFormat = new Intl.NumberFormat('pt-BR')
 const dateFormat = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' })
 

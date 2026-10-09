@@ -6,6 +6,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { ArrowUpRight, Bell, Car, ChevronDown, Heart, LayoutDashboard, LogOut, Menu, MessageCircle, Plus, Search, Settings, User, X, type LucideIcon } from 'lucide-react'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
+// Rótulos de status compartilhados com a atividade e a página Meus anúncios.
+import { LISTING_STATUS_LABELS as statusLabels } from './listing-status'
 import './member-workspace.css'
 
 export interface AccountWorkspaceListing {
@@ -41,7 +43,6 @@ const tabs = [
   { href: '/minha-conta?tab=perfil', label: 'Meu perfil' },
   { href: '/minha-conta/configuracoes', label: 'Preferências' },
 ]
-const statusLabels: Record<string, string> = { active: 'Publicado', paused: 'Pausado', sold: 'Vendido', archived: 'Arquivado', draft: 'Rascunho', pending: 'Em análise' }
 // Um só formatador para todos os números da conta: o sidebar mostrava "1137"
 // enquanto o painel de desempenho ao lado mostrava "1.137".
 const accountNumberFormat = new Intl.NumberFormat('pt-BR')

@@ -10,6 +10,7 @@ import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from './MarketplaceListingImage'
 import PlateInput from './PlateInput'
+import { LISTING_STATUS_LABELS } from './listing-status'
 import './member-tools.css'
 import {
   FUEL_OPTIONS,
@@ -60,8 +61,6 @@ const canonicalFuel = (value: string | null | undefined) =>
 
 // ── StatusBadge ────────────────────────────────────────
 function StatusBadge({ status, isSelected = false }: { status: string; isSelected?: boolean }) {
-  const l: Record<string, string> = { active: 'Ativo', paused: 'Pausado', sold: 'Vendido', archived: 'Arquivado' }
-
   const getStyles = () => {
     if (isSelected) {
       return { backgroundColor: 'rgba(0,0,0,0.12)', color: '#0A0A0A' }
@@ -76,7 +75,7 @@ function StatusBadge({ status, isSelected = false }: { status: string; isSelecte
 
   return (
     <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold" style={getStyles()}>
-      {l[status] || status}
+      {LISTING_STATUS_LABELS[status] || status}
     </span>
   )
 }
