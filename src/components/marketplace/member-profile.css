@@ -12,14 +12,14 @@
 .member-shell .mp-profile *,
 .member-shell .mp-settings * { box-sizing: border-box; }
 .member-shell .mp-profile ::selection,
-.member-shell .mp-settings ::selection { background: #d4f576; color: #1a1a1a; }
-.member-shell .mp-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 220px; align-items: start; gap: 20px; }
+.member-shell .mp-settings ::selection { background: var(--mw-lime, #deef70); color: #1a1a1a; }
+.member-shell .mp-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 230px; align-items: start; gap: 20px; }
 .member-shell .mp-stack,
 .member-shell .mp-settings-tabs { min-width: 0; }
 .member-shell .mp-surface { background: #fff; border: 0; border-radius: 20px; min-width: 0; }
 .member-shell .mp-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 24px 18px; }
 .member-shell .mp-panel-heading h2,
-.member-shell .mp-note h2 { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.3; letter-spacing: -0.02em; }
+.member-shell .mp-note h2 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.3; letter-spacing: -0.02em; }
 .member-shell .mp-panel-heading p,
 .member-shell .mp-photo-copy p,
 .member-shell .mp-form-footer p { margin: 5px 0 0; color: #626266; font-size: 13px; }
@@ -46,11 +46,11 @@
 .member-shell .mp-field-error { margin: 0; font-size: 12px; color: #ad2525; }
 .member-shell .mp-form-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 24px; }
 .member-shell .mp-form-footer p { margin: 0; font-size: 12px; }
-.member-shell .mp-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 10px 16px; border: 0; border-radius: 12px; font: inherit; font-size: 13px; font-weight: 500; text-align: center; cursor: pointer; transition: background-color 180ms ease-out, color 180ms ease-out; }
+.member-shell .mp-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 16px; border: 0; border-radius: 12px; font: inherit; font-size: 13px; font-weight: 500; text-align: center; cursor: pointer; transition: background-color 180ms ease-out, color 180ms ease-out; }
 .member-shell .mp-button svg,
 .member-shell .mp-text-link svg,
 .member-shell .mp-feedback svg { width: 16px; height: 16px; flex-shrink: 0; }
-.member-shell .mp-button-primary { background: #d4f576; color: #1a1a1a; }
+.member-shell .mp-button-primary { background: var(--mw-lime, #deef70); color: #1a1a1a; }
 .member-shell .mp-button-primary:hover:not(:disabled) { background: #c8e866; }
 .member-shell .mp-button-secondary { background: #f1f1f2; color: #333336; }
 .member-shell .mp-button-secondary:hover:not(:disabled) { background: #e5e5e8; }
@@ -74,7 +74,7 @@
 .member-shell .mp-details-body { padding: 4px 24px 24px; }
 .member-shell .mp-password-input { position: relative; }
 .member-shell .mp-password-input .mp-input { padding-right: 48px; }
-.member-shell .mp-reveal { position: absolute; top: 1px; right: 1px; display: grid; place-items: center; width: 42px; height: 42px; border: 0; border-radius: 11px; background: transparent; color: #626266; cursor: pointer; }
+.member-shell .mp-reveal { position: absolute; top: 1px; right: 1px; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 11px; background: transparent; color: #626266; cursor: pointer; }
 .member-shell .mp-reveal:hover { background: #eeeef0; color: #1a1a1a; }
 .member-shell .mp-reveal svg { width: 17px; height: 17px; }
 .member-shell .mp-danger > summary > svg:first-child,
@@ -85,13 +85,13 @@
 .member-shell .mp-note-green { background: #e9f1d5; }
 .member-shell .mp-note-lavender { background: #e7dff6; color: #383047; }
 .member-shell .mp-note p { margin: 12px 0 22px; color: inherit; font-size: 13px; line-height: 1.65; }
-.member-shell .mp-text-link { display: inline-flex; align-items: center; gap: 8px; padding-block: 6px; color: inherit; font-size: 13px; font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.member-shell .mp-text-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding-block: 6px; color: inherit; font-size: 13px; font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
 .member-shell .mp-text-link:hover { text-decoration-thickness: 2px; }
 .member-shell .mp-feedback { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 12px; font-size: 13px; overflow-wrap: anywhere; }
 .member-shell .mp-feedback span { flex: 1; min-width: 0; }
 .member-shell .mp-feedback-success { background: #edf4de; color: #334322; }
 .member-shell .mp-feedback-error { background: #fbeaea; color: #8e2525; }
-.member-shell .mp-feedback-dismiss { border: 0; background: transparent; color: inherit; font: inherit; font-size: 12px; padding: 8px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; flex-shrink: 0; }
+.member-shell .mp-feedback-dismiss { min-height: 44px; border: 0; background: transparent; color: inherit; font: inherit; font-size: 12px; padding: 8px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; flex-shrink: 0; }
 .member-shell .mp-empty { padding: 24px; font-size: 13px; }
 .member-shell .mp-empty p { margin: 0 0 12px; }
 .member-shell .mp-loading { display: grid; gap: 16px; padding: 16px; }
@@ -101,7 +101,7 @@
 .member-shell .mp-spin { animation: mp-spin 1s linear infinite; }
 .member-shell .mp-settings > .mp-feedback { margin-bottom: 16px; }
 .member-shell .mp-tabs-list { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin-bottom: 16px; border-radius: 14px; background: #e7e7e9; width: fit-content; max-width: 100%; }
-.member-shell .mp-tab { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 9px 16px; border: 0; border-radius: 11px; background: transparent; color: #535358; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: background-color 180ms ease-out, color 180ms ease-out; }
+.member-shell .mp-tab { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 0; border-radius: 11px; background: transparent; color: #535358; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: background-color 180ms ease-out, color 180ms ease-out; }
 .member-shell .mp-tab:hover { background: #f1f1f2; color: #1a1a1a; }
 .member-shell .mp-tab[data-active] { background: #fff; color: #1a1a1a; }
 .member-shell .mp-tab-panel { min-width: 0; }
@@ -113,7 +113,7 @@
 .member-shell .mp-session-row > div { min-width: 0; }
 .member-shell .mp-session-row p { margin: 4px 0 0; color: #626266; font-size: 12px; overflow-wrap: anywhere; }
 .member-shell :is(.mp-button, .mp-input, .mp-reveal, .mp-tab, .mp-tab-panel, .mp-text-link, .mp-settings-row, .mp-feedback-dismiss):focus-visible,
-.member-shell .mp-disclosure summary:focus-visible { outline: 2px solid #514071; outline-offset: 3px; }
+.member-shell .mp-disclosure summary:focus-visible { outline: 2px solid #5a47d1; outline-offset: 3px; }
 
 @keyframes mp-spin { to { transform: rotate(360deg); } }
 @keyframes mp-pulse { 50% { opacity: 0.5; } }

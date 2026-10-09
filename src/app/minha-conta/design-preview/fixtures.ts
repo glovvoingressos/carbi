@@ -20,6 +20,16 @@ export const previewUser: PreviewUser = {
   avatarUrl: '',
 }
 
+/** Formulário da aba "Meu perfil" — o painel exige sessão, então a prancheta
+ *  o injeta. Mesmo identidade do previewUser, mais o CPF que ele não carrega. */
+export const previewProfile = {
+  email: previewUser.email,
+  fullName: previewUser.fullName,
+  phone: previewUser.phone ?? '',
+  cpf: '529.982.247-25',
+  avatarUrl: previewUser.avatarUrl,
+}
+
 const photos = {
   civic: '/images/porsche-hero.jpg',
   compass: '/images/defender-octa-tasman-blue.jpg',

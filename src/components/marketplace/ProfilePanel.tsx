@@ -19,9 +19,10 @@ const formatPhone = (value: string) => {
 const formatCPF = (value: string) => value.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
 type ToastFn = (type: 'success' | 'error', message: string) => void
 
-function AvatarSection({ avatarUrl, userId, uploading, onAvatarChange, onUploadingChange, toast }: {
+function AvatarSection({ avatarUrl, userId, uploading, onAvatarChange, onUploadingChange, toast, preview = false }: {
   avatarUrl: string; userId: string; uploading: boolean
   onAvatarChange: (url: string) => void; onUploadingChange: (value: boolean) => void; toast: ToastFn
+  preview?: boolean
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const inputId = useId()
@@ -51,7 +52,7 @@ function AvatarSection({ avatarUrl, userId, uploading, onAvatarChange, onUploadi
   }
 
   return (
-    <div className="mp-photo-row" aria-busy={uploading}>
+    <div className="mp-photo-row" aria-busy={uploading} inert={preview}>
       <div className="mp-photo">
         {avatarUrl ? <Image src={avatarUrl} alt="Sua foto de perfil" width={56} height={56} unoptimized /> : <User aria-hidden="true" />}
       </div>
@@ -68,7 +69,7 @@ function AvatarSection({ avatarUrl, userId, uploading, onAvatarChange, onUploadi
   )
 }
 
-function SecuritySection({ email, toast }: { email: string; toast: ToastFn }) {
+function SecuritySection({ email, toast, preview = false }: { email: string; toast: ToastFn; preview?: boolean }) {
   const id = useId()
   const [newEmail, setNewEmail] = useState('')
   const [emailSaving, setEmailSaving] = useState(false)
@@ -117,7 +118,7 @@ function SecuritySection({ email, toast }: { email: string; toast: ToastFn }) {
   }
 
   return (
-    <section className="mp-surface mp-security" aria-labelledby={`${id}-heading`}>
+    <section className="mp-surface mp-security" aria-labelledby={`${id}-heading`} inert={preview}>
       <header className="mp-panel-heading">
         <div><h2 id={`${id}-heading`}>Acesso e segurança</h2><p>Gerencie o e-mail de acesso e sua senha.</p></div>
         <Shield className="mp-heading-icon" aria-hidden="true" />
@@ -171,7 +172,7 @@ function SecuritySection({ email, toast }: { email: string; toast: ToastFn }) {
   )
 }
 
-function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
+function DangerZone({ userId, toast, preview = false }: { userId: string; toast: ToastFn; preview?: boolean }) {
   const id = useId()
   const detailsRef = useRef<HTMLDetailsElement>(null)
   const [confirmation, setConfirmation] = useState('')
@@ -193,7 +194,7 @@ function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
     }
   }
   return (
-    <details className="mp-surface mp-disclosure mp-danger" ref={detailsRef}>
+    <details className="mp-surface mp-disclosure mp-danger" ref={detailsRef} inert={preview}>
       <summary><AlertTriangle aria-hidden="true" /><span><strong>Excluir minha conta</strong><small>Revise esta ação antes de confirmar.</small></span><ChevronDown className="mp-chevron" aria-hidden="true" /></summary>
       <form className="mp-details-body" onSubmit={deleteAccount} aria-busy={deleting}>
         <p className="mp-danger-copy">A exclusão da conta é permanente. Se deseja apenas sair, use a opção de sair da conta.</p>
@@ -210,19 +211,28 @@ function DangerZone({ userId, toast }: { userId: string; toast: ToastFn }) {
   )
 }
 
-export default function ProfilePanel({ onProfileUpdate, mode = 'profile' }: {
-  onProfileUpdate?: () => void; mode?: 'profile' | 'security'
+export type PreviewProfile = { email: string; fullName: string; phone: string; cpf: string; avatarUrl: string }
+
+export default function ProfilePanel({ onProfileUpdate, mode = 'profile', previewProfile = null }: {
+  onProfileUpdate?: () => void
+  mode?: 'profile' | 'security'
+  /**
+   * Só a prancheta de dev envia esta prop. Ela injeta dados fixos e evita a
+   * checagem de sessão; a rota real não a envia e mantém o gate autenticado.
+   */
+  previewProfile?: PreviewProfile | null
 }) {
   const id = useId()
   const supabaseReady = isSupabaseBrowserConfigured()
-  const [loading, setLoading] = useState(true)
-  const [profileLoading, setProfileLoading] = useState(mode === 'profile')
+  const isPreview = previewProfile != null
+  const [loading, setLoading] = useState(!isPreview)
+  const [profileLoading, setProfileLoading] = useState(mode === 'profile' && !isPreview)
   const [userId, setUserId] = useState<string | null>(null)
-  const [email, setEmail] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [cpf, setCpf] = useState('')
-  const [avatarUrl, setAvatarUrl] = useState('')
+  const [email, setEmail] = useState(previewProfile?.email ?? '')
+  const [fullName, setFullName] = useState(previewProfile?.fullName ?? '')
+  const [phone, setPhone] = useState(previewProfile?.phone ?? '')
+  const [cpf, setCpf] = useState(previewProfile?.cpf ?? '')
+  const [avatarUrl, setAvatarUrl] = useState(previewProfile?.avatarUrl ?? '')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [profileError, setProfileError] = useState(false)
@@ -231,7 +241,7 @@ export default function ProfilePanel({ onProfileUpdate, mode = 'profile' }: {
   const showToast = useCallback<ToastFn>((type, message) => setToast({ type, message }), [])
 
   useEffect(() => {
-    if (!supabaseReady) return
+    if (isPreview || !supabaseReady) return
     let active = true
     const supabase = getSupabaseBrowserClient()
     const { data } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
@@ -252,10 +262,10 @@ export default function ProfilePanel({ onProfileUpdate, mode = 'profile' }: {
     }
     void boot()
     return () => { active = false; data.subscription.unsubscribe() }
-  }, [supabaseReady, showToast])
+  }, [isPreview, supabaseReady, showToast])
 
   useEffect(() => {
-    if (!userId || !supabaseReady || mode === 'security') return
+    if (isPreview || !userId || !supabaseReady || mode === 'security') return
     let active = true
     const load = async () => {
       setProfileLoading(true)
@@ -274,11 +284,11 @@ export default function ProfilePanel({ onProfileUpdate, mode = 'profile' }: {
     }
     void load()
     return () => { active = false }
-  }, [userId, supabaseReady, mode, retry, showToast])
+  }, [isPreview, userId, supabaseReady, mode, retry, showToast])
 
   const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!userId || !supabaseReady || saving || uploading || profileError) return
+    if (isPreview || !userId || !supabaseReady || saving || uploading || profileError) return
     setSaving(true)
     try {
       const supabase = getSupabaseBrowserClient()
@@ -297,7 +307,8 @@ export default function ProfilePanel({ onProfileUpdate, mode = 'profile' }: {
     } finally { setSaving(false) }
   }
 
-  if (!supabaseReady || (!loading && !userId)) return (
+  // Sem isPreview este gate é idêntico ao de sempre: sem sessão, estado vazio.
+  if (!isPreview && (!supabaseReady || (!loading && !userId))) return (
     <div className="mp-surface mp-empty" role={toast ? 'alert' : 'status'}>
       <p>{toast?.message || 'Entre na sua conta para gerenciar seus dados.'}</p>
       <Link className="mp-text-link" href="/entrar?redirect=/minha-conta">Entrar na conta <ArrowUpRight aria-hidden="true" /></Link>
@@ -308,7 +319,7 @@ export default function ProfilePanel({ onProfileUpdate, mode = 'profile' }: {
       <div className="mp-skeleton mp-skeleton-photo" /><div className="mp-skeleton mp-skeleton-fields" />
     </div>
   )
-  if (!userId) return null
+  if (!isPreview && !userId) return null
 
   const feedback = toast && (
     <div className={`mp-feedback mp-feedback-${toast.type}`} role={toast.type === 'error' ? 'alert' : 'status'} aria-atomic="true">
@@ -317,7 +328,7 @@ export default function ProfilePanel({ onProfileUpdate, mode = 'profile' }: {
     </div>
   )
 
-  if (mode === 'security') return <div className="mp-stack">{feedback}<SecuritySection email={email} toast={showToast} /><DangerZone userId={userId} toast={showToast} /></div>
+  if (mode === 'security') return <div className="mp-stack">{feedback}<SecuritySection email={email} toast={showToast} preview={isPreview} /><DangerZone userId={userId ?? ''} toast={showToast} preview={isPreview} /></div>
 
   return (
     <section className="mp-profile" aria-label="Editar perfil">
@@ -327,7 +338,7 @@ export default function ProfilePanel({ onProfileUpdate, mode = 'profile' }: {
           <section className="mp-surface" aria-labelledby={`${id}-personal`}>
             <header className="mp-panel-heading"><div><h2 id={`${id}-personal`}>Meu perfil</h2><p>Sua foto e seus dados de contato.</p></div><User className="mp-heading-icon" aria-hidden="true" /></header>
             {profileError ? <div className="mp-empty"><p>Seus dados não foram carregados.</p><Button type="button" className="mp-button mp-button-secondary" onClick={() => { setToast(null); setRetry(value => value + 1) }}>Tentar novamente</Button></div> : <>
-              <AvatarSection avatarUrl={avatarUrl} userId={userId} uploading={uploading} onUploadingChange={setUploading} toast={showToast} onAvatarChange={url => { setAvatarUrl(url); onProfileUpdate?.() }} />
+              <AvatarSection avatarUrl={avatarUrl} userId={userId ?? ''} uploading={uploading} onUploadingChange={setUploading} toast={showToast} preview={isPreview} onAvatarChange={url => { setAvatarUrl(url); onProfileUpdate?.() }} />
               <form className="mp-personal-form" onSubmit={saveProfile} aria-busy={saving}>
                 <div className="mp-fields">
                   <div className="mp-field"><label htmlFor={`${id}-name`}>Nome completo</label><Input className="mp-input" id={`${id}-name`} autoComplete="name" value={fullName} onChange={event => setFullName(event.target.value)} placeholder="Seu nome" disabled={saving} /></div>
@@ -339,8 +350,8 @@ export default function ProfilePanel({ onProfileUpdate, mode = 'profile' }: {
               </form>
             </>}
           </section>
-          <SecuritySection email={email} toast={showToast} />
-          <DangerZone userId={userId} toast={showToast} />
+          <SecuritySection email={email} toast={showToast} preview={isPreview} />
+          <DangerZone userId={userId ?? ''} toast={showToast} preview={isPreview} />
         </div>
         <aside className="mp-aside" aria-label="Sobre seu perfil">
           <div className="mp-note mp-note-green"><h2>Seus contatos</h2><p>Mantenha nome e telefone atualizados para suas negociações.</p><Link href="/minha-conta/conversas" className="mp-text-link">Abrir conversas <ArrowUpRight aria-hidden="true" /></Link></div>

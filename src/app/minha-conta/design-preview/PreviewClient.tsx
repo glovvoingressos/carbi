@@ -13,6 +13,7 @@ import {
   previewConversations,
   previewListings,
   previewMetrics,
+  previewProfile,
   previewUser,
   type PreviewView,
 } from './fixtures'
@@ -64,7 +65,7 @@ export default function PreviewClient({ view, tab }: { view: PreviewView; tab?: 
         activePath="/minha-conta"
       >
         {profile ? (
-          <ProfilePanel onProfileUpdate={() => undefined} />
+          <ProfilePanel onProfileUpdate={() => undefined} previewProfile={previewProfile} />
         ) : (
           <MemberOverview
             listings={listings}
