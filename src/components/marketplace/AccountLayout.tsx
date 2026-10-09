@@ -22,6 +22,8 @@ interface AccountLayoutProps {
   listingsError?: string | null
   onListingsRetry?: () => void
   loading?: boolean
+  /** Caminho alternativo para resolver o item ativo da navegação. Só o preview de desenvolvimento usa. */
+  activePath?: string
 }
 const navigation = [
   { href: '/minha-conta', label: 'Visão geral', icon: LayoutDashboard },
@@ -40,6 +42,9 @@ const tabs = [
   { href: '/minha-conta/configuracoes', label: 'Preferências' },
 ]
 const statusLabels: Record<string, string> = { active: 'Publicado', paused: 'Pausado', sold: 'Vendido', archived: 'Arquivado', draft: 'Rascunho', pending: 'Em análise' }
+// Um só formatador para todos os números da conta: o sidebar mostrava "1137"
+// enquanto o painel de desempenho ao lado mostrava "1.137".
+const accountNumberFormat = new Intl.NumberFormat('pt-BR')
 
 function Avatar({ user, className = '' }: { user: AccountLayoutProps['user']; className?: string }) {
   const [failedSource, setFailedSource] = useState<string | null>(null)
@@ -51,8 +56,9 @@ function VehicleThumbnail({ src }: { src?: string }) {
   return <span className="mw-vehicle-photo">{src && failedSource !== src ? <img src={src} alt="" loading="lazy" decoding="async" onError={() => setFailedSource(src)} /> : <Car size={20} />}</span>
 }
 
-function Workspace({ children, user, stats, listings, listingsError, onListingsRetry, loading = false }: AccountLayoutProps) {
-  const pathname = usePathname()
+function Workspace({ children, user, stats, listings, listingsError, onListingsRetry, loading = false, activePath }: AccountLayoutProps) {
+  const routePath = usePathname()
+  const pathname = activePath ?? routePath
   const params = useSearchParams()
   const router = useRouter()
   const [remoteListings, setRemoteListings] = useState<AccountWorkspaceListing[]>([])
@@ -120,7 +126,7 @@ function Workspace({ children, user, stats, listings, listingsError, onListingsR
   const normalizedQuery = query.trim().toLocaleLowerCase('pt-BR')
   const matches = (text: string) => text.toLocaleLowerCase('pt-BR').includes(normalizedQuery)
   const portfolio = <>
-    <div className="mw-metrics" aria-label="Resumo da conta" aria-busy={metricsUnavailable}>{metricValues.map((metric, index) => <div className={`mw-metric mw-metric-${index}`} key={metric.label}><span className="mw-metric-label"><span className="mw-metric-dot" />{metric.label}</span><strong>{metricsUnavailable ? '—' : metric.value}</strong></div>)}</div>
+    <div className="mw-metrics" aria-label="Resumo da conta" aria-busy={metricsUnavailable}>{metricValues.map((metric) => <div className="mw-metric" key={metric.label}><span className="mw-metric-label"><span className="mw-metric-dot" aria-hidden="true" />{metric.label}</span><strong>{metricsUnavailable ? '—' : typeof metric.value === 'number' ? accountNumberFormat.format(metric.value) : metric.value}</strong></div>)}</div>
     <div className="mw-portfolio-title"><h2>Meus anúncios</h2><Link href="/minha-conta/anuncios" aria-label="Gerenciar todos os anúncios"><ArrowUpRight size={17} /></Link></div>
     <div className="mw-vehicle-list">
       {loading || (listings === undefined && portfolioLoading) ? <p className="mw-sidebar-note" role="status">Carregando seus veículos…</p> : listingsError || (portfolioError && listings === undefined) ? <div className="mw-sidebar-note" role="alert">{listingsError || 'Não foi possível carregar.'}<button type="button" onClick={retryPortfolio}>Tentar novamente</button></div> : vehicles.length === 0 ? <div className="mw-sidebar-note">Seu próximo anúncio começa aqui.<Link href="/anunciar-carro">Anunciar meu carro <Plus size={14} /></Link></div> : vehicles.map(vehicle => {
