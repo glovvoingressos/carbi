@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { ArrowUpRight, Bell, Car, ChevronDown, Heart, LayoutDashboard, LogOut, Menu, MessageCircle, Plus, Search, Settings, SlidersHorizontal, User, X, type LucideIcon } from 'lucide-react'
+import { ArrowUpRight, Bell, Car, ChevronDown, Heart, LayoutDashboard, LogOut, Menu, MessageCircle, Plus, Search, Settings, User, X, type LucideIcon } from 'lucide-react'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
 import './member-workspace.css'
@@ -146,7 +146,7 @@ function Workspace({ children, user, stats, listings, listingsError, onListingsR
       <nav className="mw-tabs" aria-label="Seções da conta">{tabs.map(tab => {
         const active = tab.href.includes('?') ? pathname === '/minha-conta' && profile : isActive(tab.href) && (tab.href !== '/minha-conta' || !profile)
         return <Link key={tab.href} href={tab.href} className={active ? 'is-active' : ''} aria-current={active ? 'page' : undefined}>{tab.label}</Link>
-      })}<Link href="/minha-conta/configuracoes" className="mw-tabs-settings" aria-label="Configurações"><SlidersHorizontal size={17} /></Link></nav>
+      })}</nav>
       </div>
       <main id="member-content" className="mw-content" tabIndex={-1}>{children}</main>
     </div>
