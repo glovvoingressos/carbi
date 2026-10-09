@@ -1,23 +1,40 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowDown, ArrowRight } from 'lucide-react'
+import { heroFont } from '@/components/home/home-font'
+import PlateBannerLookup from '@/components/marketplace/PlateBannerLookup'
 import './announcement-landing.css'
+
+const benefits = [
+  {
+    title: 'Grátis',
+    description: 'para anunciar seu carro',
+  },
+  {
+    title: 'Até 10 fotos',
+    description: 'para mostrar os detalhes',
+  },
+  {
+    title: 'Você revisa',
+    description: 'antes de enviar',
+  },
+]
 
 const steps = [
   {
     number: '01',
-    title: 'Pesquise pela placa',
-    description: 'Confira os dados disponíveis do veículo antes de começar o anúncio.',
+    title: 'Comece pela placa',
+    description: 'Consulte os dados disponíveis do veículo para iniciar seu anúncio.',
   },
   {
     number: '02',
-    title: 'Complete as informações',
-    description: 'Conte os detalhes do carro, adicione fotos e informe como falar com você.',
+    title: 'Conte os detalhes',
+    description: 'Complete as informações do carro, adicione fotos e informe como falar com você.',
   },
   {
     number: '03',
     title: 'Revise e envie',
-    description: 'Confira tudo com calma antes de enviar seu anúncio para publicação.',
+    description: 'Confira o anúncio com calma antes de enviar para publicação.',
   },
 ]
 
@@ -38,67 +55,67 @@ const questions = [
 
 export default function AnnouncementLanding() {
   return (
-    <div className="seller-landing">
-      <div className="seller-landing__frame">
-        <section className="seller-hero" aria-labelledby="seller-title">
-          <div className="seller-hero__copy">
-            <h1 id="seller-title">Seu carro, pronto para anunciar.</h1>
-            <p>
-              Pesquise pela placa, complete as informações e revise seu anúncio antes de enviar.
-            </p>
-            <div className="seller-hero__actions">
-              <Link className="seller-button" href="/anunciar-carro/fluxo">
-                <span>Começar anúncio</span>
-                <ArrowRight aria-hidden="true" size={19} />
-              </Link>
-              <span className="seller-hero__note">Grátis para anunciar · Até 10 fotos</span>
-            </div>
-            <a className="seller-secondary-link" href="#etapas">
-              Conheça as etapas <ArrowRight aria-hidden="true" size={16} />
-            </a>
-          </div>
-          <figure className="seller-hero__photo">
+    <div className={`announce-page ${heroFont.variable}`}>
+      <div className="announce-page__frame">
+        <section className="announce-hero" aria-labelledby="announce-title">
+          <div className="announce-hero__image" aria-hidden="true">
             <Image
-              src="/hero-car.png"
-              alt="Audi escuro visto de frente em uma área aberta sob céu nublado, imagem ilustrativa"
+              src="/assets/cars/anunciar-carro-hero-user-provided.webp"
+              alt=""
               fill
               priority
-              sizes="(max-width: 760px) 100vw, 56vw"
+              sizes="(max-width: 760px) 100vw, 96vw"
             />
-          </figure>
-        </section>
-
-        <section className="seller-facts" aria-label="Informações do anúncio">
-          <p><strong>Grátis</strong><span>para anunciar</span></p>
-          <p><strong>Até 10</strong><span>fotos do seu carro</span></p>
-          <p><strong>Você revisa</strong><span>antes de enviar</span></p>
-        </section>
-
-        <section className="seller-steps" id="etapas" aria-labelledby="seller-steps-title">
-          <div className="seller-section-heading">
-            <h2 id="seller-steps-title">Três passos, sem complicação.</h2>
-            <p>Você acompanha o cadastro e confere as informações antes de publicar.</p>
           </div>
-          <ol className="seller-steps__list">
-            {steps.map((step) => (
-              <li className="seller-step" key={step.number}>
-                <span className="seller-step__number" aria-hidden="true">{step.number}</span>
-                <div>
-                  <h3>{step.title}</h3>
-                  <p>{step.description}</p>
-                </div>
+
+          <div className="announce-hero__copy">
+            <h1 id="announce-title">Seu carro, pronto para chegar a novas mãos.</h1>
+            <p>Comece pela placa, complete os detalhes e revise tudo antes de publicar.</p>
+            <Link className="announce-hero__link" href="#plate-premium-input">
+              Começar anúncio <ArrowDown aria-hidden="true" size={18} />
+            </Link>
+          </div>
+
+          <div className="announce-hero__lookup" id="consulta">
+            <PlateBannerLookup variant="landing" />
+          </div>
+        </section>
+
+        <section className="announce-benefits" aria-label="Benefícios para anunciar">
+          {benefits.map(({ title, description }, index) => (
+            <article className={`announce-benefit announce-benefit--${index + 1}`} key={title}>
+              <div>
+                <h2>{title}</h2>
+                <p>{description}</p>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        <section className="announce-process" id="etapas" aria-labelledby="announce-process-title">
+          <div className="announce-section-heading">
+            <h2 id="announce-process-title">O caminho para anunciar.</h2>
+            <p>Você acompanha cada etapa e confere as informações antes de publicar.</p>
+          </div>
+
+          <ol className="announce-process__grid">
+            {steps.map(({ number, title, description }) => (
+              <li className="announce-process-card" key={number}>
+                <span className="announce-process-card__number">{number}</span>
+                <h3>{title}</h3>
+                <p>{description}</p>
               </li>
             ))}
           </ol>
         </section>
 
-        <section className="seller-faq" aria-labelledby="seller-faq-title">
-          <div className="seller-section-heading">
-            <h2 id="seller-faq-title">Dúvidas frequentes</h2>
+        <section className="announce-faq" aria-labelledby="announce-faq-title">
+          <div className="announce-faq__intro">
+            <h2 id="announce-faq-title">Dúvidas frequentes.</h2>
           </div>
-          <div className="seller-faq__list">
+          <div className="announce-faq__list">
             {questions.map((item) => (
-              <details className="seller-faq__item" key={item.question}>
+              <details className="announce-faq__item" key={item.question}>
                 <summary>{item.question}<span aria-hidden="true" /></summary>
                 <p>{item.answer}</p>
               </details>
@@ -106,14 +123,13 @@ export default function AnnouncementLanding() {
           </div>
         </section>
 
-        <section className="seller-last-call" aria-labelledby="seller-last-call-title">
+        <section className="announce-endcap" aria-labelledby="announce-endcap-title">
           <div>
-            <h2 id="seller-last-call-title">Vamos começar?</h2>
+            <h2 id="announce-endcap-title">Vamos nessa?</h2>
             <p>Pesquise a placa e prepare seu anúncio no seu ritmo.</p>
           </div>
-          <Link className="seller-button seller-button--dark" href="/anunciar-carro/fluxo">
-            <span>Anunciar meu carro</span>
-            <ArrowRight aria-hidden="true" size={19} />
+          <Link href="#plate-premium-input" className="announce-endcap__button">
+            Consultar placa <ArrowRight aria-hidden="true" size={19} />
           </Link>
         </section>
       </div>

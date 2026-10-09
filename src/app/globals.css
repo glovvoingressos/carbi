@@ -12394,7 +12394,7 @@ p {
   display: inline-flex;
   align-items: center;
   padding: 8px 18px;
-  border-radius: 8px;
+  border-radius: 999px;
   background: #1A1A1A;
   color: #fff;
   font-family: var(--font-heading);

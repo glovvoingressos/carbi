@@ -21,8 +21,13 @@ type FoundVehicle = {
   fipePrice?: number | null
 }
 
-export default function PlateBannerLookup() {
+type PlateBannerLookupProps = {
+  variant?: 'banner' | 'landing'
+}
+
+export default function PlateBannerLookup({ variant = 'banner' }: PlateBannerLookupProps) {
   const router = useRouter()
+  const isLanding = variant === 'landing'
   const [step, setStep] = useState<Step>('input')
   const [plate, setPlate] = useState('')
   const [loading, setLoading] = useState(false)
@@ -89,22 +94,24 @@ export default function PlateBannerLookup() {
   }
 
   return (
-    <div className={`cb-plate-premium ${step === 'preview' ? 'is-preview' : ''}`}>
-      <div className="cb-plate-premium-visual">
-        <Image
-          src="/assets/cars/plate-lookup-desert-pickup.jpg"
-          alt="Picape em uma estrada no deserto"
-          fill
-          unoptimized
-          sizes="(max-width: 760px) calc(100vw - 64px), 42vw"
-          className="cb-plate-premium-image"
-        />
-      </div>
+    <div className={`cb-plate-premium ${step === 'preview' ? 'is-preview' : ''} ${isLanding ? 'is-landing' : ''}`}>
+      {!isLanding && (
+        <div className="cb-plate-premium-visual">
+          <Image
+            src="/assets/cars/plate-lookup-desert-pickup.jpg"
+            alt="Picape em uma estrada no deserto"
+            fill
+            unoptimized
+            sizes="(max-width: 760px) calc(100vw - 64px), 42vw"
+            className="cb-plate-premium-image"
+          />
+        </div>
+      )}
 
       <div className="cb-plate-premium-content">
         <div className="cb-plate-premium-copy">
-          <span className="cb-plate-premium-kicker">Grátis por tempo limitado</span>
-          <h3>{step === 'preview' && found ? 'Seu carro está pronto para anunciar' : 'Anuncie seu carro em menos de 2 minutos.'}</h3>
+          {!isLanding && <span className="cb-plate-premium-kicker">Grátis por tempo limitado</span>}
+          <h3>{step === 'preview' && found ? 'Seu carro está pronto para anunciar' : isLanding ? 'Comece pela placa' : 'Anuncie seu carro em menos de 2 minutos.'}</h3>
           <p>{step === 'preview' && found ? 'Confira os dados encontrados e publique em poucos passos.' : 'Consulte pela placa e nós buscamos marca, modelo, ano e FIPE para você.'}</p>
           <div className="cb-plate-premium-trust"><ShieldCheck size={14} /> A placa não será publicada</div>
         </div>
