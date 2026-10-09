@@ -17,13 +17,13 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   return {
     title: 'Buscar caminhões à venda',
     description:
-      'Busque caminhões usados e seminovos por marca, categoria, preço, ano, estado e capacidade de carga. Ficha técnica e comparação FIPE.',
+      'Busque caminhões usados e seminovos por marca, categoria, preço, ano, estado e capacidade de carga. Ficha técnica e comparação FIPE quando houver referência disponível.',
     keywords: ['caminhões à venda', 'buscar caminhão', 'caminhão usado', 'cavalo mecânico', 'bitruck'],
     alternates: { canonical: '/caminhoes/buscar' },
     robots: hasParameters ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
       title: 'Buscar caminhões à venda | Carbi',
-      description: 'Caminhões usados e seminovos com ficha técnica completa e comparação FIPE.',
+      description: 'Caminhões usados e seminovos com ficha técnica completa e comparação FIPE quando houver referência disponível.',
       url: '/caminhoes/buscar',
       type: 'website',
     },
@@ -78,7 +78,7 @@ export default async function TruckSearchPage({ searchParams }: { searchParams: 
           <p className="cbi-hero-sub">
             {result.total > 0
               ? `${result.total} caminhões ativos. Filtre por categoria, marca, preço, ano, estado e capacidade de carga.`
-              : 'Filtre por categoria, marca, preço, ano, estado e capacidade de carga. Ficha técnica e comparação FIPE em cada anúncio.'}
+              : 'Filtre por categoria, marca, preço, ano, estado e capacidade de carga. Ficha técnica e comparação FIPE quando houver referência disponível.'}
           </p>
         </section>
 

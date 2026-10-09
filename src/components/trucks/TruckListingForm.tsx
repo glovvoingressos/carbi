@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type MouseEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { AlertCircle, ArrowRight, Camera, Check, Loader2, X } from 'lucide-react'
@@ -19,6 +19,14 @@ import {
 import { normalizePlateFinal } from '@/lib/marketplace'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import { TRUCK_CATEGORIES } from '@/lib/truck-seo'
+import {
+  TRUCK_LISTING_DRAFT_KEY,
+  clearTruckListingDraftImages,
+  loadTruckListingDraftImages,
+  parseTruckListingDraft,
+  saveTruckListingDraftImages,
+  serializeTruckListingDraft,
+} from '@/lib/truck-listing-draft'
 import '@/components/marketplace/listing-flow.css'
 
 /* Fluxo próprio de caminhão: usa a mesma API de anúncios e a mesma consulta de
@@ -67,6 +75,16 @@ const EMPTY_FORM: TruckForm = {
 
 type Photo = { file: File; preview: string }
 type Errors = Partial<Record<keyof TruckForm | 'photos', string>>
+
+function draftImages(photos: Photo[]) {
+  return photos.map(({ file }, index) => ({
+    id: String(index).padStart(2, '0'),
+    name: file.name,
+    type: file.type,
+    lastModified: file.lastModified,
+    blob: file,
+  }))
+}
 
 function digits(value: string): number {
   return Number(value.replace(/\D/g, ''))
@@ -126,7 +144,7 @@ function Field({ id, label, error, children }: { id: string; label: string; erro
 
 export default function TruckListingForm() {
   const router = useRouter()
-  const [step, setStep] = useState(1)
+  const [storedStep, setStep] = useState(1)
   const [form, setForm] = useState<TruckForm>(EMPTY_FORM)
   const [plate, setPlate] = useState('')
   const [fipe, setFipe] = useState<{ price: number | null; reference: string | null }>({ price: null, reference: null })
@@ -137,18 +155,103 @@ export default function TruckListingForm() {
   const [saving, setSaving] = useState(false)
   // Sem conta: a etapa 3 vira revisão e a etapa 4 é o cadastro.
   // Enquanto a sessão não for confirmada, já assume que falta a conta.
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(() => isSupabaseBrowserConfigured() ? null : false)
   const [account, setAccount] = useState<AccountForm>(ACCOUNT_INITIAL)
   const [accountErrors, setAccountErrors] = useState<AccountErrors>({})
   const [accountEmailExists, setAccountEmailExists] = useState(false)
+  const [draftReady, setDraftReady] = useState(false)
+  const draftPublished = useRef(false)
+  const photoStorageReady = useRef(false)
+  const photoPreviews = useRef(new Set<string>())
 
   const needsAccount = isAuthenticated !== true
+  const step = !needsAccount && storedStep === 4 ? 3 : storedStep
 
   useEffect(() => {
-    if (!isSupabaseBrowserConfigured()) {
-      setIsAuthenticated(false)
-      return
+    let active = true
+    const previews = photoPreviews.current
+
+    const restoreDraft = async () => {
+      try {
+        const draft = parseTruckListingDraft(localStorage.getItem(TRUCK_LISTING_DRAFT_KEY), EMPTY_FORM)
+        if (draft) {
+          setForm(draft.form)
+          setPlate(draft.plate)
+          setFipe(draft.fipe)
+          setStep(draft.step)
+        }
+      } catch {
+        // The flow remains usable when browser storage is unavailable.
+      }
+
+      try {
+        const images = await loadTruckListingDraftImages()
+        if (!active) return
+        const restored = images
+          .filter((image) => PHOTO_TYPES.includes(image.type) && image.blob.size <= MAX_PHOTO_BYTES)
+          .slice(0, MAX_PHOTOS)
+          .map((image) => {
+            const file = new File([image.blob], image.name, { type: image.type, lastModified: image.lastModified })
+            const preview = URL.createObjectURL(file)
+            previews.add(preview)
+            return { file, preview }
+          })
+        setPhotos(restored)
+        photoStorageReady.current = true
+      } catch {
+        // Do not overwrite stored photos with an empty list after a failed read.
+        if (active) setErrors((prev) => ({ ...prev, photos: 'Não foi possível recuperar as fotos salvas. Confira e adicione as fotos novamente.' }))
+      } finally {
+        if (active) setDraftReady(true)
+      }
     }
+
+    void restoreDraft()
+    return () => {
+      active = false
+      previews.forEach((preview) => URL.revokeObjectURL(preview))
+      previews.clear()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!draftReady || draftPublished.current) return
+    try {
+      localStorage.setItem(TRUCK_LISTING_DRAFT_KEY, serializeTruckListingDraft({ form, plate, fipe, step }))
+    } catch {
+      // Keep edits in memory if localStorage is blocked or full.
+    }
+  }, [draftReady, form, plate, fipe, step])
+
+  useEffect(() => {
+    if (!draftReady || !photoStorageReady.current || draftPublished.current) return
+    void saveTruckListingDraftImages(draftImages(photos)).catch(() => {
+      setErrors((prev) => ({ ...prev, photos: 'Não foi possível guardar as fotos neste navegador. Adicione-as novamente se sair desta página.' }))
+    })
+  }, [draftReady, photos])
+
+  const goToLogin = async (event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    event.preventDefault()
+    if (saving) return
+    setSaving(true)
+    try {
+      try {
+        localStorage.setItem(TRUCK_LISTING_DRAFT_KEY, serializeTruckListingDraft({ form, plate, fipe, step }))
+      } catch {
+        // Login remains available when localStorage is unavailable.
+      }
+      if (photoStorageReady.current) await saveTruckListingDraftImages(draftImages(photos))
+      router.push('/entrar?redirect=/caminhoes/anunciar')
+    } catch {
+      setFormError('Não foi possível guardar as fotos. Tente entrar novamente para preservar seu anúncio.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!isSupabaseBrowserConfigured()) return
 
     let unsubscribe: (() => void) | null = null
     let active = true
@@ -239,18 +342,29 @@ export default function TruckListingForm() {
     for (const file of incoming) {
       if (!PHOTO_TYPES.includes(file.type)) { problem = 'Use fotos em JPG, PNG ou WEBP.'; continue }
       if (file.size > MAX_PHOTO_BYTES) { problem = 'Cada foto pode ter até 10 MB.'; continue }
-      accepted.push({ file, preview: URL.createObjectURL(file) })
+      const preview = URL.createObjectURL(file)
+      photoPreviews.current.add(preview)
+      accepted.push({ file, preview })
     }
     const room = MAX_PHOTOS - photos.length
     if (accepted.length > room) problem = `Você pode enviar até ${MAX_PHOTOS} fotos.`
     const next = [...photos, ...accepted.slice(0, Math.max(room, 0))]
+    accepted.slice(Math.max(room, 0)).forEach(({ preview }) => {
+      URL.revokeObjectURL(preview)
+      photoPreviews.current.delete(preview)
+    })
+    photoStorageReady.current = true
     setPhotos(next)
     setErrors((prev) => ({ ...prev, photos: problem ?? undefined }))
   }
 
   const removePhoto = (index: number) => {
     const target = photos[index]
-    if (target) URL.revokeObjectURL(target.preview)
+    if (target) {
+      URL.revokeObjectURL(target.preview)
+      photoPreviews.current.delete(target.preview)
+    }
+    photoStorageReady.current = true
     setPhotos((prev) => prev.filter((_, i) => i !== index))
   }
 
@@ -391,6 +505,13 @@ export default function TruckListingForm() {
         throw new Error(body.error || 'Falha ao salvar as fotos do anúncio.')
       }
 
+      draftPublished.current = true
+      try {
+        localStorage.removeItem(TRUCK_LISTING_DRAFT_KEY)
+      } catch {
+        // Storage cleanup must not undo an already published listing.
+      }
+      await clearTruckListingDraftImages().catch(() => undefined)
       router.push(`/caminhoes/anuncio/${created.slug}`)
     } catch (error) {
       // Se as fotos não subiram, remove o que foi enviado e o anúncio incompleto.
@@ -415,7 +536,7 @@ export default function TruckListingForm() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
-    if (saving) return
+    if (saving || !draftReady) return
     if (step < 3) {
       handleNext()
       return
@@ -438,6 +559,10 @@ export default function TruckListingForm() {
     } finally {
       setSaving(false)
     }
+  }
+
+  if (!draftReady) {
+    return <p className="flex items-center gap-2 py-8 text-sm text-[#5f5f5c]" role="status"><Loader2 size={17} className="animate-spin" aria-hidden="true" /> Recuperando seu anúncio…</p>
   }
 
   return (
@@ -641,6 +766,7 @@ export default function TruckListingForm() {
                 </p>
                 <Link
                   href="/entrar?redirect=/caminhoes/anunciar"
+                  onClick={goToLogin}
                   className="inline-flex items-center gap-2 rounded-xl bg-[#1A1A1A] text-white text-sm font-semibold px-5 py-2.5 hover:bg-[#2D2D2D]"
                 >
                   Entrar na minha conta
@@ -744,7 +870,7 @@ export default function TruckListingForm() {
 
           <p className="text-[13px] text-[#767676]">
             Já tem conta?{' '}
-            <Link href="/entrar?redirect=/caminhoes/anunciar" className="font-semibold text-[#111] underline underline-offset-2">
+            <Link href="/entrar?redirect=/caminhoes/anunciar" onClick={goToLogin} className="font-semibold text-[#111] underline underline-offset-2">
               Entrar
             </Link>
           </p>

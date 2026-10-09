@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
-import type { ListingsPageInput, TruckListingFilters } from '@/lib/marketplace-server'
+import type { ListingsPageInput, PublicSitemapListing, TruckListingFilters } from '@/lib/marketplace-server'
 import { MAJOR_CITIES } from '@/lib/marketplace-seo'
+import { cityPatternVariants } from '@/lib/city-filter'
+import { expandTruckBodyTypeValues, expandTruckTypeValues } from '@/lib/truck-filters'
+import { filterSearchTokens } from '@/lib/vehicle-filter-normalization'
 
 export const TRUCK_BRANDS = ['Mercedes-Benz', 'Volvo', 'Scania', 'Volkswagen', 'Ford', 'Iveco']
 export const TRUCK_CATEGORIES = [
@@ -17,8 +20,8 @@ export function truckBrandSlug(brand: string) {
 }
 
 export function canonicalTruckBrand(value: string) {
-  const normalized = value.trim().toLowerCase()
-  return TRUCK_BRANDS.find((brand) => truckBrandSlug(brand) === normalized || brand.toLowerCase() === normalized) || value
+  const normalized = truckBrandSlug(value.trim())
+  return TRUCK_BRANDS.find((brand) => truckBrandSlug(brand) === normalized) || value
 }
 
 /* ────────────────────────────────────────────────────────────
@@ -40,7 +43,7 @@ export const TRUCK_CATEGORY_PRESETS: TruckSeoPreset[] = [
   {
     slug: 'cavalo-mecanico',
     title: 'Cavalos mecânicos à venda',
-    description: 'Cavalos mecânicos usados e seminovos com preço, ano, km e comparação FIPE. Anúncios reais de todo o Brasil.',
+    description: 'Cavalos mecânicos usados e seminovos com preço, ano, km e comparação FIPE quando houver referência disponível. Anúncios reais de todo o Brasil.',
     h1: 'Cavalos mecânicos à venda',
     intro: 'Compare cavalos mecânicos anunciados na Carbi por marca, ano, eixos e capacidade de carga.',
     listingQuery: { truckType: 'cavalo-mecanico', sort: 'recent' },
@@ -76,9 +79,9 @@ export const TRUCK_CATEGORY_PRESETS: TruckSeoPreset[] = [
   {
     slug: 'truck',
     title: 'Caminhões truck à venda',
-    description: 'Caminhões truck usados e seminovos na Carbi. Preço, ano, eixos e comparação com a tabela FIPE.',
+    description: 'Caminhões truck usados e seminovos na Carbi. Preço, ano, eixos e comparação com a tabela FIPE quando houver referência disponível.',
     h1: 'Caminhões truck à venda',
-    intro: 'Caminhões truck anunciados com ficha técnica completa e comparação FIPE.',
+    intro: 'Caminhões truck anunciados com ficha técnica completa e comparação FIPE quando houver referência disponível.',
     listingQuery: { truckType: 'truck', sort: 'recent' },
     faq: [
       {
@@ -129,7 +132,7 @@ export const TRUCK_PRICE_PRESETS: TruckSeoPreset[] = [
   {
     slug: 'ate-100-mil',
     title: 'Caminhões até R$ 100 mil',
-    description: 'Anúncios de caminhões até R$ 100 mil com ano, km e comparação FIPE. Oportunidades reais.',
+    description: 'Anúncios de caminhões até R$ 100 mil com ano, km e comparação FIPE quando houver referência disponível. Oportunidades reais.',
     h1: 'Caminhões até R$ 100 mil',
     intro: 'Caminhões anunciados com teto de R$ 100 mil, ordenados do menor para o maior preço.',
     listingQuery: { priceMax: 100000, sort: 'price_asc' },
@@ -137,7 +140,7 @@ export const TRUCK_PRICE_PRESETS: TruckSeoPreset[] = [
   {
     slug: 'ate-150-mil',
     title: 'Caminhões até R$ 150 mil',
-    description: 'Caminhões até R$ 150 mil anunciados na Carbi, com dados reais e comparação FIPE.',
+    description: 'Caminhões até R$ 150 mil anunciados na Carbi, com dados reais e comparação FIPE quando houver referência disponível.',
     h1: 'Caminhões até R$ 150 mil',
     intro: 'Seleção de caminhões até R$ 150 mil para comparar oportunidade e estado de conservação.',
     listingQuery: { priceMax: 150000, sort: 'price_asc' },
@@ -147,7 +150,7 @@ export const TRUCK_PRICE_PRESETS: TruckSeoPreset[] = [
     title: 'Caminhões até R$ 200 mil',
     description: 'Caminhões usados e seminovos até R$ 200 mil. Veja preços, ano, km e a ficha técnica completa.',
     h1: 'Caminhões até R$ 200 mil',
-    intro: 'Anúncios ativos de caminhões até R$ 200 mil, com ficha técnica e comparação FIPE.',
+    intro: 'Anúncios ativos de caminhões até R$ 200 mil, com ficha técnica e comparação FIPE quando houver referência disponível.',
     listingQuery: { priceMax: 200000, sort: 'price_asc' },
   },
   {
@@ -161,7 +164,7 @@ export const TRUCK_PRICE_PRESETS: TruckSeoPreset[] = [
   {
     slug: 'ate-500-mil',
     title: 'Caminhões até R$ 500 mil',
-    description: 'Caminhões seminovos e novos até R$ 500 mil anunciados na Carbi com comparação FIPE.',
+    description: 'Caminhões seminovos e novos até R$ 500 mil anunciados na Carbi com comparação FIPE quando houver referência disponível.',
     h1: 'Caminhões até R$ 500 mil',
     intro: 'Caminhões de maior valor agregado anunciados na plataforma, com ficha completa.',
     listingQuery: { priceMax: 500000, sort: 'price_asc' },
@@ -185,7 +188,7 @@ export const TRUCK_PRICE_PRESETS: TruckSeoPreset[] = [
   {
     slug: 'ate-120-mil',
     title: 'Caminhões até R$ 120 mil',
-    description: 'Caminhões até R$ 120 mil anunciados na Carbi, com ano, quilometragem e comparação FIPE.',
+    description: 'Caminhões até R$ 120 mil anunciados na Carbi, com ano, quilometragem e comparação FIPE quando houver referência disponível.',
     h1: 'Caminhões até R$ 120 mil',
     intro: 'Seleção de caminhões até R$ 120 mil para comparar capacidade e estado de conservação.',
     listingQuery: { priceMax: 120000, sort: 'price_asc' },
@@ -193,7 +196,7 @@ export const TRUCK_PRICE_PRESETS: TruckSeoPreset[] = [
   {
     slug: 'de-150-a-300-mil',
     title: 'Caminhões de R$ 150 mil a R$ 300 mil',
-    description: 'Caminhões entre R$ 150 mil e R$ 300 mil anunciados na Carbi, com ficha técnica e FIPE.',
+    description: 'Caminhões entre R$ 150 mil e R$ 300 mil anunciados na Carbi, com ficha técnica e referência FIPE quando disponível.',
     h1: 'Caminhões de R$ 150 mil a R$ 300 mil',
     intro: 'A faixa de preço mais disputada do mercado de caminhões usados, do menor para o maior valor.',
     listingQuery: { priceMin: 150000, priceMax: 300000, sort: 'price_asc' },
@@ -212,7 +215,7 @@ export const TRUCK_COMBINED_PRESETS: TruckSeoPreset[] = [
   {
     slug: 'cavalo-mecanico-ate-300-mil',
     title: 'Cavalos mecânicos até R$ 300 mil',
-    description: 'Cavalos mecânicos até R$ 300 mil anunciados na Carbi. Compare preço, ano, eixos e FIPE.',
+    description: 'Cavalos mecânicos até R$ 300 mil anunciados na Carbi. Compare preço, ano, eixos e FIPE quando houver referência disponível.',
     h1: 'Cavalos mecânicos até R$ 300 mil',
     intro: 'Cavalos mecânicos nessa faixa de preço com ficha técnica completa.',
     listingQuery: { truckType: 'cavalo-mecanico', priceMax: 300000, sort: 'price_asc' },
@@ -220,7 +223,7 @@ export const TRUCK_COMBINED_PRESETS: TruckSeoPreset[] = [
   {
     slug: 'cavalo-mecanico-ate-500-mil',
     title: 'Cavalos mecânicos até R$ 500 mil',
-    description: 'Cavalos mecânicos seminovos até R$ 500 mil com comparação FIPE e dados reais.',
+    description: 'Cavalos mecânicos seminovos até R$ 500 mil com dados reais e comparação FIPE quando houver referência disponível.',
     h1: 'Cavalos mecânicos até R$ 500 mil',
     intro: 'Cavalos mecânicos mais recentes e completos anunciados na plataforma.',
     listingQuery: { truckType: 'cavalo-mecanico', priceMax: 500000, sort: 'price_asc' },
@@ -395,7 +398,7 @@ export const TRUCK_TOPIC_PRESETS: TruckSeoPreset[] = [
   {
     slug: 'seminovos',
     title: 'Caminhões seminovos à venda',
-    description: 'Caminhões seminovos anunciados na Carbi, com preço, ano, quilometragem e comparação FIPE.',
+    description: 'Caminhões seminovos anunciados na Carbi, com preço, ano, quilometragem e comparação FIPE quando houver referência disponível.',
     h1: 'Caminhões seminovos à venda',
     intro: 'Seminovos com ficha técnica completa, para comparar preço e quilometragem antes de fechar negócio.',
     listingQuery: { sort: 'recent' },
@@ -448,14 +451,14 @@ export function resolveTruckPreset(slug: string): TruckSeoPreset | null {
     return {
       slug: normalized,
       title: `Caminhões ${label} à venda`,
-      description: `Caminhões ${label} usados e seminovos anunciados na Carbi, com preço, ano, km e comparação FIPE.`,
+      description: `Caminhões ${label} usados e seminovos anunciados na Carbi, com preço, ano, km e comparação FIPE quando houver referência disponível.`,
       h1: `Caminhões ${label} à venda`,
       intro: `Anúncios de caminhões ${label} para comparar preço, ano e categoria.`,
       listingQuery: { brand: `%${label}%`, sort: 'recent' },
       faq: [
         {
           q: `Caminhões ${label} usados: o que observar?`,
-          a: `Compare preço, ano e quilometragem entre os anúncios ativos de ${label} e use a comparação com a tabela FIPE para avaliar se o valor pedido está coerente com o mercado.`,
+          a: `Compare preço, ano e quilometragem entre os anúncios ativos de ${label} e, quando houver referência FIPE disponível, use a comparação para avaliar se o valor pedido está coerente com o mercado.`,
         },
         {
           q: `Quais categorias de ${label} aparecem na Carbi?`,
@@ -528,15 +531,46 @@ export function getAllTruckSeoParams(): Array<{ slug: string }> {
 
 const TRUCK_OG_IMAGE = { url: '/images/caminhao-hero.jpg', width: 736, height: 417, alt: 'Caminhão em rodovia' }
 
-export function truckPresetMetadata(preset: TruckSeoPreset, hasParameters = false): Metadata {
+function matchesIlike(value: string | null | undefined, pattern: string): boolean {
+  if (value == null) return false
+  const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`^${escaped.replace(/%/g, '.*').replace(/_/g, '.')}$`, 'i').test(value)
+}
+
+/** Mirrors the filters used by the preset landing pages without per-preset queries. */
+export function hasTruckPresetInventory(preset: TruckSeoPreset, inventory: PublicSitemapListing[]): boolean {
+  const input = preset.listingQuery
+  const truckTypes = input.truckType ? expandTruckTypeValues(input.truckType) : []
+  const truckBodies = input.truckBodyType ? expandTruckBodyTypeValues(input.truckBodyType) : []
+  const cities = input.city ? (Array.isArray(input.city) ? input.city : [input.city]).flatMap(cityPatternVariants) : []
+  const fuels = input.fuel ? (Array.isArray(input.fuel) ? input.fuel : [input.fuel]).flatMap((fuel) => filterSearchTokens(fuel, 'fuel')) : []
+
+  return inventory.some((listing) => {
+    if (!listing.slug) return false
+    if (input.brand && (Array.isArray(input.brand)
+      ? !input.brand.includes(listing.brand || '')
+      : !matchesIlike(listing.brand, input.brand))) return false
+    if (cities.length > 0 && !cities.some((pattern) => matchesIlike(listing.city, pattern))) return false
+    if (fuels.length > 0 && !fuels.some((fuel) => matchesIlike(listing.fuel, `%${fuel}%`))) return false
+    if (truckTypes.length > 0 && !truckTypes.includes(listing.truck_type || '')) return false
+    if (truckBodies.length > 0 && !truckBodies.includes(listing.truck_body_type || '')) return false
+    if (input.priceMin != null && (listing.price == null || listing.price < input.priceMin)) return false
+    if (input.priceMax != null && (listing.price == null || listing.price > input.priceMax)) return false
+    if (input.yearMin != null && (listing.year_model == null || listing.year_model < input.yearMin)) return false
+    if (input.yearMax != null && (listing.year_model == null || listing.year_model > input.yearMax)) return false
+    return true
+  })
+}
+
+export function truckPresetMetadata(preset: TruckSeoPreset, hasParameters = false, hasInventory = true): Metadata {
   const canonicalUrl = `${SITE_URL}/caminhoes/${preset.slug}`
   return {
     title: preset.title,
     description: preset.description,
     keywords: ['caminhões à venda', 'caminhão usado', preset.h1.toLowerCase()],
     alternates: { canonical: canonicalUrl },
-    // Filtros aplicados na URL não devem competir com a página limpa no índice
-    robots: hasParameters ? { index: false, follow: true } : { index: true, follow: true },
+    // Only populated, clean preset URLs should be indexed.
+    robots: { index: !hasParameters && hasInventory, follow: true },
     openGraph: {
       title: preset.title,
       description: preset.description,
@@ -637,7 +671,7 @@ export function truckFaqJsonLd(faqs: TruckFaq[]) {
 export const TRUCK_FAQ: TruckFaq[] = [
   {
     q: 'Como comparar o preço de um caminhão usado?',
-    a: 'Cada anúncio na Carbi mostra o preço pedido, o ano, a quilometragem e a comparação com a tabela FIPE. Use esses dados para avaliar se o valor está justo antes de negociar.',
+    a: 'Compare o preço pedido, o ano e a quilometragem dos anúncios. Quando houver referência FIPE disponível, a Carbi também mostra a comparação com a tabela para ajudar na avaliação antes de negociar.',
   },
   {
     q: 'O que significam truck, bitruck, cavalo mecânico e toco?',

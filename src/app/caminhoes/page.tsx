@@ -25,12 +25,12 @@ const hasHeroPhoto = existsSync(path.join(process.cwd(), 'public', 'images', 'ca
 export const metadata: Metadata = {
   title: 'Caminhões à venda: truck, bitruck, cavalo mecânico e toco',
   description:
-    'Caminhões usados e seminovos com ficha técnica completa: eixos, PBT, capacidade de carga e comparação com a tabela FIPE. Anuncie grátis na Carbi.',
+    'Caminhões usados e seminovos com ficha técnica completa: eixos, PBT, capacidade de carga e comparação com a tabela FIPE quando houver referência disponível. Anuncie grátis na Carbi.',
   keywords: ['caminhões à venda', 'caminhão usado', 'cavalo mecânico', 'bitruck', 'truck', 'toco', 'comprar caminhão'],
   alternates: { canonical: '/caminhoes' },
   openGraph: {
     title: 'Caminhões à venda: truck, bitruck, cavalo mecânico e toco | Carbi',
-    description: 'Caminhões usados e seminovos com ficha técnica completa e comparação FIPE.',
+    description: 'Caminhões usados e seminovos com ficha técnica completa e comparação FIPE quando houver referência disponível.',
     url: '/caminhoes',
     type: 'website',
   },
@@ -51,8 +51,8 @@ const ADVANTAGES = [
   },
   {
     icon: TrendingUp,
-    title: 'Preço comparado com a FIPE',
-    text: 'Veja se o valor pedido está justo antes de fechar negócio.',
+    title: 'Referência FIPE quando disponível',
+    text: 'Quando houver referência FIPE disponível, compare o preço pedido com a tabela antes de negociar.',
   },
   {
     icon: MessageCircle,
@@ -71,7 +71,7 @@ export default async function TruckHomePage() {
 
   const browseJsonLd = truckBrowseJsonLd({
     name: 'Caminhões à venda',
-    description: 'Caminhões usados e seminovos com ficha técnica completa e comparação FIPE.',
+    description: 'Caminhões usados e seminovos com ficha técnica completa e comparação FIPE quando houver referência disponível.',
     url: `${SITE_URL}/caminhoes`,
     items: [
       ...TRUCK_CATEGORIES.map((category) => ({ name: category.name, url: `${SITE_URL}/caminhoes/${category.slug}` })),
@@ -104,7 +104,7 @@ export default async function TruckHomePage() {
 
               <div className="tk-hero-row">
                 <p className="tk-hero-sub">
-                  Compare ano, quilometragem, eixos e capacidade de carga. Ficha técnica completa e comparação com a tabela FIPE em cada anúncio.
+                  Compare ano, quilometragem, eixos e capacidade de carga. Ficha técnica completa e comparação com a tabela FIPE quando houver referência disponível.
                 </p>
                 <Link href="/caminhoes/buscar" className="tk-pill">
                   <span className="tk-pill-circle" aria-hidden="true"><ArrowRight size={18} /></span>

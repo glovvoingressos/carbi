@@ -24,6 +24,14 @@ export default function Navbar() {
   const [isAuth, setIsAuth] = useState(false)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const pathname = usePathname()
+  const isTruckRoute = pathname.startsWith('/caminhoes') || pathname === '/vender-caminhao'
+  const navLinks = LINKS.map((link) =>
+    link.label === 'Vender' && isTruckRoute
+      ? { ...link, href: '/vender-caminhao' }
+      : link,
+  )
+  const advertiseHref = isTruckRoute ? '/caminhoes/anunciar' : '/anunciar-carro'
+  const advertiseLabel = isTruckRoute ? 'Anunciar caminhão' : 'Anunciar'
   const lastScroll = useRef(0)
   const menuToggleRef = useRef<HTMLButtonElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
@@ -149,7 +157,7 @@ export default function Navbar() {
           </Link>
 
           <div className="navbar-links">
-            {LINKS.map((l) => (
+            {navLinks.map((l) => (
               <Link key={l.href} href={l.href} className={`navbar-link ${isActive(l.href) ? 'navbar-link--active' : ''}`}>
                 {l.label}
               </Link>
@@ -166,7 +174,7 @@ export default function Navbar() {
             <Link href={isAuth ? '/minha-conta' : '/entrar'} className="navbar-login">
               {isAuth ? 'Minha conta' : 'Entrar'}
             </Link>
-            <Link href="/anunciar-carro" className="navbar-cta">Anunciar</Link>
+            <Link href={advertiseHref} className="navbar-cta">{advertiseLabel}</Link>
           </div>
 
           <div className="navbar-mobile-actions-row">
@@ -223,7 +231,7 @@ export default function Navbar() {
             transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="navbar-mobile-inner">
-              {LINKS.map((l) => (
+              {navLinks.map((l) => (
                 <Link key={l.href} href={l.href} className={`navbar-mobile-link ${isActive(l.href) ? 'navbar-mobile-link--active' : ''}`}>
                   <span>{l.label}</span>
                   <ChevronRight size={16} />
@@ -239,7 +247,7 @@ export default function Navbar() {
                 <Link href={isAuth ? '/minha-conta' : '/entrar'} className="navbar-mobile-login">
                   {isAuth ? 'Minha conta' : 'Entrar'}
                 </Link>
-                <Link href="/anunciar-carro" className="navbar-mobile-cta">Anunciar grátis</Link>
+                <Link href={advertiseHref} className="navbar-mobile-cta">{isTruckRoute ? 'Anunciar caminhão grátis' : 'Anunciar grátis'}</Link>
               </div>
             </div>
           </motion.div>

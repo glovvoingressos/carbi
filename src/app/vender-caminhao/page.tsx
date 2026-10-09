@@ -80,7 +80,7 @@ export default function VenderCaminhaoPage() {
                 <Check size={16} aria-hidden="true" /> Chat interno
               </li>
               <li>
-                <Check size={16} aria-hidden="true" /> Comparação com a FIPE
+                <Check size={16} aria-hidden="true" /> Comparação FIPE quando disponível
               </li>
             </ul>
           </section>

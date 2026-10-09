@@ -4,10 +4,11 @@ import { notFound } from 'next/navigation'
 import MarketplaceClient from '@/components/marketplace/MarketplaceClient'
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo/JSONLD'
 import { FAQSection } from '@/components/seo/SEOContentSection'
-import { fetchPublicTruckListingsPage, getFilterOptions, type ListingSort, type TruckListingFilters } from '@/lib/marketplace-server'
+import { fetchPublicTruckListingsPage, getFilterOptions, getPublicTruckSeoInventory, type ListingSort, type TruckListingFilters } from '@/lib/marketplace-server'
 import { ALLOWED_SORTS } from '@/lib/marketplace-seo'
 import {
   getAllTruckSeoParams,
+  hasTruckPresetInventory,
   resolveTruckPreset,
   serializeJsonLd,
   truckCollectionJsonLd,
@@ -39,7 +40,7 @@ export async function generateMetadata({
   if (!preset) {
     return {
       title: 'Caminhões à venda',
-      description: 'Caminhões usados e seminovos com preço, ficha técnica e comparação FIPE.',
+      description: 'Caminhões usados e seminovos com preço, ficha técnica e comparação FIPE quando houver referência disponível.',
     }
   }
 
@@ -47,7 +48,8 @@ export async function generateMetadata({
     Array.isArray(value) ? value.some(Boolean) : typeof value === 'string' && value.trim().length > 0,
   )
 
-  return truckPresetMetadata(preset, hasParameters)
+  const hasInventory = !hasParameters && hasTruckPresetInventory(preset, await getPublicTruckSeoInventory())
+  return truckPresetMetadata(preset, hasParameters, hasInventory)
 }
 
 function readValue(searchParams: Record<string, string | string[] | undefined>, key: string): string | undefined {

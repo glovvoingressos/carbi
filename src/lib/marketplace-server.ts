@@ -1,4 +1,5 @@
 import { getSupabaseServerClient, getSupabaseAdminClient, isSupabaseConfigured } from '@/lib/supabase-server'
+import { cache } from 'react'
 import { ListingPublic } from '@/lib/marketplace'
 import { getFipePrice } from '@/lib/fipe-api'
 import { normalizePlateFinal, parseFipePriceToNumber } from '@/lib/marketplace'
@@ -677,6 +678,14 @@ export type PublicSitemapListing = {
   published_at: string | null
   created_at: string
   images?: Array<{ url: string; sort_order: number }>
+  // Truck-only fields used to match SEO presets against this same snapshot.
+  brand?: string | null
+  city?: string | null
+  fuel?: string | null
+  price?: number | null
+  year_model?: number | null
+  truck_type?: string | null
+  truck_body_type?: string | null
 }
 
 /**
@@ -700,10 +709,16 @@ export async function fetchPublicSitemapListingsPage({
   const supabase = getSupabaseServerClient()
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
-  let query = supabase
-    .from('vehicle_listings')
-    .select('id, slug, updated_at, published_at, created_at', { count: 'exact' })
-    .eq('status', 'active')
+  // Keep each selection literal so Supabase can infer its selected row shape.
+  let query = vehicleType === 'truck'
+    ? supabase.from('vehicle_listings').select(
+      'id, slug, updated_at, published_at, created_at, brand, city, fuel, price, year_model, truck_type, truck_body_type',
+      { count: 'exact' },
+    ).eq('status', 'active')
+    : supabase.from('vehicle_listings').select(
+      'id, slug, updated_at, published_at, created_at',
+      { count: 'exact' },
+    ).eq('status', 'active')
 
   query = vehicleType === 'truck'
     ? query.eq('vehicle_type', 'truck')
@@ -718,7 +733,7 @@ export async function fetchPublicSitemapListingsPage({
     return { items: [], total: 0, page, pageSize }
   }
 
-  const items = data as PublicSitemapListing[]
+  const items: PublicSitemapListing[] = data
   if (!includeImages || items.length === 0) return { items, total: count || 0, page, pageSize }
 
   const listingIds = items.map((item) => item.id)
@@ -743,6 +758,18 @@ export async function fetchPublicSitemapListingsPage({
     pageSize,
   }
 }
+
+/** Share a lightweight public truck snapshot across metadata calls in one render. */
+export const getPublicTruckSeoInventory = cache(async (): Promise<PublicSitemapListing[]> => {
+  const firstPage = await fetchPublicSitemapListingsPage({ vehicleType: 'truck' })
+  const totalPages = Math.ceil(firstPage.total / firstPage.pageSize)
+  const remainingPages = await Promise.all(
+    Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) =>
+      fetchPublicSitemapListingsPage({ vehicleType: 'truck', page: index + 2 }),
+    ),
+  )
+  return [firstPage, ...remainingPages].flatMap((page) => page.items).filter((listing) => Boolean(listing.slug))
+})
 
 export type TruckListingFilters = ListingsPageInput & {
   truckType?: string | string[]

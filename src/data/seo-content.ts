@@ -65,7 +65,7 @@ export const SEO_DATA = {
     title: 'Vender caminhão: anuncie grátis e venda rápido',
     description: 'Anuncie seu caminhão grátis na Carbi. Consulte a placa, preencha a ficha técnica de caminhão (eixos, PBT, CMT e carroceria) e negocie pelo chat interno.',
     h1: 'Anuncie seu caminhão grátis e venda rápido',
-    subtitle: 'Ficha técnica completa, consulta por placa, comparação com a tabela FIPE e chat interno — sem custo para publicar.',
+    subtitle: 'Ficha técnica completa, consulta por placa e chat interno — sem custo para publicar. Comparação com a tabela FIPE quando houver referência disponível.',
     benefits: [
       { icon: 'Zap', title: 'Cadastro em poucos passos', description: 'A consulta pela placa já preenche marca, modelo, ano e versão. Você só completa o que é específico do caminhão.' },
       { icon: 'ShieldCheck', title: 'Ficha técnica de caminhão', description: 'Tipo, eixos, capacidade de carga, PBT, CMT, carroceria e cabine — os dados que o comprador procura antes de ligar.' },
@@ -74,7 +74,7 @@ export const SEO_DATA = {
     steps: [
       { title: 'Consulte a placa', description: 'Informe a placa do caminhão para recuperar marca, modelo, ano e versão e começar com a ficha preenchida.' },
       { title: 'Complete a ficha', description: 'Adicione eixos, capacidade de carga, PBT, CMT, carroceria, cabine e as fotos reais do veículo.' },
-      { title: 'Publique e negocie', description: 'Compare seu preço com a tabela FIPE, publique gratuitamente e responda compradores pelo chat.' },
+      { title: 'Publique e negocie', description: 'Publique gratuitamente e responda compradores pelo chat. Quando houver referência FIPE disponível, compare seu preço com a tabela.' },
     ],
     faqs: [
       { q: 'Anunciar caminhão na Carbi tem alguma taxa?', a: 'Não. Publicar o anúncio é gratuito: você preenche a ficha técnica, adiciona fotos e publica. A negociação acontece pelo chat da plataforma.' },

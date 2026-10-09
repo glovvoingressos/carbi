@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 import { MARKETPLACE_SEO_SLUGS, MAJOR_CITIES } from '@/lib/marketplace-seo'
-import { TRUCK_SEO_SLUGS, TRUCK_BRANDS, TRUCK_YEAR_SLUGS, truckBrandSlug } from '@/lib/truck-seo'
+import { getAllTruckSeoParams, hasTruckPresetInventory, resolveTruckPreset } from '@/lib/truck-seo'
 import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import { slugifyBrand } from '@/lib/brand-utils'
 import { getRankingSitemapPaths } from '@/lib/rankings-seo'
@@ -106,41 +106,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
-  // Páginas de aterrissagem de SEO de caminhão (mesmo modelo de /carros/[slug])
-  // Inclui marca-* e cidade-*; as categorias já entram como presets.
-  for (const slug of TRUCK_SEO_SLUGS) {
+  // Match every truck preset against the public listing snapshot already fetched.
+  for (const { slug } of getAllTruckSeoParams()) {
+    const preset = resolveTruckPreset(slug)
+    if (!preset || !hasTruckPresetInventory(preset, publicListings.trucks)) continue
+    const isBrand = slug.startsWith('marca-')
+    const isCity = slug.startsWith('cidade-')
+    const isYear = slug.startsWith('ano-')
     entries.push({
       url: `${SITE_URL}/caminhoes/${slug}`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.85,
-    })
-  }
-
-  for (const brand of TRUCK_BRANDS) {
-    entries.push({
-      url: `${SITE_URL}/caminhoes/marca-${truckBrandSlug(brand)}`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    })
-  }
-
-  for (const city of MAJOR_CITIES) {
-    entries.push({
-      url: `${SITE_URL}/caminhoes/cidade-${city.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    })
-  }
-
-  for (const slug of TRUCK_YEAR_SLUGS) {
-    entries.push({
-      url: `${SITE_URL}/caminhoes/${slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
+      changeFrequency: isYear ? 'monthly' : isCity ? 'weekly' : 'daily',
+      priority: isYear || isCity ? 0.7 : isBrand ? 0.8 : 0.85,
     })
   }
 

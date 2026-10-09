@@ -32,7 +32,7 @@ const BRAND_FAQ = [
   },
   {
     q: 'Consigo comparar caminhões de marcas diferentes?',
-    a: 'Sim. Cada anúncio mostra preço, ano, quilometragem, capacidade de carga e comparação com a tabela FIPE, o que permite comparar modelos de marcas diferentes com as mesmas referências.',
+    a: 'Sim. Compare preço, ano, quilometragem e capacidade de carga dos anúncios de diferentes marcas. Quando houver referência FIPE disponível, o anúncio também mostra a comparação com a tabela.',
   },
   {
     q: 'Anunciar caminhão de qualquer marca é grátis?',
