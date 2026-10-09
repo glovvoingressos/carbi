@@ -73,11 +73,22 @@
 .member-overview-performance, .member-overview-next-action { border-radius: 20px; padding: 18px; min-width: 0; overflow-wrap: anywhere; }
 .member-overview-performance { background: var(--overview-lavender); color: #251b3b; }
 .member-overview-performance .member-overview-panel-heading { margin-bottom: 5px; }
-.member-overview-performance-description { color: var(--overview-lavender-ink); font-size: 11px; }
+/* Precisa de (0,2,0). O reset .mw-workspace p { color:inherit } de
+   member-workspace.css:4 tem (0,1,1) e vencia esta regra em (0,1,0): a
+   descrição saía na cor cheia do cartão, idêntica ao título, enquanto o
+   font-size:11px sobrevivia porque aquela regra não declara font-size.
+   Os irmãos escaparam por outros motivos — dt e o selo não são <p>, e o <p>
+   do preço é (0,1,1), empata com o reset e vem depois (member-overview.css é
+   carregado após member-workspace.css). Este é o único da coluna que perdia. */
+.member-overview .member-overview-performance-description { color: var(--overview-lavender-ink); font-size: 11px; }
 .member-overview-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px !important; }
 .member-overview-metrics > div { display: grid; gap: 3px; }
 .member-overview-metrics dt { font-size: 11px; color: var(--overview-lavender-ink); }
-.member-overview-metrics dd { font-size: 24px; font-weight: 500; letter-spacing: -.025em; line-height: 1.2; overflow-wrap: anywhere; }
+/* 700: DESIGN.md traz Title (700, 24px) para exatamente este tamanho e manda
+   em "número grande e bold". Estava 500 aqui e 600 no .mw-metric strong da
+   carteira — o mesmo KPI de 24px, na mesma tela, em dois pesos. A referência
+   é Poppins Light/Medium/Bold; 700 é o Bold dela. */
+.member-overview-metrics dd { font-size: 24px; font-weight: 700; letter-spacing: -.025em; line-height: 1.2; overflow-wrap: anywhere; }
 .member-overview-selected-vehicle { margin-top: 14px; padding-top: 14px; border-top: 1px solid #a796d9; }
 .member-overview-selected-vehicle > p { font-size: 11px; color: var(--overview-lavender-ink); }
 .member-overview-selected-title { display: flex; gap: 9px; align-items: center; margin-bottom: 10px; }
@@ -89,7 +100,10 @@
 .member-overview-next-action { background: var(--overview-lime); color: #243410; }
 .member-overview-next-action h3 { font-size: 17px; font-weight: 500; letter-spacing: -.02em; margin-bottom: 8px; }
 .member-overview-next-action p { color: #425427; font-size: 12px; }
-.member-overview-publish { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 42px; background: #1a1a1a; color: #fff; border-radius: 12px; padding: 7px 12px; margin-top: 18px; font-size: 12px; font-weight: 500; }
+/* 44, o mesmo piso do .member-overview-footer-link: era 42, ou seja, o CTA
+   principal de toda a coluna direita era menor que o link secundário do painel
+   branco ao lado. */
+.member-overview-publish { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; background: #1a1a1a; color: #fff; border-radius: 12px; padding: 7px 12px; margin-top: 18px; font-size: 12px; font-weight: 500; }
 .member-overview-publish span { display: flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 50%; background: var(--overview-lime); color: #243410; }
 .member-overview-publish:hover { background: #353535; }
 .member-overview-loading { display: grid; gap: 16px; padding: 10px 0; }
@@ -130,10 +144,14 @@
 }
 
 /* O código da conta já levava alvos a 44px em pointer:coarse
-   (.mw-portfolio-title a, .mw-dialog-close) — os controles do painel ficaram para trás. */
+   (.mw-portfolio-title a, .mw-dialog-close) — os controles do painel ficaram
+   para trás. O seletor com > é obrigatório: a regra da linha de cima,
+   .member-overview-performance > .member-overview-text-link, tem (0,2,0) e
+   vencia a (0,1,0) abaixo em qualquer ordem, deixando o alvo em 32px no toque. */
 @media (pointer: coarse) {
   .member-overview-icon-link { width: 44px; height: 44px; }
-  .member-overview-text-link { min-height: 44px; }
+  .member-overview-text-link,
+  .member-overview-performance > .member-overview-text-link { min-height: 44px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
