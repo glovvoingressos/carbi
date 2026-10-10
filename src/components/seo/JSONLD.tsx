@@ -89,6 +89,10 @@ export function OrganizationSchema() {
 export function VehicleSchema({ vehicle }: { vehicle: any }) {
   // Handle both ListingPublic (with price) and CarSpec (catalog)
   const isListing = 'price' in vehicle;
+  const isTruck = vehicle.vehicle_type === 'truck'
+  const listingUrl = isTruck
+    ? `/caminhoes/anuncio/${vehicle.slug}`
+    : `/anuncios/${vehicle.slug}`
   const vehicleName = [vehicle.brand, vehicle.model, vehicle.version, vehicle.year_model || vehicle.year]
     .filter(Boolean)
     .join(' ')
@@ -98,7 +102,7 @@ export function VehicleSchema({ vehicle }: { vehicle: any }) {
 
   const schema: any = {
     '@context': 'https://schema.org',
-    '@type': 'Car',
+    '@type': isTruck ? 'Vehicle' : 'Car',
     'name': vehicleName,
     'description': vehicle.description || `Ficha técnica completa do ${vehicle.brand} ${vehicle.model} ${vehicle.year_model || ''}.`,
       'brand': {
@@ -114,8 +118,17 @@ export function VehicleSchema({ vehicle }: { vehicle: any }) {
   if (imageUrls.length > 0) schema.image = imageUrls
   if (vehicle.version) schema.vehicleConfiguration = vehicle.version
   if (isListing) {
-    schema.url = absoluteUrl(`/anuncios/${vehicle.slug}`)
+    schema.url = absoluteUrl(listingUrl)
     schema.itemCondition = 'https://schema.org/UsedCondition'
+  }
+
+  if (isTruck && vehicle.axles != null) schema.numberOfAxles = vehicle.axles
+  if (isTruck && vehicle.load_capacity != null) {
+    schema.payload = {
+      '@type': 'QuantitativeValue',
+      value: vehicle.load_capacity,
+      unitCode: 'KGM',
+    }
   }
 
   if (vehicle.mileage !== undefined) {
@@ -132,7 +145,7 @@ export function VehicleSchema({ vehicle }: { vehicle: any }) {
       'price': vehicle.price,
       'priceCurrency': 'BRL',
       'availability': vehicle.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut',
-      'url': absoluteUrl(`/anuncios/${vehicle.slug}`)
+      'url': absoluteUrl(listingUrl)
     }
   }
 

@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'Minha busca',
   description: 'Acompanhe sua busca no Carbi e as oportunidades compatíveis que encontramos para você.',
+  robots: { index: false, follow: false },
 }
 
 const levelClass: Record<MatchLevel, string> = {

@@ -1,4 +1,6 @@
-import { ListingsPageInput, ListingSort } from '@/lib/marketplace-server'
+import type { ListingsPageInput, ListingSort, PublicSitemapListing } from '@/lib/marketplace-server'
+import { cityPatternVariants } from '@/lib/city-filter'
+import { filterSearchTokens } from '@/lib/vehicle-filter-normalization'
 
 export type MarketplaceSeoPreset = {
   slug: string
@@ -537,3 +539,103 @@ export const QUICK_LINKS: Array<{ href: string; label: string }> = [
 ]
 
 export const ALLOWED_SORTS: ListingSort[] = ['recent', 'price_asc', 'price_desc', 'mileage_asc', 'year_desc']
+
+function foldInventoryValue(value: string | null | undefined): string {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+}
+
+function matchesIlike(value: string | null | undefined, pattern: string): boolean {
+  if (value == null) return false
+  const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`^${escaped.replace(/%/g, '.*').replace(/_/g, '.')}$`, 'i').test(value)
+}
+
+function inputValues(value: string | string[] | undefined): string[] {
+  return value == null ? [] : Array.isArray(value) ? value : [value]
+}
+
+/**
+ * Checks whether one row from the public listing snapshot would satisfy the
+ * filters of a car SEO landing page. The same predicate gates canonical
+ * landing pages and their sitemap URLs, without issuing one query per slug.
+ */
+export function matchesMarketplaceSeoQuery(
+  listing: PublicSitemapListing,
+  input: ListingsPageInput,
+): boolean {
+  if (!listing.slug) return false
+
+  const vehicleTypes = inputValues(input.vehicle_type)
+  if (vehicleTypes.length > 0 && listing.vehicle_type
+    && !vehicleTypes.includes(listing.vehicle_type)) return false
+  if (vehicleTypes.length > 0 && !listing.vehicle_type && !vehicleTypes.includes('car')) return false
+
+  const brands = inputValues(input.brand)
+  if (brands.length > 0) {
+    if (Array.isArray(input.brand)) {
+      if (!brands.some((brand) => foldInventoryValue(brand) === foldInventoryValue(listing.brand))) return false
+    } else if (!matchesIlike(listing.brand, input.brand!)) {
+      return false
+    }
+  }
+
+  const models = inputValues(input.model)
+  if (models.length > 0) {
+    if (Array.isArray(input.model)) {
+      if (!models.some((model) => foldInventoryValue(model) === foldInventoryValue(listing.model))) return false
+    } else if (!foldInventoryValue(listing.model).includes(foldInventoryValue(models[0]))) {
+      return false
+    }
+  }
+
+  const cities = inputValues(input.city).flatMap(cityPatternVariants)
+  if (cities.length > 0 && !cities.some((pattern) => matchesIlike(listing.city, pattern))) return false
+  if (input.state && foldInventoryValue(input.state) !== foldInventoryValue(listing.state)) return false
+
+  const canonicalFilters = [
+    { value: input.bodyType, field: listing.body_type, kind: 'bodyType' as const },
+    { value: input.transmission, field: listing.transmission, kind: 'transmission' as const },
+    { value: input.fuel, field: listing.fuel, kind: 'fuel' as const },
+    { value: input.color, field: listing.color, kind: 'color' as const },
+  ]
+  for (const filter of canonicalFilters) {
+    const values = inputValues(filter.value)
+    if (values.length === 0) continue
+    const tokens = values.flatMap((value) => {
+      const normalized = filterSearchTokens(value, filter.kind)
+      const stems = normalized
+        .filter((token) => filter.kind === 'bodyType' || filter.kind === 'color')
+        .filter((token) => /[oa]$/.test(token))
+        .map((token) => token.slice(0, -1))
+      return [...normalized, ...stems]
+    })
+    const normalizedField = foldInventoryValue(filter.field)
+    if (!tokens.some((token) => normalizedField.includes(foldInventoryValue(token)))) return false
+  }
+
+  const ranges: Array<[number | undefined, number | undefined, number | null | undefined]> = [
+    [input.priceMin, input.priceMax, listing.price],
+    [input.yearMin, input.yearMax, listing.year_model],
+    [input.mileageMin, input.mileageMax, listing.mileage],
+  ]
+  for (const [min, max, value] of ranges) {
+    if (min == null && max == null) continue
+    if (value == null || (min != null && value < min) || (max != null && value > max)) return false
+  }
+
+  if (input.optionalItems?.length && !input.optionalItems.every((item) => listing.optional_items?.includes(item))) {
+    return false
+  }
+
+  if (input.q) {
+    const terms = input.q.split(/[^\p{L}\p{N}]+/u).map(foldInventoryValue).filter((term) => term.length >= 2).slice(0, 6)
+    const searchable = [listing.brand, listing.model, listing.title, listing.version, listing.city, listing.state, listing.fuel, listing.transmission, listing.body_type]
+      .map(foldInventoryValue)
+    if (!terms.every((term) => searchable.some((field) => field.includes(term)))) return false
+  }
+
+  return true
+}

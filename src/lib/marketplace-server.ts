@@ -678,12 +678,26 @@ export type PublicSitemapListing = {
   published_at: string | null
   created_at: string
   images?: Array<{ url: string; sort_order: number }>
-  // Truck-only fields used to match SEO presets against this same snapshot.
+  vehicle_type?: 'car' | 'truck' | null
+  // Listing fields used to match SEO landing pages against this snapshot.
   brand?: string | null
+  model?: string | null
+  title?: string | null
+  version?: string | null
   city?: string | null
+  state?: string | null
   fuel?: string | null
+  transmission?: string | null
+  color?: string | null
+  body_type?: string | null
   price?: number | null
   year_model?: number | null
+  mileage?: number | null
+  optional_items?: string[] | null
+  engine?: string | null
+  horsepower?: number | null
+  doors?: number | null
+  // Truck-specific fields used to match truck SEO presets.
   truck_type?: string | null
   truck_body_type?: string | null
 }
@@ -712,11 +726,11 @@ export async function fetchPublicSitemapListingsPage({
   // Keep each selection literal so Supabase can infer its selected row shape.
   let query = vehicleType === 'truck'
     ? supabase.from('vehicle_listings').select(
-      'id, slug, updated_at, published_at, created_at, brand, city, fuel, price, year_model, truck_type, truck_body_type',
+      'id, slug, updated_at, published_at, created_at, vehicle_type, brand, city, state, fuel, price, year_model, truck_type, truck_body_type',
       { count: 'exact' },
     ).eq('status', 'active')
     : supabase.from('vehicle_listings').select(
-      'id, slug, updated_at, published_at, created_at',
+      'id, slug, updated_at, published_at, created_at, vehicle_type, brand, model, title, version, city, state, fuel, transmission, color, body_type, price, year_model, mileage, optional_items, engine, horsepower, doors',
       { count: 'exact' },
     ).eq('status', 'active')
 

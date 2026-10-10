@@ -59,13 +59,20 @@ export default function HomeHero({ listingCount, cityCount, brandCount }: HomeHe
 
         <div className="hh-right">
           <div className="hh-photo">
-            <Image
-              src="/images/porsche-gt3-studio.jpg"
-              alt="Porsche 911 GT3 preto em estúdio branco, imagem ilustrativa"
-              fill
-              priority
-              sizes="(max-width: 900px) 100vw, 46vw"
-            />
+            <picture>
+              <source
+                media="(max-width: 640px)"
+                srcSet="/images/home-hero-mobile.webp"
+                type="image/webp"
+              />
+              <Image
+                src="/images/home-hero-desktop.webp"
+                alt="SUV preto atravessa uma estrada de terra em uma paisagem desértica, imagem ilustrativa"
+                fill
+                priority
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 48vw, 46vw"
+              />
+            </picture>
             <Link href="/anunciar-carro" className="hh-badge">
               Anuncie<br />grátis
             </Link>

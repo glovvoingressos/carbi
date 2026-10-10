@@ -5,9 +5,17 @@ import { ArrowRight, Check, TrendingUp, Target, BarChart3, Users, Zap, Shield, C
 export const metadata: Metadata = {
   title: 'Tráfego Pago Grátis',
   description: 'Anuncie seu carro na Carbi e receba tráfego pago grátis no Google e Meta Ads. Seus anúncios chegam a milhares de compradores sem custo.',
+  alternates: { canonical: '/trafego-pago-gratis' },
   openGraph: {
     title: 'Tráfego Pago Grátis | Carbi',
     description: 'Anuncie seu carro na Carbi e receba tráfego pago grátis no Google e Meta Ads.',
+    url: '/trafego-pago-gratis',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Tráfego Pago Grátis | Carbi',
+    description: 'Anuncie seu carro na Carbi e divulgue seu anúncio para compradores.',
   },
 }
 

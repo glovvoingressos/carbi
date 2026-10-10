@@ -1,97 +1,23 @@
-import React from 'react'
+import { cache } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Sparkles, ArrowRight } from 'lucide-react'
 import ListingCard from '@/components/marketplace/ListingCard'
 import { BreadcrumbSchema } from '@/components/seo/JSONLD'
-import { fetchPublicListingsPage, ListingSort } from '@/lib/marketplace-server'
+import { fetchPublicListingsPage } from '@/lib/marketplace-server'
 import type { ListingPublic } from '@/lib/marketplace'
-
-type IntentData = {
-  title: string
-  desc: string
-  h1: string
-  filter: (listing: ListingPublic) => boolean
-  query?: {
-    sort?: ListingSort
-    priceMin?: number
-    priceMax?: number
-    bodyType?: string | string[]
-    fuel?: string | string[]
-  }
-}
-
-const INTENTS: Record<string, IntentData> = {
-  'ate-50-mil': {
-    title: 'Melhores Carros até 50 mil | Opções Baratas e Seguras',
-    desc: 'Buscando um carro até 50 mil reais? Confira anúncios reais com preços atualizados, fotos e comparação FIPE.',
-    h1: 'Melhores Carros até 50 mil reais',
-    query: { priceMax: 50000, sort: 'price_asc' },
-    filter: (listing) => listing.price <= 50000,
-  },
-  'ate-100-mil': {
-    title: 'Melhores Carros até 100 mil | Custo Benefício',
-    desc: 'Encontre carros até 100 mil reais na Carbi. Compare SUVs, sedans e hatches com valor atualizado de mercado.',
-    h1: 'Melhores Carros até 100 mil reais',
-    query: { priceMax: 100000, priceMin: 50000, sort: 'price_asc' },
-    filter: (listing) => listing.price <= 100000 && listing.price > 50000,
-  },
-  'economicos': {
-    title: 'Carros Mais Econômicos | Baixo Consumo de Combustível',
-    desc: 'Descubra anúncios reais com foco em baixo consumo, manutenção acessível e melhor custo por uso.',
-    h1: 'Carros Mais Econômicos do Brasil',
-    query: { sort: 'mileage_asc' },
-    filter: (listing) => {
-      const fuel = `${listing.fuel} ${listing.engine || ''}`.toLowerCase()
-      return listing.mileage <= 70000 || /flex|gasoline|hybrid|electric/.test(fuel)
-    },
-  },
-  'para-familia': {
-    title: 'Melhores Carros para Família | Espaço e Porta Malas Grande',
-    desc: 'Para viajar com conforto e levar tudo. Veja anúncios reais com bom espaço interno e carrocerias familiares.',
-    h1: 'Melhores Carros para Família',
-    query: { bodyType: ['suv', 'sedan', 'pickup'], sort: 'recent' },
-    filter: (listing) => /suv|sedan|pickup|van/.test((listing.body_type || '').toLowerCase()) || (listing.doors || 0) >= 4,
-  },
-  '7-lugares': {
-    title: 'Carros de 7 Lugares | Melhores Opções para Grupos Grandes',
-    desc: 'Precisa de mais espaço? Confira uma seleção de anúncios reais mais adequados para famílias grandes e viagens.',
-    h1: 'Melhores Carros de 7 Lugares',
-    query: { bodyType: ['suv', 'pickup'], sort: 'recent' },
-    filter: (listing) => /suv|pickup|van/.test((listing.body_type || '').toLowerCase()) || (listing.doors || 0) >= 4,
-  },
-  'hibridos': {
-    title: 'Carros Híbridos e Sustentáveis | Tecnologia e Economia',
-    desc: 'O futuro chegou. Conheça os anúncios reais de híbridos no Brasil, unindo desempenho e economia.',
-    h1: 'Melhores Carros Híbridos',
-    query: { fuel: 'hybrid', sort: 'recent' },
-    filter: (listing) => /hybrid|híbrido/.test(`${listing.fuel} ${listing.engine}`.toLowerCase()),
-  },
-  'off-road': {
-    title: 'Melhores Carros Off-Road | Tração 4x4 e Aventura',
-    desc: 'Para quem não tem medo de estrada ruim. Veja anúncios reais com foco em robustez e aventura.',
-    h1: 'Carros Selecionados para Off-Road',
-    query: { bodyType: ['pickup', 'suv'], sort: 'recent' },
-    filter: (listing) => /pickup|suv|awd|4x4|4wd/.test(`${listing.body_type} ${listing.engine} ${listing.optional_items.join(' ')}`.toLowerCase()),
-  },
-  'esportivos': {
-    title: 'Carros Esportivos de Alta Performance | Velocidade e Design',
-    desc: 'Paixão por dirigir. Confira anúncios reais com foco em desempenho, potência e desenho agressivo.',
-    h1: 'Carros Esportivos e de Performance',
-    query: { sort: 'recent' },
-    filter: (listing) => (listing.horsepower || 0) >= 200 || /turbo|sport|tsi|tfs/i.test(`${listing.engine} ${listing.optional_items.join(' ')}`),
-  },
-}
+import { CATEGORY_INTENT_SLUGS, resolveCategoryIntent, type IntentData } from '@/lib/category-intents'
 
 export async function generateStaticParams() {
-  return Object.keys(INTENTS).map((intent) => ({ intent }))
+  return CATEGORY_INTENT_SLUGS.map((intent) => ({ intent }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ intent: string }> }): Promise<Metadata> {
   const resolved = await params
-  const data = INTENTS[resolved.intent]
+  const data = resolveCategoryIntent(resolved.intent)
   if (!data) return { title: 'Não Encontrado' }
+  const hasInventory = (await getCategoryListings(resolved.intent)).length > 0
 
   return {
     title: `${data.title}`,
@@ -106,18 +32,19 @@ export async function generateMetadata({ params }: { params: Promise<{ intent: s
       url: `/categorias/${resolved.intent}`,
       type: 'website',
     },
+    robots: { index: hasInventory, follow: true },
   }
 }
 
 export default async function IntentHubPage({ params }: { params: Promise<{ intent: string }> }) {
   const resolved = await params
-  const data = INTENTS[resolved.intent]
+  const data = resolveCategoryIntent(resolved.intent)
 
   if (!data) {
     notFound()
   }
 
-  const filteredListings = await fetchCategoryListings(data)
+  const filteredListings = await getCategoryListings(resolved.intent)
 
   return (
     <main className="fingen-shell">
@@ -205,6 +132,11 @@ async function fetchCategoryListings(data: IntentData): Promise<ListingPublic[]>
     .filter(data.filter)
     .slice(0, 16)
 }
+
+const getCategoryListings = cache(async (slug: string): Promise<ListingPublic[]> => {
+  const data = resolveCategoryIntent(slug)
+  return data ? fetchCategoryListings(data) : []
+})
 
 function Badge({ text }: { text: string }) {
   return (

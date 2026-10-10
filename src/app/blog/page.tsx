@@ -5,6 +5,18 @@ import { ArrowRight, Clock, TrendingUp, Car, DollarSign, Shield, Fuel } from 'lu
 export const metadata: Metadata = {
   title: 'Blog',
   description: 'Dicas, comparativos e análises sobre o mercado de seminovos no Brasil. Decida com dados reais.',
+  alternates: { canonical: '/blog' },
+  openGraph: {
+    title: 'Blog | Carbi',
+    description: 'Dicas, comparativos e análises sobre o mercado de seminovos no Brasil. Decida com dados reais.',
+    url: '/blog',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Blog | Carbi',
+    description: 'Dicas, comparativos e análises sobre o mercado de seminovos no Brasil. Decida com dados reais.',
+  },
 }
 
 const posts = [

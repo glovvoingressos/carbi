@@ -49,6 +49,12 @@ export async function generateMetadata({
   const hasParameters = Object.values(sp).some((value) =>
     Array.isArray(value) ? value.some(Boolean) : typeof value === 'string' && value.trim().length > 0,
   )
+  const hasInventory = !hasParameters && (await fetchPublicListingsPage({
+    ...preset.listingQuery,
+    vehicle_type: 'car',
+    page: 1,
+    pageSize: 1,
+  })).total > 0
 
   return {
     title: preset.title,
@@ -57,12 +63,17 @@ export async function generateMetadata({
     alternates: {
       canonical: canonicalUrl,
     },
-    robots: hasParameters ? { index: false, follow: true } : { index: true, follow: true },
+    robots: { index: hasInventory, follow: true },
     openGraph: {
       title: preset.title,
       description: preset.description,
       url: canonicalUrl,
       type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: preset.title,
+      description: preset.description,
     },
   }
 }
@@ -105,6 +116,7 @@ function parseListingInput(
 
   const input: ListingsPageInput = {
     ...presetQuery,
+    vehicle_type: 'car',
     q: readValue(searchParams, 'q') || presetQuery.q,
     ...(vehicleType.length > 0 ? { vehicle_type: vehicleType } : {}),
     ...(brand.length > 0 ? { brand } : {}),
