@@ -207,6 +207,23 @@ export default function AuthCard({ onAuthenticated, redirectTo, defaultMode = 'l
           console.info('[AuthCard signup] email já cadastrado (anti-enumeração): nenhum e-mail de confirmação é enviado.')
           return
         }
+        try {
+          let notificationResponse: Response | null = null
+          for (let attempt = 0; attempt < 2; attempt += 1) {
+            notificationResponse = await fetch('/api/auth/signup-notification', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: data.user.id }),
+            })
+            if (notificationResponse.ok || notificationResponse.status < 500 || attempt === 1) break
+            await new Promise((resolve) => setTimeout(resolve, 300))
+          }
+          if (!notificationResponse?.ok) {
+            console.error('Admin signup notification failed:', notificationResponse?.status)
+          }
+        } catch (notificationError) {
+          console.error('Admin signup notification request failed:', notificationError)
+        }
         if (data.session) {
           const { error: upsertError } = await supabase.from('users').upsert({ id: data.user.id, email, full_name: fullName, phone: phone.replace(/\D/g, ''), cpf: cpf.replace(/\D/g, '') }, { onConflict: 'id' })
           if (upsertError) {

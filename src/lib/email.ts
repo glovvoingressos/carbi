@@ -15,6 +15,16 @@ function toSendResult(response: ResendSendResult & { headers?: Record<string, st
   return { success: true, data: response?.data ?? null }
 }
 
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character]!)
+}
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 const LOGO_URL = `${SITE_URL}/logo.svg`
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Carbi <noreply@carbi.com.br>'
@@ -61,7 +71,7 @@ export async function sendNewMessageEmail(params: NewMessageEmailParams) {
           <p>Olá, <strong>${recipientName || 'Cliente'}</strong>!</p>
           <p>O usuário <strong>${senderName || 'Alguém'}</strong> enviou uma mensagem a respeito do veículo <strong>${vehicleTitle}</strong>:</p>
           
-          <blockquote style="background-color: #f3f4f6; border-left: 4px solid #2563eb; padding: 16px; border-radius: 4px; margin: 24px 0; font-style: italic;">
+          <blockquote style="background-color: #f3f4f6; border: 1px solid #e5e7eb; padding: 16px; border-radius: 4px; margin: 24px 0; font-style: italic;">
             "${messageContent}"
           </blockquote>
 
@@ -123,7 +133,7 @@ export async function sendNewOfferEmail(params: NewOfferEmailParams) {
           <p>Olá, <strong>${sellerName || 'Vendedor'}</strong>!</p>
           <p>O comprador <strong>${buyerName || 'Interessado'}</strong> fez uma proposta para o seu veículo <strong>${vehicleTitle}</strong>.</p>
           
-          <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 16px; border-radius: 4px; margin: 24px 0;">
+          <div style="background-color: #f0fdf4; border: 1px solid #d1fae5; padding: 16px; border-radius: 4px; margin: 24px 0;">
             <p style="margin: 0; font-size: 18px; font-weight: bold; color: #065f46;">
               Valor da Oferta: ${formatBRL(offerAmount)}
             </p>
@@ -214,7 +224,7 @@ export async function sendOfferStatusUpdateEmail(params: OfferStatusUpdateEmailP
           <p>${statusDescription}</p>
 
           ${status === 'countered' && counterAmount ? `
-            <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 4px; margin: 24px 0;">
+            <div style="background-color: #fffbeb; border: 1px solid #fef3c7; padding: 16px; border-radius: 4px; margin: 24px 0;">
               <p style="margin: 0; font-size: 18px; font-weight: bold; color: #78350f;">
                 Novo Valor Sugerido: ${formatBRL(counterAmount)}
               </p>
@@ -223,13 +233,13 @@ export async function sendOfferStatusUpdateEmail(params: OfferStatusUpdateEmailP
           ` : ''}
 
           ${status === 'rejected' && message ? `
-            <blockquote style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 16px; border-radius: 4px; margin: 24px 0; font-style: italic;">
+            <blockquote style="background-color: #fef2f2; border: 1px solid #fee2e2; padding: 16px; border-radius: 4px; margin: 24px 0; font-style: italic;">
               "${message}"
             </blockquote>
           ` : ''}
 
           ${status === 'accepted' && message ? `
-            <blockquote style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 16px; border-radius: 4px; margin: 24px 0; font-style: italic;">
+            <blockquote style="background-color: #f0fdf4; border: 1px solid #d1fae5; padding: 16px; border-radius: 4px; margin: 24px 0; font-style: italic;">
               "${message}"
             </blockquote>
           ` : ''}
@@ -289,7 +299,7 @@ export async function sendListingCreatedEmail(params: ListingCreatedEmailParams)
           <p>Olá, <strong>${userName || 'Anunciante'}</strong>!</p>
           <p>Seu veículo <strong>${vehicleTitle}</strong> foi cadastrado com sucesso e já está disponível para compradores de todo o Brasil.</p>
           
-          <div style="background-color: #eff6ff; border-left: 4px solid #2563eb; padding: 16px; border-radius: 4px; margin: 24px 0;">
+          <div style="background-color: #eff6ff; border: 1px solid #dbeafe; padding: 16px; border-radius: 4px; margin: 24px 0;">
             <p style="margin: 0; font-size: 16px; font-weight: bold; color: #1e3a8a;">
               Preço anunciado: ${formatBRL(price)}
             </p>
@@ -373,7 +383,7 @@ export async function sendAdminNewListingEmail(params: AdminNewListingEmailParam
           <h2 style="color: #7c3aed; text-align: center;">Novo anúncio no marketplace</h2>
           <p>Um novo veículo foi anunciado na plataforma Carbi.</p>
 
-          <div style="background-color: #f5f3ff; border-left: 4px solid #7c3aed; padding: 16px; border-radius: 4px; margin: 24px 0;">
+          <div style="background-color: #f5f3ff; border: 1px solid #ede9fe; padding: 16px; border-radius: 4px; margin: 24px 0;">
             <p style="margin: 0; font-size: 18px; font-weight: bold; color: #5b21b6;">
               ${vehicleTitle}
             </p>
@@ -407,6 +417,59 @@ export async function sendAdminNewListingEmail(params: AdminNewListingEmailParam
   }
 }
 
+interface AdminNewSignupEmailParams {
+  userEmail: string
+  userName?: string | null
+}
+
+export async function sendAdminNewSignupEmail({ userEmail, userName }: AdminNewSignupEmailParams) {
+  const adminEmail = process.env.ADMIN_NOTIFY_EMAIL?.trim()
+  if (!adminEmail) {
+    console.error('ADMIN_NOTIFY_EMAIL não configurada. Não foi possível notificar o cadastro.')
+    return { success: false, error: 'ADMIN_NOTIFY_EMAIL não configurada.' }
+  }
+
+  if (!process.env.RESEND_API_KEY) {
+    console.error('RESEND_API_KEY não configurada. Não foi possível notificar o cadastro.')
+    return { success: false, error: 'RESEND_API_KEY não configurada.' }
+  }
+
+  try {
+    const name = escapeHtml(userName?.trim() || 'Sem nome informado')
+    const email = escapeHtml(userEmail.trim())
+    const adminLink = `${SITE_URL}/admin/usuarios`
+    const response = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: adminEmail,
+      subject: 'Novo cadastro no Carbi',
+      html: `
+        <div style="font-family: 'DM Sans', system-ui, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 24px;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
+          </div>
+          <h2 style="color: #1a1a1a; text-align: center;">Nova conta criada</h2>
+          <p>Uma nova pessoa acabou de se cadastrar na Carbi.</p>
+          <div style="background-color: #f7f8f4; border: 1px solid #e6e7e3; padding: 16px; border-radius: 8px; margin: 24px 0;">
+            <p style="margin: 0 0 8px; font-size: 16px; font-weight: bold; color: #1a1a1a;">${name}</p>
+            <p style="margin: 0; font-size: 14px; color: #4b5563;">${email}</p>
+          </div>
+          <p style="font-size: 13px; color: #697386;">A confirmação do e-mail pode estar pendente.</p>
+          <div style="text-align: center; margin-top: 28px;">
+            <a href="${adminLink}" style="background-color: #1a1a1a; color: #d4f576; padding: 12px 22px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Ver usuários cadastrados</a>
+          </div>
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin-top: 36px;" />
+          <p style="font-size: 12px; color: #6b7280; text-align: center;">Notificação automática da Carbi.</p>
+        </div>
+      `,
+    })
+
+    return toSendResult(response)
+  } catch (error) {
+    console.error('Falha ao enviar e-mail de novo cadastro para o admin:', error)
+    return { success: false, error }
+  }
+}
+
 // 6. Confirmação de Anúncio Excluído
 interface ListingDeletedEmailParams {
   userEmail: string
@@ -436,7 +499,7 @@ export async function sendListingDeletedEmail(params: ListingDeletedEmailParams)
           <p>Olá, <strong>${userName || 'Anunciante'}</strong>!</p>
           <p>Confirmamos que o anúncio do veículo <strong>${vehicleTitle}</strong> foi removido do marketplace Carbi.</p>
           
-          <div style="background-color: #f3f4f6; border-left: 4px solid #4b5563; padding: 16px; border-radius: 4px; margin: 24px 0;">
+          <div style="background-color: #f3f4f6; border: 1px solid #e5e7eb; padding: 16px; border-radius: 4px; margin: 24px 0;">
             <p style="margin: 0; font-size: 14px; color: #374151;">
               Caso você tenha vendido o veículo pela nossa plataforma, ficamos muito felizes em ajudar!
             </p>
@@ -524,7 +587,7 @@ export async function sendListingStatusChangedEmail(params: ListingStatusChanged
           <p>Olá, <strong>${userName || 'Anunciante'}</strong>!</p>
           <p>${description}</p>
           
-          <div style="background-color: #f9fafb; border-left: 4px solid ${statusColor}; padding: 16px; border-radius: 4px; margin: 24px 0;">
+          <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 16px; border-radius: 4px; margin: 24px 0;">
             <p style="margin: 0; font-size: 16px; font-weight: bold; color: #1f2937;">
               ${vehicleTitle}
             </p>
@@ -583,7 +646,7 @@ export async function sendWelcomeEmail(params: WelcomeEmailParams) {
           <p>Olá, <strong>${userName || 'Parceiro'}</strong>!</p>
           <p>Sua conta foi criada com sucesso. Agora você pode anunciar seus carros e encontrar os melhores seminovos do Brasil.</p>
 
-          <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 16px; border-radius: 4px; margin: 24px 0;">
+          <div style="background-color: #f0fdf4; border: 1px solid #d1fae5; padding: 16px; border-radius: 4px; margin: 24px 0;">
             <p style="margin: 0; font-size: 14px; font-weight: bold; color: #065f46;">
               O que você pode fazer agora:
             </p>

@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { CheckCircle2, CircleDot, Loader2, LockKeyhole, MessageCircle, Search, Send, UserRound, XCircle } from 'lucide-react'
 
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '../../lib/supabase-browser'
@@ -239,9 +240,12 @@ export default function AdminSupportInbox() {
           <h1 className="mt-1 text-3xl font-black tracking-tight text-[#1A1A1A]">Inbox de suporte</h1>
           <p className="mt-1 text-sm text-[#697386]">Responda às conversas dos visitantes em um só lugar.</p>
         </div>
-        <span className="inline-flex items-center gap-2 self-start rounded-full bg-[#1A1A1A] px-4 py-2 text-xs font-bold text-[#D4F576] sm:self-auto">
-          <CircleDot size={14} aria-hidden="true" /> Atualização automática
-        </span>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <Link href="/admin/usuarios" className="rounded-xl border border-[#E1E4DE] bg-white px-4 py-2.5 text-xs font-bold text-[#1A1A1A] transition hover:bg-[#F7F8F4]">Usuários cadastrados</Link>
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#1A1A1A] px-4 py-2 text-xs font-bold text-[#D4F576]">
+            <CircleDot size={14} aria-hidden="true" /> Atualização automática
+          </span>
+        </div>
       </header>
 
       {error && <p role="alert" className="rounded-xl border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#B91C1C]">{error}</p>}

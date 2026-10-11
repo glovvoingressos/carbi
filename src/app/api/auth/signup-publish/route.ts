@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase-server'
+import { notifyAdminAboutNewSignupOnce } from '@/lib/admin-signup-notification'
 import { sendWelcomeEmailOnce } from '@/lib/welcome-email'
 
 export async function POST(request: NextRequest) {
@@ -49,6 +50,16 @@ export async function POST(request: NextRequest) {
     }
 
     if (data?.user) {
+      const signupNotification = {
+        id: data.user.id,
+        email: data.user.email || email,
+        name: fullName,
+      }
+      let notification = await notifyAdminAboutNewSignupOnce(signupNotification)
+      if (!notification.success) notification = await notifyAdminAboutNewSignupOnce(signupNotification)
+      if (!notification.success) {
+        console.error('[signup-publish] admin signup notification failed')
+      }
       void sendWelcomeEmailOnce({ id: data.user.id, email, name: fullName })
         .catch((err) => console.error('[signup-publish] welcome email failed', err))
     }
