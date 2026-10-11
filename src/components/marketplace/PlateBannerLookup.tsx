@@ -6,8 +6,6 @@ import Image from 'next/image'
 import { Search, Loader2, AlertCircle, Car, ArrowRight, ShieldCheck } from 'lucide-react'
 import { lookupPlateClient, savePlateLookup } from '@/lib/integrations/placaapi/client'
 import { formatBRL } from '@/data/cars'
-import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
-import { buildLoginRedirect } from '@/lib/auth-redirect'
 
 type Step = 'input' | 'preview'
 
@@ -66,24 +64,12 @@ export default function PlateBannerLookup({ variant = 'banner' }: PlateBannerLoo
     }
   }
 
-  const handleAnunciar = async () => {
+  const handleAnunciar = () => {
     if (!found || starting) return
 
     const destination = '/anunciar-carro/fluxo'
     setStarting(true)
-    try {
-      if (!isSupabaseBrowserConfigured()) {
-        router.push(buildLoginRedirect(destination))
-        return
-      }
-
-      const { data: { session } } = await getSupabaseBrowserClient().auth.getSession()
-      router.push(session ? destination : buildLoginRedirect(destination))
-    } catch {
-      router.push(buildLoginRedirect(destination))
-    } finally {
-      setStarting(false)
-    }
+    router.push(destination)
   }
 
   const handleReset = () => {
@@ -112,7 +98,7 @@ export default function PlateBannerLookup({ variant = 'banner' }: PlateBannerLoo
         <div className="cb-plate-premium-copy">
           {!isLanding && <span className="cb-plate-premium-kicker">Grátis por tempo limitado</span>}
           <h3>{step === 'preview' && found ? 'Seu carro está pronto para anunciar' : isLanding ? 'Comece pela placa' : 'Anuncie seu carro em menos de 2 minutos.'}</h3>
-          <p>{step === 'preview' && found ? 'Confira os dados encontrados e publique em poucos passos.' : 'Consulte pela placa e nós buscamos marca, modelo, ano e FIPE para você.'}</p>
+          <p>{step === 'preview' && found ? 'Confira os dados e preencha o anúncio como visitante. A conta será pedida só na hora de publicar.' : 'Consulte pela placa e nós buscamos marca, modelo, ano e FIPE para você.'}</p>
           <div className="cb-plate-premium-trust"><ShieldCheck size={14} /> A placa não será publicada</div>
         </div>
 

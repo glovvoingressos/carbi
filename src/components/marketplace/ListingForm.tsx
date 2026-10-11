@@ -7,7 +7,7 @@ import Link from 'next/link'
 import type { FipeResult } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
 import { trackEvent } from '@/lib/analytics'
-import { lookupPlateClient, readPlateLookup } from '@/lib/integrations/placaapi/client'
+import { clearPlateLookup, lookupPlateClient, readPlateLookup } from '@/lib/integrations/placaapi/client'
 import type { PlacaApiResponse } from '@/lib/integrations/placaapi/types'
 import PlateInput from '@/components/marketplace/PlateInput'
 import ListingStepper from '@/components/marketplace/ListingStepper'
@@ -68,6 +68,44 @@ interface UploadImageItem {
   id: string
   file: File
   previewUrl: string
+}
+
+type ImageUploadProgress = {
+  completed: number
+  total: number
+  currentImage: number | null
+  phase: 'uploading' | 'saving'
+}
+
+function ImageUploadStatus({ progress }: { progress: ImageUploadProgress }) {
+  const percent = progress.phase === 'saving'
+    ? 100
+    : Math.round((progress.completed / progress.total) * 100)
+  const message = progress.phase === 'saving'
+    ? 'Fotos enviadas. Salvando o anúncio…'
+    : progress.currentImage
+      ? `Enviando foto ${progress.currentImage} de ${progress.total}`
+      : `${progress.completed} de ${progress.total} fotos enviadas`
+
+  return (
+    <div className="rounded-xl border border-[#E5E5E5] bg-white px-4 py-3 text-left" role="status" aria-live="polite">
+      <div className="mb-2 flex items-center justify-between gap-3 text-xs font-semibold text-[#333]">
+        <span>{message}</span>
+        <span>{percent}%</span>
+      </div>
+      <div
+        className="h-1.5 overflow-hidden rounded-full bg-[#EAEAEA]"
+        role="progressbar"
+        aria-label="Progresso do envio das fotos"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percent}
+        aria-valuetext={message}
+      >
+        <div className="h-full rounded-full bg-[#16855C] transition-[width] duration-300" style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  )
 }
 
 type PlateFormData = {
@@ -294,6 +332,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [fipeLoading, setFipeLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [imageUploadProgress, setImageUploadProgress] = useState<ImageUploadProgress | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [account, setAccount] = useState(ACCOUNT_INITIAL)
@@ -334,7 +373,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   useEffect(() => {
     let cancelled = false
     const restoreDraft = async () => {
-      let parsed: { form: FormState; currentStep: number; listingSubStep: number } | null = null
+      let parsed: { form: FormState; currentStep: number; listingSubStep: number; manualVehicleMode?: boolean } | null = null
       try {
         parsed = parseListingDraft<FormState>(localStorage.getItem(LISTING_DRAFT_KEY))
       } catch {
@@ -344,6 +383,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         setForm({ ...INITIAL_STATE, ...parsed.form, plateFinal: normalizePlateFinal(parsed.form.plateFinal) || '' })
         setCurrentStep(parsed.currentStep)
         setListingSubStep(parsed.listingSubStep)
+        setManualVehicleMode(parsed.manualVehicleMode === true)
       }
 
       try {
@@ -443,7 +483,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     if (!draftHydrated.current) return
     const timeout = window.setTimeout(() => {
       try {
-        localStorage.setItem(LISTING_DRAFT_KEY, serializeListingDraft({ form, currentStep, listingSubStep }))
+        localStorage.setItem(LISTING_DRAFT_KEY, serializeListingDraft({ form, currentStep, listingSubStep, manualVehicleMode }))
       } catch {
         // Private browsing or a full storage quota should not block publishing.
       }
@@ -456,7 +496,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       }))).catch(() => undefined)
     }, 250)
     return () => window.clearTimeout(timeout)
-  }, [form, currentStep, listingSubStep, images])
+  }, [form, currentStep, listingSubStep, manualVehicleMode, images])
 
   useEffect(() => {
     if (!draftHydrated.current) return
@@ -907,22 +947,9 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   }
 
   const startManualVehicleEntry = () => {
+    clearPlateLookup()
     setManualVehicleMode(true)
     setError(null)
-    setForm((prev) => ({
-      ...prev,
-      brand: '',
-      model: '',
-      version: '',
-      year: '',
-      yearModel: '',
-      engine: '',
-      horsepower: '',
-      fuel: '',
-      transmission: '',
-      bodyType: '',
-      plateFinal: '',
-    }))
   }
 
   const continueManualVehicleEntry = () => {
@@ -934,7 +961,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     }
     setError(null)
     setFieldErrors({})
-    setManualVehicleMode(false)
     setListingSubStep(2)
   }
 
@@ -954,6 +980,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     setError(null)
     setSuccess(null)
     setValidationDetails([])
+    setImageUploadProgress(null)
 
     try {
       if (!isAuthenticated) {
@@ -1085,10 +1112,12 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
       const created = (await createResponse.json()) as { id: string; slug: string; emailStatus?: unknown }
       const uploaded: Array<{ storage_path: string; public_url: string; sort_order: number; is_primary: boolean }> = []
+      setImageUploadProgress({ completed: 0, total: images.length, currentImage: 1, phase: 'uploading' })
 
       try {
         for (let i = 0; i < images.length; i += 1) {
           const image = images[i]
+          setImageUploadProgress({ completed: i, total: images.length, currentImage: i + 1, phase: 'uploading' })
           const sanitizedName = image.file.name.replace(/[^a-zA-Z0-9_.-]/g, '-')
           const storagePath = `${session.user.id}/${created.id}/${String(i + 1).padStart(2, '0')}-${Date.now()}-${sanitizedName}`
 
@@ -1108,8 +1137,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             sort_order: i,
             is_primary: i === 0,
           })
+          setImageUploadProgress({ completed: i + 1, total: images.length, currentImage: null, phase: 'uploading' })
         }
 
+        setImageUploadProgress({ completed: images.length, total: images.length, currentImage: null, phase: 'saving' })
         const imageResponse = await fetch(`/api/marketplace/listings/${created.id}/images`, {
           method: 'POST',
           headers: authHeader(session.access_token),
@@ -1135,6 +1166,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       localStorage.removeItem(LISTING_DRAFT_KEY)
       await clearListingDraftImages()
       setSuccess('Anúncio publicado com sucesso. Redirecionando...')
+      setImageUploadProgress(null)
 
       trackEvent('create_listing', {
         item_brand: form.brand || '',
@@ -1149,6 +1181,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       setError(submitError instanceof Error ? submitError.message : 'Falha ao publicar anúncio.')
     } finally {
       setSaving(false)
+      setImageUploadProgress(null)
     }
   }
 
@@ -1169,7 +1202,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   return (
     <div
-      className={`listing-form-ref space-y-6 sm:space-y-8 w-full max-w-none sm:max-w-3xl mx-auto ${currentStep === 3 ? 'pb-28 sm:pb-4' : 'pb-4'}`}
+      className={`listing-form-ref space-y-6 sm:space-y-8 w-full max-w-none sm:max-w-3xl mx-auto ${currentStep === 3 ? 'pb-40 sm:pb-4' : currentStep === 2 ? 'pb-28 sm:pb-4' : 'pb-4'}`}
       aria-busy={saving || fipeLoading}
     >
       <ListingStepper currentStep={currentStep} onStepChange={(step) => {
@@ -1713,7 +1746,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               <div className="fingen-flow-substep-card p-4 sm:p-6 space-y-4 mt-10">
                 <div className="space-y-1">
                   <p className="fingen-flow-field-label text-base">Crie sua conta para publicar</p>
-                  <p className="text-[13px] text-[#767676]">Seus dados do anúncio são guardados e a publicação é imediata.</p>
+                  <p className="text-[13px] text-[#767676]">Seu rascunho fica salvo. Entre ou crie sua conta somente agora, antes de publicar.</p>
                 </div>
 
                 {accountEmailExists ? (
@@ -1773,6 +1806,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                         aria-describedby={accountErrors.cpf ? 'account-cpf-error' : undefined}
                       />
                       {accountErrors.cpf ? <p id="account-cpf-error" className="listing-field-error">{accountErrors.cpf}</p> : null}
+                      <p className="mt-1 text-[11px] leading-relaxed text-[#6F6F6F]">
+                        Usamos o CPF para validar sua identidade e ajudar a prevenir golpes. Ele não aparece no anúncio.{' '}
+                        <Link href="/privacidade" className="font-semibold underline underline-offset-2">Saiba como tratamos seus dados</Link>.
+                      </p>
                     </div>
                     <div className="sm:col-span-2">
                       <label className="text-xs font-medium text-[#767676]" htmlFor="account-email">E-mail</label>
@@ -1827,6 +1864,12 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
           </div>
         )}
         </FadeContent>
+
+        {imageUploadProgress && currentStep === 3 ? (
+          <div className="hidden sm:block">
+            <ImageUploadStatus progress={imageUploadProgress} />
+          </div>
+        ) : null}
 
         {error ? (
           <div className="listing-form-error rounded-2xl p-5" role="alert">
@@ -1893,18 +1936,25 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
           </div>
         </div>
 
-        {currentStep === 3 ? (
+        {currentStep >= 2 ? (
           <div className="fixed inset-x-0 bottom-0 z-30 p-4 pb-[max(16px,env(safe-area-inset-bottom))] sm:hidden bg-gradient-to-t from-white via-white to-transparent">
+            {currentStep === 3 && imageUploadProgress ? (
+              <div className="mb-3">
+                <ImageUploadStatus progress={imageUploadProgress} />
+              </div>
+            ) : null}
             <button
               type="button"
-              disabled={saving}
-              onClick={handleSubmit}
+              disabled={saving || fipeLoading}
+              onClick={currentStep === 3 ? handleSubmit : nextStep}
               className="tfp-btn-primary w-full justify-center"
             >
-              {saving ? (
+              {currentStep === 2 ? (
+                <>Próxima etapa <ArrowRight className="h-4 w-4" /></>
+              ) : saving ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Publicando...
+                  {imageUploadProgress ? 'Enviando fotos...' : 'Preparando publicação...'}
                 </>
               ) : (
                 !isAuthenticated ? 'Criar conta e publicar' : 'Publicar anúncio'

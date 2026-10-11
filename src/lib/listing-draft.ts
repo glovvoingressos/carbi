@@ -6,6 +6,7 @@ export interface ListingDraftSnapshot<T> {
   form: T
   currentStep: number
   listingSubStep: number
+  manualVehicleMode?: boolean
   updatedAt: number
 }
 
@@ -47,6 +48,7 @@ export function parseListingDraft<T>(value: string | null): ListingDraftSnapshot
       form: parsed.form,
       currentStep: Math.min(3, Math.max(1, parsed.currentStep)),
       listingSubStep: Math.min(4, Math.max(1, parsed.listingSubStep)),
+      manualVehicleMode: parsed.manualVehicleMode === true,
       updatedAt: typeof parsed.updatedAt === 'number' ? parsed.updatedAt : Date.now(),
     }
   } catch {

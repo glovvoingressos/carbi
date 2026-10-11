@@ -19,6 +19,14 @@ export function savePlateLookup(data: PlacaApiResponse): void {
   }
 }
 
+export function clearPlateLookup(): void {
+  try {
+    sessionStorage.removeItem(PLATE_CACHE_KEY)
+  } catch {
+    // sessionStorage unavailable — ignore
+  }
+}
+
 export function readPlateLookup(): PlacaApiResponse | null {
   try {
     const raw = sessionStorage.getItem(PLATE_CACHE_KEY)
