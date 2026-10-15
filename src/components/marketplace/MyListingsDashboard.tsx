@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, Save, Upload, Trash2, Check, AlertCircle, Image as ImageIcon, GripVertical, Star, X, Search, Car, Plus, Eye, TrendingUp, BarChart3 } from 'lucide-react'
 import { motion, Reorder } from 'motion/react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
-import { LISTING_ALLOWED_TYPES, LISTING_MAX_IMAGES, LISTING_MAX_IMAGE_SIZE_MB, normalizePlateFinal, parseMoneyInputToNumber, parseBrazilianInt, formatBrazilianInt } from '@/lib/marketplace'
+import { getListingPriceReview, LISTING_ALLOWED_TYPES, LISTING_MAX_IMAGES, LISTING_MAX_IMAGE_SIZE_MB, normalizePlateFinal, parseMoneyInputToNumber, parseBrazilianInt, formatBrazilianInt } from '@/lib/marketplace'
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from './MarketplaceListingImage'
@@ -20,7 +20,7 @@ import {
 } from '@/lib/vehicle-filter-normalization'
 
 interface DashboardImage { id: string; public_url: string; storage_path: string; sort_order: number; is_primary: boolean }
-interface DashboardListing { id: string; slug: string; title: string; description: string; vehicle_type?: 'car' | 'truck'; brand: string; model: string; version: string | null; year: number; year_model: number; vin?: string | null; mileage: number; price: number; city: string; state: string; status: string; transmission: string; fuel: string; color: string; body_type: string; optional_items: string[]; engine: string | null; horsepower: number | null; doors: number | null; plate_final: string | null; truck_type?: string | null; load_capacity?: number | null; axles?: number | null; truck_body_type?: string | null; structured_data?: Record<string, unknown> | null; images: DashboardImage[] | null; view_count?: number }
+interface DashboardListing { id: string; slug: string; title: string; description: string; vehicle_type?: 'car' | 'truck'; brand: string; model: string; version: string | null; year: number; year_model: number; vin?: string | null; mileage: number; price: number; fipe_price?: number | null; fipe_reference_month?: string | null; city: string; state: string; status: string; transmission: string; fuel: string; color: string; body_type: string; optional_items: string[]; engine: string | null; horsepower: number | null; doors: number | null; plate_final: string | null; truck_type?: string | null; load_capacity?: number | null; axles?: number | null; truck_body_type?: string | null; structured_data?: Record<string, unknown> | null; images: DashboardImage[] | null; view_count?: number }
 interface UploadImageItem { id: string; file?: File; previewUrl: string; isExisting: boolean; originalImage?: DashboardImage; is_primary: boolean; sort_order: number }
 
 const authH = (t: string) => ({ Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' })
@@ -167,6 +167,7 @@ function PhotoGrid({ images, isDragging, onDragEnter, onDragLeave, onDragOver, o
 
 // ── ListingCard ─────────────────────────────────────────
 function ListingCard({ listing, isSelected, onSelect }: { listing: DashboardListing; isSelected: boolean; onSelect: () => void }) {
+  const priceReview = listing.vehicle_type === 'truck' ? null : getListingPriceReview(listing.price, listing.fipe_price)
   return (
     <motion.button
       onClick={onSelect}
@@ -184,6 +185,7 @@ function ListingCard({ listing, isSelected, onSelect }: { listing: DashboardList
             <StatusBadge status={listing.status} isSelected={isSelected} />
           </div>
           <p className="mt-1 text-sm font-bold text-[#0A0A0A]">{formatBRL(listing.price)}</p>
+          {priceReview && <p className="mt-1 text-[10px] font-semibold text-amber-800">Revisão de preço · {priceReview.differencePercent.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}% {priceReview.direction === 'above' ? 'acima' : 'abaixo'} da FIPE</p>}
           <div className="flex items-center gap-2 mt-1">
             <span className="text-[10px]" style={{ color: isSelected ? 'rgba(10,10,10,0.7)' : '#6B7280' }}>{listing.year}/{listing.year_model}</span>
             <span className="text-[10px]" style={{ color: isSelected ? 'rgba(10,10,10,0.7)' : '#6B7280' }}>{listing.mileage?.toLocaleString('pt-BR')} km</span>
@@ -237,6 +239,12 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
 
       <div className="member-tools-editor-context">
         <div className="member-tools-editor-title"><h3 className="member-tools-panel-heading">{listing.title}</h3><StatusBadge status={listing.status} /></div>
+        {listing.vehicle_type !== 'truck' && getListingPriceReview(listing.price, listing.fipe_price) && (
+          <p className="mt-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" role="status">
+            Revisão de preço: {getListingPriceReview(listing.price, listing.fipe_price)?.reason}
+            {listing.fipe_reference_month ? ` Referência FIPE: ${listing.fipe_reference_month}.` : ''} Ajuste o valor e salve para solicitar nova publicação.
+          </p>
+        )}
         <span className="member-tools-views"><Eye size={14} /> {(listing.view_count || 0).toLocaleString('pt-BR')} visualizações</span>
         <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="member-tools-live-link">Ver ao vivo →</a>
       </div>

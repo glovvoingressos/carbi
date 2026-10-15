@@ -1,34 +1,34 @@
 import React from 'react'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowRight, MapPin, CheckCircle2 } from 'lucide-react'
-import { LocalBusinessBHTicketsSchema } from '@/components/seo/JSONLD'
+import { ArrowRight } from 'lucide-react'
 import ListingCard from '@/components/marketplace/ListingCard'
 import { fetchPublicListingsPage } from '@/lib/marketplace-server'
+import { MIN_INDEXABLE_INVENTORY } from '@/lib/marketplace-seo'
 
-export const metadata: Metadata = {
-  title: 'Carros Usados em BH (Belo Horizonte) | Compra e Venda',
-  description: 'Procurando carros usados e seminovos em Belo Horizonte (BH)? Encontre anúncios reais, compare valores atualizados e faça um negócio seguro.',
-  keywords: ['carros usados bh', 'comprar carro belo horizonte', 'seminovos bh', 'loja de carros bh', 'veículos usados'],
-  alternates: {
-    canonical: '/carros-usados-bh',
-  },
-  openGraph: {
-    title: 'Carros Usados e Seminovos em BH - As Melhores Ofertas',
-    description: 'Encontre o seu próximo carro em Belo Horizonte com a confiança da Carbi.',
-    locale: 'pt_BR',
-    type: 'website',
-    url: '/carros-usados-bh',
-  },
+async function getInventory() {
+  return fetchPublicListingsPage({ city: '%Belo Horizonte%', state: 'MG', vehicle_type: 'car', page: 1, pageSize: 12, sort: 'recent' })
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const inventory = await getInventory()
+  const canIndex = inventory.total >= MIN_INDEXABLE_INVENTORY
+  return {
+    title: 'Carros à venda em Belo Horizonte | Carbi',
+    description: 'Veja carros anunciados em Belo Horizonte. Preços e dados são informados pelos vendedores; confirme as condições diretamente antes da compra.',
+    keywords: ['carros à venda em Belo Horizonte', 'comprar carro em BH', 'carros usados BH'],
+    alternates: { canonical: '/carros-usados-bh' },
+    robots: { index: canIndex, follow: true },
+  }
 }
 
 export default async function CarrosUsadosBHPage() {
-  const { items } = await fetchPublicListingsPage({ city: '%Belo Horizonte%', state: 'MG', page: 1, pageSize: 12, sort: 'recent' })
+  const { items, total } = await getInventory()
+  if (total < MIN_INDEXABLE_INVENTORY) notFound()
 
   return (
     <div className="fingen-shell">
-      <LocalBusinessBHTicketsSchema />
-
       <section className="fingen-dark-hero">
         <div className="fingen-shell-content" style={{ textAlign: 'center' }}>
           <div className="fingen-breadcrumb" style={{ justifyContent: 'center', color: 'rgba(255,255,255,0.5)' }}>
@@ -39,34 +39,9 @@ export default async function CarrosUsadosBHPage() {
           <h1 className="text-balance">
             Carros usados em BH
           </h1>
-          <p style={{ maxWidth: '500px', margin: '0 auto' }}>
-            Compare anúncios reais, confira valores atualizados e avance com mais confiança.
+          <p style={{ maxWidth: '560px', margin: '0 auto' }}>
+            {total} carros anunciados em Belo Horizonte. Preço, quilometragem e estado do veículo são informados pelo vendedor; confirme os detalhes antes de negociar.
           </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
-            <Link href="/anunciar-carro-bh" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: 'var(--radius-full)', background: 'var(--color-accent)', color: 'var(--color-text-primary)', fontWeight: 600, fontSize: '14px', textDecoration: 'none', transition: 'all 0.15s ease' }}>
-              Quero Vender Meu Carro <ArrowRight style={{ width: '16px', height: '16px' }} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="fingen-section">
-        <div className="fingen-shell-content">
-          <div className="fingen-grid-3">
-            {[
-              { title: 'Valor atualizado ao vivo', desc: 'Negociação apoiada por dados reais.' },
-              { title: 'Atendimento local', desc: 'Compradores ativos em BH e região.' },
-              { title: 'Venda em 24h', desc: 'Foco em oferta e resposta rápida.' },
-            ].map((item) => (
-              <div key={item.title} className="fingen-card-white" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                <CheckCircle2 style={{ width: '24px', height: '24px', color: 'var(--color-trust)', flexShrink: 0, marginTop: '2px' }} />
-                <div>
-                  <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '4px' }}>{item.title}</h4>
-                  <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -90,7 +65,7 @@ export default async function CarrosUsadosBHPage() {
             </div>
           ) : (
             <div className="fingen-card-white" style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--color-text-secondary)' }}>
-              Nenhum anúncio ativo encontrado em Belo Horizonte no momento.
+                Nenhum anúncio ativo encontrado em Belo Horizonte no momento.
             </div>
           )}
         </div>
@@ -102,10 +77,7 @@ export default async function CarrosUsadosBHPage() {
             <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>Comprar carro usado em Belo Horizonte</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
-                O mercado de <strong style={{ color: 'var(--color-text-primary)' }}>carros usados em BH</strong> é um dos mais aquecidos do Brasil. A página agora mostra anúncios reais da cidade, em vez de um catálogo auxiliar.
-              </p>
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
-                Se você quer vender, use o botão acima para publicar seu carro e aparecer para compradores na região.
+                A lista reúne anúncios cadastrados na plataforma e pode mudar conforme os vendedores publicam, atualizam ou encerram ofertas. Verifique documentação, histórico, estado e preço antes de fechar negócio.
               </p>
             </div>
           </div>

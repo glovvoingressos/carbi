@@ -171,6 +171,31 @@ export interface ListingPublic {
   view_count?: number
 }
 
+export type ListingPriceReview = {
+  ratio: number
+  differencePercent: number
+  direction: 'above' | 'below'
+  reason: string
+}
+
+/** Flags only large deviations; smaller differences remain visible for normal negotiation. */
+export function getListingPriceReview(price: number | string, fipePrice: number | string | null | undefined): ListingPriceReview | null {
+  const numericPrice = typeof price === 'number' ? price : Number(price)
+  const numericFipe = typeof fipePrice === 'number' ? fipePrice : Number(fipePrice)
+  if (!Number.isFinite(numericPrice) || numericPrice <= 0 || !Number.isFinite(numericFipe) || numericFipe <= 0) return null
+  const ratio = numericPrice / numericFipe
+  if (ratio <= 5 && ratio >= 0.2) return null
+  const direction = ratio > 5 ? 'above' : 'below'
+  const differencePercent = Math.abs((ratio - 1) * 100)
+  const directionLabel = direction === 'above' ? 'acima' : 'abaixo'
+  return {
+    ratio,
+    differencePercent,
+    direction,
+    reason: `O preço anunciado está ${differencePercent.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}% ${directionLabel} da referência FIPE. O anúncio foi ocultado para revisão.`,
+  }
+}
+
 export function parseMoneyInputToNumber(value: string): number {
   const normalized = value.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')
   const parsed = Number(normalized)

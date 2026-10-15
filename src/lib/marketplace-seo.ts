@@ -2,6 +2,8 @@ import type { ListingsPageInput, ListingSort, PublicSitemapListing } from '@/lib
 import { cityPatternVariants } from '@/lib/city-filter'
 import { filterSearchTokens } from '@/lib/vehicle-filter-normalization'
 
+export const MIN_INDEXABLE_INVENTORY = 3
+
 export type MarketplaceSeoPreset = {
   slug: string
   title: string
@@ -316,17 +318,9 @@ export const COMBINED_PRESETS: MarketplaceSeoPreset[] = [
 
 export const TOPIC_PRESETS: MarketplaceSeoPreset[] = [
   {
-    slug: 'anunciar-gratis',
-    title: 'Anunciar carro grátis',
-    description: 'Publique seu carro grátis na Carbi com fotos reais, chat interno e comparação FIPE.',
-    h1: 'Anunciar carro grátis',
-    intro: 'Fluxo rápido para publicar seu veículo sem custo e alcançar compradores reais.',
-    listingQuery: { sort: 'recent' },
-  },
-  {
     slug: 'seminovos-a-venda',
     title: 'Seminovos à venda',
-    description: 'Veja seminovos à venda com preço, fotos quadradas e comparação FIPE atualizada.',
+    description: 'Veja seminovos à venda com preço pedido, fotos e referência FIPE quando disponível para a versão e o ano-modelo.',
     h1: 'Seminovos à venda',
     intro: 'Descubra seminovos reais em destaque, com filtros e ordenação por intenção de compra.',
     listingQuery: { sort: 'recent' },
@@ -334,7 +328,7 @@ export const TOPIC_PRESETS: MarketplaceSeoPreset[] = [
   {
     slug: 'carros-usados',
     title: 'Carros usados à venda',
-    description: 'Encontre carros usados à venda com transparência, preço real e anúncios ativos.',
+    description: 'Encontre anúncios ativos de carros usados com preço pedido, fotos e dados informados pelos vendedores.',
     h1: 'Carros usados à venda',
     intro: 'Seleção de carros usados para quem busca compra direta com mais confiança.',
     listingQuery: { sort: 'recent' },
@@ -480,11 +474,9 @@ export function resolveSeoPreset(slug: string): MarketplaceSeoPreset | null {
 
   if (normalized.startsWith('cidade-')) {
     const citySlug = normalized.replace('cidade-', '')
-    const cityName = citySlug.replace(/-/g, ' ')
-    // Exibição com o nome oficial; o filtro aceita as duas grafias
-    // (ver city-filter), então não precisa se preocupar com acento aqui.
-    const titleCity = MAJOR_CITIES.find((city) => city.slug === citySlug)?.name
-      || cityName.replace(/\b\w/g, (match) => match.toUpperCase())
+    const city = MAJOR_CITIES.find((item) => item.slug === citySlug)
+    if (!city) return null
+    const titleCity = city.name
     return {
       slug: normalized,
       title: `Carros em ${titleCity}`,

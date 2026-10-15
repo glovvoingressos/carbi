@@ -69,7 +69,8 @@ export default function HomeHero({ listingCount, cityCount, brandCount }: HomeHe
                 src="/images/home-hero-desktop.webp"
                 alt="SUV preto atravessa uma estrada de terra em uma paisagem desértica, imagem ilustrativa"
                 fill
-                priority
+                loading="eager"
+                fetchPriority="high"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 48vw, 46vw"
               />
             </picture>

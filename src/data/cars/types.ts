@@ -45,4 +45,9 @@ export interface CarSpec {
   shortDesc: string
   idealFor: string
   image: string
+  catalogSourceUrl?: string
+  catalogSourceLabel?: string
+  catalogReference?: string
+  fuelEconomyCityEthanol?: number
+  fuelEconomyRoadEthanol?: number
 }

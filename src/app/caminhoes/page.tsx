@@ -62,7 +62,7 @@ const ADVANTAGES = [
   {
     icon: BadgeCheck,
     title: 'Anúncio grátis',
-    text: 'Publique seu caminhão sem custo e alcance compradores de todo o Brasil.',
+    text: 'Publique seu caminhão sem custo dentro dos limites do plano gratuito e converse com interessados pelo chat interno.',
   },
 ]
 
@@ -218,6 +218,9 @@ export default async function TruckHomePage() {
         {/* ═══ FAQ ═══ */}
         <FAQSchema items={TRUCK_FAQ} />
         <FAQSection items={TRUCK_FAQ} />
+        <p className="mx-auto max-w-6xl px-4 pb-8 text-xs leading-relaxed text-gray-500">
+          Responsabilidade editorial: Carbi. Os dados do anúncio são informados pelo vendedor; confira documentos, configuração e condição do caminhão antes de negociar.
+        </p>
 
         {/* ═══ CTA FINAL ═══ */}
         <section className="tk-cta">
@@ -225,7 +228,7 @@ export default async function TruckHomePage() {
             <p className="tk-cta-eyebrow">Carbi caminhões</p>
             <h2 className="tk-cta-title">Anuncie seu caminhão grátis</h2>
             <p className="tk-cta-text">
-              Ficha técnica, fotos e chat interno. Seu caminhão divulgado para compradores de todo o Brasil.
+              Publicação padrão sem custo no plano gratuito, limitada a 5 anúncios ativos por conta e 10 fotos por anúncio. Converse com interessados pelo chat interno.
             </p>
           </div>
           <Link href="/caminhoes/anunciar" className="tk-btn tk-btn-amber">

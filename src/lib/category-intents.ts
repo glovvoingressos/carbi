@@ -103,7 +103,7 @@ export function hasCategoryIntentInventory(slug: string, inventory: PublicSitema
 
   // The category page scans at most three 48-item pages. Mirror that visible
   // inventory window so it is not listed in the sitemap while rendering empty.
-  return matchingQuery.slice(0, 144).some((listing) => {
+  const usefulMatches = matchingQuery.slice(0, 144).filter((listing) => {
     return intent.filter({
       price: listing.price ?? Number.NaN,
       mileage: listing.mileage ?? Number.NaN,
@@ -115,4 +115,5 @@ export function hasCategoryIntentInventory(slug: string, inventory: PublicSitema
       horsepower: listing.horsepower ?? null,
     })
   })
+  return usefulMatches.length >= 3
 }

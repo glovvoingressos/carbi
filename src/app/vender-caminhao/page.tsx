@@ -71,7 +71,7 @@ export default function VenderCaminhaoPage() {
             </div>
             <ul className="tk-sell-checks">
               <li>
-                <Check size={16} aria-hidden="true" /> Publicação gratuita
+                <Check size={16} aria-hidden="true" /> Publicação padrão sem custo, dentro dos limites do plano
               </li>
               <li>
                 <Check size={16} aria-hidden="true" /> Consulta pela placa

@@ -74,7 +74,7 @@ export default function HomeFeaturedListing({ listing }: HomeFeaturedListingProp
               year={listing.year ?? undefined}
               imageUrls={listing.imageUrls}
               alt={listing.imageAlt}
-              priority
+              sizes="(max-width: 767px) 100vw, 50vw"
               className="hf-image"
             />
             <span className="hf-status">{sourceLabel}</span>

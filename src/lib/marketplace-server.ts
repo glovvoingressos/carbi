@@ -2,7 +2,7 @@ import { getSupabaseServerClient, getSupabaseAdminClient, isSupabaseConfigured }
 import { cache } from 'react'
 import { ListingPublic } from '@/lib/marketplace'
 import { getFipePrice } from '@/lib/fipe-api'
-import { normalizePlateFinal, parseFipePriceToNumber } from '@/lib/marketplace'
+import { getListingPriceReview, normalizePlateFinal, parseFipePriceToNumber } from '@/lib/marketplace'
 import { classifyVehicleCategory, classifyByFuelType } from '@/lib/vehicle-category'
 import { applyCityFilter } from '@/lib/city-filter'
 import { applyTruckQueryFilters, expandTruckBodyTypeValues, expandTruckTypeValues } from '@/lib/truck-filters'
@@ -207,6 +207,10 @@ function normalizeTableRow(row: ListingRow): ListingPublic {
   } as ListingPublic
 }
 
+function filterPriceOutliers(listings: ListingPublic[]): ListingPublic[] {
+  return listings.filter((listing) => listing.vehicle_type === 'truck' || !getListingPriceReview(listing.price, listing.fipe_price))
+}
+
 function formatRelativeTime(dateInput?: string | null): string | null {
   if (!dateInput) return null
   const target = new Date(dateInput).getTime()
@@ -366,11 +370,11 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
        const extras = await supabase.from('vehicle_listings_public').select('id, structured_data, cabin_type, pbt, cmt, truck_category, chassis').in('id', ids)
        if (!extras.error && Array.isArray(extras.data)) {
          const byId = new Map(extras.data.map(row => [row.id, row]))
-         return rows.map(row => normalizeTableRow({ ...row, ...(byId.get(row.id) || {}) }))
+         return filterPriceOutliers(rows.map(row => normalizeTableRow({ ...row, ...(byId.get(row.id) || {}) })))
        }
      } catch {
      }
-     return rows.map(normalizeTableRow)
+     return filterPriceOutliers(rows.map(normalizeTableRow))
    }
 
 
@@ -476,21 +480,21 @@ async function queryListings(input: ListingQueryInput): Promise<ListingPublic[]>
      }
    } catch {
    }
-   return rows.map(normalizeTableRow)
+   return filterPriceOutliers(rows.map(normalizeTableRow))
 
 }
 
 export async function queryPublicListings(input: ListingQueryInput): Promise<ListingPublic[]> {
   if (!isSupabaseConfigured()) return []
   const listings = await queryListings(input)
-  return enrichListingSignals(listings)
+  return filterPriceOutliers(await enrichListingSignals(listings))
 }
 
 export async function getPublicListingBySlug(slug: string): Promise<ListingPublic | null> {
   if (!isSupabaseConfigured()) return null
   const results = await queryListings({ slug, single: true, limit: 1 })
   if (!results[0]) return null
-  const [enriched] = await enrichListingSignals(results)
+  const [enriched] = filterPriceOutliers(await enrichListingSignals(results))
   return enriched || null
 }
 
@@ -510,13 +514,13 @@ export async function getRelatedListings(params: {
     excludeId: params.excludeId,
     vehicle_type: params.vehicle_type,
     limit: params.limit || 6,
-  })
+  }).then(filterPriceOutliers)
 }
 
 export async function getLatestPublicListings(limit?: number): Promise<ListingPublic[]> {
   if (!isSupabaseConfigured()) return []
   const listings = await queryListings(limit === undefined ? { fetchAll: true } : { limit })
-  return enrichListingSignals(listings)
+  return filterPriceOutliers(await enrichListingSignals(listings))
 }
 
 export async function searchPublicListings(query: string, limit = 24): Promise<ListingPublic[]> {
@@ -524,7 +528,7 @@ export async function searchPublicListings(query: string, limit = 24): Promise<L
   const q = query.trim()
   if (!q) return getLatestPublicListings(limit)
   const listings = await queryListings({ q, limit })
-  return enrichListingSignals(listings)
+  return filterPriceOutliers(await enrichListingSignals(listings))
 }
 
 function applySort(
@@ -551,7 +555,7 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
 
   const supabase = getSupabaseServerClient()
   let query = supabase
-    .from('vehicle_listings')
+    .from('vehicle_listings_public')
     .select(`
       id,
       user_id,
@@ -667,8 +671,8 @@ export async function fetchPublicListingsPage(input: ListingsPageInput = {}) {
 
    const normalized = dataWithImages.map(normalizeTableRow)
 
-  const items = await enrichListingSignals(normalized)
-  return { items, total: count || 0, page, pageSize }
+   const items = filterPriceOutliers(await enrichListingSignals(normalized))
+  return { items, total: Math.max(0, (count || 0) - (normalized.length - items.length)), page, pageSize }
 }
 
 export type PublicSitemapListing = {
@@ -691,6 +695,7 @@ export type PublicSitemapListing = {
   color?: string | null
   body_type?: string | null
   price?: number | null
+  fipe_price?: number | null
   year_model?: number | null
   mileage?: number | null
   optional_items?: string[] | null
@@ -718,19 +723,19 @@ export async function fetchPublicSitemapListingsPage({
   pageSize?: number
   includeImages?: boolean
 }): Promise<{ items: PublicSitemapListing[]; total: number; page: number; pageSize: number }> {
-  if (!isSupabaseConfigured()) return { items: [], total: 0, page, pageSize }
+  if (!isSupabaseConfigured()) throw new Error('Supabase não configurado; não é possível gerar sitemap completo de anúncios.')
 
   const supabase = getSupabaseServerClient()
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
   // Keep each selection literal so Supabase can infer its selected row shape.
   let query = vehicleType === 'truck'
-    ? supabase.from('vehicle_listings').select(
-      'id, slug, updated_at, published_at, created_at, vehicle_type, brand, city, state, fuel, price, year_model, truck_type, truck_body_type',
+    ? supabase.from('vehicle_listings_public').select(
+      'id, slug, updated_at, published_at, created_at, vehicle_type, brand, city, state, fuel, price, fipe_price, year_model, truck_type, truck_body_type',
       { count: 'exact' },
     ).eq('status', 'active')
-    : supabase.from('vehicle_listings').select(
-      'id, slug, updated_at, published_at, created_at, vehicle_type, brand, model, title, version, city, state, fuel, transmission, color, body_type, price, year_model, mileage, optional_items, engine, horsepower, doors',
+    : supabase.from('vehicle_listings_public').select(
+      'id, slug, updated_at, published_at, created_at, vehicle_type, brand, model, title, version, city, state, fuel, transmission, color, body_type, price, fipe_price, year_model, mileage, optional_items, engine, horsepower, doors',
       { count: 'exact' },
     ).eq('status', 'active')
 
@@ -743,19 +748,22 @@ export async function fetchPublicSitemapListingsPage({
     .range(from, to)
 
   if (error || !Array.isArray(data)) {
-    if (error) console.error('fetchPublicSitemapListingsPage query error:', error.message, error.details, error.hint)
-    return { items: [], total: 0, page, pageSize }
+    console.error('fetchPublicSitemapListingsPage query error:', error?.message, error?.details, error?.hint)
+    throw new Error(`Falha ao consultar anúncios do sitemap (${vehicleType}, página ${page}).`)
   }
+  if (count === null) throw new Error(`Consulta do sitemap sem contagem de anúncios (${vehicleType}, página ${page}).`)
 
   const items: PublicSitemapListing[] = data
-  if (!includeImages || items.length === 0) return { items, total: count || 0, page, pageSize }
+  const safeItems = vehicleType === 'truck' ? items : items.filter((item) => !getListingPriceReview(Number(item.price), Number(item.fipe_price)))
+  if (!includeImages || safeItems.length === 0) return { items: safeItems, total: count, page, pageSize }
 
-  const listingIds = items.map((item) => item.id)
-  const { data: imageRows } = await supabase
+  const listingIds = safeItems.map((item) => item.id)
+  const { data: imageRows, error: imageError } = await supabase
     .from('vehicle_listing_images')
     .select('listing_id, public_url, sort_order')
     .in('listing_id', listingIds)
     .order('sort_order', { ascending: true })
+  if (imageError) throw new Error(`Falha ao consultar imagens para sitemap (${vehicleType}, página ${page}).`)
 
   const imagesByListing = new Map<string, Array<{ url: string; sort_order: number }>>()
   for (const image of imageRows || []) {
@@ -766,8 +774,8 @@ export async function fetchPublicSitemapListingsPage({
   }
 
   return {
-    items: items.map((item) => ({ ...item, images: imagesByListing.get(item.id) || [] })),
-    total: count || 0,
+    items: safeItems.map((item) => ({ ...item, images: imagesByListing.get(item.id) || [] })),
+    total: count,
     page,
     pageSize,
   }

@@ -114,6 +114,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
           enrichment={enrichment || undefined}
           comparison={comparison}
           currentFipePrice={currentFipePrice}
+          currentFipeReferenceMonth={currentFipeResult?.referenceMonth || listing.fipe_reference_month || null}
         />
       </div>
     </main>

@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import MarketplaceClient from '@/components/marketplace/MarketplaceClient'
 import { BreadcrumbSchema } from '@/components/seo/JSONLD'
 import { fetchPublicListingsPage, getFilterOptions, ListingSort, ListingsPageInput } from '@/lib/marketplace-server'
-import { ALLOWED_SORTS, MARKETPLACE_SEO_SLUGS, resolveSeoPreset } from '@/lib/marketplace-seo'
+import { ALLOWED_SORTS, MARKETPLACE_SEO_SLUGS, MIN_INDEXABLE_INVENTORY, resolveSeoPreset } from '@/lib/marketplace-seo'
 import { getAllCars } from '@/lib/data-fetcher'
 import { slugifyBrand } from '@/lib/brand-utils'
 
@@ -38,12 +38,7 @@ export async function generateMetadata({
   const { slug } = await params
   const sp = await searchParams
   const preset = resolveSeoPreset(slug)
-  if (!preset) {
-    return {
-      title: 'Carros à venda',
-      description: 'Explore anúncios ativos com filtros inteligentes e dados reais.',
-    }
-  }
+  if (!preset) notFound()
 
   const canonicalUrl = `${SITE_URL}/carros/${preset.slug}`
   const hasParameters = Object.values(sp).some((value) =>
@@ -54,7 +49,7 @@ export async function generateMetadata({
     vehicle_type: 'car',
     page: 1,
     pageSize: 1,
-  })).total > 0
+  })).total >= MIN_INDEXABLE_INVENTORY
 
   return {
     title: preset.title,
@@ -158,6 +153,7 @@ export default async function CarrosSeoPage({
   const sp = await searchParams
   const queryInput = parseListingInput(sp, preset.listingQuery)
   const listings = await fetchPublicListingsPage(queryInput)
+  if (preset.slug.startsWith('cidade-') && listings.total < MIN_INDEXABLE_INVENTORY) notFound()
   const filterOptions = await getFilterOptions()
 
   return (

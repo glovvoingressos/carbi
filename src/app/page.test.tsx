@@ -43,9 +43,9 @@ describe('HomePage featured seller card', () => {
     const page = await HomePage()
     render(page)
 
-    const card = screen.getByRole('link', { name: /Anuncie grátis em 2 minutos/ })
+    const card = screen.getByRole('link', { name: /Anuncie grátis em poucos passos/ })
     const image = within(card).getByRole('img', { name: 'Land Rover Defender Octa azul Tasman, imagem ilustrativa' })
-    const copy = within(card).getByText('Anuncie grátis em 2 minutos')
+    const copy = within(card).getByText('Anuncie grátis em poucos passos')
 
     expect(image.compareDocumentPosition(copy) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(card.getAttribute('href')).toBe('/anunciar-carro')

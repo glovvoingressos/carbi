@@ -8,6 +8,7 @@ interface HistoryItem {
   year: number
   price: string
   priceNum: number
+  referenceMonth: string
 }
 
 interface FipeHistoryProps {
@@ -33,7 +34,7 @@ export default function FipeHistory({ history }: FipeHistoryProps) {
         </div>
         <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-full">
           <TrendingUp className="w-3.5 h-3.5 text-white/70" strokeWidth={1.75} />
-          <span className="text-[11px] text-white/70 tracking-tight">Dados oficiais</span>
+            <span className="text-[11px] text-white/70 tracking-tight">FIPE via Parallelum</span>
         </div>
       </div>
 
@@ -82,7 +83,7 @@ export default function FipeHistory({ history }: FipeHistoryProps) {
         </div>
 
         <p className="mt-6 text-[12px] text-[#A3A3A3] tracking-tight">
-          * Valores médios de mercado para o modelo e versão selecionados (referência mensal oficial).
+          Referência {history[0].referenceMonth}. Valores por ano-modelo da versão consultada; a disponibilidade depende da correspondência exata na FIPE.
         </p>
       </div>
     </div>

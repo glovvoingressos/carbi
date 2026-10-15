@@ -15,6 +15,7 @@ type MarketplaceListingImageProps = {
   width?: number
   height?: number
   preferTransformed?: boolean
+  sizes?: string
 }
 
 export default function MarketplaceListingImage({
@@ -28,6 +29,7 @@ export default function MarketplaceListingImage({
   width = CAR_IMAGE_WIDTH,
   height = CAR_IMAGE_HEIGHT,
   preferTransformed = true,
+  sizes = '(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 33vw',
 }: MarketplaceListingImageProps) {
   const sources = useMemo(
     () => resolveMarketplaceCarImageCandidates({ brand, model, year, preferredUrls: imageUrls, width, height, preferTransformed }),
@@ -41,6 +43,7 @@ export default function MarketplaceListingImage({
       className={className}
       containerClassName="h-full w-full"
       priority={priority}
+      sizes={sizes}
       loadingLabel={`Carregando imagem de ${alt}`}
     />
   )

@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import type { CarSpec } from '@/data/cars'
-import { formatBRL } from '@/data/cars'
 import CarImage from '@/components/car/CarImage'
+import { slugifyBrand } from '@/lib/brand-utils'
+import { canonicalModelSlug } from '@/lib/vehicle-slug'
 
 interface CompareTableProps {
   cars: CarSpec[]
@@ -19,11 +20,7 @@ function WinnerPill({ children }: { children: React.ReactNode }) {
 
 export default function CompareTable({ cars, winners }: CompareTableProps) {
   const rows: Array<{ label: string; render: (car: CarSpec) => React.ReactNode; winner?: string }> = [
-    {
-      label: 'Preço',
-      winner: winners.priceBrl,
-      render: (car) => formatBRL(car.priceBrl),
-    },
+    { label: 'Ano-modelo', render: (car) => String(car.year) },
     {
       label: 'Motor',
       render: (car) => `${car.engineType} ${car.displacement} ${car.turbo ? 'Turbo' : ''}`.trim(),
@@ -43,16 +40,20 @@ export default function CompareTable({ cars, winners }: CompareTableProps) {
       render: (car) => car.transmission,
     },
     {
-      label: 'Consumo (cidade)',
+      label: 'Consumo na cidade',
       winner: winners.fuelEconomyCityGas,
-      render: (car) => `${car.fuelEconomyCityGas} km/l`,
+      render: (car) => car.fuelEconomyCityGas > 0
+        ? car.engineType === 'Flex' && car.fuelEconomyCityEthanol
+          ? `${car.fuelEconomyCityGas} km/l (gasolina) · ${car.fuelEconomyCityEthanol} km/l (etanol)`
+          : `${car.fuelEconomyCityGas} km/l (${car.engineType.toLocaleLowerCase('pt-BR')})`
+        : 'Não informado',
     },
     {
       label: '0-100 km/h',
       render: (car) => `${car.acceleration0100}s`,
     },
     {
-      label: 'Porta-malas',
+      label: 'Caçamba / porta-malas',
       winner: winners.trunkCapacity,
       render: (car) => `${car.trunkCapacity} L`,
     },
@@ -73,15 +74,14 @@ export default function CompareTable({ cars, winners }: CompareTableProps) {
       {/* Header */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
         {cars.map((car) => {
-          const brandSlug = car.brand.toLowerCase().replace(/\s+/g, '-')
           return (
-            <Link href={`/${brandSlug}/${car.slug}`} key={car.id} className="bg-white border border-[#EAEAE8] rounded-2xl p-4 hover:border-[#0A0A0A] transition-colors">
+            <Link href={`/${slugifyBrand(car.brand)}/${canonicalModelSlug(car.model)}`} key={car.id} className="bg-white border border-[#EAEAE8] rounded-2xl p-4 hover:border-[#0A0A0A] transition-colors">
               <div className="w-full aspect-square rounded-xl mb-3 overflow-hidden bg-[#FAFAF9] border border-[#EAEAE8]">
-                <CarImage id={car.id} brand={car.brand} model={car.model} year={car.year} src={car.image} fit="cover" aspectRatio="1/1" className="w-full h-full object-cover" />
+                <CarImage id={car.id} brand={car.brand} model={car.model} year={car.year} src={car.image} strict fit="cover" aspectRatio="1/1" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-[14px] font-semibold text-[#0A0A0A] tracking-tight">{car.brand} {car.model}</h3>
               <p className="text-[12px] text-[#A3A3A3] mt-0.5">{car.version}</p>
-              <p className="text-[15px] font-semibold text-[#0A0A0A] mt-2 tracking-tight">{formatBRL(car.priceBrl)}</p>
+              <p className="text-[12px] text-[#52607A] mt-2">Consulte a FIPE por versão e ano</p>
             </Link>
           )
         })}

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import AnnouncementLanding from '@/components/seo/AnnouncementLanding'
 
-const description = 'Crie seu anúncio de carro grátis na Carbi. Informe os dados do veículo, inclua fotos e converse com pessoas interessadas.'
+const description = 'Crie seu anúncio de carro sem custo no plano gratuito: até 5 anúncios ativos por conta e até 10 fotos em cada anúncio.'
 
 export const metadata: Metadata = {
   title: 'Anunciar carro grátis | Venda seu carro na Carbi',

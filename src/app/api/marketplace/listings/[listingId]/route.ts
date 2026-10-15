@@ -3,7 +3,8 @@ import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingDeletedEmail, sendListingStatusChangedEmail } from '@/lib/email'
-import { buildListingRollbackPayload, normalizePlateFinal, resolveTruckPatch } from '@/lib/marketplace'
+import { buildListingRollbackPayload, getListingPriceReview, normalizePlateFinal, parseFipePriceToNumber, resolveTruckPatch } from '@/lib/marketplace'
+import { getFipePrice } from '@/lib/fipe-api'
 import type { TruckCategory } from '@/lib/trucks'
 import {
   normalizeBodyType,
@@ -146,6 +147,32 @@ export async function PATCH(
     if (truckPatch.error) return NextResponse.json({ error: truckPatch.error }, { status: 400 })
     Object.assign(updates, truckPatch.updates)
 
+    const identityChanged = ['brand', 'model', 'version', 'year_model'].some((field) => field in updates)
+    const effectiveBrand = typeof updates.brand === 'string' ? updates.brand : listing.brand
+    const effectiveModel = typeof updates.model === 'string' ? updates.model : listing.model
+    const effectiveVersion = typeof updates.version === 'string' ? updates.version : listing.version
+    const effectiveYear = typeof updates.year_model === 'number' ? updates.year_model : listing.year_model
+    const effectivePrice = typeof updates.price === 'number' ? updates.price : Number(listing.price)
+    let exactFipePrice: number | null = null
+    let fipeReferenceMonth: string | null = null
+    if (listing.vehicle_type !== 'truck') {
+      try {
+        const fipeResult = await getFipePrice(effectiveBrand, effectiveModel, effectiveYear, effectiveVersion || undefined)
+        exactFipePrice = fipeResult ? parseFipePriceToNumber(fipeResult.price) || null : null
+        fipeReferenceMonth = fipeResult?.referenceMonth || null
+      } catch (error) {
+        console.error('FIPE lookup failed during listing update review', { listingId, error })
+      }
+      if (exactFipePrice) {
+        updates.fipe_price = exactFipePrice
+        updates.fipe_reference_month = fipeReferenceMonth
+      } else if (identityChanged) {
+        updates.fipe_price = null
+        updates.fipe_reference_month = null
+      }
+    }
+    const reviewFipePrice = exactFipePrice ?? (!identityChanged ? (Number(listing.fipe_price) || null) : null)
+    const priceReview = listing.vehicle_type === 'truck' ? null : getListingPriceReview(effectivePrice, reviewFipePrice)
     // Handle status transition for published_at
     if (typeof body.status === 'string') {
       const allowedStatus = new Set(['active', 'sold', 'paused', 'archived'])
@@ -156,6 +183,16 @@ export async function PATCH(
       if (body.status === 'active' && !listing.published_at) {
         updates.published_at = new Date().toISOString()
       } else if (body.status !== 'active') {
+        updates.published_at = null
+      }
+    }
+
+    if (priceReview) {
+      if (body.status === 'active' && listing.status !== 'active') {
+        return NextResponse.json({ error: `${priceReview.reason} Ajuste o valor antes de reativar o anúncio.`, review: priceReview }, { status: 409 })
+      }
+      if (listing.status === 'active' && (!body.status || body.status === 'active')) {
+        updates.status = 'paused'
         updates.published_at = null
       }
     }

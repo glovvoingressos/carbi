@@ -98,6 +98,7 @@ export default function BlogPage() {
             <p className="blog-hero-sub">
               Dicas, comparativos e análises para você decidir com dados reais.
             </p>
+            <p className="mt-3 text-xs text-gray-500">Responsabilidade editorial: Carbi.</p>
           </div>
         </section>
 

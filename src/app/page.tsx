@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   ArrowRight, ChevronRight, Plus, Zap,
 } from 'lucide-react'
 import { getLatestPublicListings, searchPublicListings } from '@/lib/marketplace-server'
 import { cars } from '@/data/cars'
-import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
 import ModelComparison from '@/components/home/ModelComparison'
 import RankingsBanner from '@/components/home/RankingsBanner'
 import HomeCounters from '@/components/home/HomeCounters'
@@ -14,24 +14,26 @@ import HomeListings from '@/components/home/HomeListings'
 import HomeFeaturedListing, { type HomeFeaturedListingData } from '@/components/home/HomeFeaturedListing'
 import HomeHero from '@/components/home/HomeHero'
 import { heroFont } from '@/components/home/home-font'
+import { slugifyBrand } from '@/lib/brand-utils'
+import { canonicalModelSlug } from '@/lib/vehicle-slug'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Carbi | anunciar carros grátis, seminovos à venda e FIPE',
-  description: 'Anuncie carros grátis, encontre seminovos à venda, compare preço com FIPE e negocie pelo chat interno.',
+  description: 'Anuncie sem custo no plano gratuito, encontre seminovos à venda e consulte a FIPE quando ano e versão coincidirem.',
   keywords: ['anunciar carros grátis', 'seminovos à venda', 'carros à venda', 'anunciar carro', 'vender carro', 'comprar carro', 'tabela fipe'],
   alternates: { canonical: '/' },
   openGraph: {
     title: 'Carbi | anunciar carros grátis, seminovos à venda e FIPE',
-    description: 'Anuncie carros grátis, encontre seminovos à venda, compare preço com FIPE e negocie pelo chat interno.',
+    description: 'Anuncie sem custo no plano gratuito, encontre seminovos à venda e consulte a FIPE quando ano e versão coincidirem.',
     url: '/',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Carbi | anunciar carros grátis, seminovos à venda e FIPE',
-    description: 'Anuncie carros grátis, encontre seminovos à venda, compare preço com FIPE e negocie pelo chat interno.',
+    description: 'Anuncie sem custo no plano gratuito, encontre seminovos à venda e consulte a FIPE quando ano e versão coincidirem.',
   },
 }
 
@@ -86,19 +88,22 @@ export default async function HomePage() {
   const topBrands = [...new Set(listings.map((l) => l.brand))].slice(0, 6)
   const cities = [...new Set(listings.map((l) => l.city))].filter(Boolean).slice(0, 6)
 
-  const mapCar = (c: typeof cars[0]) => ({
-    brand: c.brand,
-    model: c.model,
-    version: c.version,
-    segment: c.segment,
-    priceBrl: c.priceBrl,
-    horsepower: c.horsepower,
-    fuelEconomyCityGas: c.fuelEconomyCityGas,
-    airbagsCount: c.airbagsCount,
-    slug: c.slug,
-    image: c.image,
-    idealFor: c.idealFor,
-  })
+  const mapCar = (c: typeof cars[0]) => {
+    return {
+      brand: c.brand,
+      model: c.model,
+      version: c.version,
+      segment: c.segment,
+      engineType: c.engineType,
+      horsepower: c.horsepower,
+      fuelEconomyCityGas: c.fuelEconomyCityGas,
+      airbagsCount: c.airbagsCount,
+      slug: c.slug,
+      image: c.image,
+      idealFor: c.idealFor,
+      modelPath: `/${slugifyBrand(c.brand)}/${canonicalModelSlug(c.model)}`,
+    }
+  }
   const comparisonCars = cars.filter((c) => c.isPopular).slice(0, 2).map(mapCar)
   const allComparisonCars = cars.map(mapCar)
 
@@ -112,7 +117,7 @@ export default async function HomePage() {
       />
 
       <div className="cb-wrap">
-        <HomeCounters cityCount={cities.length} />
+        <HomeCounters cityCount={new Set(listings.map((listing) => listing.city.trim().toLocaleLowerCase('pt-BR')).filter(Boolean)).size} />
       </div>
 
       {/* ═══ PLATE LOOKUP ═══ */}
@@ -184,7 +189,14 @@ export default async function HomePage() {
           </div>
 
           <div className="cb-process-visual">
-            <img src="/images/ChatGPT Image 31 de ago. de 2026, 22_12_52-2.png" alt="Chat interno Carbi" loading="lazy" />
+            <Image
+              src="/images/ChatGPT Image 31 de ago. de 2026, 22_12_52-2.png"
+              alt="Chat interno Carbi"
+              width={1275}
+              height={1234}
+              sizes="(max-width: 767px) 100vw, 50vw"
+              loading="lazy"
+            />
           </div>
         </div>
       </section>
@@ -204,8 +216,8 @@ export default async function HomePage() {
               </div>
               <div className="cb-build-card-featured-content">
                 <div>
-                  <h3>Anuncie grátis em 2 minutos</h3>
-                  <p>Seu anúncio com fotos, comparação com a FIPE e alcance para compradores interessados.</p>
+                  <h3>Anuncie grátis em poucos passos</h3>
+                  <p>Apresente seu carro com fotos atuais, dados do veículo e preço pedido.</p>
                 </div>
                 <span className="cb-build-cta">
                   Anunciar meu carro <ArrowRight size={16} />
@@ -214,20 +226,20 @@ export default async function HomePage() {
             </Link>
             <Link href="/qual-carro" className="cb-build-card cb-build-card-lime cb-build-card-secondary">
               <div>
-                <h3>Compare com a FIPE</h3>
-                <p>Saiba se o preço está justo antes de fechar negócio.</p>
+                <h3>Compare veículos e preços</h3>
+                <p>Consulte a FIPE quando houver correspondência de ano e versão.</p>
               </div>
               <span className="cb-build-cta">
                 Comparar agora <ArrowRight size={16} />
               </span>
             </Link>
-            <Link href="/trafego-pago-gratis" className="cb-build-card cb-build-card-light cb-build-card-secondary">
+            <Link href="/anunciar-carro" className="cb-build-card cb-build-card-light cb-build-card-secondary">
               <div>
-                <h3>Tráfego pago grátis</h3>
-                <p>Divulgamos seus anúncios no Google e Meta Ads sem custo.</p>
+                <h3>Anuncie sem custo</h3>
+                <p>Mantenha até 5 anúncios ativos por conta e adicione até 10 fotos em cada anúncio.</p>
               </div>
               <span className="cb-build-cta">
-                Saiba mais <ArrowRight size={16} />
+                Começar anúncio <ArrowRight size={16} />
               </span>
             </Link>
           </div>
@@ -268,7 +280,7 @@ export default async function HomePage() {
               <div className="cb-cta-eyebrow">Carbi</div>
               <h2>Pronto para encontrar o carro certo?</h2>
               <p>
-                Anuncie grátis, compare preços com a FIPE e negocie direto com o vendedor.
+                Anuncie no plano gratuito, consulte a FIPE quando houver correspondência e converse pelo chat interno.
                 Sem complicação, do jeito que deveria ser.
               </p>
               <div className="cb-hero-cta-row" style={{ marginBottom: 0 }}>

@@ -160,7 +160,7 @@ export default async function CarrosAVendaPage({
             )}
           </h1>
           <p className="cbi-hero-sub">
-            {result.total} anúncios ativos na plataforma. Compare com a Tabela FIPE e negocie com segurança.
+            {result.total} anúncios ativos na plataforma. O preço mostrado é o valor pedido pelo vendedor; a referência FIPE aparece quando há correspondência disponível.
           </p>
         </section>
 
@@ -179,7 +179,7 @@ export default async function CarrosAVendaPage({
             items={[
               { q: 'Como comprar um carro com segurança na Carbi?', a: 'Sempre utilize nosso chat interno para negociação, verifique as fotos detalhadas e agende visitas em locais públicos e movimentados.' },
               { q: 'Os preços dos carros são negociáveis?', a: 'Sim, a Carbi facilita a conexão direta entre comprador e vendedor, permitindo que vocês cheguem ao melhor valor sem taxas de corretagem.' },
-              { q: 'Como saber se o carro está com preço justo?', a: 'Cada anúncio exibe uma comparação automática com a Tabela FIPE do mês vigente, indicando se o valor está abaixo, na média ou acima do mercado.' }
+              { q: 'Como saber se o preço pedido está próximo da FIPE?', a: 'A comparação aparece quando ano e versão do anúncio correspondem a uma referência disponível. Confira o mês indicado; a FIPE é uma referência, não o preço final de venda.' }
             ]}
           />
         </section>

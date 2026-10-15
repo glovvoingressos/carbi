@@ -8,7 +8,7 @@ import './announcement-landing.css'
 const benefits = [
   {
     title: 'Grátis',
-    description: 'para anunciar seu carro',
+    description: 'plano padrão, até 5 anúncios ativos por conta',
   },
   {
     title: 'Até 10 fotos',
@@ -41,7 +41,7 @@ const steps = [
 const questions = [
   {
     question: 'Anunciar meu carro tem algum custo?',
-    answer: 'Não. Criar e enviar seu anúncio na Carbi é grátis.',
+    answer: 'A publicação padrão faz parte do plano gratuito, sem prazo promocional definido na oferta atual. O limite é de até 5 anúncios ativos por conta; recursos Pro têm cobrança separada.',
   },
   {
     question: 'Quantas fotos posso adicionar?',

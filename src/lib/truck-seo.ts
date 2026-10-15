@@ -380,14 +380,14 @@ export const TRUCK_TOPIC_PRESETS: TruckSeoPreset[] = [
   {
     slug: 'anunciar-gratis',
     title: 'Anunciar caminhão grátis',
-    description: 'Publique seu caminhão grátis na Carbi, com ficha técnica, fotos e chat interno.',
+    description: 'Publique seu caminhão sem custo no plano gratuito, dentro do limite de anúncios ativos por conta, com ficha técnica, fotos e chat interno.',
     h1: 'Anunciar caminhão grátis',
-    intro: 'Publique seu caminhão sem custo e alcance compradores de todo o Brasil.',
+    intro: 'Publique os dados do caminhão na Carbi e converse com interessados pelo chat interno.',
     listingQuery: { sort: 'recent' },
     faq: [
       {
         q: 'Anunciar caminhão na Carbi tem alguma taxa?',
-        a: 'Não. O anúncio é gratuito: você preenche a ficha técnica, adiciona fotos e publica. A negociação acontece pelo chat interno da plataforma.',
+        a: 'A publicação padrão faz parte do plano gratuito, sem prazo promocional definido na oferta atual. O limite é de até 5 anúncios ativos por conta e 10 fotos por anúncio; recursos Pro podem ter cobrança própria.',
       },
       {
         q: 'Preciso ter conta para anunciar meu caminhão?',
@@ -545,7 +545,7 @@ export function hasTruckPresetInventory(preset: TruckSeoPreset, inventory: Publi
   const cities = input.city ? (Array.isArray(input.city) ? input.city : [input.city]).flatMap(cityPatternVariants) : []
   const fuels = input.fuel ? (Array.isArray(input.fuel) ? input.fuel : [input.fuel]).flatMap((fuel) => filterSearchTokens(fuel, 'fuel')) : []
 
-  return inventory.some((listing) => {
+  return inventory.filter((listing) => {
     if (!listing.slug) return false
     if (input.brand && (Array.isArray(input.brand)
       ? !input.brand.includes(listing.brand || '')
@@ -559,7 +559,7 @@ export function hasTruckPresetInventory(preset: TruckSeoPreset, inventory: Publi
     if (input.yearMin != null && (listing.year_model == null || listing.year_model < input.yearMin)) return false
     if (input.yearMax != null && (listing.year_model == null || listing.year_model > input.yearMax)) return false
     return true
-  })
+  }).length >= 3
 }
 
 export function truckPresetMetadata(preset: TruckSeoPreset, hasParameters = false, hasInventory = true): Metadata {
@@ -679,11 +679,11 @@ export const TRUCK_FAQ: TruckFaq[] = [
   },
   {
     q: 'Posso anunciar meu caminhão gratuitamente?',
-    a: 'Sim. O anúncio de caminhão é gratuito, com ficha técnica, fotos e chat interno para negociar sem expor seu telefone.',
+    a: 'A publicação padrão faz parte do plano gratuito, dentro do limite de até 5 anúncios ativos por conta e até 10 fotos por anúncio. Recursos Pro podem ter cobrança própria.',
   },
   {
     q: 'A consulta pela placa funciona para caminhões?',
-    a: 'Sim. A busca por placa retorna marca, modelo, ano e versão do caminhão para preencher o anúncio em poucos passos.',
+    a: 'A busca por placa consulta os dados disponíveis. Confira e complete marca, modelo, ano e versão antes de publicar.',
   },
 ]
 

@@ -15710,7 +15710,7 @@ p {
 .cb-rankings-table-head,
 .cb-rankings-table-row {
   display: grid !important;
-  grid-template-columns: 70px minmax(220px, 2fr) minmax(140px, 1.2fr) minmax(150px, 1.2fr) 120px 44px !important;
+  grid-template-columns: 70px minmax(220px, 2fr) minmax(160px, 1.2fr) minmax(160px, 1fr) 44px !important;
   align-items: center;
   gap: 16px;
 }

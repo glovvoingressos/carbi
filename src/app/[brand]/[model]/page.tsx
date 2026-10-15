@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { formatBRL } from '@/data/cars'
-import { getCarDetail, getCarVariants } from '@/lib/data-fetcher'
+import { getCarDetail, getCarVariants, isTiggoFamilyRoute } from '@/lib/data-fetcher'
 import { getFipePrice, getFipeHistory, getFipeYearsByModelName } from '@/lib/fipe-api'
+import { formatBRL } from '@/data/cars'
 import CarCard from '@/components/car/CarCard'
 import {
   Fuel, Zap, Gauge, Shield, Package, Timer, ChevronRight, TrendingDown, ArrowRight
@@ -14,21 +14,28 @@ import VideoReviews from '@/components/car/VideoReviews'
 import CarImage from '@/components/car/CarImage'
 import YearSelector from '@/components/car/YearSelector'
 import FipeHistory from '@/components/car/FipeHistory'
-import { getEnhancedSpecs } from '@/lib/car-query-service'
 import { getListingVehicleId, getRelatedListings } from '@/lib/marketplace-server'
 import MarketplaceListingCard from '@/components/marketplace/ListingCard'
 import { getAllCars, groupCarsByModel } from '@/lib/data-fetcher'
 import { getVehicleEnrichmentForPublic } from '@/lib/vehicle-enrichment-server'
 import { slugifyBrand } from '@/lib/brand-utils'
+import { heroFont } from '@/components/home/home-font'
+import { getCatalogCarImage } from '@/data/unsafeCarAssets'
+import './model-page.css'
 
 export async function generateStaticParams() {
   const cars = await getAllCars()
-  return groupCarsByModel(cars)
+  const params = groupCarsByModel(cars)
     .map((item) => ({
       brand: slugifyBrand(item.representative.brand),
       model: item.modelSlug,
     }))
     .slice(0, 250)
+
+  if (cars.some((car) => slugifyBrand(car.brand) === 'caoa-chery' && /^tiggo/i.test(car.model))) {
+    params.push({ brand: 'caoa-chery', model: 'tiggo' })
+  }
+  return params
 }
 
 export async function generateMetadata({
@@ -40,14 +47,56 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const resolved = await params
   const sp = await searchParams
-  const car = await getCarDetail(resolved.brand, resolved.model)
+  if (sp.year?.trim() && !/^\d{4}$/.test(sp.year)) {
+    return { title: 'Ano-modelo não encontrado', robots: { index: false, follow: true } }
+  }
+  if (isTiggoFamilyRoute(resolved.brand, resolved.model)) {
+    const hasVariantParameters = Boolean(sp.year?.trim() || sp.version?.trim())
+    const title = 'Linha CAOA Chery Tiggo: compare Tiggo 5X, 7 e 8'
+    const description = 'Compare os modelos Tiggo 5X, Tiggo 7 e Tiggo 8 da CAOA Chery e acesse a ficha técnica da geração desejada.'
+    return {
+      title,
+      description,
+      alternates: { canonical: `/${resolved.brand}/${resolved.model}` },
+      robots: hasVariantParameters ? { index: false, follow: true } : { index: true, follow: true },
+      openGraph: {
+        title: `${title} | Carbi`,
+        description,
+        url: `/${resolved.brand}/${resolved.model}`,
+        type: 'website',
+      },
+    }
+  }
+  let car = await getCarDetail(resolved.brand, resolved.model)
 
   if (!car) return { title: 'Carro não encontrado' }
+  if (sp.version?.trim()) {
+    const variants = await getCarVariants(resolved.brand, resolved.model)
+    const requestedVersion = sp.version.trim().toLocaleLowerCase('pt-BR')
+    const matchingVariant = variants.find((variant) => variant.version.trim().toLocaleLowerCase('pt-BR') === requestedVersion)
+    if (!matchingVariant) return { title: 'Versão não encontrada', robots: { index: false, follow: true } }
+    car = matchingVariant
+  }
+  const catalogImage = getCatalogCarImage(car.brand, car.model, car.image)
   const modelName = `${car.brand} ${car.model}`
-  const title = `${modelName}: preço, versões e ficha técnica`
+  const requestedYear = sp.year && /^\d{4}$/.test(sp.year) ? Number.parseInt(sp.year, 10) : Number.NaN
+  let metadataYears: number[] = []
+  try {
+    metadataYears = await getFipeYearsByModelName(car.brand, car.model, 24, car.version)
+  } catch (error) {
+    console.error('Unable to resolve FIPE years for catalog metadata', error)
+  }
+  const titleYear = Number.isInteger(requestedYear) && (metadataYears.length === 0 || metadataYears.includes(requestedYear))
+    ? requestedYear
+    : (metadataYears.includes(car.year) ? car.year : metadataYears[0] || car.year)
+  if (Number.isInteger(requestedYear) && metadataYears.length > 0 && !metadataYears.includes(requestedYear)) {
+    return { title: 'Ano-modelo não encontrado', robots: { index: false, follow: true } }
+  }
+  const titleVersion = car.version
+  const title = `${modelName} ${titleYear} ${titleVersion}: preço e ficha técnica`
   // O template do layout já adiciona "| Carbi"; OG/Twitter não passam por ele.
   const socialTitle = `${title} | Carbi`
-  const description = `${modelName} à venda: consulte preço FIPE, versões, consumo, ficha técnica e anúncios de carros usados e seminovos na Carbi.`
+  const description = `Consulte dados de catálogo e preço FIPE do ${modelName} ${titleYear} ${titleVersion}. A FIPE pode não ter valor disponível para todas as combinações de ano e versão.`
   const hasVariantParameters = Boolean(sp.year?.trim() || sp.version?.trim())
 
   return {
@@ -63,7 +112,7 @@ export async function generateMetadata({
       description,
       url: `/${resolved.brand}/${resolved.model}`,
       type: 'website',
-      ...(car.image ? { images: [{ url: car.image, alt: modelName }] } : {}),
+      ...(titleYear === car.year && catalogImage ? { images: [{ url: catalogImage, alt: modelName }] } : {}),
     },
   }
 }
@@ -77,31 +126,32 @@ export default async function CarDetailPage({
 }) {
   const resolved = await params
   const { year: searchYear, version: searchVersion } = await searchParams
+  if (isTiggoFamilyRoute(resolved.brand, resolved.model)) {
+    const familyModels = groupCarsByModel((await getAllCars()).filter((car) =>
+      slugifyBrand(car.brand) === 'caoa-chery' && /^tiggo\s/i.test(car.model),
+    )).sort((a, b) => a.modelSlug.localeCompare(b.modelSlug))
+    if (familyModels.length === 0) notFound()
+    return <TiggoFamilyHub models={familyModels} />
+  }
   let car = await getCarDetail(resolved.brand, resolved.model)
 
   if (!car) notFound()
   const modelVariants = await getCarVariants(resolved.brand, resolved.model)
-  if (searchVersion && modelVariants.length > 0) {
-    const desired = searchVersion.trim().toLowerCase()
-    const matched = modelVariants.find((variant) => variant.version.trim().toLowerCase() === desired)
-      || modelVariants.find((variant) => variant.version.trim().toLowerCase().includes(desired))
-    if (matched) {
-      car = matched
-    }
+  if (searchVersion?.trim()) {
+    const desired = searchVersion.trim().toLocaleLowerCase('pt-BR')
+    const matched = modelVariants.find((variant) => variant.version.trim().toLocaleLowerCase('pt-BR') === desired)
+    if (!matched) notFound()
+    car = matched
   }
+  const catalogImage = getCatalogCarImage(car.brand, car.model, car.image)
 
-  const requestedYear = searchYear ? parseInt(searchYear, 10) : car.year
+  const hasValidSearchYear = searchYear && /^\d{4}$/.test(searchYear)
+  if (searchYear && !hasValidSearchYear) notFound()
 
   const allCars = await getAllCars()
   const brandSlug = car.brand.toLowerCase().replace(/\s+/g, '-')
   const segmentCars = allCars.filter((c) => c.segment === car.segment)
   const similarCars = segmentCars.filter((c) => c.id !== car.id).slice(0, 4)
-  const benchmarkCars = segmentCars.length > 0 ? segmentCars : [car]
-  const bestPrice = Math.min(...benchmarkCars.map((c) => c.priceBrl))
-  const bestConsumption = Math.max(...benchmarkCars.map((c) => c.fuelEconomyCityGas))
-  const bestHp = Math.max(...benchmarkCars.map((c) => c.horsepower))
-  const bestTorque = Math.max(...benchmarkCars.map((c) => c.torque))
-  const bestTrunk = Math.max(...benchmarkCars.map((c) => c.trunkCapacity))
 
   let availableYears: number[] = []
   try {
@@ -110,13 +160,18 @@ export default async function CarDetailPage({
     console.error('Failed to fetch years for selector')
   }
 
-  const displayYear = Number.isFinite(requestedYear) && availableYears.includes(requestedYear)
+  const requestedYear = hasValidSearchYear ? Number.parseInt(searchYear, 10) : car.year
+  if (hasValidSearchYear && availableYears.length > 0 && !availableYears.includes(requestedYear)) notFound()
+  const displayYear = Number.isInteger(requestedYear) && availableYears.includes(requestedYear)
     ? requestedYear
-    : (availableYears[0] || null)
+    : hasValidSearchYear
+      ? requestedYear
+      : (availableYears.includes(car.year) ? car.year : availableYears[0] || car.year)
 
   const fipeData = displayYear ? await getFipePrice(car.brand, car.model, displayYear, car.version) : null
   const priceHistory = await getFipeHistory(car.brand, car.model, 6, car.version)
-  const enhancedSpecs = displayYear ? await getEnhancedSpecs(car.brand, car.model, displayYear) : null
+  const isCatalogYear = displayYear === car.year
+  const selectedCatalogImage = isCatalogYear ? catalogImage : null
   const relatedListings = await getRelatedListings({
     brand: car.brand,
     model: car.model,
@@ -132,20 +187,38 @@ export default async function CarDetailPage({
   const fipePrice = fipeData ? parseFipeValue(fipeData.price) : null
   const displayPriceLabel = fipePrice ? formatBRL(fipePrice) : 'Não disponível'
 
-  const displayHp = enhancedSpecs?.horsepower || car.horsepower
-  const displayTorque = enhancedSpecs?.torque || car.torque
-  const displayWeight = enhancedSpecs?.weight || car.weightKg
-  const displayEngine = car.displacement && car.displacement !== 'Não informado'
-    ? `${car.engineType} ${car.displacement}L${car.turbo ? ' Turbo' : ''}`
+  const displayHp = isCatalogYear ? car.horsepower : 0
+  const displayTorque = isCatalogYear ? car.torque : 0
+  const displayWeight = isCatalogYear ? car.weightKg : 0
+  const displacementValue = Number.parseFloat(String(car.displacement).replace(',', '.'))
+  const displacementText = String(car.displacement || '').trim()
+  const displacementParts = displacementText.match(/^(\d+(?:[.,]\d+)?)(.*)$/)
+  const displayEngine = isCatalogYear
+    ? Number.isFinite(displacementValue) && displacementValue > 0
+      ? `${displacementParts?.[1]?.replace(',', '.') || displacementText} L${displacementParts?.[2] ? ` ${displacementParts[2].trim()}` : ''}${car.turbo && !/turbo/i.test(displacementParts?.[2] || '') ? ' Turbo' : ''}`
+      : car.engineType === 'Elétrico' ? 'Elétrico' : 'Não informado'
     : 'Não informado'
-  const displayTransmission = car.transmission && car.transmission !== 'Não informado' ? car.transmission : 'Não informado'
-  const displayFuel = car.engineType && car.engineType !== 'Não informado' ? car.engineType : 'Não informado'
-  const displayConsumption = car.fuelEconomyCityGas > 0 ? `${car.fuelEconomyCityGas} km/l` : 'Não informado'
-  const displayTrunk = car.trunkCapacity > 0 ? `${car.trunkCapacity} L` : 'Não informado'
+  const displayTransmission = isCatalogYear && car.transmission && car.transmission !== 'Não informado' ? car.transmission : 'Não informado'
+  const displayFuel = isCatalogYear && ['Gasolina', 'Flex', 'Diesel', 'Elétrico', 'Híbrido', 'Híbrido plug-in'].includes(car.engineType)
+    ? car.engineType
+    : 'Não informado'
+  const displayConsumption = isCatalogYear && car.fuelEconomyCityGas > 0
+    ? car.engineType === 'Flex' && car.fuelEconomyCityEthanol
+      ? `${car.fuelEconomyCityGas} km/l (gasolina) · ${car.fuelEconomyCityEthanol} km/l (etanol)`
+      : `${car.fuelEconomyCityGas} km/l (${car.engineType.toLocaleLowerCase('pt-BR')})`
+    : 'Não informado'
+  const displayTrunk = isCatalogYear && car.trunkCapacity > 0 ? `${car.trunkCapacity} L` : 'Não informado'
+  const cargoLabel = car.segment === 'pickup' ? 'Caçamba' : 'Porta-malas'
+  const displayWeightLabel = displayWeight > 0 ? `${displayWeight} kg` : 'Não informado'
+  const catalogMeasure = (value: number, unit: string) => isCatalogYear && Number.isFinite(value) && value > 0 ? `${value} ${unit}` : 'Não informado'
+  const schemaVehicle = isCatalogYear
+    ? { ...car, image: selectedCatalogImage || undefined, year_model: displayYear }
+    : { ...car, image: undefined, year_model: displayYear, engineType: undefined, transmission: undefined, fuel: undefined, fuelType: undefined, color: undefined }
 
   return (
-    <div className="container pt-24 pb-8">
-      <VehicleSchema vehicle={car} />
+    <div className={`car-model-page ${heroFont.variable}`}>
+      <div className="cmp-container">
+      <VehicleSchema vehicle={schemaVehicle} />
       <BreadcrumbSchema items={[
         { name: 'Home', url: '/' },
         { name: 'Marcas', url: '/marcas' },
@@ -154,7 +227,7 @@ export default async function CarDetailPage({
       ]} />
 
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-sm text-[#A3A3A3] mb-6 overflow-x-auto no-scrollbar">
+      <nav className="cmp-breadcrumb flex items-center gap-1.5 text-sm text-[#A3A3A3] mb-6 overflow-x-auto no-scrollbar">
         <Link href="/" className="hover:text-[#0A0A0A] transition-colors shrink-0">Home</Link>
         <ChevronRight className="w-3 h-3 shrink-0" />
         <Link href="/marcas" className="hover:text-[#0A0A0A] transition-colors shrink-0">Marcas</Link>
@@ -165,42 +238,55 @@ export default async function CarDetailPage({
       </nav>
 
       {/* Main Grid */}
-      <div className="grid items-start gap-8 lg:grid-cols-[1fr_360px] max-[330px]:gap-5">
+      <div className="cmp-main-grid grid items-start gap-8 lg:grid-cols-[1fr_360px] max-[330px]:gap-5">
 
         {/* ── MAIN COLUMN ── */}
-        <div className="space-y-8">
+        <div className="cmp-content-column space-y-8">
 
           {/* Hero */}
-          <div className="card-elevated grid overflow-hidden md:grid-cols-2">
-            <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-[#FAFAF9]">
-              <CarImage
+          <section className="cmp-hero card-elevated grid overflow-hidden md:grid-cols-2">
+            <div className="cmp-hero-photo relative flex items-center justify-center overflow-hidden bg-[#FAFAF9]">
+              {isCatalogYear ? <CarImage
                 id={car.id}
                 brand={car.brand}
                 model={car.model}
                 year={car.year}
-                src={car.image}
-                fit="cover"
+                src={selectedCatalogImage || undefined}
+                priority
+                strict
+                fit="contain"
                 aspectRatio="1/1"
                 className="h-full w-full"
-              />
+              /> : (
+                <div className="flex h-full w-full items-center justify-center p-6 text-center text-sm text-[#737373]">
+                  Imagem não confirmada para o ano-modelo {displayYear}.
+                </div>
+              )}
+              {selectedCatalogImage?.startsWith('https://cloudfront.alpes.one/') && (
+                <span className="cmp-photo-caption">Imagem oficial CAOA Chery</span>
+              )}
             </div>
-            <div className="flex flex-col justify-center p-6 md:p-8 max-[330px]:p-4">
-              <div className="mb-4 flex flex-wrap gap-2">
+            <div className="cmp-hero-copy flex flex-col justify-center p-6 md:p-8 max-[330px]:p-4">
+              <div className="cmp-badges mb-4 flex flex-wrap gap-2">
                 <span className="badge badge-brand text-[10px]">{car.segment}</span>
-                {car.year === 2024 && <span className="badge badge-neutral text-[10px]">Novo</span>}
                 {car.turbo && <span className="badge badge-neutral text-[10px]">Turbo</span>}
               </div>
-              <h1 className="mb-1 text-2xl font-bold leading-tight text-[#0A0A0A] md:text-3xl max-[330px]:text-xl">{car.brand} {car.model}</h1>
-              <p className="text-sm text-[#525252] mb-1">{car.version}</p>
-              <p className="text-xs text-[#A3A3A3] mb-3">Preço FIPE</p>
-              <p className="text-3xl font-bold tracking-normal text-[#10B981] md:text-4xl max-[330px]:text-2xl">{displayPriceLabel}</p>
+              <h1 className="cmp-title mb-1 text-2xl font-bold leading-tight text-[#0A0A0A] md:text-3xl max-[330px]:text-xl">{car.brand} {car.model} {displayYear} {car.version}</h1>
+              <p className="cmp-intro">Ficha técnica e referência de preço para a versão e o ano selecionados.</p>
+              <div className="cmp-price-panel">
+                <p className="cmp-price-label">Preço FIPE · {fipeData ? 'consulta confirmada' : 'sem valor confirmado'}</p>
+                <p className="cmp-price-value">{displayPriceLabel}</p>
+                {fipeData
+                  ? <p className="cmp-price-source">Fonte: FIPE via Parallelum · referência {fipeData.referenceMonth} · ano-modelo {fipeData.modelYear}</p>
+                  : <p className="cmp-price-source">Não exibimos estimativa sem uma correspondência confirmada de ano e versão.</p>}
+              </div>
               <div className="flex gap-3 mt-5 items-center">
                 <YearSelector currentYear={displayYear || 'Sem ano'} availableYears={availableYears} />
               </div>
 
               {searchYear && (
                 <div className="mt-3 px-3 py-2 bg-[#ECFDF5] rounded-lg text-xs font-medium text-[#10B981]">
-                  Exibindo dados de {displayYear}. Alguns campos podem variar por versão.
+                  Versão de catálogo: {car.version}, ano-modelo selecionado: {displayYear}. O valor FIPE só aparece quando a versão coincide.
                 </div>
               )}
 
@@ -209,7 +295,7 @@ export default async function CarDetailPage({
                 <span className="font-medium">Ideal para:</span> {car.idealFor}
               </p>
             </div>
-          </div>
+          </section>
 
           {/* Advertise CTA */}
           <section className="card p-5 md:p-6">
@@ -227,10 +313,10 @@ export default async function CarDetailPage({
 
           {/* Key Stats Mobile */}
           <div className="grid grid-cols-2 gap-3 lg:hidden">
-            <StatCard label="Preço FIPE" value={displayPriceLabel} isWinner={fipePrice !== null ? fipePrice <= bestPrice : false} />
-            <StatCard label="Consumo" value={displayConsumption} isWinner={car.fuelEconomyCityGas > 0 ? car.fuelEconomyCityGas === bestConsumption : false} />
-            <StatCard label="Potência" value={`${displayHp} cv`} isWinner={displayHp >= bestHp} />
-            <StatCard label="Torque" value={`${displayTorque} Nm`} isWinner={displayTorque >= bestTorque} />
+            <StatCard label="Preço FIPE" value={displayPriceLabel} />
+            <StatCard label="Consumo" value={displayConsumption} />
+            <StatCard label="Potência" value={displayHp > 0 ? `${displayHp} cv` : 'Não informado'} />
+            <StatCard label="Torque" value={displayTorque > 0 ? `${displayTorque} Nm` : 'Não informado'} />
           </div>
 
           {/* Specs Grid */}
@@ -238,16 +324,22 @@ export default async function CarDetailPage({
             <div className="card p-6">
               <p className="label mb-4">Especificações</p>
               <div className="space-y-3 text-sm">
+                {isCatalogYear && car.catalogSourceUrl && (
+                  <p className="text-xs leading-relaxed text-[#737373]">
+                    Fonte: <a className="underline" href={car.catalogSourceUrl} target="_blank" rel="noreferrer">{car.catalogSourceLabel || 'ficha técnica do fabricante'}</a>
+                    {car.catalogReference ? ` · ${car.catalogReference}` : ''}
+                  </p>
+                )}
                 <SpecRow label="Motor" value={displayEngine} />
                 <SpecRow label="Câmbio" value={displayTransmission} />
                 <SpecRow label="Combustível" value={displayFuel} />
-                <SpecRow label="Tração" value={car.drive} />
-                <SpecRow label="Peso" value={`${displayWeight} kg`} />
-                <SpecRow label="Comprimento" value={`${car.lengthMm} mm`} />
-                <SpecRow label="Entre-eixos" value={`${car.wheelbaseMm} mm`} />
-                <SpecRow label="Porta-malas" value={displayTrunk} isWinner={car.trunkCapacity > 0 ? car.trunkCapacity === bestTrunk : false} />
-                <SpecRow label="Vel. máxima" value={`${car.topSpeed} km/h`} />
-                <SpecRow label="0-100 km/h" value={`${car.acceleration0100}s`} />
+                <SpecRow label="Tração" value={isCatalogYear ? car.drive : 'Não informado'} />
+                <SpecRow label="Peso" value={displayWeightLabel} />
+                <SpecRow label="Comprimento" value={catalogMeasure(car.lengthMm, 'mm')} />
+                <SpecRow label="Entre-eixos" value={catalogMeasure(car.wheelbaseMm, 'mm')} />
+                <SpecRow label={cargoLabel} value={displayTrunk} />
+                <SpecRow label="Vel. máxima" value={catalogMeasure(car.topSpeed, 'km/h')} />
+                <SpecRow label="0-100 km/h" value={catalogMeasure(car.acceleration0100, 's')} />
               </div>
             </div>
 
@@ -255,20 +347,20 @@ export default async function CarDetailPage({
               <div className="card p-6">
                 <p className="label mb-4">Motor ({displayYear})</p>
                 <div className="space-y-3 text-sm">
-                  <SpecRow label="Potência" value={displayHp > 0 ? `${displayHp} cv` : 'Não informado'} isWinner={displayHp > 0 ? displayHp >= bestHp : false} />
-                  <SpecRow label="Torque" value={displayTorque > 0 ? `${displayTorque} Nm` : 'Não informado'} isWinner={displayTorque > 0 ? displayTorque >= bestTorque : false} />
+                  <SpecRow label="Potência" value={displayHp > 0 ? `${displayHp} cv` : 'Não informado'} />
+                  <SpecRow label="Torque" value={displayTorque > 0 ? `${displayTorque} Nm` : 'Não informado'} />
                   <SpecRow label="Tipo Motor" value={displayEngine} />
-                  <SpecRow label="Aspiração" value={car.turbo ? 'Turbo' : 'Natural'} />
+                  <SpecRow label="Aspiração" value={isCatalogYear ? (car.turbo ? 'Turbo' : 'Natural') : 'Não informado'} />
                 </div>
               </div>
 
               <div className="card p-6">
                 <p className="label mb-4">Segurança & Tech</p>
                 <div className="space-y-3 text-sm">
-                  <SpecRow label="Airbags" value={car.airbagsCount > 0 ? `${car.airbagsCount}` : 'Não informado'} />
-                  <SpecRow label="Latin NCAP" value={car.latinNcap > 0 ? `${car.latinNcap}/5` : 'N/A'} />
-                  <SpecRow label="Multimídia" value={car.hasMultimedia ? 'Sim' : 'Não'} />
-                  <SpecRow label="Smartphone" value={car.hasCarplay ? 'Apple/Android' : 'Não'} />
+                  <SpecRow label="Airbags" value={isCatalogYear && car.airbagsCount > 0 ? `${car.airbagsCount}` : 'Não informado'} />
+                  <SpecRow label="Latin NCAP" value={isCatalogYear && car.latinNcap > 0 ? `${car.latinNcap}/5` : 'Não informado'} />
+                  <SpecRow label="Multimídia" value={isCatalogYear ? (car.hasMultimedia ? 'Sim' : 'Não') : 'Não informado'} />
+                  <SpecRow label="Smartphone" value={isCatalogYear ? (car.hasCarplay ? 'Apple/Android' : 'Não') : 'Não informado'} />
                 </div>
               </div>
             </div>
@@ -331,22 +423,27 @@ export default async function CarDetailPage({
 
           {/* SEO Section */}
           <section className="card p-6 md:p-8">
-            <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">
-              Vale a pena comprar o {car.brand} {car.model} em 2026?
+              <h2 className="text-lg font-bold text-[#0A0A0A] mb-4">
+              Dados de catálogo e referência FIPE do {car.brand} {car.model}
             </h2>
             <div className="text-sm text-[#525252] space-y-3 leading-relaxed">
               <p>
-                O <strong>{car.brand} {car.model} {car.year}</strong> consolida-se como uma opção de {car.segment} que atende bem ao mercado atual.
-                Com motorização {car.engineType} e desempenho focado na eficiência, ele faz cerca de {car.fuelEconomyCityGas} km/l na cidade, o que representa um custo competitivo.
+                Esta página reúne os dados de catálogo da versão <strong>{car.brand} {car.model} {car.version} {displayYear}</strong>.
+                {displayEngine !== 'Não informado' ? ` Motorização informada: ${displayEngine}.` : ''}
+                {displayConsumption !== 'Não informado' ? ` Consumo urbano informado no catálogo: ${displayConsumption}.` : ''}
+                {displayTrunk !== 'Não informado' ? ` Capacidade da ${cargoLabel.toLocaleLowerCase('pt-BR')} informada: ${displayTrunk}.` : ''}
               </p>
               <p>
-                Levando em conta o desgaste natural e a projeção de valor ao longo do tempo, a revenda
-                tende a ser em linha com os concorrentes diretos. Se você busca {car.pros[0]?.toLowerCase()} com a segurança
-                de ter {car.trunkCapacity}L de porta-malas, vale sim a pena incluí-lo no seu radar.
+                {fipeData
+                  ? `O valor exibido é da FIPE para ${fipeData.modelYear}, referência ${fipeData.referenceMonth}, consultado via Parallelum.`
+                  : 'Não exibimos um valor FIPE porque não foi possível confirmar a combinação exata de ano e versão.'}
               </p>
             </div>
+            <p className="mt-5 text-xs leading-relaxed text-[#737373]">
+              Responsabilidade editorial: Carbi. A ficha técnica corresponde ao ano de catálogo exibido; a referência FIPE, quando disponível, identifica a fonte e o mês consultado acima.
+            </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#EAEAE8]">
-              <Link href="/carros-usados-bh" className="btn btn-primary btn-sm">
+              <Link href={`/carros-a-venda?q=${encodeURIComponent(`${car.brand} ${car.model}`)}`} className="btn btn-primary btn-sm">
                 Ver ofertas <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -361,18 +458,14 @@ export default async function CarDetailPage({
           <div className="card p-5">
             <p className="label mb-4">Estatísticas</p>
             <div className="space-y-3">
-              <StatCard label="Preço FIPE" value={displayPriceLabel} isWinner={fipePrice !== null ? fipePrice <= bestPrice : false} />
-              <StatCard label="Consumo" value={displayConsumption} isWinner={car.fuelEconomyCityGas > 0 ? car.fuelEconomyCityGas === bestConsumption : false} />
-              <StatCard label="Potência" value={`${car.horsepower} cv`} isWinner={car.horsepower === bestHp} />
-              <StatCard label="Torque" value={`${car.torque} Nm`} isWinner={car.torque === bestTorque} />
-              <StatCard label="Porta-malas" value={displayTrunk} isWinner={car.trunkCapacity > 0 ? car.trunkCapacity === bestTrunk : false} />
+              <StatCard label="Preço FIPE" value={displayPriceLabel} />
+              <StatCard label="Consumo" value={displayConsumption} />
+              <StatCard label="Potência" value={displayHp > 0 ? `${displayHp} cv` : 'Não informado'} />
+              <StatCard label="Torque" value={displayTorque > 0 ? `${displayTorque} Nm` : 'Não informado'} />
+              <StatCard label={cargoLabel} value={displayTrunk} />
             </div>
           </div>
 
-          <div className="card p-5">
-            <p className="text-xs text-[#A3A3A3] font-medium mb-1">Preço Sugerido</p>
-            <p className="text-2xl font-bold text-[#0A0A0A] mb-4 tracking-tight">{formatBRL(car.priceBrl)}</p>
-          </div>
         </aside>
 
       </div>
@@ -400,6 +493,60 @@ export default async function CarDetailPage({
           </div>
         </div>
       )}
+      </div>
+    </div>
+  )
+}
+
+function TiggoFamilyHub({ models }: { models: ReturnType<typeof groupCarsByModel> }) {
+  return (
+    <div className={`car-model-page ${heroFont.variable}`}>
+      <div className="cmp-container">
+        <BreadcrumbSchema items={[
+          { name: 'Home', url: '/' },
+          { name: 'Marcas', url: '/marcas' },
+          { name: 'CAOA Chery', url: '/marcas/caoa-chery' },
+          { name: 'Linha Tiggo', url: '/caoa-chery/tiggo' },
+        ]} />
+        <nav className="cmp-breadcrumb flex items-center gap-1.5 text-sm text-[#A3A3A3] mb-6">
+          <Link href="/">Home</Link><ChevronRight className="w-3 h-3" />
+          <Link href="/marcas">Marcas</Link><ChevronRight className="w-3 h-3" />
+          <Link href="/marcas/caoa-chery">CAOA Chery</Link><ChevronRight className="w-3 h-3" />
+          <span className="text-[#0A0A0A] font-medium">Linha Tiggo</span>
+        </nav>
+        <header className="cmp-family-intro card-elevated">
+          <p className="cmp-family-eyebrow">CAOA Chery</p>
+          <h1 className="cmp-title">Compare os modelos da linha Tiggo</h1>
+          <p>Escolha a geração para consultar ficha técnica e referência FIPE da versão e do ano disponíveis.</p>
+        </header>
+        <section aria-label="Modelos CAOA Chery Tiggo" className="cmp-family-grid">
+          {models.map(({ modelSlug, representative }) => {
+            const image = getCatalogCarImage(representative.brand, representative.model, representative.image)
+            return (
+              <article key={modelSlug} className="cmp-family-card">
+                <CarImage
+                  id={representative.id}
+                  brand={representative.brand}
+                  model={representative.model}
+                  year={representative.year}
+                  src={image || undefined}
+                  strict
+                  fit="contain"
+                  aspectRatio="4/3"
+                  className="cmp-family-image"
+                />
+                <div className="cmp-family-copy">
+                  <h2>{representative.brand} {representative.model}</h2>
+                  <p>Versão de catálogo: {representative.version} · ano {representative.year}</p>
+                  <Link href={`/caoa-chery/${modelSlug}`} className="btn btn-primary btn-sm">
+                    Ver ficha e preço FIPE
+                  </Link>
+                </div>
+              </article>
+            )
+          })}
+        </section>
+      </div>
     </div>
   )
 }
@@ -412,6 +559,7 @@ function StatCard({ label, value, isWinner }: { label: string; value: string; is
     'Potência': <Gauge className="w-3.5 h-3.5" />,
     'Torque': <Timer className="w-3.5 h-3.5" />,
     'Porta-malas': <Package className="w-3.5 h-3.5" />,
+    'Caçamba': <Package className="w-3.5 h-3.5" />,
   }
 
   return (

@@ -352,11 +352,22 @@ export async function resolveBrandAndModelByYear(
   return { brand, model: candidates[0] }
 }
 
-export async function getFipeYearsByModelName(brandName: string, modelName: string, limit = 6, _versionName?: string): Promise<number[]> {
-  // Ignoramos a versão para o seletor de anos para permitir que o usuário veja o histórico completo do modelo
+export async function getFipeYearsByModelName(brandName: string, modelName: string, limit = 6, versionName?: string): Promise<number[]> {
   const resolved = await resolveBrandAndModel(brandName, modelName, 'cars')
   if (!resolved) return []
-  return getFilteredFipeYears(resolved.brand.code, resolved.model.code, limit)
+  const years = await getFilteredFipeYears(resolved.brand.code, resolved.model.code, limit)
+  if (!versionName?.trim()) return years
+
+  const requestedTokens = normalize(versionName).split(' ').filter(Boolean)
+  const matchingYears: number[] = []
+  for (const year of years) {
+    const versions = await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, year)
+    if (versions.some((version) => {
+      const candidate = normalize(version.name)
+      return requestedTokens.every((token) => candidate.split(' ').includes(token))
+    })) matchingYears.push(year)
+  }
+  return matchingYears
 }
 
 export async function getFipePrice(
@@ -375,14 +386,19 @@ export async function getFipePrice(
   if (versions.length === 0) return null
 
   let selected = versions[0]
-  if (versionName) {
-    const nv = normalize(versionName)
-    const match = versions.find(v => normalize(v.name).includes(nv)) || 
-                  versions.find(v => nv.includes(normalize(v.name)))
-    if (match) selected = match
+  if (versionName?.trim()) {
+    const requestedTokens = normalize(versionName).split(' ').filter(Boolean)
+    const matches = versions.filter((version) => {
+      const candidateTokens = normalize(version.name).split(' ')
+      return requestedTokens.every((token) => candidateTokens.includes(token))
+    })
+    // Never silently substitute another trim's FIPE value.
+    if (matches.length !== 1) return null
+    selected = matches[0]
   }
 
-  return getFipeDetailByCode(resolved.brand.code, resolved.model.code, selected.code)
+  const detail = await getFipeDetailByCode(resolved.brand.code, resolved.model.code, selected.code)
+  return detail?.modelYear === targetYear ? detail : null
 }
 
 export async function getFipeHistory(
@@ -390,7 +406,7 @@ export async function getFipeHistory(
   modelName: string,
   yearsCount = 6,
   versionName?: string
-): Promise<{ year: number; price: string; priceNum: number }[]> {
+): Promise<{ year: number; price: string; priceNum: number; referenceMonth: string }[]> {
   const resolved = await resolveBrandAndModel(brandName, modelName, 'cars', versionName)
   if (!resolved) return []
 
@@ -402,21 +418,23 @@ export async function getFipeHistory(
       if (versions.length === 0) return null
       
       let selected = versions[0]
-      if (versionName) {
-        const nv = normalize(versionName)
-        const match = versions.find(v => normalize(v.name).includes(nv))
-        if (match) selected = match
+      if (versionName?.trim()) {
+        const requestedTokens = normalize(versionName).split(' ').filter(Boolean)
+        const matches = versions.filter((version) => requestedTokens.every((token) => normalize(version.name).split(' ').includes(token)))
+        if (matches.length !== 1) return null
+        selected = matches[0]
       }
       
       const detail = await getFipeDetailByCode(resolved.brand.code, resolved.model.code, selected.code)
-      if (!detail) return null
+      if (!detail || detail.modelYear !== year) return null
       
       const priceNum = parseFloat(detail.price.replace(/[^\d,]/g, '').replace(',', '.'))
-      return { year, price: detail.price, priceNum }
+      if (!Number.isFinite(priceNum) || priceNum <= 0) return null
+      return { year, price: detail.price, priceNum, referenceMonth: detail.referenceMonth }
     })
   )
 
-  return history.filter((h): h is { year: number; price: string; priceNum: number } => h !== null)
+  return history.filter((h): h is { year: number; price: string; priceNum: number; referenceMonth: string } => h !== null)
 }
 
 export async function getFipeMonthlyHistory(
@@ -436,11 +454,11 @@ export async function getFipeMonthlyHistory(
   if (versions.length === 0) return []
 
   let selected = versions[0]
-  if (versionName) {
-    const nv = normalize(versionName)
-    const match = versions.find(v => normalize(v.name).includes(nv)) ||
-                  versions.find(v => nv.includes(normalize(v.name)))
-    if (match) selected = match
+  if (versionName?.trim()) {
+    const requestedTokens = normalize(versionName).split(' ').filter(Boolean)
+    const matches = versions.filter((version) => requestedTokens.every((token) => normalize(version.name).split(' ').includes(token)))
+    if (matches.length !== 1) return []
+    selected = matches[0]
   }
 
   const refs = await getFipeReferences()

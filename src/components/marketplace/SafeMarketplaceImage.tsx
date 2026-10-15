@@ -1,7 +1,8 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import { useState } from 'react'
 import { ImageIcon } from 'lucide-react'
 
 function normalizeSources(sources: Array<string | null | undefined>) {
@@ -14,19 +15,22 @@ function normalizeSources(sources: Array<string | null | undefined>) {
   )
 }
 
-function loadImage(source: string): Promise<boolean> {
-  if (typeof window === 'undefined') return Promise.resolve(false)
+function isOptimizableSource(source: string) {
+  if (source.startsWith('/') && !source.startsWith('//')) return true
 
-  return new Promise((resolve) => {
-    const image = new window.Image()
-    image.onload = () => resolve(true)
-    image.onerror = () => resolve(false)
-    image.src = source
+  try {
+    const imageUrl = new URL(source)
+    if (imageUrl.protocol === 'https:' && imageUrl.hostname === 'images.unsplash.com') return true
 
-    if (image.complete && image.naturalWidth > 0) {
-      resolve(true)
-    }
-  })
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    if (!supabaseUrl) return false
+    const storageUrl = new URL(supabaseUrl)
+
+    return (imageUrl.origin === storageUrl.origin
+      && imageUrl.pathname.startsWith('/storage/v1/object/public/'))
+  } catch {
+    return false
+  }
 }
 
 type SafeMarketplaceImageProps = {
@@ -35,53 +39,43 @@ type SafeMarketplaceImageProps = {
   className?: string
   containerClassName?: string
   priority?: boolean
+  sizes?: string
   loadingLabel?: string
 }
 
-export default function SafeMarketplaceImage({
+export default function SafeMarketplaceImage(props: SafeMarketplaceImageProps) {
+  const sources = normalizeSources(props.sources)
+  const sourceKey = JSON.stringify(sources)
+
+  return <SafeMarketplaceImageView key={sourceKey} {...props} sources={sources} />
+}
+
+function SafeMarketplaceImageView({
   sources,
   alt,
   className,
   containerClassName = 'h-full w-full',
   priority = false,
+  sizes = '100vw',
   loadingLabel = 'Carregando foto',
-}: SafeMarketplaceImageProps) {
-  const sourceKey = JSON.stringify(normalizeSources(sources))
-  const [resolvedSrc, setResolvedSrc] = useState<string | null>(null)
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+}: SafeMarketplaceImageProps & { sources: string[] }) {
+  const [sourceIndex, setSourceIndex] = useState(0)
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>(
+    sources.length > 0 ? 'loading' : 'error',
+  )
+  const source = sources[sourceIndex]
 
-  useEffect(() => {
-    let cancelled = false
-
-    async function resolve() {
-      const normalizedSources = JSON.parse(sourceKey) as string[]
-      setResolvedSrc(null)
-      setStatus(normalizedSources.length > 0 ? 'loading' : 'error')
-
-      for (const source of normalizedSources) {
-        const loaded = await loadImage(source)
-        if (cancelled) return
-        if (loaded) {
-          setResolvedSrc(source)
-          setStatus('ready')
-          return
-        }
-      }
-
-      if (!cancelled) {
-        setResolvedSrc(null)
-        setStatus('error')
-      }
+  function handleError() {
+    if (sourceIndex + 1 < sources.length) {
+      setSourceIndex((index) => index + 1)
+      setStatus('loading')
+      return
     }
 
-    void resolve()
+    setStatus('error')
+  }
 
-    return () => {
-      cancelled = true
-    }
-  }, [sourceKey])
-
-  if (status === 'error') {
+  if (status === 'error' || !source) {
     return (
       <div
         className={`relative flex items-center justify-center overflow-hidden bg-[#F4F4F1] ${containerClassName}`}
@@ -96,8 +90,11 @@ export default function SafeMarketplaceImage({
     )
   }
 
+  const imageClassName = `absolute inset-0 h-full w-full ${className ?? 'object-cover'}`
+  const imageStyle = { transform: 'scale(1.02)' }
+
   return (
-    <div className={`relative overflow-hidden ${containerClassName}`} aria-busy={status === 'loading'}>
+    <div className={`relative overflow-hidden bg-[#F4F4F1] ${containerClassName}`} aria-busy={status === 'loading'}>
       {status !== 'ready' ? (
         <div className="absolute inset-0 flex items-center justify-center bg-[#F4F4F1]">
           <div className="h-1.5 w-12 animate-pulse rounded-full bg-black/10" />
@@ -105,16 +102,32 @@ export default function SafeMarketplaceImage({
         </div>
       ) : null}
 
-      {resolvedSrc ? (
-        <img
-          src={resolvedSrc}
+      {isOptimizableSource(source) ? (
+        <Image
+          src={source}
           alt={alt}
-          className={`absolute inset-0 w-full h-full transition-opacity duration-300 ${className ?? 'object-cover'} ${status === 'ready' ? 'opacity-100' : 'opacity-0'}`}
+          fill
+          sizes={sizes}
+          priority={priority}
           loading={priority ? 'eager' : 'lazy'}
-          decoding="async"
-          style={{ transform: 'scale(1.02)' }}
+          onLoad={() => setStatus('ready')}
+          onError={handleError}
+          className={imageClassName}
+          style={imageStyle}
         />
-      ) : null}
+      ) : (
+        <img
+          src={source}
+          alt={alt}
+          className={imageClassName}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
+          decoding="async"
+          onLoad={() => setStatus('ready')}
+          onError={handleError}
+          style={imageStyle}
+        />
+      )}
     </div>
   )
 }

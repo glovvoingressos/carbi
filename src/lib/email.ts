@@ -273,6 +273,7 @@ interface ListingCreatedEmailParams {
   vehicleTitle: string
   price: number
   listingSlug: string
+  reviewMessage?: string | null
 }
 
 export async function sendListingCreatedEmail(params: ListingCreatedEmailParams) {
@@ -281,7 +282,7 @@ export async function sendListingCreatedEmail(params: ListingCreatedEmailParams)
     return { success: true, warning: 'RESEND_API_KEY not configured' }
   }
 
-  const { userEmail, userName, vehicleTitle, price, listingSlug } = params
+  const { userEmail, userName, vehicleTitle, price, listingSlug, reviewMessage } = params
 
   try {
     const listingLink = `${SITE_URL}/anuncios/${listingSlug}`
@@ -289,30 +290,34 @@ export async function sendListingCreatedEmail(params: ListingCreatedEmailParams)
     const data = await resend.emails.send({
       from: FROM_EMAIL,
       to: userEmail,
-      subject: `Seu anúncio do ${vehicleTitle} está no ar! 🚀`,
+      subject: reviewMessage ? `Ajuste de preço necessário no anúncio do ${vehicleTitle}` : `Seu anúncio do ${vehicleTitle} está no ar! 🚀`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1f2937; padding: 20px;">
           <div style="text-align: center; margin-bottom: 24px;">
             <img src="${LOGO_URL}" alt="Carbi" style="max-width: 120px; height: auto;" />
           </div>
-          <h2 style="color: #2563eb; text-align: center;">Parabéns! Seu anúncio está ativo</h2>
+          <h2 style="color: #2563eb; text-align: center;">${reviewMessage ? 'Seu anúncio precisa de ajuste de preço' : 'Parabéns! Seu anúncio está ativo'}</h2>
           <p>Olá, <strong>${userName || 'Anunciante'}</strong>!</p>
-          <p>Seu veículo <strong>${vehicleTitle}</strong> foi cadastrado com sucesso e já está disponível para compradores de todo o Brasil.</p>
+          <p>${reviewMessage
+            ? `Seu veículo <strong>${vehicleTitle}</strong> foi cadastrado, mas está oculto enquanto o preço é ajustado. ${reviewMessage}`
+            : `Seu veículo <strong>${vehicleTitle}</strong> foi cadastrado com sucesso e já está disponível para compradores de todo o Brasil.`}</p>
           
           <div style="background-color: #eff6ff; border: 1px solid #dbeafe; padding: 16px; border-radius: 4px; margin: 24px 0;">
             <p style="margin: 0; font-size: 16px; font-weight: bold; color: #1e3a8a;">
               Preço anunciado: ${formatBRL(price)}
             </p>
             <p style="margin: 4px 0 0 0; font-size: 13px; color: #3b82f6;">
-              Status: Ativo e Visível
+              Status: ${reviewMessage ? 'Pausado até o ajuste do preço' : 'Ativo e Visível'}
             </p>
           </div>
 
           <div style="text-align: center; margin-top: 32px;">
             <a href="${listingLink}" style="background-color: #2563eb; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-              Visualizar Meu Anúncio
+              ${reviewMessage ? 'Acessar meus anúncios' : 'Visualizar Meu Anúncio'}
             </a>
           </div>
+
+          ${reviewMessage ? `<p style="font-size: 14px; text-align: center; color: #374151;">Acesse <a href="${SITE_URL}/minha-conta/anuncios">Meus anúncios</a>, ajuste o valor e ative a publicação.</p>` : ''}
 
           <div style="margin-top: 32px; background-color: #f9fafb; padding: 16px; border-radius: 6px; font-size: 14px;">
             <h4 style="margin: 0 0 8px 0; color: #374151;">Dicas de Venda Rápida:</h4>
@@ -652,9 +657,8 @@ export async function sendWelcomeEmail(params: WelcomeEmailParams) {
             </p>
             <ul style="margin: 8px 0 0 0; padding-left: 20px; color: #047857; font-size: 14px;">
               <li>Anunciar seu carro grátis em poucos minutos</li>
-              <li>Comparar preços com a tabela FIPE</li>
-              <li>Receber tráfego pago grátis no Google e Meta Ads</li>
-              <li>Negociar seguro pelo chat interno</li>
+              <li>Consultar a FIPE quando houver correspondência exata de versão e ano-modelo</li>
+              <li>Conversar com interessados pelo chat interno</li>
             </ul>
           </div>
 

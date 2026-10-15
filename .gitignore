@@ -36,3 +36,4 @@ supabase/.temp/
 
 # backup files
 *.bak
+.seo-cache/

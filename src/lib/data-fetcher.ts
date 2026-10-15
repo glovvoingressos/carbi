@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { CarSpec, cars as staticCars } from '@/data/cars'
+import { canonicalModelName, canonicalModelSlug } from '@/lib/vehicle-slug'
 
 function normalizeName(value: string): string {
   return value
@@ -15,92 +16,12 @@ function slugify(value: string): string {
   return normalizeName(value).replace(/\s+/g, '-')
 }
 
-const MODEL_TRIM_STOPWORDS = new Set([
-  'advance',
-  'advantage',
-  'ambition',
-  'attraction',
-  'black',
-  'comfortline',
-  'drive',
-  'edition',
-  'exclusive',
-  'gl',
-  'gli',
-  'griffe',
-  'highline',
-  'hybrid',
-  'line',
-  'limited',
-  'lt',
-  'ltz',
-  'm',
-  'pack',
-  'performance',
-  'plus',
-  'premium',
-  'prestige',
-  'pro',
-  'rs',
-  's',
-  'sline',
-  'sport',
-  'style',
-  'tech',
-  'touring',
-  'ultimate',
-  'xlt',
-  'xrx',
-  'xrv',
-])
-
-function isLikelyEngineToken(token: string): boolean {
-  const clean = normalizeName(token)
-  if (!clean) return false
-  if (/^\d/.test(clean)) return true
-  if (clean.includes('tfsi') || clean.includes('tsi') || clean.includes('turbo') || clean.includes('flex')) return true
-  if (clean.includes('tronic') || clean.includes('tiptronic') || clean.includes('quattro')) return true
-  if (clean.includes('cv') || clean.includes('v6') || clean.includes('v8') || clean.includes('v12')) return true
-  return false
-}
-
-function canonicalModelFromRaw(modelName: string): string {
-  const normalizedRaw = String(modelName || '')
-    .replace(/\bTTRS\b/gi, 'TT RS')
-    .replace(/\bTT-RS\b/gi, 'TT RS')
-    .replace(/\bTRON\b/gi, 'TRON')
-    .replace(/\be-tron\b/gi, 'etron')
-  const rawTokens = normalizedRaw
-    .replace(/\s+/g, ' ')
-    .trim()
-    .split(' ')
-    .filter(Boolean)
-
-  if (rawTokens.length === 0) return ''
-
-  const picked: string[] = []
-  for (let i = 0; i < rawTokens.length; i += 1) {
-    const token = rawTokens[i]
-    if (i > 0 && isLikelyEngineToken(token)) break
-    picked.push(token)
-    if (picked.length >= 4) break
-  }
-
-  while (picked.length > 1) {
-    const tail = normalizeName(picked[picked.length - 1]).replace(/-/g, '')
-    if (!MODEL_TRIM_STOPWORDS.has(tail)) break
-    picked.pop()
-  }
-
-  return picked.join(' ').trim() || rawTokens[0]
-}
-
-function canonicalModelSlug(modelName: string): string {
-  return slugify(canonicalModelFromRaw(modelName))
-}
-
 function toBrandSlug(value: string): string {
   return slugify(value)
+}
+
+export function isTiggoFamilyRoute(brandSlug: string, modelSlug: string): boolean {
+  return toBrandSlug(brandSlug) === 'caoa-chery' && modelSlug === 'tiggo'
 }
 
 function num(value: unknown): number {
@@ -153,7 +74,6 @@ function pickPreferredVariant(cars: CarSpec[]): CarSpec | null {
     if (b.year !== a.year) return b.year - a.year
     const scoreDiff = technicalCompletenessScore(b) - technicalCompletenessScore(a)
     if (scoreDiff !== 0) return scoreDiff
-    if (a.priceBrl !== b.priceBrl) return a.priceBrl - b.priceBrl
     return a.model.localeCompare(b.model)
   })[0]
 }
@@ -176,7 +96,7 @@ export function groupCarsByModel(cars: CarSpec[]): Array<{
     .map(([modelSlug, variants]) => {
       const representative = pickPreferredVariant(variants)
       if (!representative) return null
-      const canonicalModel = canonicalModelFromRaw(representative.model)
+      const canonicalModel = canonicalModelName(representative.model)
       return {
         modelSlug,
         representative: {
@@ -263,7 +183,7 @@ export async function getDBCars(): Promise<CarSpec[]> {
         isPopular: bool(dbCar.is_popular),
         pros: [],
         cons: [],
-        shortDesc: `${modelName} ${parsedYear} com valor atualizado em tempo real.`,
+        shortDesc: `Dados de catálogo para ${modelName} ${parsedYear}.`,
         idealFor: 'Quem busca dados atualizados do veículo',
         image: typeof dbCar.image_url === 'string' ? dbCar.image_url : '',
       } as CarSpec

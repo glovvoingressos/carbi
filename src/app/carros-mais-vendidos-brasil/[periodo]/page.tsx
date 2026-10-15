@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { getMonthlyRankings } from '@/lib/rankings-data'
 import RankingsHubView from '@/components/rankings/RankingsHubView'
 
@@ -10,10 +11,11 @@ export async function generateMetadata({
   params: Promise<{ periodo: string }>
 }): Promise<Metadata> {
   const { periodo } = await params
-  const label = periodo.replace('-', ' ').toUpperCase()
+  if (periodo !== 'setembro-2026') notFound()
+  const label = 'Setembro de 2026 · 1ª quinzena'
   return {
-    title: `Carros mais vendidos no Brasil - ${label}`,
-    description: `Ranking de vendas de veículos 0km e seminovos em ${label}. Confira o TOP 100 com dados FIPE e emplacamentos.`,
+    title: `10 carros novos mais emplacados no Brasil - ${label}`,
+    description: `Recorte parcial de emplacamentos da primeira quinzena de setembro de 2026, com fontes e método informados.`,
     alternates: { canonical: `/carros-mais-vendidos-brasil/${periodo}` },
   }
 }
@@ -24,18 +26,13 @@ export default async function CarrosMaisVendidosPeriodoPage({
   params: Promise<{ periodo: string }>
 }) {
   const { periodo } = await params
-  const [newRankings, usedRankings] = await Promise.all([
-    getMonthlyRankings(periodo, 'new'),
-    getMonthlyRankings(periodo, 'used'),
-  ])
-
-  const label = periodo === 'julho-2026' ? 'Julho / 2026' : periodo.replace('-', ' ').toUpperCase()
+  if (periodo !== 'setembro-2026') notFound()
+  const newRankings = await getMonthlyRankings(periodo, 'new')
 
   return (
     <RankingsHubView
       initialNewRankings={newRankings}
-      initialUsedRankings={usedRankings}
-      periodLabel={label}
+      periodLabel="Setembro / 2026 · 1ª quinzena"
       periodSlug={periodo}
     />
   )

@@ -2,13 +2,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, ChevronDown, ChevronUp, Minus } from 'lucide-react'
 import { getMonthlyRankings } from '@/lib/rankings-data'
-import { formatBRL } from '@/data/cars'
 import { heroFont } from './home-font'
+import { getSeptemberFirstHalfShare } from '@/data/rankings-september-2026'
 import './rankings-banner.css'
 
 const RANKING_PERIOD = 'setembro-2026'
 const MONTH_LABEL = 'Setembro / 2026 · 1ª quinzena'
-const SOURCE_LABEL = 'Fenabrave / Bright Consulting'
 
 function trendInfo(moved: number) {
   if (moved > 0) {
@@ -40,14 +39,14 @@ export default async function RankingsBanner() {
           </div>
 
           <header className="rk-head">
-            <p className="rk-eyebrow">Top 10 mais vendidos · {MONTH_LABEL}</p>
-            <h2 id="rk-title" className="rk-title">Os carros mais vendidos do Brasil</h2>
+            <p className="rk-eyebrow">Top 10 mais emplacados · {MONTH_LABEL}</p>
+            <h2 id="rk-title" className="rk-title">Os carros mais emplacados do Brasil</h2>
             <p className="rk-lead">
               Emplacamentos de carros 0 km. Dados parciais da primeira quinzena de setembro de 2026.
             </p>
             <dl className="rk-stats">
               <div className="rk-stat">
-                <dt>Unidades vendidas</dt>
+                <dt>Soma dos 10 modelos</dt>
                 <dd>{totalUnits.toLocaleString('pt-BR')}</dd>
               </div>
               <div className="rk-stat">
@@ -61,11 +60,11 @@ export default async function RankingsBanner() {
             <a href="#ranking-mais-vendidos" className="rk-tab" aria-current="page">
               Mais vendidos
             </a>
-            <Link href="/carros-mais-vendidos-brasil" className="rk-tab">
-              Top 100
+              <Link href="/carros-mais-vendidos-brasil/setembro-2026" className="rk-tab">
+              Top 10
             </Link>
             <Link href="/rankings" className="rk-tab">
-              Por estado
+              Comparativos
             </Link>
           </nav>
 
@@ -97,8 +96,7 @@ export default async function RankingsBanner() {
                     <p className="rk-cat">{car.category}</p>
                     <p className="rk-meta">
                       <span><strong>{car.unitsSold.toLocaleString('pt-BR')}</strong> un.</span>
-                      <span>{car.marketSharePercentage.toFixed(1).replace('.', ',')}%</span>
-                      <span>desde {formatBRL(car.startingPriceBrl)}</span>
+                      <span aria-label={`${getSeptemberFirstHalfShare(car.unitsSold).toFixed(1).replace('.', ',')}% de participação estimada pela Carbi`}>{getSeptemberFirstHalfShare(car.unitsSold).toFixed(1).replace('.', ',')}% est.</span>
                     </p>
                   </div>
                 </li>
@@ -107,11 +105,11 @@ export default async function RankingsBanner() {
           </ol>
 
           <footer className="rk-foot">
-            <Link href="/carros-mais-vendidos-brasil" className="rk-cta">
+            <Link href="/carros-mais-vendidos-brasil/setembro-2026" className="rk-cta">
               Ver ranking completo
               <ArrowRight size={18} aria-hidden="true" />
             </Link>
-            <p className="rk-source">Fonte: {SOURCE_LABEL} · {MONTH_LABEL}.</p>
+            <p className="rk-source">Contagens: <a href="https://motor1.uol.com.br/news/808566/carros-mais-vendidos-quinzena-setembro/" target="_blank" rel="noreferrer">Motor1 / Fenabrave</a> · 109.536 emplacamentos de veículos leves: <a href="https://pt.linkedin.com/posts/bright-consulting-isd_an%C3%A1lise-de-vendas-quinzenal-setembro-2026-activity-7506035976927117314-YTPr" target="_blank" rel="noreferrer">Bright Consulting</a> · {MONTH_LABEL}. Participação estimada pela Carbi.</p>
           </footer>
         </article>
       </div>

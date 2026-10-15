@@ -18,7 +18,7 @@ describe('PlateBannerLookup', () => {
     render(<PlateBannerLookup />)
 
     const image = screen.getByRole('img', { name: 'Picape em uma estrada no deserto' })
-    const heading = screen.getByRole('heading', { name: 'Anuncie seu carro em menos de 2 minutos.' })
+    const heading = screen.getByRole('heading', { name: 'Prepare seu anúncio de carro.' })
 
     expect(image.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(image.getAttribute('src')).toBe('/assets/cars/plate-lookup-desert-pickup.jpg')

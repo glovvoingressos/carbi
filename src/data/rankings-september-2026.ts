@@ -1,7 +1,13 @@
-import type { RankingModelItem } from './rankings-july-2026'
+import type { RankingModelItem } from './rankings-types'
 
-// Ranking da 1ª quinzena de setembro de 2026, com base nos emplacamentos
-// divulgados pela Fenabrave e reportados pela Bright Consulting.
+export const SEPTEMBER_2026_FIRST_HALF_TOTAL = 109536
+
+export function getSeptemberFirstHalfShare(unitsSold: number): number {
+  return Math.round((unitsSold / SEPTEMBER_2026_FIRST_HALF_TOTAL) * 1000) / 10
+}
+
+// Contagens por modelo reportadas pelo Motor1 a partir dos dados da Fenabrave.
+// A Bright Consulting divulgou 109.536 emplacamentos de veículos leves no período.
 export const SEPTEMBER_2026_NEW_RANKINGS: RankingModelItem[] = [
   {
     position: 1,
@@ -9,10 +15,8 @@ export const SEPTEMBER_2026_NEW_RANKINGS: RankingModelItem[] = [
     model: 'Strada',
     slug: 'fiat-strada',
     unitsSold: 7307,
-    marketSharePercentage: 6.7,
     category: 'Picape Compacta',
     segment: 'pickup',
-    startingPriceBrl: 146990,
   },
   {
     position: 2,
@@ -20,10 +24,8 @@ export const SEPTEMBER_2026_NEW_RANKINGS: RankingModelItem[] = [
     model: 'Polo',
     slug: 'volkswagen-polo',
     unitsSold: 4995,
-    marketSharePercentage: 4.6,
     category: 'Hatch Compacto',
     segment: 'hatch',
-    startingPriceBrl: 129140,
   },
   {
     position: 3,
@@ -31,10 +33,8 @@ export const SEPTEMBER_2026_NEW_RANKINGS: RankingModelItem[] = [
     model: 'Dolphin Mini',
     slug: 'byd-dolphin-mini',
     unitsSold: 4414,
-    marketSharePercentage: 4.0,
     category: 'Hatch Elétrico',
     segment: 'electric',
-    startingPriceBrl: 121590,
   },
   {
     position: 4,
@@ -42,10 +42,8 @@ export const SEPTEMBER_2026_NEW_RANKINGS: RankingModelItem[] = [
     model: 'Argo',
     slug: 'fiat-argo',
     unitsSold: 3298,
-    marketSharePercentage: 3.0,
     category: 'Hatch Compacto',
     segment: 'hatch',
-    startingPriceBrl: 104990,
   },
   {
     position: 5,
@@ -53,10 +51,8 @@ export const SEPTEMBER_2026_NEW_RANKINGS: RankingModelItem[] = [
     model: 'Tera',
     slug: 'volkswagen-tera',
     unitsSold: 3273,
-    marketSharePercentage: 3.0,
     category: 'SUV Compacto',
     segment: 'suv',
-    startingPriceBrl: 118900,
   },
   {
     position: 6,
@@ -64,10 +60,8 @@ export const SEPTEMBER_2026_NEW_RANKINGS: RankingModelItem[] = [
     model: 'HB20',
     slug: 'hyundai-hb20',
     unitsSold: 3203,
-    marketSharePercentage: 2.9,
     category: 'Hatch Compacto',
     segment: 'hatch',
-    startingPriceBrl: 130610,
   },
   {
     position: 7,
@@ -75,10 +69,8 @@ export const SEPTEMBER_2026_NEW_RANKINGS: RankingModelItem[] = [
     model: 'T-Cross',
     slug: 'volkswagen-t-cross',
     unitsSold: 2999,
-    marketSharePercentage: 2.7,
     category: 'SUV Compacto',
     segment: 'suv',
-    startingPriceBrl: 184790,
   },
   {
     position: 8,
@@ -86,10 +78,8 @@ export const SEPTEMBER_2026_NEW_RANKINGS: RankingModelItem[] = [
     model: 'Song',
     slug: 'byd-song',
     unitsSold: 2735,
-    marketSharePercentage: 2.5,
     category: 'SUV Híbrido',
     segment: 'suv',
-    startingPriceBrl: 189800,
   },
   {
     position: 9,
@@ -97,10 +87,8 @@ export const SEPTEMBER_2026_NEW_RANKINGS: RankingModelItem[] = [
     model: 'Creta',
     slug: 'hyundai-creta',
     unitsSold: 2646,
-    marketSharePercentage: 2.4,
     category: 'SUV Compacto',
     segment: 'suv',
-    startingPriceBrl: 174290,
   },
   {
     position: 10,
@@ -108,9 +96,7 @@ export const SEPTEMBER_2026_NEW_RANKINGS: RankingModelItem[] = [
     model: 'Toro',
     slug: 'fiat-toro',
     unitsSold: 2621,
-    marketSharePercentage: 2.4,
     category: 'Picape Intermediária',
     segment: 'pickup',
-    startingPriceBrl: 227840,
   },
 ]

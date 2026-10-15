@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
-import { ListingFormPayload, normalizePlateFinal, normalizeTruckPayload, validateListingPayload } from '@/lib/marketplace'
+import { ListingFormPayload, normalizePlateFinal, normalizeTruckPayload, parseFipePriceToNumber, getListingPriceReview, validateListingPayload } from '@/lib/marketplace'
+import { getFipePrice } from '@/lib/fipe-api'
 import { queryPublicListings } from '@/lib/marketplace-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingCreatedEmail, sendAdminNewListingEmail } from '@/lib/email'
-import { notifyListingPublished } from '@/lib/notifications'
 import {
   normalizeBodyType,
   normalizeColor,
@@ -72,6 +72,21 @@ export async function POST(req: NextRequest) {
     const normalizedColor = normalizeColor(payload.color)
     const resolvedBodyType = normalizeBodyType(payload.body_type)
     const truckPayload = normalizeTruckPayload(payload)
+    let fipeResult = null
+    if (payload.vehicle_type !== 'truck') {
+      try {
+        fipeResult = await getFipePrice(payload.brand, payload.model, payload.year_model, payload.version || undefined)
+      } catch (error) {
+        console.error('FIPE lookup failed during listing review', error)
+      }
+    }
+    const fipePrice = payload.vehicle_type === 'truck'
+      ? payload.fipe_price || null
+      : (fipeResult ? parseFipePriceToNumber(fipeResult.price) || null : null)
+    const fipeReferenceMonth = payload.vehicle_type === 'truck'
+      ? payload.fipe_reference_month || null
+      : (fipeResult?.referenceMonth || null)
+    const priceReview = payload.vehicle_type === 'truck' ? null : getListingPriceReview(payload.price, fipePrice)
 
     // Limite de anúncios grátis
     const { count: activeCount, error: countError } = await supabase
@@ -104,8 +119,8 @@ export async function POST(req: NextRequest) {
       fipe_brand_code: payload.fipe_brand_code || null,
       fipe_model_code: payload.fipe_model_code || null,
       fipe_year_code: payload.fipe_year_code || null,
-      fipe_reference_month: payload.fipe_reference_month || null,
-      fipe_price: payload.fipe_price || null,
+      fipe_reference_month: fipeReferenceMonth,
+      fipe_price: fipePrice,
       technical_data: (truckPayload.structured_data as Record<string, unknown> | undefined) || payload.structured_data || {},
     }
 
@@ -146,11 +161,11 @@ export async function POST(req: NextRequest) {
       fipe_brand_code: payload.fipe_brand_code || null,
       fipe_model_code: payload.fipe_model_code || null,
       fipe_year_code: payload.fipe_year_code || null,
-      fipe_reference_month: payload.fipe_reference_month || null,
-      fipe_price: payload.fipe_price || null,
+      fipe_reference_month: fipeReferenceMonth,
+      fipe_price: fipePrice,
       structured_data: payload.structured_data || {},
       ...truckPayload,
-      status: 'active',
+      status: priceReview ? 'paused' : 'active',
     }
 
     const { data, error } = await supabase
@@ -210,7 +225,8 @@ export async function POST(req: NextRequest) {
             userName,
             vehicleTitle: resolvedTitle,
             price: payload.price,
-            listingSlug: data.slug
+            listingSlug: data.slug,
+            reviewMessage: priceReview?.reason,
           })
           console.log('[DEBUG-EMAIL] listing created email result', createdResult)
           emailStatus.userEmailSent = createdResult
@@ -259,7 +275,12 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ...data, vehicle_id: vehicle.id, emailStatus }, { status: 201 })
+    return NextResponse.json({
+      ...data,
+      vehicle_id: vehicle.id,
+      emailStatus,
+      ...(priceReview ? { review: { ...priceReview, referenceMonth: fipeReferenceMonth } } : {}),
+    }, { status: 201 })
   } catch (error) {
     console.error('POST /api/marketplace/listings failed', error)
     return NextResponse.json({ error: 'Falha ao criar anúncio.' }, { status: 500 })

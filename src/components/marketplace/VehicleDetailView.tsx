@@ -52,6 +52,7 @@ interface VehicleDetailViewProps {
     diffValue?: number | null
   }
   currentFipePrice?: number | null
+  currentFipeReferenceMonth?: string | null
 }
 
 function formatDate(value: string | null | undefined) {
@@ -89,6 +90,7 @@ export default function VehicleDetailView({
   enrichment,
   comparison,
   currentFipePrice,
+  currentFipeReferenceMonth,
 }: VehicleDetailViewProps) {
   const [isFavorite, setIsFavorite] = useState(false)
   const [sessionUserId, setSessionUserId] = useState<string | null>(null)
@@ -122,7 +124,9 @@ export default function VehicleDetailView({
   }, [listing.id])
 
   const listingImages = useMemo(() => listing.images?.map((img) => img.url).filter(Boolean) || [], [listing.images])
-  const fipePrice = currentFipePrice ?? (listing.fipe_price ? Number(listing.fipe_price) : null)
+  const fipePrice = currentFipePrice !== undefined
+    ? currentFipePrice
+    : (listing.fipe_price ? Number(listing.fipe_price) : null)
   const price = Number(listing.price)
   const diffValue = fipePrice ? price - fipePrice : null
   const diffPercent = fipePrice ? (diffValue! / fipePrice) * 100 : null
@@ -144,7 +148,7 @@ export default function VehicleDetailView({
       { icon: null, label: 'Capacidade de carga', value: listing.load_capacity != null ? `${listing.load_capacity.toLocaleString('pt-BR')} kg` : 'Não informado' },
       { icon: null, label: 'PBT', value: listing.pbt != null ? `${listing.pbt.toLocaleString('pt-BR')} kg` : 'Não informado' },
       { icon: null, label: 'CMT', value: listing.cmt != null ? `${listing.cmt.toLocaleString('pt-BR')} kg` : 'Não informado' },
-      { icon: null, label: 'FIPE', value: listing.fipe_price != null ? 'Disponível' : 'Indisponível' },
+    { icon: null, label: 'FIPE', value: fipePrice != null ? formatBRL(fipePrice) : 'Indisponível' },
     ] : []),
   ]
 
@@ -231,6 +235,8 @@ export default function VehicleDetailView({
                 </div>
               )}
             </div>
+            <p className="mt-1 text-xs text-gray-500">Preço anunciado pelo vendedor</p>
+            {fipePrice && <p className="mt-1 text-xs text-gray-500">FIPE · referência {currentFipeReferenceMonth || listing.fipe_reference_month || 'não informada'} · fonte: consulta via Parallelum</p>}
 
             <div className="fingen-detail-specs-row">
               <span><Calendar size={14} /> {listing.year_model}</span>
@@ -266,7 +272,7 @@ export default function VehicleDetailView({
               </span>
             </div>
             <div className="fingen-detail-dark-value">{formatBRL(fipePrice)}</div>
-            <div className="fingen-detail-dark-label">Tabela FIPE referência</div>
+            <div className="fingen-detail-dark-label">Tabela FIPE · referência {currentFipeReferenceMonth || listing.fipe_reference_month || 'não informada'} · consulta via Parallelum</div>
             {diffValue !== null && (
               <div className="fingen-detail-dark-diff">
                 <span className={diffValue <= 0 ? 'positive' : 'negative'}>
@@ -429,8 +435,9 @@ export default function VehicleDetailView({
       {/* Mobile Bottom Bar */}
       <div className="fingen-detail-mobile-bar">
         <div className="fingen-detail-mobile-price">
+          <span>Preço anunciado</span>
           <strong>{formatBRL(price)}</strong>
-          {fipePrice && <span>FIPE {formatBRL(fipePrice)}</span>}
+          {fipePrice && <span>FIPE {formatBRL(fipePrice)} · {currentFipeReferenceMonth || listing.fipe_reference_month || 'referência não informada'}</span>}
         </div>
         <div className="fingen-detail-mobile-chat">
           <ChatStarter listingId={listing.id} label="Chat" />

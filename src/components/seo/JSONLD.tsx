@@ -19,59 +19,6 @@ export default function JSONLD({ data }: JSONLDProps) {
   )
 }
 
-export function LocalBusinessSchema() {
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    'name': 'Carbi Marketplace',
-    'image': absoluteUrl('/logo.svg'),
-    '@id': SITE_URL,
-    'url': SITE_URL,
-    'description': 'Marketplace automotivo premium para anunciar e comprar carros usados e seminovos com dados reais da FIPE.',
-    'address': {
-      '@type': 'PostalAddress',
-      'streetAddress': 'Belo Horizonte',
-      'addressLocality': 'Belo Horizonte',
-      'addressRegion': 'MG',
-      'postalCode': '',
-      'addressCountry': 'BR'
-    },
-    'geo': {
-      '@type': 'GeoCoordinates',
-      'latitude': -19.9167,
-      'longitude': -43.9333
-    },
-    'openingHoursSpecification': {
-      '@type': 'OpeningHoursSpecification',
-      'dayOfWeek': [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday'
-      ],
-      'opens': '00:00',
-      'closes': '23:59'
-    },
-    'sameAs': [
-      'https://www.instagram.com/carbioficial',
-      'https://www.facebook.com/carbioficial',
-      'https://twitter.com/carbioficial',
-      'https://www.linkedin.com/company/carbi',
-    ],
-    'priceRange': '$$',
-    'currenciesAccepted': 'BRL',
-    'paymentAccepted': 'Dinheiro, Cartão de crédito, PIX',
-    'areaServed': {
-      '@type': 'Country',
-      'name': 'Brasil'
-    }
-  }
-  return <JSONLD data={schema} />
-}
-
 export function OrganizationSchema() {
   const schema = {
     '@context': 'https://schema.org',
@@ -79,9 +26,6 @@ export function OrganizationSchema() {
     'name': 'Carbi',
     'url': SITE_URL,
     'logo': absoluteUrl('/logo.svg'),
-    'sameAs': [
-      'https://instagram.com/carbi'
-    ]
   }
   return <JSONLD data={schema} />
 }
@@ -104,18 +48,22 @@ export function VehicleSchema({ vehicle }: { vehicle: any }) {
     '@context': 'https://schema.org',
     '@type': isTruck ? 'Vehicle' : 'Car',
     'name': vehicleName,
-    'description': vehicle.description || `Ficha técnica completa do ${vehicle.brand} ${vehicle.model} ${vehicle.year_model || ''}.`,
+    ...(typeof vehicle.description === 'string' && vehicle.description.trim()
+      ? { description: vehicle.description.trim() }
+      : {}),
       'brand': {
         '@type': 'Brand',
         'name': vehicle.brand
       },
-    'modelDate': vehicle.year_model || vehicle.year,
     'color': vehicle.color,
-    'fuelType': vehicle.fuel || vehicle.engineType,
+    'fuelType': vehicle.fuel || vehicle.fuelType,
     'vehicleTransmission': vehicle.transmission,
   }
 
   if (imageUrls.length > 0) schema.image = imageUrls
+  else if (typeof vehicle.image === 'string' && vehicle.image.trim()) {
+    schema.image = [absoluteUrl(vehicle.image.trim())]
+  }
   if (vehicle.version) schema.vehicleConfiguration = vehicle.version
   if (isListing) {
     schema.url = absoluteUrl(listingUrl)
@@ -152,23 +100,6 @@ export function VehicleSchema({ vehicle }: { vehicle: any }) {
   return <JSONLD data={schema} />
 }
 
-export function LocalBusinessBHTicketsSchema() {
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'AutoDealer',
-    'name': 'Carbi Belo Horizonte',
-    'description': 'Maior marketplace de carros usados em Belo Horizonte. Venda seu carro com atrito zero.',
-    'url': 'https://www.carbi.com.br/carros-usados-bh',
-    'address': {
-      '@type': 'PostalAddress',
-      'addressLocality': 'Belo Horizonte',
-      'addressRegion': 'MG',
-      'addressCountry': 'BR'
-    }
-  }
-  return <JSONLD data={schema} />
-}
-
 export function WebSiteSchema() {
   const schema = {
     '@context': 'https://schema.org',
@@ -200,19 +131,6 @@ export function BreadcrumbSchema({ items }: { items: Array<{ name: string; url: 
   return <JSONLD data={schema} />
 }
 
-export function FAQSchema({ items }: { items: { q: string; a: string }[] }) {
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: items.map((item) => ({
-      '@type': 'Question',
-      name: item.q,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: item.a,
-      },
-    })),
-  }
-
-  return <JSONLD data={schema} />
+export function FAQSchema(_props: { items: { q: string; a: string }[] }) {
+  return null
 }

@@ -114,7 +114,7 @@ export default function HomeCounters({
       </div>
       <div className="cb-stat">
         <div className="cb-stat-value">
-          <span>{statsAvailable ? '+30 mil' : '—'}</span>
+          <AnimatedValue value={statsAvailable ? stats?.total_views ?? null : null} />
         </div>
         <div className="cb-stat-label">Visualizações acumuladas</div>
       </div>
@@ -122,7 +122,7 @@ export default function HomeCounters({
         <div className="cb-stat-value">
           <AnimatedValue value={cityMetric} />
         </div>
-        <div className="cb-stat-label">Cidades com anúncios recentes</div>
+        <div className="cb-stat-label">Cidades com anúncios ativos</div>
       </div>
       <div className="cb-stat">
         <div className="cb-stat-value">

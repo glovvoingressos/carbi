@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Star, Bookmark, Zap, Fuel, ArrowRight } from 'lucide-react'
+import { Bookmark, Zap, Fuel, ArrowRight } from 'lucide-react'
 import type { CarSpec } from '@/data/cars'
-import { formatBRL } from '@/data/cars'
+import { slugifyBrand } from '@/lib/brand-utils'
+import { canonicalModelSlug } from '@/lib/vehicle-slug'
 import CarImage from './CarImage'
 
 interface CarCardProps {
@@ -14,23 +15,9 @@ interface CarCardProps {
   view?: 'grid' | 'list'
 }
 
-function getDisplayRating(car: CarSpec): number {
-  if (car.latinNcap > 0) return parseFloat((car.latinNcap * 0.95 + 0.2).toFixed(1))
-  return 4.4
-}
-
 function getCardBadge(car: CarSpec): { label: string; tone: 'dark' | 'light' } | null {
   if (car.segment === 'electric' || car.engineType.toLowerCase().includes('elétrico')) {
     return { label: 'Elétrico', tone: 'dark' }
-  }
-  if (car.isPopular && car.latinNcap >= 5) {
-    return { label: '5 estrelas', tone: 'light' }
-  }
-  if (car.isPopular) {
-    return { label: 'Popular', tone: 'light' }
-  }
-  if (car.tags?.includes('tecnologia') || car.tags?.includes('hibrido')) {
-    return { label: 'Destaque', tone: 'light' }
   }
   return null
 }
@@ -39,10 +26,8 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
   const [saved, setSaved] = useState(false)
   const router = useRouter()
 
-  const brandSlug = car.brand.toLowerCase().replace(/\s+/g, '-')
-  const rating = getDisplayRating(car)
   const badge = getCardBadge(car)
-  const detailUrl = `/${brandSlug}/${car.slug}`
+  const detailUrl = `/${slugifyBrand(car.brand)}/${canonicalModelSlug(car.model)}`
 
   const segmentLabel: Record<string, string> = {
     hatch: 'Hatch', sedan: 'Sedan', suv: 'SUV', picape: 'Picape', eletrico: 'Elétrico',
@@ -62,7 +47,7 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
       }}
       tabIndex={0}
       role="link"
-      aria-label={`${car.brand} ${car.model} ${car.year} - ${formatBRL(car.priceBrl)}`}
+      aria-label={`${car.brand} ${car.model} ${car.version}, ano-modelo ${car.year}`}
     >
       {/* Image - 100% width, only top corners rounded */}
       <div className="relative w-full h-[280px] overflow-hidden rounded-t-[28px]">
@@ -72,6 +57,7 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
           model={car.model}
           year={car.year}
           src={car.image}
+          strict
           fit="cover"
           className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-[1.03]"
         />
@@ -100,10 +86,7 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
       {/* Content - with internal padding */}
       <div className="px-6 py-5 flex flex-col flex-1">
         <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1">
-            <Star className="w-3.5 h-3.5 fill-[#FACC15] text-[#FACC15]" />
-            <span className="text-[13px] font-medium text-[#0A0A0A]">{rating}</span>
-          </div>
+          <span className="text-[12px] font-medium text-[#8A95A8]">Ano-modelo {car.year}</span>
           <span className="text-[11px] font-medium text-[#8A95A8] uppercase tracking-wider truncate max-w-[80px]">
             {segLabel}
           </span>
@@ -114,12 +97,9 @@ export default function CarCard({ car, index = 0 }: CarCardProps) {
         </h3>
         <p className="text-[13px] text-[#A3A3A3] mb-3 truncate">{car.version}</p>
 
-        <div className="flex items-baseline gap-1 mb-4">
-          <span className="text-[13px] font-semibold text-[#52607A]">R$</span>
-          <p className="text-[22px] font-bold text-[#0A0A0A] tracking-tight leading-none">
-            {formatBRL(car.priceBrl).replace('R$', '').trim()}
-          </p>
-        </div>
+        <p className="mb-4 text-xs leading-relaxed text-[#52607A]">
+          Consulte o preço FIPE para esta versão e ano.
+        </p>
 
         <div className="flex gap-1.5 flex-wrap mb-4">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#52607A] bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-full">

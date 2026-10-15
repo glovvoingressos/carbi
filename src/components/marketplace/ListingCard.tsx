@@ -10,7 +10,7 @@ import MarketplaceListingImage from './MarketplaceListingImage'
 export default function ListingCard({ listing, priority = false, index = 0 }: { listing: ListingPublic; priority?: boolean; index?: number }) {
   const [favorited, setFavorited] = useState(false)
 
-  const hasFipe = typeof listing.fipe_price === 'number' && listing.fipe_price > 0
+  const hasFipe = Number(listing.fipe_price) > 0
   const fipe = hasFipe ? Math.round((1 - Number(listing.price) / Number(listing.fipe_price)) * 100) : null
   const isBelowFipe = fipe !== null && fipe <= -3
   const imageUrls = listing.images?.map((img) => img.url) || []
@@ -58,10 +58,12 @@ export default function ListingCard({ listing, priority = false, index = 0 }: { 
         <div className="cbi-card-title">
           {listing.model} {listing.year_model}
         </div>
-        <div className="flex items-baseline gap-1 mt-2">
+        <div className="mt-2 text-[10px] text-[#737373]">Preço anunciado</div>
+        <div className="flex items-baseline gap-1">
           <span className="text-[12px] font-semibold text-[#52607A]">R$</span>
           <div className="cbi-card-price">{formatBRL(Number(listing.price)).replace('R$', '').trim()}</div>
         </div>
+        {hasFipe && <div className="mt-1 text-[10px] text-[#737373]">FIPE · {listing.fipe_reference_month || 'referência não informada'}</div>}
         <div className="cbi-card-specs">
           <span><Gauge size={12} /> {listing.mileage.toLocaleString('pt-BR')} km</span>
           <span><Calendar size={12} /> {listing.year_model}</span>

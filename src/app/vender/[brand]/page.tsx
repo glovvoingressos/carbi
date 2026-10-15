@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import SEOPageClient from '@/components/seo/SEOPageClient'
 import { fetchPublicListingsPage } from '@/lib/marketplace-server'
 import { getAllCars } from '@/lib/data-fetcher'
@@ -10,57 +11,14 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 // Marcas que precisam de caixa alta
 const upperCaseBrands = new Set(['ram', 'bmw', 'byd', 'gwm', 'gac'])
 
-// Marcas chinesas com conteúdo específico
+// Orientação específica para veículos BYD; demais marcas usam apenas instruções
+// genéricas de preenchimento sem alegações sobre garantia, rede ou desempenho.
 const chineseBrandInfo: Record<string, { description: string; highlights: string[] }> = {
-  'jaecoo': {
-    description: 'Jaecoo é a marca premium da Chery, trazendo SUVs modernos com design arrojado e tecnologia embarcada para o Brasil.',
-    highlights: ['SUVs com design premium', 'Tecnologia embarcada', 'Garantia de 5 anos', 'Peças de reposição disponíveis'],
-  },
-  'gac': {
-    description: 'GAC Motor traz veículos chineses com qualidade comprovada e preço competitivo para o mercado brasileiro.',
-    highlights: ['Custo-benefício excelente', 'Equipamentos de série', 'Garantia de fábrica', 'Rede de assistência'],
-  },
-  'geely': {
-    description: 'Geely é uma das maiores montadoras chinesas, dona da Volvo, trazendo inovação e qualidade para o Brasil.',
-    highlights: ['Tecnologia Volvo', 'Design moderno', 'Segurança premium', 'Inovação constante'],
-  },
-  'gwm': {
-    description: 'GWM (Great Wall Motors) oferece SUVs e pickups robustos com tecnologia avançada e preço competitivo.',
-    highlights: ['SUVs robustos', 'Híbridos e elétricos', '4x4 acessível', 'Tecnologia embarcada'],
-  },
-  'omoda': {
-    description: 'Omoda é a marca de design da Chery, com SUVs que combinam estilo arrojado e tecnologia moderna.',
-    highlights: ['Design arrojado', 'Tecnologia embarcada', 'Preço competitivo', 'Garantia estendida'],
-  },
-  'caoa-chery': {
-    description: 'CAOA Chery é a joint venture da Chery no Brasil, oferecendo veículos com qualidade e garantia local.',
-    highlights: ['Montagem nacional', 'Garantia de 5 anos', 'Rede própria', 'Peças disponíveis'],
-  },
-  'chery': {
-    description: 'Chery é uma das maiores exportadoras chinesas, com veículos testados em mais de 80 países.',
-    highlights: ['Qualidade global', 'Preço competitivo', 'Tecnologia embarcada', 'Garantia de 5 anos'],
-  },
-  'leapmotor': {
-    description: 'Leapmotor é uma joint venture com a Stellantis, trazendo elétricos acessíveis para o Brasil.',
-    highlights: ['Elétricos acessíveis', 'Tecnologia Stellantis', 'Design moderno', 'Inovação em mobilidade'],
-  },
-  'jetour': {
-    description: 'Jetour é a marca de viagem da Chery, oferecendo SUVs spacious e confortáveis para famílias.',
-    highlights: ['SUVs spacious', 'Conforto familiar', 'Tecnologia embarcada', 'Preço competitivo'],
-  },
-  'wey': {
-    description: 'Wey é a marca premium da GWM, trazendo luxo e tecnologia acessível para o mercado brasileiro.',
-    highlights: ['Luxo acessível', 'Tecnologia avançada', 'Design sofisticado', 'Segurança 5 estrelas'],
-  },
-  'haval': {
-    description: 'Haval é a marca de SUVs da GWM, reconhecida mundialmente por veículos robustos e confiáveis.',
-    highlights: ['SUVs globais', '4x4 acessível', 'Tecnologia embarcada', 'Milhões vendidos no mundo'],
+  byd: {
+    description: 'Prepare seu anúncio de BYD com informações verificáveis sobre versão, sistema elétrico, estado da bateria e histórico documental do veículo.',
+    highlights: ['Informe a versão e o ano-modelo exatos', 'Anexe laudo da bateria se tiver', 'Descreva a garantia conforme os documentos', 'Inclua revisões e histórico de reparos'],
   },
 }
-
-// Marcas elétricas/híbridas
-const evBrands = new Set(['byd', 'gwm', 'volvo', 'bmw', 'porsche', 'audi', 'chevrolet', 'geely', 'leapmotor'])
-const hybridBrands = new Set(['byd', 'gwm', 'jaecoo'])
 
 function titleCase(value: string) {
   const normalized = value.toLowerCase()
@@ -87,31 +45,35 @@ export const dynamicParams = true
 
 export async function generateMetadata({ params }: { params: Promise<{ brand: string }> }): Promise<Metadata> {
   const { brand } = await params
+  const knownBrands = await getAllCars()
+  if (!knownBrands.some((car) => slugifyBrand(car.brand) === brand.toLowerCase())) {
+    return { title: 'Marca não encontrada', robots: { index: false, follow: true } }
+  }
   const capitalizedBrand = titleCase(brand)
   const canonicalUrl = `${SITE_URL}/vender/${brand}`
-  const isEv = evBrands.has(brand.toLowerCase())
-  const isHybrid = hybridBrands.has(brand.toLowerCase())
 
-  const evSuffix = isEv ? ' Elétrico' : isHybrid ? ' Híbrido' : ''
+  const isByd = brand.toLowerCase() === 'byd'
+  const title = isByd ? 'Anunciar BYD na Carbi | Prepare seu anúncio' : `Anunciar ${capitalizedBrand} na Carbi`
+  const description = isByd
+    ? 'Anuncie seu BYD na Carbi. Informe a versão, o estado da bateria quando houver laudo, a garantia conforme os documentos e o histórico de revisões.'
+    : `Crie um anúncio de ${capitalizedBrand} na Carbi, com fotos, dados do veículo e contato pelo chat interno.`
 
   return {
-    title: `Vender ${capitalizedBrand}${evSuffix}: Anuncie seu ${capitalizedBrand} rápido na Carbi`,
-    description: `Quer vender seu ${capitalizedBrand}${evSuffix}? Na Carbi você anuncia seu ${capitalizedBrand} usado ou seminovo com segurança e alcança compradores reais em todo o Brasil.`,
+    title,
+    description,
     keywords: [
       `vender ${capitalizedBrand}`,
       `anunciar ${capitalizedBrand}`,
       'vender carro',
       'anunciar carro grátis',
       'seminovos à venda',
-      isEv ? 'carro elétrico' : '',
-      isHybrid ? 'carro híbrido' : '',
-    ].filter(Boolean),
+    ],
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: `Vender ${capitalizedBrand}${evSuffix}: Anuncie seu ${capitalizedBrand} rápido na Carbi`,
-      description: `Quer vender seu ${capitalizedBrand}${evSuffix}? Na Carbi você anuncia com segurança e alcança compradores reais.`,
+      title,
+      description,
       type: 'website',
       url: canonicalUrl,
     },
@@ -120,55 +82,61 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
 
 export default async function VenderBrandPage({ params }: { params: Promise<{ brand: string }> }) {
   const { brand } = await params
+  const knownBrands = await getAllCars()
+  if (!knownBrands.some((car) => slugifyBrand(car.brand) === brand.toLowerCase())) notFound()
   const capitalizedBrand = titleCase(brand)
   const brandLower = brand.toLowerCase()
-  const { items } = await fetchPublicListingsPage({ brand: `%${capitalizedBrand}%`, page: 1, pageSize: 24, sort: 'recent' })
+  const { total } = await fetchPublicListingsPage({ brand: `%${capitalizedBrand}%`, vehicle_type: 'car', page: 1, pageSize: 24, sort: 'recent' })
 
   const brandInfo = chineseBrandInfo[brandLower]
-  const isEv = evBrands.has(brandLower)
-  const isHybrid = hybridBrands.has(brandLower)
 
-  const brandDescription = brandInfo?.description || `A ${capitalizedBrand} é uma marca reconhecida no mercado automotivo brasileiro, oferecendo veículos de qualidade para todos os perfis de compradores.`
-  const brandHighlights = brandInfo?.highlights || ['Qualidade comprovada', 'Rede de assistência', 'Peças disponíveis', 'Garantia de fábrica']
+  const isByd = brandLower === 'byd'
+  const brandDescription = brandInfo?.description || `Prepare o anúncio do seu ${capitalizedBrand} com versão, ano-modelo, quilometragem, fotos e histórico disponíveis.`
+  const brandHighlights = brandInfo?.highlights || ['Informe a versão exata', 'Use fotos atuais', 'Registre quilometragem e estado', 'Anexe documentos pertinentes']
 
   const data = {
-    h1: `Vender ${capitalizedBrand} Rápido e Seguro`,
+    h1: isByd ? 'Anunciar BYD' : `Anunciar ${capitalizedBrand}`,
     subtitle: brandDescription,
     ctaButtonText: `Anunciar meu ${capitalizedBrand}`,
     benefits: [
-      { icon: 'BadgeDollarSign', title: 'Valorização real', description: `Compare seu ${capitalizedBrand} com anúncios ativos e a FIPE para precificar melhor.` },
-      { icon: 'Car', title: `${items.length} anúncios ativos`, description: `Veja demanda real por ${capitalizedBrand} na plataforma antes de publicar.` },
-      { icon: 'ShieldCheck', title: 'Venda direta', description: 'Conectamos você a compradores reais, com chat interno e sem expor contato.' },
-      ...(isEv ? [{ icon: 'Zap', title: 'Elétricos', description: 'Destaque para veículos elétricos com autonomia e custo por km.' }] : []),
-      ...(isHybrid ? [{ icon: 'Leaf', title: 'Híbridos', description: 'Destaque para veículos híbridos com economia de combustível.' }] : []),
+      { icon: 'BadgeDollarSign', title: 'Preço com contexto', description: `Compare o valor pedido com anúncios da plataforma e use FIPE somente quando a combinação exata estiver disponível.` },
+      { icon: 'Car', title: total ? `${total} ${total === 1 ? 'anúncio' : 'anúncios'} de ${capitalizedBrand}` : `Anúncio de ${capitalizedBrand}`, description: total ? 'Consulte os anúncios publicados e compare versão, ano e estado antes de definir o preço.' : 'Não há anúncios públicos desta marca para usar como comparação no momento.' },
+      { icon: 'ShieldCheck', title: 'Informações claras', description: 'Descreva o veículo com dados e documentos que possam ser conferidos pelo interessado.' },
     ],
     sections: [
       {
-        badge: 'Sobre a marca',
-        title: `Por que escolher ${capitalizedBrand}`,
+        badge: isByd ? 'Preparação do anúncio' : 'Sobre o anúncio',
+        title: isByd ? 'O que informar ao anunciar um BYD' : `Como preparar o anúncio do seu ${capitalizedBrand}`,
         subtitle: brandDescription,
-        content: `A ${capitalizedBrand} se destaca por: ${brandHighlights.join(', ')}. Na Carbi, você encontra compradores interessados em veículos da marca.`,
+        content: isByd
+          ? `Identifique a versão e o ano-modelo sem abreviações ambíguas. Para veículos com bateria de tração, informe autonomia e histórico de recarga apenas quando souber; se houver laudo de saúde da bateria, indique a data e anexe o documento. Registre revisões, reparos e eventuais sinistros com comprovantes, quando disponíveis. Sobre garantia, copie prazo, cobertura e validade dos documentos oficiais do veículo; não estime esses dados.`
+          : `Antes de publicar, confira os dados da versão, ano-modelo, quilometragem e estado do veículo. Use fotos atuais e inclua comprovantes de revisões e reparos quando disponíveis.`,
       },
       {
         badge: 'Mercado atual',
-        title: `Como está a procura por ${capitalizedBrand}`,
-        subtitle: `Os anúncios ativos mostram a janela de preço e demanda da marca.`,
-        content: `Hoje há ${items.length} anúncio(s) ativo(s) de ${capitalizedBrand} na plataforma. Use essa vitrine para ajustar o preço e publicar com mais confiança.`,
+        title: `Como definir o preço do seu ${capitalizedBrand}`,
+        subtitle: `Use referências compatíveis com a versão, o ano-modelo e o estado do veículo.`,
+        content: total > 0
+          ? `Há ${total} anúncio(s) público(s) de ${capitalizedBrand} na plataforma. Compare veículos com versão, ano-modelo, quilometragem e condição semelhantes. A FIPE só deve ser usada quando a combinação exata estiver disponível; ela é referência, não garantia do preço de venda.`
+          : `No momento, não há anúncios públicos de ${capitalizedBrand} para comparação na plataforma. Consulte a FIPE apenas quando houver correspondência exata de versão e ano-modelo e deixe claro que ela é uma referência, não garantia do preço de venda.`,
       },
       {
         badge: 'Guia de venda',
-        title: `Como vender seu ${capitalizedBrand} pelo melhor preço`,
-        subtitle: `Preço justo e fotos reais aceleram o fechamento.`,
-        content: `Ao anunciar na Carbi, seu ${capitalizedBrand} entra no mesmo fluxo de descoberta que os compradores já usam para pesquisar seminovos e carros usados.`,
+        title: `Como publicar seu ${capitalizedBrand} na Carbi`,
+        subtitle: 'Revise as informações e mantenha o anúncio alinhado ao estado atual do veículo.',
+        content: `Preencha versão, ano-modelo, quilometragem e preço pedido. Inclua fotos atuais e responda às perguntas pelo chat interno. ${isByd ? 'Para um BYD, acrescente documentos de bateria e garantia somente se estiverem disponíveis e puderem ser conferidos.' : ''}`,
       },
     ],
-    faqs: [
-      { q: `É fácil vender um ${capitalizedBrand} usado?`, a: `Sim. O fluxo de anúncio é rápido e o contato com interessados acontece pelo chat interno.` },
-      { q: `Como avaliar meu ${capitalizedBrand}?`, a: 'Use a comparação com FIPE e a régua de anúncios ativos da própria plataforma.' },
-      { q: 'Quanto tempo demora para vender?', a: `Depende do preço e da demanda, mas anúncios bem posicionados tendem a receber contato rápido.` },
-      ...(isEv ? [{ q: 'É difícil vender um carro elétrico?', a: 'Não. A demanda por elétricos está crescendo. Na Carbi, compradores especializados buscam ativamente veículos elétricos.' }] : []),
-      ...(isHybrid ? [{ q: 'Carros híbridos têm boa saída?', a: 'Sim. Híbridos são muito procurados por quem busca economia sem abrir mão da autonomia.' }] : []),
-    ],
+    faqs: isByd
+      ? [
+          { q: 'Devo informar a saúde da bateria do BYD?', a: 'Informe um percentual ou avaliação somente se tiver laudo ou diagnóstico identificável. Se não tiver, não estime; descreva apenas o que pode confirmar.' },
+          { q: 'Como declarar a garantia do BYD?', a: 'Confira os documentos oficiais e informe prazo, cobertura e validade exatamente como aparecem neles. As condições podem variar por modelo, componente e histórico.' },
+          { q: 'O que incluir no histórico do veículo?', a: 'Informe revisões, reparos, sinistros conhecidos e intervenções na bateria, se houver. Anexe notas, laudos ou registros que sustentem as informações.' },
+        ]
+      : [
+          { q: `O que informar ao anunciar um ${capitalizedBrand}?`, a: 'Informe versão, ano-modelo, quilometragem, estado e preço pedido. Use fotos atuais e inclua documentos relevantes quando disponíveis.' },
+          { q: `Como comparar o preço do meu ${capitalizedBrand}?`, a: 'Compare anúncios de versão, ano e condição semelhantes. Use a FIPE apenas se encontrar a combinação exata e informe a referência consultada.' },
+        ],
   }
 
   return (

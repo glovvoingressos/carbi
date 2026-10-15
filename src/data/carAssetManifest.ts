@@ -155,7 +155,7 @@ export const availableCarAssetPaths = new Set<string>([
   '/assets/cars/ram-1500-2024.png',
   '/assets/cars/ram-dakota-2-0-turbo-2026.png',
   '/assets/cars/ram-ram-1500-limited-v8-2026.png',
-  '/assets/cars/ram-rampage-2-0-turbo-laramie-2026.png',
+  '/assets/cars/ram-rampage-2-0-turbo-flex-rt-2027.webp',
   '/assets/cars/renault-boreal-1-3-tce-2026.png',
   '/assets/cars/renault-duster-13-turbo-iconic-2026.png',
   '/assets/cars/renault-duster-2024.png',

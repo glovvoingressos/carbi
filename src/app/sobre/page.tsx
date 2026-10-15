@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/sobre' },
   openGraph: {
     title: 'Sobre o Carbi',
-    description: 'Marketplace automotivo brasileiro com FIPE verificada, chat interno e anúncios grátis.',
+    description: 'Marketplace automotivo brasileiro com referência FIPE quando disponível, chat interno e anúncios sem custo.',
     url: '/sobre',
     type: 'website',
   },
@@ -17,31 +17,30 @@ export const metadata: Metadata = {
 const PILLARS = [
   {
     icon: ShieldCheck,
-    title: 'Negociação segura',
-    desc: 'Chat interno, perfis verificados e histórico do veículo para você decidir sem medo.',
+    title: 'Mais informação',
+    desc: 'Use os dados disponíveis no anúncio e confirme documentos, estado e histórico antes de negociar.',
   },
   {
     icon: BarChart3,
-    title: 'FIPE em todo lugar',
-    desc: 'Compare o preço pedido com a tabela FIPE e veja se a oferta está acima, abaixo ou na média.',
+    title: 'Referência FIPE quando disponível',
+    desc: 'Quando a combinação exata de modelo, ano e versão é encontrada, mostramos a referência e o mês consultado.',
   },
   {
     icon: MessageCircle,
-    title: 'Sem intermediários',
-    desc: 'Conversa direta entre comprador e vendedor. Sem markup, sem ligação, sem espera.',
+    title: 'Contato pela plataforma',
+    desc: 'O chat permite iniciar uma conversa entre comprador e vendedor sem publicar o telefone no anúncio.',
   },
   {
     icon: Heart,
-    title: 'Grátis para começar',
-    desc: 'Anunciar é gratuito. Planos Pro existem só para quem quer mais destaque e selo de verificado.',
+    title: 'Anúncio sem custo',
+    desc: 'Cada conta pode manter até 5 anúncios ativos, com até 10 fotos em cada publicação.',
   },
 ] as const
 
 const NUMBERS = [
-  { value: '100%', label: 'Grátis para anunciar' },
-  { value: '24/7', label: 'Anúncios no ar' },
-  { value: 'FIPE', label: 'Integrada em todo anúncio' },
-  { value: '0', label: 'Taxa sobre a venda' },
+  { value: '5', label: 'anúncios ativos por conta' },
+  { value: '10', label: 'fotos por anúncio' },
+  { value: 'FIPE', label: 'quando a versão é confirmada' },
 ] as const
 
 export default function SobrePage() {
@@ -55,8 +54,7 @@ export default function SobrePage() {
           </h1>
           <p className="cb-lead" style={{ maxWidth: '60ch' }}>
             O Carbi nasceu para tirar a dor de comprar e vender carro no Brasil.
-            Sem ligação chata, sem leads repetidos, sem anúncio invisível.
-            Dados reais, FIPE verificada e conversa direta.
+            A plataforma reúne anúncios, dados disponíveis dos veículos e ferramentas para iniciar uma negociação.
           </p>
 
           <div className="cb-stats-row">
@@ -79,7 +77,7 @@ export default function SobrePage() {
             </div>
             <p style={{ maxWidth: '44ch', color: 'var(--cb-ink-soft)' }}>
               Decisões boas precisam de informação boa. Por isso construímos um produto
-              com dados abertos, sem letras miúdas e sem truques.
+              com limites e fontes apresentados de forma clara.
             </p>
           </div>
 
@@ -120,10 +118,10 @@ export default function SobrePage() {
                 com a mesma confiança.
               </p>
               <ul className="cb-about-checklist">
-                <li><Check size={16} /> Anúncio grátis e ilimitado</li>
-                <li><Check size={16} /> Comparação FIPE em todo anúncio</li>
-                <li><Check size={16} /> Chat interno com moderação</li>
-                <li><Check size={16} /> Perfis verificados para vendedores</li>
+                <li><Check size={16} /> Até 5 anúncios ativos por conta</li>
+                <li><Check size={16} /> Até 10 fotos por anúncio</li>
+                <li><Check size={16} /> Referência FIPE quando a versão é encontrada</li>
+                <li><Check size={16} /> Chat interno para contato</li>
               </ul>
             </div>
           </div>
@@ -137,8 +135,7 @@ export default function SobrePage() {
               <p className="cb-eyebrow">Pronto pra começar?</p>
               <h2 style={{ maxWidth: '20ch' }}>Anuncie grátis ou encontre seu próximo carro</h2>
               <p style={{ maxWidth: '48ch' }}>
-                Sem custo pra começar, sem assinatura, sem pegadinha. Você coloca
-                o carro no ar em poucos minutos.
+                O cadastro permite até 5 anúncios ativos por conta. Cada anúncio aceita até 10 fotos.
               </p>
             </div>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>

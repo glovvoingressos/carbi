@@ -44,7 +44,7 @@ const CHANNELS = [
 const FAQS = [
   {
     q: 'Como anuncio meu carro na Carbi?',
-    a: 'Crie sua conta, clique em "Anunciar grátis" e siga o passo a passo. Em menos de 2 minutos seu anúncio está no ar.',
+    a: 'Clique em "Anunciar grátis", preencha os dados, adicione fotos e revise antes de enviar. A publicação padrão é sem custo dentro do limite do plano gratuito.',
   },
   {
     q: 'A Carbi cobra para anunciar?',

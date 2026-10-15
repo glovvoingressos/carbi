@@ -1110,7 +1110,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         throw new Error(body.error || 'Falha ao criar anúncio.')
       }
 
-      const created = (await createResponse.json()) as { id: string; slug: string; emailStatus?: unknown }
+      const created = (await createResponse.json()) as { id: string; slug: string; status?: string; review?: { reason?: string } | null; emailStatus?: unknown }
       const uploaded: Array<{ storage_path: string; public_url: string; sort_order: number; is_primary: boolean }> = []
       setImageUploadProgress({ completed: 0, total: images.length, currentImage: 1, phase: 'uploading' })
 
@@ -1165,7 +1165,9 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
       localStorage.removeItem(LISTING_DRAFT_KEY)
       await clearListingDraftImages()
-      setSuccess('Anúncio publicado com sucesso. Redirecionando...')
+      setSuccess(created.review?.reason
+        ? `Anúncio criado, mas oculto até corrigir o preço: ${created.review.reason} Acesse seus anúncios para ajustar o valor.`
+        : 'Anúncio publicado com sucesso. Redirecionando...')
       setImageUploadProgress(null)
 
       trackEvent('create_listing', {
@@ -1175,7 +1177,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         currency: 'BRL',
       })
       setTimeout(() => {
-        router.push(`/anuncios/${created.slug}`)
+        router.push(created.status === 'paused' ? '/minha-conta/anuncios' : `/anuncios/${created.slug}`)
       }, 800)
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Falha ao publicar anúncio.')

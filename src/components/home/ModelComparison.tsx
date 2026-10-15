@@ -12,36 +12,30 @@ import {
   Zap,
   ArrowLeftRight,
   Sparkles,
-  Crown,
-  TrendingUp,
   ChevronDown,
   Search as SearchIcon,
 } from 'lucide-react'
 
-type View = 'specs' | 'cost'
+type View = 'specs' | 'efficiency'
 
 interface CarComparison {
   brand: string
   model: string
   version: string
   segment: string
-  priceBrl: number
+  engineType: string
   horsepower: number
   fuelEconomyCityGas: number
   airbagsCount: number
   slug: string
   image: string
   idealFor: string
+  modelPath: string
 }
 
 interface ModelComparisonProps {
   cars: CarComparison[]
   allCars: CarComparison[]
-}
-
-function formatBRL(value: number) {
-  if (!Number.isFinite(value)) return '—'
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
 }
 
 function safeNumber(value: number, fallback = 0) {
@@ -63,7 +57,7 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
   const [searchTerm, setSearchTerm] = useState('')
   const [activeOptionIndex, setActiveOptionIndex] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
-  const tabRefs = useRef<Record<View, HTMLButtonElement | null>>({ specs: null, cost: null })
+  const tabRefs = useRef<Record<View, HTMLButtonElement | null>>({ specs: null, efficiency: null })
   const optionRefs = useRef<HTMLButtonElement[]>([])
   const inView = useInView(sectionRef, { once: true, margin: '-80px' })
   const shouldReduceMotion = useReducedMotion()
@@ -98,7 +92,7 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
         <div className="cmp-empty-icon" aria-hidden="true"><ArrowLeftRight size={20} /></div>
         <div>
           <h2 className="cmp-empty-title">Comparativo indisponível</h2>
-          <p className="cmp-empty-copy">Escolha pelo menos dois modelos para comparar especificações e custo-benefício.</p>
+          <p className="cmp-empty-copy">Escolha pelo menos dois modelos para comparar as especificações disponíveis.</p>
         </div>
       </div>
     )
@@ -135,7 +129,7 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
   }
 
   const handleViewKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    const viewOrder: View[] = ['specs', 'cost']
+    const viewOrder: View[] = ['specs', 'efficiency']
     const currentIndex = viewOrder.indexOf(view)
     let nextIndex = currentIndex
 
@@ -230,33 +224,6 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
     }
   }
 
-  const savingsPerYear = (litersPerYear: number, fuelPrice = 6.5) =>
-    safeNumber(litersPerYear) * safeNumber(fuelPrice)
-
-  const avgKmYear = 12000
-  const aFuelCost = avgKmYear / Math.max(safeNumber(carA.fuelEconomyCityGas), 0.1)
-  const bFuelCost = avgKmYear / Math.max(safeNumber(carB.fuelEconomyCityGas), 0.1)
-
-  const comparisonScore = (car: CarComparison) => {
-    const horsepower = safeNumber(car.horsepower)
-    const fuelEconomy = safeNumber(car.fuelEconomyCityGas)
-    const airbags = safeNumber(car.airbagsCount)
-
-    if (view === 'specs') {
-      return (horsepower / 200) + (fuelEconomy / 20) + (airbags / 10)
-    }
-
-    const maxPrice = Math.max(safeNumber(carA.priceBrl), safeNumber(carB.priceBrl), 1)
-    const priceValue = 1 - Math.min(Math.max(safeNumber(car.priceBrl), 0) / maxPrice, 1)
-    const economyValue = Math.min(Math.max(fuelEconomy, 0) / 20, 1)
-    return priceValue * 0.45 + economyValue * 0.55
-  }
-
-  const scoreDifference = comparisonScore(carA) - comparisonScore(carB)
-  const winningSide: 'left' | 'right' | null = Math.abs(scoreDifference) < 0.001
-    ? null
-    : scoreDifference > 0 ? 'left' : 'right'
-
   return (
     <div className="cmp-card" ref={sectionRef}>
       <motion.div
@@ -269,7 +236,7 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
           Qual carro <span className="cmp-title-accent">combina com você</span>?
         </h2>
         <p className="cmp-lead">
-          Compare lado a lado os carros mais procurados e decida com dados reais.
+          Compare especificações disponíveis no catálogo e consulte a FIPE por versão e ano.
         </p>
       </motion.div>
 
@@ -298,16 +265,16 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
         <button
           type="button"
           role="tab"
-          id="cmp-tab-cost"
-          aria-controls="cmp-panel-cost"
-          aria-selected={view === 'cost'}
-          tabIndex={view === 'cost' ? 0 : -1}
-          ref={(element) => { tabRefs.current.cost = element }}
-          className={`cmp-toggle-opt ${view === 'cost' ? 'is-active' : ''}`}
-          onClick={() => setView('cost')}
+          id="cmp-tab-efficiency"
+          aria-controls="cmp-panel-efficiency"
+          aria-selected={view === 'efficiency'}
+          tabIndex={view === 'efficiency' ? 0 : -1}
+          ref={(element) => { tabRefs.current.efficiency = element }}
+          className={`cmp-toggle-opt ${view === 'efficiency' ? 'is-active' : ''}`}
+          onClick={() => setView('efficiency')}
           onKeyDown={handleViewKeyDown}
         >
-          Custo-benefício
+          Consumo e segurança
         </button>
         <motion.span
           className="cmp-toggle-thumb"
@@ -322,13 +289,10 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
         {[{ car: carA, side: 'left' as const }, { car: carB, side: 'right' as const }].map(({ car, side }, i) => {
           const otherCar = side === 'left' ? carB : carA
           const options = filteredOptions(side)
-          const highlight = winningSide === side
-          const tie = winningSide === null
-
           return (
             <motion.div
               key={`${car.slug}-${side}`}
-              className={`cmp-col ${highlight ? 'is-highlight' : ''}`}
+              className="cmp-col"
               initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
               transition={shouldReduceMotion
@@ -336,20 +300,11 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                 : { duration: 0.55, delay: 0.2 + i * 0.12, ease: [0.22, 0.61, 0.36, 1] }}
               whileHover={shouldReduceMotion ? undefined : { y: -6 }}
               layout={!shouldReduceMotion}
-              aria-label={`${car.brand} ${car.model}${highlight ? ', melhor escolha nesta visão' : tie ? ', empate nesta visão' : ''}`}
+              aria-label={`${car.brand} ${car.model}`}
             >
-              {highlight && (
-                <motion.div
-                  className="cmp-col-glow"
-                  aria-hidden="true"
-                  animate={{ opacity: shouldReduceMotion ? 0.34 : [0.4, 0.8, 0.4] }}
-                  transition={shouldReduceMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                />
-              )}
-
               <div className="cmp-col-top">
-                <span className={`cmp-badge ${highlight ? 'is-highlight' : ''} ${tie ? 'is-tie' : ''}`}>
-                  {highlight ? <><Crown size={11} /> Melhor escolha</> : tie ? <><ArrowLeftRight size={11} /> Empate técnico</> : car.segment}
+                <span className="cmp-badge">
+                  {car.segment}
                 </span>
 
                 <div className="cmp-picker">
@@ -427,7 +382,6 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                             >
                               <span className="cmp-picker-item-brand">{opt.brand}</span>
                               <span className="cmp-picker-item-model">{opt.model}</span>
-                              <span className="cmp-picker-item-price">{formatBRL(opt.priceBrl)}</span>
                             </button>
                           ))}
                           {options.length === 0 && (
@@ -445,21 +399,6 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                 <p className="cmp-version">{car.version}</p>
               </div>
 
-              <div className="cmp-price-block">
-                <span className="cmp-price-currency">R$</span>
-                <motion.span
-                  key={`price-${car.slug}`}
-                  className="cmp-price-value"
-                  initial={shouldReduceMotion ? false : { opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.4 }}
-                >
-                  {Number.isFinite(car.priceBrl) ? Math.round(car.priceBrl / 1000) : '—'}
-                </motion.span>
-                <span className="cmp-price-suffix">mil</span>
-              </div>
-              <p className="cmp-price-meta">preço sugerido Carbi</p>
-
               <AnimatePresence mode="wait" initial={false}>
                 {view === 'specs' ? (
                   <motion.div
@@ -476,12 +415,17 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                   >
                     {SPECS.map((spec, si) => {
                       const Icon = spec.icon
-                      const value = safeNumber(car[spec.key as keyof CarComparison] as number)
-                      const otherValue = safeNumber(otherCar[spec.key as keyof CarComparison] as number)
+                      const rawValue = safeNumber(car[spec.key as keyof CarComparison] as number)
+                      const rawOtherValue = safeNumber(otherCar[spec.key as keyof CarComparison] as number)
+                      const isConsumption = spec.key === 'fuelEconomyCityGas'
+                      const value = isConsumption && /elétric/i.test(car.engineType) ? 0 : rawValue
+                      const otherValue = isConsumption && /elétric/i.test(otherCar.engineType) ? 0 : rawOtherValue
                       const pct = Math.min(Math.max((value / spec.max) * 100, 0), 100)
                       const otherPct = Math.min(Math.max((otherValue / spec.max) * 100, 0), 100)
-                      const isTie = value === otherValue
-                      const isWinner = !isTie && pct > otherPct
+                      const isComparable = value > 0 && otherValue > 0 && (!isConsumption || car.engineType === otherCar.engineType)
+                      const isTie = isComparable && value === otherValue
+                      const isWinner = isComparable && pct > otherPct
+                      const shownValue = value > 0 ? `${value}${spec.suffix}` : 'Não informado'
                       return (
                         <motion.div
                           key={spec.key}
@@ -493,13 +437,13 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                           <div className="cmp-spec-top">
                             <div className="cmp-spec-label-wrap">
                               <Icon size={13} className="cmp-spec-icon" />
-                              <span className="cmp-spec-label">{spec.label}</span>
+                              <span className="cmp-spec-label">{spec.label}{isConsumption ? ` · ${car.engineType}` : ''}</span>
                             </div>
                             <span
                               className={`cmp-spec-value ${isWinner ? 'is-winner' : ''}`}
-                              aria-label={`${value}${spec.suffix}${isWinner ? ', melhor resultado' : isTie ? ', empate' : ''}`}
+                              aria-label={`${shownValue}${isWinner ? ', melhor resultado' : isTie ? ', empate' : ''}`}
                             >
-                              {value}{spec.suffix}
+                              {shownValue}
                             </span>
                           </div>
                           <div className="cmp-progress-track">
@@ -518,11 +462,11 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                   </motion.div>
                 ) : (
                   <motion.div
-                    key="cost"
+                    key="efficiency"
                     className="cmp-features"
-                    id="cmp-panel-cost"
+                    id="cmp-panel-efficiency"
                     role="tabpanel"
-                    aria-labelledby="cmp-tab-cost"
+                    aria-labelledby="cmp-tab-efficiency"
                     tabIndex={0}
                     initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -531,25 +475,12 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
                   >
                     <CostRow
                       icon={<Zap size={13} />}
-                      label="Consumo médio"
+                      label="Consumo na cidade"
                       current={car.fuelEconomyCityGas}
                       other={otherCar.fuelEconomyCityGas}
+                      currentFuel={car.engineType}
+                      otherFuel={otherCar.engineType}
                       suffix=" km/l"
-                    />
-                    <CostRow
-                      icon={<TrendingUp size={13} />}
-                      label="Gasto anual com combustível"
-                      current={i === 0 ? aFuelCost : bFuelCost}
-                      other={i === 0 ? bFuelCost : aFuelCost}
-                      formatter={(v) => formatBRL(savingsPerYear(v))}
-                      lowerIsBetter
-                    />
-                    <CostRow
-                      icon={<Gauge size={13} />}
-                      label="Potência por R$ mil"
-                      current={(safeNumber(car.horsepower) / Math.max(safeNumber(car.priceBrl), 1)) * 1000}
-                      other={(safeNumber(otherCar.horsepower) / Math.max(safeNumber(otherCar.priceBrl), 1)) * 1000}
-                      formatter={(v) => `${v.toFixed(2)} cv/mil`}
                     />
                     <CostRow
                       icon={<Shield size={13} />}
@@ -568,11 +499,11 @@ export default function ModelComparison({ cars, allCars }: ModelComparisonProps)
               </div>
 
               <Link
-                href={`/carros/${car.slug}`}
-                className={`cmp-cta ${highlight ? 'is-highlight' : ''}`}
+                href={car.modelPath}
+                className="cmp-cta"
                 aria-label={`Ver detalhes do ${car.brand} ${car.model}`}
               >
-                <span>Ver {car.model}</span>
+                <span>Ver ficha e preço FIPE</span>
                 <motion.span
                   className="cmp-cta-arrow"
                   aria-hidden="true"
@@ -615,29 +546,30 @@ function CostRow({
   label,
   current,
   other,
+  currentFuel,
+  otherFuel,
   suffix,
-  formatter,
-  lowerIsBetter,
 }: {
   icon: ReactNode
   label: string
   current: number
   other: number
+  currentFuel?: string
+  otherFuel?: string
   suffix?: string
-  formatter?: (v: number) => string
-  lowerIsBetter?: boolean
 }) {
   const safeCurrent = safeNumber(current)
   const safeOther = safeNumber(other)
-  const isTie = safeCurrent === safeOther
-  const isWinner = !isTie && (lowerIsBetter ? safeCurrent < safeOther : safeCurrent > safeOther)
-  const formatted = formatter ? formatter(safeCurrent) : `${safeCurrent}${suffix || ''}`
+  const isComparable = safeCurrent > 0 && safeOther > 0 && (!currentFuel || !otherFuel || currentFuel === otherFuel)
+  const isTie = isComparable && safeCurrent === safeOther
+  const isWinner = isComparable && safeCurrent > safeOther
+  const formatted = safeCurrent > 0 ? `${safeCurrent}${suffix || ''}` : 'Não informado'
   return (
     <div className="cmp-spec">
       <div className="cmp-spec-top">
         <div className="cmp-spec-label-wrap">
           {icon}
-          <span className="cmp-spec-label">{label}</span>
+          <span className="cmp-spec-label">{label}{suffix?.includes('km/l') && currentFuel ? ` · ${currentFuel === 'Flex' ? 'gasolina' : currentFuel}` : ''}</span>
         </div>
         <span
           className={`cmp-spec-value ${isWinner ? 'is-winner' : ''}`}

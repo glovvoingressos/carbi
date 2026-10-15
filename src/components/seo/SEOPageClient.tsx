@@ -69,9 +69,15 @@ export default function SEOPageClient({ data, ctaHref }: SEOPageClientProps) {
 
       <FAQSection items={data.faqs} />
 
+      <div className="fingen-shell-content" style={{ paddingTop: '8px', paddingBottom: '8px' }}>
+        <p style={{ fontSize: '12px', lineHeight: 1.6, color: 'var(--color-text-tertiary, #737373)' }}>
+          Responsabilidade editorial: Carbi. Confirme dados, documentos, preço pedido e condições diretamente com o vendedor antes de negociar.
+        </p>
+      </div>
+
       <SEOCallToAction
         title={data.bottomCtaTitle || "Pronto para negociar seu veículo?"}
-        description={data.bottomCtaDescription || "Junte-se a milhares de motoristas que já simplificaram sua vida com a Carbi."}
+        description={data.bottomCtaDescription || "Crie seu anúncio com os dados do veículo e converse com interessados pelo chat interno."}
         buttonText={data.bottomCtaButtonText || "Começar hoje"}
         buttonHref={ctaHref}
       />

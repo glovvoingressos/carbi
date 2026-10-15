@@ -1,22 +1,9 @@
-import {
-  JULY_2026_NEW_RANKINGS,
-  JULY_2026_USED_RANKINGS,
-  STATE_RANKINGS_DATA,
-} from '@/data/rankings-july-2026'
-
-const RANKING_PERIOD = 'julho-2026'
+import { SEPTEMBER_2026_NEW_RANKINGS } from '@/data/rankings-september-2026'
 
 export function getRankingSitemapPaths(): string[] {
-  const modelSlugs = new Set([
-    ...JULY_2026_NEW_RANKINGS.map((item) => item.slug),
-    ...JULY_2026_USED_RANKINGS.map((item) => item.slug),
-  ])
-
   return [
-    '/carros-mais-vendidos-brasil',
-    `/carros-mais-vendidos-brasil/${RANKING_PERIOD}`,
-    ...Array.from(modelSlugs, (slug) => `/carros-mais-vendidos-brasil/${RANKING_PERIOD}/${slug}`),
-    ...Object.keys(STATE_RANKINGS_DATA).map((state) => `/carros-mais-vendidos/${state}`),
+    '/carros-mais-vendidos-brasil/setembro-2026',
+    ...SEPTEMBER_2026_NEW_RANKINGS.map((item) => `/carros-mais-vendidos-brasil/setembro-2026/${item.slug}`),
   ]
 }
 
@@ -34,19 +21,10 @@ export function buildRankingStructuredData({
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: `${brand} ${model}: vendas e preço FIPE em ${periodLabel}`,
-    description: `Relatório de vendas e FIPE do ${brand} ${model} em ${periodLabel}.`,
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': canonicalUrl,
-    },
-    author: {
-      '@type': 'Organization',
-      name: 'Carbi',
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'Carbi',
-    },
+    headline: `${brand} ${model}: emplacamentos em ${periodLabel}`,
+    description: `Posição e quantidade de emplacamentos do ${brand} ${model} no recorte informado, com fontes e método apresentados na página.`,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
+    author: { '@type': 'Organization', name: 'Carbi' },
+    publisher: { '@type': 'Organization', name: 'Carbi' },
   }
 }

@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import Image from 'next/image'
 import { availableCarAssetPaths } from '@/data/carAssetManifest'
+import { getCatalogCarImage, isUnsafeCarAsset } from '@/data/unsafeCarAssets'
 
 interface CarImageProps {
   id: string
@@ -10,6 +12,7 @@ interface CarImageProps {
   year: number
   src?: string
   priority?: boolean
+  strict?: boolean
   className?: string
   style?: React.CSSProperties
   fit?: 'contain' | 'cover'
@@ -23,19 +26,18 @@ export default function CarImage({
   year,
   src,
   priority = false,
+  strict = false,
   className,
   style,
   fit = 'contain',
   aspectRatio = '16/10',
 }: CarImageProps) {
-  const [resolvedSrc, setResolvedSrc] = useState<string | null>(null)
+  const [candidateIndex, setCandidateIndex] = useState(0)
   const [hasFinalError, setHasFinalError] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    setResolvedSrc(null)
+    setCandidateIndex(0)
     setHasFinalError(false)
-    setIsLoading(true)
   }, [id, src, brand, model, year])
 
   const slug = (value: string) =>
@@ -45,8 +47,6 @@ export default function CarImage({
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
-
-  const tokenize = (value: string) => slug(value).split('-').filter(Boolean)
 
   const resolvedCandidates = useMemo(() => {
     const brandSlug = slug(brand)
@@ -72,8 +72,9 @@ export default function CarImage({
 
     const fallbackYears = year >= 2025 ? [2025, 2024] : [2024]
 
-    const imageCandidates = [
-      src,
+    const preferredImage = getCatalogCarImage(brand, model, src)
+    const imageCandidates: Array<string | null> = strict ? [preferredImage] : [
+      preferredImage,
       `/assets/cars/${id}.png`,
       ...brandVariants.flatMap((b) => [
         `/assets/cars/${b}-${modelSlug}.png`,
@@ -87,91 +88,20 @@ export default function CarImage({
           `/assets/cars/${b}-${modelBaseSlug}-${fy}.png`,
         ])
       ]),
-    ].filter(Boolean) as string[]
+    ]
 
-    const manifestPaths = Array.from(availableCarAssetPaths)
-    const modelTokens = tokenize(modelBaseSlug)
-
-    const bestManifestMatch = manifestPaths
-      .map((assetPath) => {
-        const file = assetPath.replace('/assets/cars/', '').replace('.png', '')
-        const fileTokens = file.split('-').filter(Boolean)
-        let score = 0
-
-        if (file.includes(`${brandSlug}-`) || file.includes(`vw-`)) score += 30
-        for (const token of modelTokens) {
-          if (fileTokens.includes(token)) score += 8
-        }
-        if (file.includes(`${modelBaseSlug}-`)) score += 20
-        if (file.endsWith('-2025')) score += 3
-        if (file.endsWith('-2024')) score += 2
-
-        return { assetPath, score }
-      })
-      .filter((item) => item.score > 0)
-      .sort((a, b) => b.score - a.score)[0]?.assetPath
-
-    const uniqueImageCandidates = Array.from(new Set([
-      ...imageCandidates,
-      ...(bestManifestMatch ? [bestManifestMatch] : []),
-    ]))
+    const uniqueImageCandidates = Array.from(new Set(imageCandidates.filter((path): path is string => Boolean(path))))
 
     return uniqueImageCandidates.filter((path) => {
       if (!path.startsWith('/assets/cars/')) return true
-      return availableCarAssetPaths.has(path)
+      return availableCarAssetPaths.has(path) && !isUnsafeCarAsset(path)
     })
-  }, [brand, model, year, src, id])
+  }, [brand, model, year, src, id, strict])
 
+  const activeSrc = resolvedCandidates[candidateIndex]
   useEffect(() => {
-    if (resolvedCandidates.length === 0) {
-      setHasFinalError(true)
-      setIsLoading(false)
-    }
-  }, [resolvedCandidates.length])
-
-  useEffect(() => {
-    let cancelled = false
-
-    if (resolvedCandidates.length === 0) {
-      setHasFinalError(true)
-      setIsLoading(false)
-      return
-    }
-
-    const tryResolve = async () => {
-      setIsLoading(true)
-      setHasFinalError(false)
-
-      for (const candidate of resolvedCandidates) {
-        const loaded = await new Promise<boolean>((resolve) => {
-          const image = new window.Image()
-          image.onload = () => resolve(true)
-          image.onerror = () => resolve(false)
-          image.src = candidate
-          if (image.complete && image.naturalWidth > 0) resolve(true)
-        })
-
-        if (cancelled) return
-        if (loaded) {
-          setResolvedSrc(candidate)
-          setIsLoading(false)
-          return
-        }
-      }
-
-      if (!cancelled) {
-        setResolvedSrc(null)
-        setHasFinalError(true)
-        setIsLoading(false)
-      }
-    }
-
-    void tryResolve()
-
-    return () => {
-      cancelled = true
-    }
-  }, [resolvedCandidates])
+    if (!activeSrc) setHasFinalError(true)
+  }, [activeSrc])
 
   return (
     <div 
@@ -181,29 +111,29 @@ export default function CarImage({
         aspectRatio,
       }}
     >
-      {!hasFinalError && resolvedSrc && (
-        <img
-          src={resolvedSrc}
+      {!hasFinalError && activeSrc && (
+        <Image
+          src={activeSrc}
+          fill
+          sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 720px"
           alt={`${brand} ${model} ${year}`}
-          className={`absolute inset-0 w-full h-full ${fit === 'cover' ? 'object-cover' : 'object-contain'} transition-all duration-700 ${isLoading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
+          className={`absolute inset-0 w-full h-full ${fit === 'cover' ? 'object-cover' : 'object-contain'}`}
           style={{
-            transform: isLoading ? 'scale(0.98)' : 'scale(1)',
             objectPosition: 'center center',
             pointerEvents: 'none'
           }}
-          loading={priority ? 'eager' : 'lazy'}
+          preload={priority}
+          loading={priority ? undefined : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
+          onError={() => {
+            if (candidateIndex + 1 < resolvedCandidates.length) setCandidateIndex((index) => index + 1)
+            else setHasFinalError(true)
+          }}
         />
       )}
 
-      {/* Loading Shimmer / Pulse */}
-      {isLoading && resolvedCandidates.length > 0 && (
-        <div className="absolute inset-0 flex items-center justify-center bg-transparent animate-pulse z-10">
-          <div className="w-12 h-1.5 bg-black/10 rounded-full animate-bounce" />
-        </div>
-      )}
-
       {/* Premium Fallback UI (Se tudo falhar) */}
-      {hasFinalError && (
+      {(hasFinalError || !activeSrc) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-gray-100 to-gray-200">
            <div className="relative mb-3 flex items-center justify-center">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/60 backdrop-blur-md border border-white/70 rounded-full absolute animate-pulse" />
