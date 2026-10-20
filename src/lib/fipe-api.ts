@@ -85,6 +85,11 @@ async function fetchFipe<T>(endpoint: string, useReference = true, type = 'cars'
     })
 
     if (!res.ok) {
+      // Historical references beyond the subscription window answer 402. The
+      // caller stops walking older months, so this is expected, not an error.
+      if (res.status === 402 && referenceOverride) {
+        return [] as any
+      }
       console.error(`FIPE API Error (${res.status}): ${url}`)
       return [] as any
     }
@@ -196,6 +201,68 @@ export async function getFipeVersionsByYear(brandCode: string, modelCode: string
     }))
 }
 
+const FUEL_LABELS = new Set([
+  'flex', 'gasolina', 'gas', 'diesel', 'alcool', 'etanol', 'hibrido', 'hybrid',
+  'gnv', 'eletrico', 'electric',
+])
+
+function tokensOf(value?: string | null): string[] {
+  return normalize(value || '').split(' ').filter(Boolean)
+}
+
+function isFuelOrYearLabel(token: string): boolean {
+  return FUEL_LABELS.has(token) || /^\d+$/.test(token)
+}
+
+// FIPE v2 year entries carry only the fuel (e.g. "2025 Flex"). Older payloads
+// also carried the trim (e.g. "2025 Sport"), so both shapes must be supported.
+function yearVariantsCarryTrim(versions: FipeVersionOption[]): boolean {
+  return versions.some((version) =>
+    tokensOf(version.name).some((token) => !isFuelOrYearLabel(token)),
+  )
+}
+
+function matchYearVariants(versions: FipeVersionOption[], tokens: string[]): FipeVersionOption[] {
+  if (tokens.length === 0) return []
+  return versions.filter((version) => {
+    const candidateTokens = tokensOf(version.name)
+    return tokens.every((token) => candidateTokens.includes(token))
+  })
+}
+
+/**
+ * Picks the FIPE year variant for an already-resolved model.
+ *
+ * The trim is resolved at the model level (see resolveBrandAndModelByYear), so
+ * year variants only differ by fuel. When the variant label still contains a
+ * trim name, it must match exactly; otherwise the single variant is used, or the
+ * fuel is inferred from the version/model name when several variants exist.
+ */
+export function selectFipeYearVariant(
+  versions: FipeVersionOption[],
+  versionName?: string | null,
+  modelName?: string | null,
+): FipeVersionOption | null {
+  if (versions.length === 0) return null
+
+  const carriesTrim = yearVariantsCarryTrim(versions)
+  const requestedTokens = tokensOf(versionName).filter((token) => token.length >= 2)
+  const exactMatches = matchYearVariants(versions, requestedTokens)
+  if (exactMatches.length === 1) return exactMatches[0]
+
+  // Never substitute another trim's FIPE value.
+  if (carriesTrim) return null
+
+  // Fuel-only labels (the current API shape): a single variant for the year is
+  // unambiguous once the model/trim has already been resolved.
+  if (versions.length === 1) return versions[0]
+
+  const fuelTokens = [...new Set([...tokensOf(versionName), ...tokensOf(modelName)])]
+    .filter((token) => FUEL_LABELS.has(token))
+  const fuelMatches = matchYearVariants(versions, fuelTokens)
+  return fuelMatches.length === 1 ? fuelMatches[0] : null
+}
+
 /**
  * Resolvers for auto-hydration (used by [brand]/[model]/page.tsx)
  */
@@ -288,6 +355,38 @@ async function countRealYears(brandCode: string, modelCode: string): Promise<num
   }
 }
 
+const VERSION_TOKEN_ALIASES: Record<string, string> = {
+  hybrid: 'hibrido',
+  hibrida: 'hibrido',
+}
+
+function canonicalTokens(value?: string | null): string[] {
+  return tokensOf(value).map((token) => VERSION_TOKEN_ALIASES[token] || token)
+}
+
+/**
+ * True when the trim name is accounted for by the FIPE model name. Prevents
+ * falling back to another trim's model (e.g. "LT1" resolving to "Premier" or
+ * "2.0T FSI" resolving to "3.2 V6") when the version cannot be matched.
+ */
+export function isVersionCoveredByModel(versionName?: string | null, modelName?: string | null): boolean {
+  const versionTokens = canonicalTokens(versionName).filter((token) => token.length >= 2)
+  if (versionTokens.length === 0) return true
+
+  const modelTokens = canonicalTokens(modelName)
+  const normalizedModel = normalize(modelName || '')
+  return versionTokens.every((token) =>
+    modelTokens.includes(token) || (token.length >= 3 && normalizedModel.includes(token)),
+  )
+}
+
+function restrictCandidatesToVersion(candidates: FipeItem[], versionName?: string): FipeItem[] {
+  if (!versionName || !canonicalTokens(versionName).some((token) => token.length >= 2)) {
+    return candidates
+  }
+  return candidates.filter((candidate) => isVersionCoveredByModel(versionName, candidate.name))
+}
+
 export async function resolveBrandAndModel(
   brandName: string,
   modelName: string,
@@ -305,12 +404,17 @@ export async function resolveBrandAndModel(
   const candidates = await getCandidateModels(brand, models, modelName, versionName)
   if (candidates.length === 0) return null
 
+  // The version must be represented in the chosen model name; otherwise we
+  // could show another trim's FIPE value.
+  const pool = restrictCandidatesToVersion(candidates, versionName)
+  if (pool.length === 0) return null
+
   // When the version alone is ambiguous (e.g. "EXL" matching several trims),
   // prefer the trim with the most available model years.
-  let best = candidates[0]
-  if (candidates.length > 1) {
+  let best = pool[0]
+  if (pool.length > 1) {
     let bestCount = -1
-    for (const candidate of candidates) {
+    for (const candidate of pool) {
       const count = await countRealYears(brand.code, candidate.code)
       if (count > bestCount) {
         bestCount = count
@@ -342,9 +446,12 @@ export async function resolveBrandAndModelByYear(
   const candidates = await getCandidateModels(brand, models, modelName, versionName)
   if (candidates.length === 0) return null
 
+  const pool = restrictCandidatesToVersion(candidates, versionName)
+  if (pool.length === 0) return null
+
   // Prefer the first candidate that actually has a version for the target year,
   // so a short/ambiguous version never resolves to a wrong trim.
-  for (const candidate of candidates) {
+  for (const candidate of pool) {
     const versions = await getFipeVersionsByYear(brand.code, candidate.code, targetYear)
     if (versions.length > 0) return { brand, model: candidate }
   }
@@ -385,17 +492,8 @@ export async function getFipePrice(
   const versions = await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, targetYear)
   if (versions.length === 0) return null
 
-  let selected = versions[0]
-  if (versionName?.trim()) {
-    const requestedTokens = normalize(versionName).split(' ').filter(Boolean)
-    const matches = versions.filter((version) => {
-      const candidateTokens = normalize(version.name).split(' ')
-      return requestedTokens.every((token) => candidateTokens.includes(token))
-    })
-    // Never silently substitute another trim's FIPE value.
-    if (matches.length !== 1) return null
-    selected = matches[0]
-  }
+  const selected = selectFipeYearVariant(versions, versionName, resolved.model.name)
+  if (!selected) return null
 
   const detail = await getFipeDetailByCode(resolved.brand.code, resolved.model.code, selected.code)
   return detail?.modelYear === targetYear ? detail : null
@@ -416,15 +514,10 @@ export async function getFipeHistory(
     years.map(async (year) => {
       const versions = await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, year)
       if (versions.length === 0) return null
-      
-      let selected = versions[0]
-      if (versionName?.trim()) {
-        const requestedTokens = normalize(versionName).split(' ').filter(Boolean)
-        const matches = versions.filter((version) => requestedTokens.every((token) => normalize(version.name).split(' ').includes(token)))
-        if (matches.length !== 1) return null
-        selected = matches[0]
-      }
-      
+
+      const selected = selectFipeYearVariant(versions, versionName, resolved.model.name)
+      if (!selected) return null
+
       const detail = await getFipeDetailByCode(resolved.brand.code, resolved.model.code, selected.code)
       if (!detail || detail.modelYear !== year) return null
       
@@ -453,13 +546,8 @@ export async function getFipeMonthlyHistory(
   const versions = await getFipeVersionsByYear(resolved.brand.code, resolved.model.code, targetYear)
   if (versions.length === 0) return []
 
-  let selected = versions[0]
-  if (versionName?.trim()) {
-    const requestedTokens = normalize(versionName).split(' ').filter(Boolean)
-    const matches = versions.filter((version) => requestedTokens.every((token) => normalize(version.name).split(' ').includes(token)))
-    if (matches.length !== 1) return []
-    selected = matches[0]
-  }
+  const selected = selectFipeYearVariant(versions, versionName, resolved.model.name)
+  if (!selected) return []
 
   const refs = await getFipeReferences()
 

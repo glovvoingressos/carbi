@@ -86,29 +86,6 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
             ))}
           </div>
         </button>
-
-        {gallery.length > 1 ? (
-          <>
-            <button
-              type="button"
-              onClick={goPrev}
-              className="ref-ad-gallery-arrow ref-ad-gallery-arrow-left"
-              aria-label="Foto anterior"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              type="button"
-              onClick={goNext}
-              className="ref-ad-gallery-arrow ref-ad-gallery-arrow-right"
-              aria-label="Próxima foto"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-
-            <div className="ref-ad-gallery-count">{safeIndex + 1}/{gallery.length}</div>
-          </>
-        ) : null}
       </div>
 
       {isLightboxOpen ? (
@@ -191,6 +168,28 @@ export default function ListingImageGallery({ images, title, badgeLabel, fipeBad
               </button>
             )
           })}
+        </div>
+      ) : null}
+
+      {gallery.length > 1 ? (
+        <div className="ref-ad-gallery-controls">
+          <button
+            type="button"
+            onClick={goPrev}
+            className="ref-ad-gallery-arrow ref-ad-gallery-arrow-left"
+            aria-label="Foto anterior"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <span className="ref-ad-gallery-count" aria-live="polite">{safeIndex + 1}/{gallery.length}</span>
+          <button
+            type="button"
+            onClick={goNext}
+            className="ref-ad-gallery-arrow ref-ad-gallery-arrow-right"
+            aria-label="Próxima foto"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
       ) : null}
     </div>

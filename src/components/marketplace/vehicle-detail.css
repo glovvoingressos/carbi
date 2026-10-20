@@ -10,7 +10,7 @@
    ============================================================ */
 
 .vehicle-detail-page {
-  background: #ffffff;
+  background: #f3f3ef;
   padding-bottom: 110px; /* espaço da barra fixa no celular */
   /* Cards da FIPE (comparativo e histórico) em verde oliva claro.
      As variáveis abaixo alimentam o gráfico; o padrão escuro continua valendo
@@ -25,6 +25,13 @@
   --fipe-radius: 999px;
   --fipe-footer-radius: 16px;
 }
+
+/* O fundo do shell global é branco; a página do anúncio usa um tom mais quente
+   para que os cards brancos se destaquem. */
+main.vehicle-detail-page {
+  background: #f3f3ef;
+}
+
 
 @media (min-width: 768px) {
   .vehicle-detail-page {
@@ -53,33 +60,36 @@
   font-weight: 600;
 }
 
-/* ── Ações do topo (voltar / favoritar / compartilhar) ── */
+/* ── Ações do topo (voltar / favoritar / compartilhar) ──
+   Fora da imagem, compactas e em carbon para não competir com a foto. */
 .vehicle-detail-page .fingen-detail-header {
-  padding: 16px;
+  position: static;
+  padding: 16px 0 10px;
+  pointer-events: auto;
 }
 
 .vehicle-detail-page .fingen-detail-back,
 .vehicle-detail-page .fingen-detail-action-btn {
-  width: 44px;
-  height: 44px;
-  border: 1.5px solid #e4e4e1;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  color: #111111;
-  box-shadow: 0 2px 8px rgba(17, 17, 17, 0.06);
+  width: 34px;
+  height: 34px;
+  border: 1px solid #1c1c1a;
+  background: #1c1c1a;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(17, 17, 17, 0.14);
   transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
 }
 
 .vehicle-detail-page .fingen-detail-back svg,
 .vehicle-detail-page .fingen-detail-action-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
 }
 
 .vehicle-detail-page .fingen-detail-back:hover,
 .vehicle-detail-page .fingen-detail-action-btn:hover {
-  border-color: #111111;
-  background: #ffffff;
+  border-color: #000000;
+  background: #000000;
+  color: #ffffff;
   transform: translateY(-1px);
 }
 
@@ -106,31 +116,50 @@
   background: #efefec;
 }
 
-.vehicle-detail-page .ref-ad-gallery-arrow {
-  width: 44px;
-  height: 44px;
-  border: 0;
-  background: rgba(255, 255, 255, 0.94);
-  color: #111111;
-  box-shadow: 0 4px 14px rgba(17, 17, 17, 0.14);
-  transition: transform 0.18s ease, background 0.18s ease;
+.vehicle-detail-page .ref-ad-gallery-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 0 0;
 }
 
-.vehicle-detail-page .ref-ad-gallery-arrow svg {
-  width: 20px;
-  height: 20px;
-}
-
-.vehicle-detail-page .ref-ad-gallery-arrow:hover {
-  background: #ffffff;
-  transform: translateY(-50%) scale(1.06);
-}
-
-.vehicle-detail-page .ref-ad-gallery-count {
+.vehicle-detail-page .ref-ad-gallery-controls .ref-ad-gallery-arrow {
+  position: static;
+  transform: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #1c1c1a;
   border-radius: 999px;
-  background: rgba(17, 17, 17, 0.74);
+  background: #1c1c1a;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(17, 17, 17, 0.14);
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.vehicle-detail-page .ref-ad-gallery-controls .ref-ad-gallery-arrow svg {
+  width: 16px;
+  height: 16px;
+}
+
+.vehicle-detail-page .ref-ad-gallery-controls .ref-ad-gallery-arrow:hover {
+  background: #000000;
+  border-color: #000000;
+  transform: translateY(-1px);
+}
+
+.vehicle-detail-page .ref-ad-gallery-controls .ref-ad-gallery-count {
+  position: static;
+  padding: 5px 12px;
+  border: 1px solid #e4e4df;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1c1c1a;
+  font-family: var(--font-sans);
+  font-size: 12px;
   font-weight: 600;
-  backdrop-filter: blur(6px);
+  letter-spacing: 0;
+  backdrop-filter: none;
 }
 
 .vehicle-detail-page .ref-ad-gallery-thumbs {
@@ -168,9 +197,11 @@
 
 /* ── Card de preço ── */
 .vehicle-detail-page .fingen-detail-price-card {
-  background: #f8f8f8;
+  background: #ffffff;
+  border: 1px solid #e8e8e3;
   border-radius: 24px;
   padding: 22px;
+  box-shadow: 0 1px 2px rgba(17, 17, 17, 0.04);
 }
 
 .vehicle-detail-page .fingen-detail-price-make {
@@ -284,12 +315,21 @@
   box-shadow: none;
 }
 
-/* ── Cards da FIPE (comparativo e histórico): verde oliva claro ── */
+/* ── Cards da FIPE (comparativo e histórico): fundo carbon ── */
 .vehicle-detail-page .fingen-detail-card-dark {
   padding: 22px;
+  border: 1px solid #2c2c28;
   border-radius: 24px;
-  background: #e9edd9;
-  color: #111111;
+  background: linear-gradient(180deg, #20201d 0%, #171715 100%);
+  color: #f4f4ef;
+  /* Variáveis do gráfico no tema escuro */
+  --fipe-track: rgba(255, 255, 255, 0.12);
+  --fipe-muted: #b6b6ac;
+  --fipe-footer-bg: rgba(255, 255, 255, 0.07);
+  --fipe-footer-text: #d8d8cd;
+  --fipe-empty: #b6b6ac;
+  --fipe-bar-text: #ffffff;
+  --fipe-bar-text-latest: #111111;
 }
 
 .vehicle-detail-page .fingen-detail-dark-header h3 {
@@ -297,20 +337,20 @@
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: #111111;
+  color: #f7f7f2;
 }
 
 .vehicle-detail-page .fingen-detail-dark-badge {
   border-radius: 999px;
-  background: #ffffff;
-  color: #3f3f3c;
+  background: rgba(255, 255, 255, 0.12);
+  color: #f4f4ef;
   font-size: 12px;
   letter-spacing: 0.02em;
 }
 
 .vehicle-detail-page .fingen-detail-dark-badge.success {
-  background: #cbead8;
-  color: #0b4a34;
+  background: #d4f576;
+  color: #14140f;
 }
 
 .vehicle-detail-page .fingen-detail-dark-value {
@@ -319,33 +359,34 @@
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1;
-  color: #111111;
+  color: #ffffff;
 }
 
 .vehicle-detail-page .fingen-detail-dark-label {
-  color: #5f5f5c;
+  color: #a9a9a0;
 }
 
 .vehicle-detail-page .fingen-detail-dark-diff span {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .vehicle-detail-page .fingen-detail-dark-diff .positive {
-  background: #cbead8;
-  color: #0b4a34;
+  background: rgba(212, 245, 118, 0.16);
+  color: #d4f576;
 }
 
 .vehicle-detail-page .fingen-detail-dark-diff .negative {
-  background: #ffdede;
-  color: #98122f;
+  background: rgba(255, 143, 122, 0.16);
+  color: #ff9a86;
 }
 
 /* ── Cards claros ── */
 .vehicle-detail-page .fingen-detail-card {
-  padding: 20px;
-  border: 0;
+  padding: 22px;
+  border: 1px solid #e8e8e3;
   border-radius: 24px;
-  background: #f8f8f8;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(17, 17, 17, 0.04);
 }
 
 .vehicle-detail-page .fingen-detail-card-title {
@@ -356,6 +397,38 @@
   margin-bottom: 16px;
 }
 
+/* ── Organização em cards ──
+   Cada seção é um card independente, com respiro consistente. O grid vale
+   também no celular (antes o espaçamento vinha só das margens dos blocos). */
+.vehicle-detail-page .fingen-detail-rest {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+.vehicle-detail-page .fingen-detail-rest > * {
+  margin-bottom: 0;
+}
+
+/* Cards da FIPE continuam em carbon, separados dos cards brancos */
+.vehicle-detail-page .fingen-detail-rest > .fingen-detail-card-dark {
+  border: 1px solid #2c2c28;
+}
+
+@media (min-width: 768px) {
+  .vehicle-detail-page .fingen-detail-rest {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .vehicle-detail-page .fingen-detail-rest > .fingen-detail-card-dark,
+  .vehicle-detail-page .fingen-detail-rest .fingen-detail-report--full {
+    grid-column: 1 / -1;
+  }
+}
+
 .vehicle-detail-page .fingen-detail-specs-grid {
   gap: 10px;
 }
@@ -363,7 +436,7 @@
 .vehicle-detail-page .fingen-detail-spec-item {
   padding: 12px 14px;
   border-radius: 16px;
-  background: #ffffff;
+  background: #f6f6f2;
 }
 
 .vehicle-detail-page .fingen-detail-spec-label {
@@ -380,7 +453,7 @@
 .vehicle-detail-page .fingen-detail-optional-item {
   padding: 8px 14px;
   border-radius: 999px;
-  background: #ffffff;
+  background: #f6f6f2;
   color: #3f3f3c;
   font-size: 13px;
 }
@@ -398,7 +471,7 @@
 .vehicle-detail-page .fingen-detail-safety-item {
   padding: 14px;
   border-radius: 16px;
-  background: #ffffff;
+  background: #f6f6f2;
   color: #3f3f3c;
 }
 
@@ -484,8 +557,8 @@
 
 .vehicle-detail-page .fingen-detail-similar-card {
   scroll-snap-align: start;
-  background: #f8f8f8;
-  border: 0;
+  background: #ffffff;
+  border: 1px solid #e8e8e3;
   border-radius: 24px;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }

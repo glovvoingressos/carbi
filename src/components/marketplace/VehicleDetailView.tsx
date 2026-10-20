@@ -235,8 +235,6 @@ export default function VehicleDetailView({
                 </div>
               )}
             </div>
-            <p className="mt-1 text-xs text-gray-500">Preço anunciado pelo vendedor</p>
-            {fipePrice && <p className="mt-1 text-xs text-gray-500">FIPE · referência {currentFipeReferenceMonth || listing.fipe_reference_month || 'não informada'} · fonte: consulta via Parallelum</p>}
 
             <div className="fingen-detail-specs-row">
               <span><Calendar size={14} /> {listing.year_model}</span>
@@ -272,7 +270,7 @@ export default function VehicleDetailView({
               </span>
             </div>
             <div className="fingen-detail-dark-value">{formatBRL(fipePrice)}</div>
-            <div className="fingen-detail-dark-label">Tabela FIPE · referência {currentFipeReferenceMonth || listing.fipe_reference_month || 'não informada'} · consulta via Parallelum</div>
+            <div className="fingen-detail-dark-label">Tabela FIPE · referência {currentFipeReferenceMonth || listing.fipe_reference_month || 'não informada'}</div>
             {diffValue !== null && (
               <div className="fingen-detail-dark-diff">
                 <span className={diffValue <= 0 ? 'positive' : 'negative'}>

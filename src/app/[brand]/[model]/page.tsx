@@ -277,7 +277,7 @@ export default async function CarDetailPage({
                 <p className="cmp-price-label">Preço FIPE · {fipeData ? 'consulta confirmada' : 'sem valor confirmado'}</p>
                 <p className="cmp-price-value">{displayPriceLabel}</p>
                 {fipeData
-                  ? <p className="cmp-price-source">Fonte: FIPE via Parallelum · referência {fipeData.referenceMonth} · ano-modelo {fipeData.modelYear}</p>
+                  ? <p className="cmp-price-source">Fonte: FIPE · referência {fipeData.referenceMonth} · ano-modelo {fipeData.modelYear}</p>
                   : <p className="cmp-price-source">Não exibimos estimativa sem uma correspondência confirmada de ano e versão.</p>}
               </div>
               <div className="flex gap-3 mt-5 items-center">
@@ -435,7 +435,7 @@ export default async function CarDetailPage({
               </p>
               <p>
                 {fipeData
-                  ? `O valor exibido é da FIPE para ${fipeData.modelYear}, referência ${fipeData.referenceMonth}, consultado via Parallelum.`
+                  ? `O valor exibido é da FIPE para ${fipeData.modelYear}, referência ${fipeData.referenceMonth}.`
                   : 'Não exibimos um valor FIPE porque não foi possível confirmar a combinação exata de ano e versão.'}
               </p>
             </div>

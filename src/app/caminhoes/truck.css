@@ -434,6 +434,14 @@
 .truck-site .vehicle-detail-page .fingen-detail-card-dark {
   background: var(--tk-steel);
   color: var(--tk-ink);
+  /* O tema escuro do anúncio de carro não vale aqui: card de aço claro. */
+  --fipe-track: rgba(16, 20, 24, 0.08);
+  --fipe-muted: var(--tk-muted);
+  --fipe-footer-bg: rgba(16, 20, 24, 0.04);
+  --fipe-footer-text: var(--tk-muted);
+  --fipe-empty: var(--tk-muted);
+  --fipe-bar-text: #ffffff;
+  --fipe-bar-text-latest: #111111;
 }
 
 .truck-site .vehicle-detail-page .fingen-detail-dark-header h3,

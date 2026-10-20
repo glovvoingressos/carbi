@@ -15,6 +15,7 @@
     "test:marketplace:e2e": "node scripts/test-marketplace-e2e.mjs",
     "test:autodev:e2e": "node scripts/test-autodev-e2e.mjs",
     "sync:fipe:catalog": "node scripts/sync-fipe-catalog.mjs",
+    "backfill:fipe": "node --experimental-strip-types scripts/backfill-fipe-snapshots.mjs",
     "audit:catalog:tech": "node scripts/audit-catalog-tech.mjs",
     "sync:hf:fipex:catalog": "node scripts/sync-hf-fipex-catalog.mjs",
     "sync:autodev:catalog": "node scripts/sync-autodev-catalog.mjs"
