@@ -97,7 +97,7 @@ export default function PlateBannerLookup({ variant = 'banner' }: PlateBannerLoo
       <div className="cb-plate-premium-content">
         <div className="cb-plate-premium-copy">
           {!isLanding && <span className="cb-plate-premium-kicker">Consulta sem custo</span>}
-          <h3>{step === 'preview' && found ? 'Seu carro está pronto para anunciar' : isLanding ? 'Comece pela placa' : 'Prepare seu anúncio de carro.'}</h3>
+          <h3>{step === 'preview' && found ? 'Seu carro está pronto para anunciar' : isLanding ? 'Comece pela placa' : 'Anuncie seu carro em 2 minutos'}</h3>
           <p>{step === 'preview' && found ? 'Confira os dados e preencha o anúncio como visitante. A conta será pedida só na hora de publicar.' : 'Consulte pela placa e nós buscamos marca, modelo, ano e FIPE para você.'}</p>
           <div className="cb-plate-premium-trust"><ShieldCheck size={14} /> A placa não será publicada</div>
         </div>

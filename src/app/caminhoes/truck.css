@@ -620,32 +620,6 @@
   }
 }
 
-.tk-hero-top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-
-.tk-novelty {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: var(--tk-amber);
-  color: var(--tk-ink);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.tk-hero-kicker {
-  color: var(--tk-muted);
-  font-size: 13px;
-  font-weight: 600;
-}
-
 .tk-hero-title {
   margin: 20px 0 0;
   max-width: 14ch;
@@ -677,10 +651,10 @@
 
 .tk-hero-sub {
   margin: 0;
-  max-width: 44ch;
+  max-width: 46ch;
   color: var(--tk-muted);
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .tk-pill {
@@ -792,27 +766,6 @@
   }
 }
 
-.tk-hero-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 28px;
-  margin-top: 22px;
-}
-
-.tk-hero-stat strong {
-  display: block;
-  font-family: var(--hh-font), sans-serif;
-  font-size: 32px;
-  font-weight: 600;
-  line-height: 1;
-  color: var(--tk-ink);
-}
-
-.tk-hero-stat span {
-  color: var(--tk-muted);
-  font-size: 12px;
-}
-
 .tk-hero-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -862,9 +815,9 @@
 
 .tk-hero-card-title {
   font-family: var(--hh-font), sans-serif;
-  font-size: 22px;
+  font-size: 17px;
   font-weight: 600;
-  line-height: 1.05;
+  line-height: 1.15;
 }
 
 .tk-hero-card-arrow {
@@ -883,7 +836,7 @@
   padding: 0 24px;
   border: 0;
   border-radius: 999px;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
@@ -914,7 +867,13 @@
 
 /* Seções da home */
 .tk-section {
-  margin-top: 40px;
+  margin-top: 56px;
+}
+
+@media (min-width: 768px) {
+  .tk-section {
+    margin-top: 64px;
+  }
 }
 
 .tk-section-head {
@@ -923,15 +882,15 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .tk-section-title {
   margin: 0;
   font-family: var(--hh-font), sans-serif;
-  font-size: clamp(30px, 6vw, 44px);
+  font-size: 23px;
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.2;
   letter-spacing: -0.01em;
   color: var(--tk-ink);
 }
@@ -1048,7 +1007,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  margin-top: 40px;
+  margin-top: 56px;
   padding: 28px 24px;
   border-radius: 24px;
   background: var(--tk-ink);
@@ -1056,6 +1015,7 @@
 
 @media (min-width: 768px) {
   .tk-cta {
+    margin-top: 64px;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;

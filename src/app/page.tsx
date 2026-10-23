@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
-  ArrowRight, ChevronRight, Plus, Zap,
+  ArrowRight, ChevronRight, MessageCircle, Plus, ShieldCheck, TrendingUp, Zap,
 } from 'lucide-react'
 import { getLatestPublicListings, searchPublicListings } from '@/lib/marketplace-server'
 import { cars } from '@/data/cars'
@@ -154,49 +154,47 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ═══ HOW IT WORKS ═══ */}
-      <section className={`cb-section-pad cb-process-section ${heroFont.variable}`}>
-        <div className="cb-wrap cb-process-grid">
-          <div>
-            <h2 className="cb-process-title">Do jeito mais simples</h2>
-            <p className="cb-process-intro">
-              Do primeiro filtro à negociação, todo o processo pensado para você economizar tempo e comparar melhor.
-            </p>
+      {/* ═══ APP SHOWCASE ═══ */}
+      <section id="home-showcase" className={`cb-section-pad cb-showcase ${heroFont.variable}`} aria-labelledby="home-showcase-title">
+        <div className="cb-wrap cb-showcase-wrap">
+          <h2 id="home-showcase-title" className="cb-showcase-title">
+            Negocie pelo{' '}
+            <span className="cb-showcase-pill">
+              chat interno
+              <span className="cb-showcase-pill-icon" aria-hidden="true">
+                <MessageCircle size={18} />
+              </span>
+            </span>{' '}
+            na Carbi.
+          </h2>
 
-            <div className="cb-process-steps">
-            <div className="cb-process-step">
-              <div className="cb-step-num">01</div>
-              <div className="cb-step-body">
-                <h3>Busque o carro ideal</h3>
-                <p>Filtre por marca, preço, ano e cidade. Compare com a FIPE e veja os dados reais de cada veículo.</p>
-              </div>
+          <div className="cb-showcase-stage">
+            <div className="cb-showcase-note cb-showcase-note--left">
+              <span className="cb-showcase-note-title">Sem intermediários</span>
+              <span className="cb-showcase-note-text">Fale direto com o vendedor, do primeiro contato ao test drive.</span>
             </div>
-            <div className="cb-process-step">
-              <div className="cb-step-num">02</div>
-              <div className="cb-step-body">
-                <h3>Fale direto com o vendedor</h3>
-                <p>Chat interno, sem intermediários. Tire dúvidas, combine visita e negocie com segurança.</p>
-              </div>
+
+            <div className="cb-showcase-phone">
+              <Image
+                src="/images/ChatGPT Image 31 de ago. de 2026, 22_12_52-2.png"
+                alt="Conversa no chat interno da Carbi em um celular"
+                width={1275}
+                height={1234}
+                sizes="(max-width: 900px) 78vw, 380px"
+                loading="lazy"
+              />
             </div>
-            <div className="cb-process-step">
-              <div className="cb-step-num">03</div>
-              <div className="cb-step-body">
-                <h3>Fechou o negócio</h3>
-                <p>Compare as informações, consulte a FIPE e negocie com mais clareza antes de fechar.</p>
-              </div>
-            </div>
+
+            <div className="cb-showcase-note cb-showcase-note--right">
+              <span className="cb-showcase-note-title">Sem expor seu telefone</span>
+              <span className="cb-showcase-note-text">A conversa fica dentro da Carbi. Combine tudo com segurança.</span>
             </div>
           </div>
 
-          <div className="cb-process-visual">
-            <Image
-              src="/images/ChatGPT Image 31 de ago. de 2026, 22_12_52-2.png"
-              alt="Chat interno Carbi"
-              width={1275}
-              height={1234}
-              sizes="(max-width: 767px) 100vw, 50vw"
-              loading="lazy"
-            />
+          <div className="cb-showcase-rail" aria-hidden="true">
+            <span><MessageCircle size={16} /></span>
+            <span><ShieldCheck size={16} /></span>
+            <span><TrendingUp size={16} /></span>
           </div>
         </div>
       </section>
@@ -277,7 +275,6 @@ export default async function HomePage() {
         <div className="cb-wrap">
           <div className="cb-cta-block">
             <div>
-              <div className="cb-cta-eyebrow">Carbi</div>
               <h2>Pronto para encontrar o carro certo?</h2>
               <p>
                 Anuncie no plano gratuito, consulte a FIPE quando houver correspondência e converse pelo chat interno.
