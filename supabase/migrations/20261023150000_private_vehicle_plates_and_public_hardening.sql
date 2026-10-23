@@ -127,9 +127,12 @@ end $$;
 
 -- 4) A tabela base deixa de ser pública; leitura pública só pela view.
 revoke all on public.vehicle_listings from anon;
+revoke select (id, user_id, vehicle_id, brand, model, fuel, transmission, color, body_type, optional_items, status, created_at)
+  on public.vehicle_listings from anon;
 revoke truncate, references, trigger on public.vehicle_listings from authenticated;
 
 drop policy if exists "public can view active listings" on public.vehicle_listings;
+drop policy if exists "temporary public read for legacy filters" on public.vehicle_listings;
 drop policy if exists "owners can view own listings" on public.vehicle_listings;
 create policy "owners can view own listings" on public.vehicle_listings
   for select to authenticated
