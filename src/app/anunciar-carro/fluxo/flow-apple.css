@@ -2215,7 +2215,7 @@
 }
 
 .lf-apple .lf-preview-media {
-  background: #f4f4f6;
+  background: #ececf0;
 }
 
 .lf-apple .lf-preview-chips span {
@@ -2232,6 +2232,35 @@
 
 .lf-apple .lf-mobile-cta {
   background: rgba(244, 244, 246, 0.9);
+}
+
+/* Bloco de placa: sem caixa externa; só um tile cinza para a consulta */
+.lf-apple .lf-plate-section {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.lf-apple .plate-input > div:first-child > div:first-child {
+  background: #f4f4f6;
+}
+
+.lf-apple .plate-input > div:nth-child(2) {
+  padding: 16px;
+  border: 0;
+  border-radius: 24px;
+  background: #f4f4f6;
+}
+
+.lf-apple .plate-input .bg-amber-50 {
+  border: 0;
+  background: #ffffff;
+}
+
+.lf-apple .plate-input #listing-plate {
+  border: 1px solid #e4e4e7;
+  background: #ffffff;
 }
 
 /* Responsivo v3 */
