@@ -18,7 +18,8 @@
     "backfill:fipe": "node --experimental-strip-types scripts/backfill-fipe-snapshots.mjs",
     "audit:catalog:tech": "node scripts/audit-catalog-tech.mjs",
     "sync:hf:fipex:catalog": "node scripts/sync-hf-fipex-catalog.mjs",
-    "sync:autodev:catalog": "node scripts/sync-autodev-catalog.mjs"
+    "sync:autodev:catalog": "node scripts/sync-autodev-catalog.mjs",
+    "reclassify:trucks": "node --experimental-strip-types scripts/reclassify-truck-listings.mjs"
   },
   "keywords": [],
   "author": "",

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Heart, TrendingUp, Gauge, Calendar, MapPin, ArrowUpRight } from 'lucide-react'
-import { ListingPublic } from '@/lib/marketplace'
+import { ListingPublic, publicListingPath } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from './MarketplaceListingImage'
 
@@ -17,7 +17,7 @@ export default function ListingCard({ listing, priority = false, index = 0 }: { 
 
   return (
     <Link
-      href={`/anuncios/${listing.slug}`}
+      href={publicListingPath(listing)}
       className="cbi-card"
       style={{ animationDelay: `${Math.min(index, 12) * 45}ms` }}
     >

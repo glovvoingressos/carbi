@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { TrendingDown, TrendingUp, Calendar, MessageCircle } from 'lucide-react'
@@ -68,6 +68,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   const { slug } = await params
   const listing = await getPublicListingBySlug(slug)
   if (!listing) notFound()
+
+  // Caminhões têm página própria, com breadcrumb e dados estruturados corretos.
+  if (listing.vehicle_type === 'truck') redirect(`/caminhoes/anuncio/${listing.slug}`)
 
   const related = await getRelatedListings({
     brand: listing.brand,

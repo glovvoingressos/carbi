@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 
 import { formatBRL } from '@/data/cars'
-import type { ListingPublic } from '@/lib/marketplace'
+import { publicListingPath, type ListingPublic } from '@/lib/marketplace'
 import MarketplaceListingImage from '@/components/marketplace/MarketplaceListingImage'
 import {
   Select,
@@ -177,7 +177,7 @@ export default function HomeListings({ listings, fetchError = false }: HomeListi
           return (
             <Link
               key={listing.id}
-              href={`/anuncios/${listing.slug}`}
+              href={publicListingPath(listing)}
               className="cb-listing-card focus-visible:ring-2 focus-visible:ring-[var(--cb-iris)] focus-visible:ring-offset-2"
               data-testid="home-listing-card"
             >

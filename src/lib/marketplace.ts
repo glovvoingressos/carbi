@@ -7,6 +7,13 @@ export const LISTING_MAX_IMAGE_SIZE_MB = 10
 export const LISTING_MAX_IMAGE_SIZE_BYTES = LISTING_MAX_IMAGE_SIZE_MB * 1024 * 1024
 export const LISTING_ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
+/** URL pública do anúncio: caminhões têm detalhe próprio em /caminhoes. */
+export function publicListingPath(listing: { slug: string; vehicle_type?: string | null }): string {
+  return listing.vehicle_type === 'truck'
+    ? `/caminhoes/anuncio/${listing.slug}`
+    : `/anuncios/${listing.slug}`
+}
+
 export function normalizePlateFinal(value: string | null | undefined): string | null {
   const normalized = String(value || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase()
   return normalized ? normalized.slice(-1) : null

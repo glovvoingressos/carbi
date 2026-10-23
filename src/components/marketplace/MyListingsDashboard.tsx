@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, Save, Upload, Trash2, Check, AlertCircle, Image as ImageIcon, GripVertical, Star, X, Search, Car, Plus, Eye, TrendingUp, BarChart3 } from 'lucide-react'
 import { motion, Reorder } from 'motion/react'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
-import { getListingPriceReview, LISTING_ALLOWED_TYPES, LISTING_MAX_IMAGES, LISTING_MAX_IMAGE_SIZE_MB, normalizePlateFinal, parseMoneyInputToNumber, parseBrazilianInt, formatBrazilianInt } from '@/lib/marketplace'
+import { formatBrazilianInt, getListingPriceReview, LISTING_ALLOWED_TYPES, LISTING_MAX_IMAGES, LISTING_MAX_IMAGE_SIZE_MB, normalizePlateFinal, parseBrazilianInt, parseMoneyInputToNumber, publicListingPath } from '@/lib/marketplace'
 import AuthCard from '@/components/marketplace/AuthCard'
 import { formatBRL } from '@/data/cars'
 import MarketplaceListingImage from './MarketplaceListingImage'
@@ -246,7 +246,7 @@ function ListingEditor({ listing, formData, setFormData, errors, setErrors, isDi
           </p>
         )}
         <span className="member-tools-views"><Eye size={14} /> {(listing.view_count || 0).toLocaleString('pt-BR')} visualizações</span>
-        <a href={`/anuncios/${listing.slug}`} target="_blank" rel="noopener noreferrer" className="member-tools-live-link">Ver ao vivo →</a>
+        <a href={publicListingPath(listing)} target="_blank" rel="noopener noreferrer" className="member-tools-live-link">Ver ao vivo →</a>
       </div>
 
       {/* Plate Input */}

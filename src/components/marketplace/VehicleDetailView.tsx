@@ -20,7 +20,7 @@ import {
   Car,
   ChevronRight,
 } from 'lucide-react'
-import { ListingPublic } from '@/lib/marketplace'
+import { ListingPublic, publicListingPath } from '@/lib/marketplace'
 import { formatBRL } from '@/data/cars'
 import { trackEvent } from '@/lib/analytics'
 import ListingImageGallery from './ListingImageGallery'
@@ -407,7 +407,7 @@ export default function VehicleDetailView({
           </div>
           <div className="fingen-detail-similar-grid">
             {relatedListings.slice(0, 4).map((item) => (
-              <Link href={`/anuncios/${item.slug}`} className="fingen-detail-similar-card" key={item.id}>
+              <Link href={publicListingPath(item)} className="fingen-detail-similar-card" key={item.id}>
                 <div className="fingen-detail-similar-img">
                   <MarketplaceListingImage
                     brand={item.brand}

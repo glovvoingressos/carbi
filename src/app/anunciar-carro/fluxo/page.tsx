@@ -29,7 +29,12 @@ export default function AnunciarFluxoPage() {
         <div className="listing-flow-trust"><ShieldCheck size={16} aria-hidden="true" /> Seus dados protegidos</div>
       </header>
       <main className="listing-flow-main">
-        <p className="listing-flow-intro">Preencha os dados, adicione fotos e publique gratuitamente.</p>
+        <p className="listing-flow-intro">
+          Preencha os dados, adicione fotos e publique gratuitamente.{' '}
+          <Link href="/caminhoes/anunciar" className="font-semibold underline">
+            É caminhão? Anuncie na área de caminhões.
+          </Link>
+        </p>
         <ListingForm />
       </main>
     </div>

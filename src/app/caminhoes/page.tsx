@@ -19,6 +19,10 @@ import {
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.carbi.com.br'
 
+// A vitrine precisa refletir anúncios recém-publicados. Sem isso a página é
+// pré-renderizada no build e só muda no próximo deploy.
+export const dynamic = 'force-dynamic'
+
 // Foto da hero: entra sozinha quando existir public/images/caminhao-hero.jpg
 const hasHeroPhoto = existsSync(path.join(process.cwd(), 'public', 'images', 'caminhao-hero.jpg'))
 
@@ -79,12 +83,6 @@ export default async function TruckHomePage() {
     ],
   })
 
-  const stats = [
-    { value: featured.total, label: 'caminhões anunciados' },
-    { value: TRUCK_BRANDS.length, label: 'marcas' },
-    { value: TRUCK_CATEGORIES.length, label: 'categorias' },
-  ].filter((stat) => stat.value > 0)
-
   return (
     <main className="cbi-page">
       <div className="cbi-main">
@@ -95,16 +93,13 @@ export default async function TruckHomePage() {
         <section className="tk-hero">
           <div className="tk-hero-grid">
             <div className="tk-hero-text">
-              <div className="tk-hero-top">
-                <span className="tk-novelty">Novidade</span>
-                <span className="tk-hero-kicker">Agora a Carbi também tem área de caminhões</span>
-              </div>
-
-              <h1 className="tk-hero-title">Caminhões à venda, do toco ao cavalo mecânico.</h1>
+              <h1 className="tk-hero-title">A Carbi agora tem área de caminhões.</h1>
 
               <div className="tk-hero-row">
                 <p className="tk-hero-sub">
-                  Compare ano, quilometragem, eixos e capacidade de carga. Ficha técnica completa e comparação com a tabela FIPE quando houver referência disponível.
+                  Compare ano, quilometragem, eixos e capacidade de carga.
+                  <br />
+                  Ficha técnica completa e comparação com a tabela FIPE quando disponível.
                 </p>
                 <Link href="/caminhoes/buscar" className="tk-pill">
                   <span className="tk-pill-circle" aria-hidden="true"><ArrowRight size={18} /></span>
@@ -126,17 +121,6 @@ export default async function TruckHomePage() {
               ) : null}
             </div>
           </div>
-
-          {stats.length > 0 ? (
-            <div className="tk-hero-stats" role="list">
-              {stats.map((stat) => (
-                <div key={stat.label} className="tk-hero-stat" role="listitem">
-                  <strong>{stat.value}</strong>
-                  <span>{stat.label}</span>
-                </div>
-              ))}
-            </div>
-          ) : null}
 
           <div className="tk-hero-cards">
             {TRUCK_CATEGORIES.map((category) => {
@@ -202,12 +186,8 @@ export default async function TruckHomePage() {
 
         {/* ═══ ATALHOS ═══ */}
         <section className="tk-section" aria-label="Atalhos de caminhão">
-          <div className="tk-section-head">
-            <h2 className="tk-section-title">Explore os caminhões</h2>
-          </div>
           <nav className="truck-links" aria-label="Páginas de caminhões">
             <Link href="/caminhoes/marcas" className="truck-link">Marcas de caminhão</Link>
-            <Link href="/caminhoes/categorias" className="truck-link">Categorias</Link>
             <Link href="/caminhoes/cavalo-mecanico" className="truck-link">Cavalos mecânicos</Link>
             <Link href="/caminhoes/caminhoes-bau" className="truck-link">Carroceria baú</Link>
             <Link href="/caminhoes/anunciar-gratis" className="truck-link">Anunciar grátis</Link>
@@ -237,12 +217,6 @@ export default async function TruckHomePage() {
           </Link>
         </section>
       </div>
-
-      <nav className="cbi-nav" aria-label="Navegação de caminhões">
-        <Link href="/caminhoes" className="active">Home</Link>
-        <Link href="/caminhoes/buscar">Buscar</Link>
-        <Link href="/caminhoes/anunciar">Anunciar</Link>
-      </nav>
     </main>
   )
 }

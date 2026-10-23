@@ -4,6 +4,7 @@ import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-se
 import { ListingFormPayload, normalizePlateFinal, normalizeTruckPayload, parseFipePriceToNumber, getListingPriceReview, validateListingPayload } from '@/lib/marketplace'
 import { getFipePrice } from '@/lib/fipe-api'
 import { queryPublicListings } from '@/lib/marketplace-server'
+import { isTruckListing } from '@/lib/truck-classification'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingCreatedEmail, sendAdminNewListingEmail } from '@/lib/email'
 import {
@@ -55,7 +56,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })
     }
 
-    const payload = (await req.json()) as ListingFormPayload
+    let payload = (await req.json()) as ListingFormPayload
+    // Segurança: o formulário de carro pode receber um caminhão (marca/modelo
+    // de caminhão). Sem isso o anúncio fica `vehicle_type = 'car'` e some de
+    // /caminhoes, mesmo estando ativo.
+    if (payload.vehicle_type !== 'truck' && isTruckListing(payload)) {
+      payload = { ...payload, vehicle_type: 'truck', body_type: 'Caminhão' }
+    }
     const validationErrors = validateListingPayload(payload)
 
     if (validationErrors.length > 0) {
