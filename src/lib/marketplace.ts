@@ -237,6 +237,35 @@ export function parseFipePriceToNumber(priceLabel: string): number {
   return Number.isFinite(parsed) ? parsed : 0
 }
 
+/**
+ * Resolve o snapshot FIPE que fica gravado no anúncio.
+ *
+ * A consulta do servidor é a fonte principal, mas a FIPE é um serviço externo
+ * sujeito a rate limit (429) e indisponibilidade. Nesses casos, usamos o valor
+ * que o formulário já consultou no navegador (`fipe_price` do payload) para
+ * não perder o comparativo na página do anúncio.
+ */
+export function resolveListingFipeSnapshot(input: {
+  vehicleType: 'car' | 'truck'
+  fipeResult?: FipeResult | null
+  clientPrice?: number | null
+  clientReferenceMonth?: string | null
+}): { price: number | null; referenceMonth: string | null } {
+  const clientPrice = typeof input.clientPrice === 'number' && input.clientPrice > 0
+    ? input.clientPrice
+    : null
+
+  if (input.vehicleType === 'truck') {
+    return { price: clientPrice, referenceMonth: input.clientReferenceMonth || null }
+  }
+
+  const serverPrice = input.fipeResult ? parseFipePriceToNumber(input.fipeResult.price) || null : null
+  return {
+    price: serverPrice || clientPrice,
+    referenceMonth: input.fipeResult?.referenceMonth || input.clientReferenceMonth || null,
+  }
+}
+
 export function getFipeComparison(
   listingPrice: number,
   fipePrice: number | null,

@@ -5,6 +5,7 @@ import {
   getListingPriceReview,
   getListingImageRejection,
   normalizePlateFinal,
+  resolveListingFipeSnapshot,
 } from './marketplace'
 
 describe('marketplace listing helpers', () => {
@@ -58,5 +59,50 @@ describe('marketplace listing helpers', () => {
     expect(getListingPriceReview(1_600_000, null)).toBeNull()
     expect(getListingPriceReview('invalid', 100_000)).toBeNull()
     expect(getListingPriceReview(10_000, 100_000)?.direction).toBe('below')
+  })
+})
+
+describe('resolveListingFipeSnapshot', () => {
+  const serverResult = {
+    price: 'R$ 140.000,00',
+    brand: 'Peugeot',
+    model: '2008 GT 1.0 Turbo 200 5p Aut.',
+    modelYear: 2025,
+    fuel: 'Flex',
+    codeFipe: '004274-0',
+    referenceMonth: 'outubro de 2026',
+    vehicleType: 1,
+    fuelAcronym: 'F',
+  }
+
+  it('uses the server lookup when it succeeds', () => {
+    expect(resolveListingFipeSnapshot({
+      vehicleType: 'car',
+      fipeResult: serverResult,
+      clientPrice: 999,
+      clientReferenceMonth: 'setembro de 2026',
+    })).toEqual({ price: 140000, referenceMonth: 'outubro de 2026' })
+  })
+
+  it('falls back to the value found by the form when the FIPE API fails', () => {
+    expect(resolveListingFipeSnapshot({
+      vehicleType: 'car',
+      fipeResult: null,
+      clientPrice: 139000,
+      clientReferenceMonth: 'outubro de 2026',
+    })).toEqual({ price: 139000, referenceMonth: 'outubro de 2026' })
+  })
+
+  it('keeps truck snapshots provided by the form', () => {
+    expect(resolveListingFipeSnapshot({
+      vehicleType: 'truck',
+      clientPrice: 300000,
+      clientReferenceMonth: 'outubro de 2026',
+    })).toEqual({ price: 300000, referenceMonth: 'outubro de 2026' })
+  })
+
+  it('returns null when neither side has a valid price', () => {
+    expect(resolveListingFipeSnapshot({ vehicleType: 'car' })).toEqual({ price: null, referenceMonth: null })
+    expect(resolveListingFipeSnapshot({ vehicleType: 'car', clientPrice: 0 })).toEqual({ price: null, referenceMonth: null })
   })
 })

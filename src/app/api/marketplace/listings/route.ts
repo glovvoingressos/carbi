@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
-import { ListingFormPayload, normalizePlateFinal, normalizeTruckPayload, parseFipePriceToNumber, getListingPriceReview, validateListingPayload } from '@/lib/marketplace'
+import { ListingFormPayload, normalizePlateFinal, normalizeTruckPayload, getListingPriceReview, resolveListingFipeSnapshot, validateListingPayload } from '@/lib/marketplace'
 import { getFipePrice } from '@/lib/fipe-api'
 import { queryPublicListings } from '@/lib/marketplace-server'
 import { isTruckListing } from '@/lib/truck-classification'
@@ -87,12 +87,14 @@ export async function POST(req: NextRequest) {
         console.error('FIPE lookup failed during listing review', error)
       }
     }
-    const fipePrice = payload.vehicle_type === 'truck'
-      ? payload.fipe_price || null
-      : (fipeResult ? parseFipePriceToNumber(fipeResult.price) || null : null)
-    const fipeReferenceMonth = payload.vehicle_type === 'truck'
-      ? payload.fipe_reference_month || null
-      : (fipeResult?.referenceMonth || null)
+    const fipeSnapshot = resolveListingFipeSnapshot({
+      vehicleType: payload.vehicle_type,
+      fipeResult,
+      clientPrice: payload.fipe_price,
+      clientReferenceMonth: payload.fipe_reference_month,
+    })
+    const fipePrice = fipeSnapshot.price
+    const fipeReferenceMonth = fipeSnapshot.referenceMonth
     const priceReview = payload.vehicle_type === 'truck' ? null : getListingPriceReview(payload.price, fipePrice)
 
     // Limite de anúncios grátis
