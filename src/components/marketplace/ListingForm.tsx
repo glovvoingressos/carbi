@@ -2,7 +2,24 @@
 
 import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, ArrowRight, ArrowLeft, ImagePlus, MoveLeft, MoveRight, Trash2, Check, Sparkles } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import {
+  Loader2,
+  ArrowRight,
+  ArrowLeft,
+  ImagePlus,
+  MoveLeft,
+  MoveRight,
+  Trash2,
+  Check,
+  Calendar,
+  Camera,
+  Car,
+  Gauge,
+  MapPin,
+  MessageCircle,
+  ShieldCheck,
+} from 'lucide-react'
 import Link from 'next/link'
 import type { FipeResult } from '@/lib/fipe-api'
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from '@/lib/supabase-browser'
@@ -11,6 +28,7 @@ import { clearPlateLookup, lookupPlateClient, readPlateLookup } from '@/lib/inte
 import type { PlacaApiResponse } from '@/lib/integrations/placaapi/types'
 import PlateInput from '@/components/marketplace/PlateInput'
 import ListingStepper from '@/components/marketplace/ListingStepper'
+import ListingLivePreview from '@/components/marketplace/ListingLivePreview'
 import {
   ACCOUNT_INITIAL,
   ACCOUNT_INPUT_IDS,
@@ -37,7 +55,6 @@ import { formatBRL } from '@/data/cars'
 import { enrichVehicle } from '@/lib/vehicle-enrichment'
 import { brandsAreEquivalent } from '@/lib/brand-normalization'
 import { parseDescription } from '@/lib/format-description'
-import FadeContent from '@/components/FadeContent'
 import { FUEL_OPTIONS, TRANSMISSION_OPTIONS } from '@/lib/vehicle-filter-normalization'
 import {
   LISTING_DRAFT_KEY,
@@ -320,6 +337,8 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [listingSubStep, setListingSubStep] = useState(1)
+  const [stepDirection, setStepDirection] = useState(1)
+  const shouldReduceMotion = useReducedMotion()
   const [form, setForm] = useState<FormState>({ ...INITIAL_STATE, vehicle_type: vehicleType })
   const [images, setImages] = useState<UploadImageItem[]>([])
 
@@ -463,6 +482,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         : null
       plateFipeLookupRef.current = Boolean(nextFipeResult)
       setFipeResult(nextFipeResult)
+      setStepDirection(1)
       setListingSubStep(2)
     }
 
@@ -924,6 +944,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     setError(null)
     setValidationDetails([])
     setFieldErrors({})
+    setStepDirection(1)
     setListingSubStep(1)
     setCurrentStep((prev) => Math.min(3, prev + 1))
   }
@@ -931,6 +952,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const prevStep = () => {
     setError(null)
     setValidationDetails([])
+    setStepDirection(-1)
     if (currentStep === 1 && listingSubStep > 1) {
       setListingSubStep((prev) => prev - 1)
       return
@@ -947,12 +969,14 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       }
     }
     setError(null)
+    setStepDirection(1)
     setListingSubStep((prev) => Math.min(4, prev + 1))
   }
 
   const startManualVehicleEntry = () => {
     clearPlateLookup()
     privatePlateRef.current = ''
+    setStepDirection(-1)
     setManualVehicleMode(true)
     setError(null)
   }
@@ -966,6 +990,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     }
     setError(null)
     setFieldErrors({})
+    setStepDirection(1)
     setListingSubStep(2)
   }
 
@@ -1210,26 +1235,32 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   return (
     <div
-      className={`listing-form-ref space-y-6 sm:space-y-8 w-full max-w-none sm:max-w-3xl mx-auto ${currentStep === 3 ? 'pb-40 sm:pb-4' : currentStep === 2 ? 'pb-28 sm:pb-4' : 'pb-4'}`}
+      className="lf-form-layout"
       aria-busy={saving || fipeLoading}
     >
-      <ListingStepper currentStep={currentStep} onStepChange={(step) => {
-        if (step < currentStep) {
-          setError(null)
-          setValidationDetails([])
-          setListingSubStep(1)
-          setCurrentStep(step)
-        }
-      }} />
+      <div className="lf-form-column">
+        <ListingStepper currentStep={currentStep} onStepChange={(step) => {
+          if (step < currentStep) {
+            setError(null)
+            setValidationDetails([])
+            setStepDirection(-1)
+            setListingSubStep(1)
+            setCurrentStep(step)
+          }
+        }} />
 
-      <div className="space-y-6">
-        <FadeContent
-          key={`${currentStep}-${listingSubStep}`}
-          className="listing-flow-step-transition"
-          duration={260}
-          threshold={0}
-          initialOpacity={0}
-        >
+        <div className="lf-form-card">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={`${currentStep}-${listingSubStep}`}
+              className="lf-step"
+              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: stepDirection * 26, scale: 0.986 }}
+              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, x: 0, scale: 1 }}
+              exit={shouldReduceMotion
+                ? { opacity: 0 }
+                : { opacity: 0, x: stepDirection * -16, scale: 0.996, transition: { duration: 0.18, ease: [0.4, 0, 0.2, 1] } }}
+              transition={shouldReduceMotion ? { duration: 0.12 } : { type: 'spring', stiffness: 380, damping: 34, mass: 0.9 }}
+            >
         {currentStep === 1 && (
           <div className="space-y-6">
             <div>
@@ -1243,7 +1274,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
             {/* Sub-step 1: Plate Lookup */}
             {listingSubStep === 1 && (
-              <div className="fingen-flow-substep-card p-3 sm:p-5 space-y-3 sm:space-y-4 animate-fade-in">
+              <div className="fingen-flow-substep-card lf-plate-section p-3 sm:p-5 space-y-3 sm:space-y-4">
                 {manualVehicleMode ? (
                   <div className="space-y-4">
                     <div>
@@ -1332,7 +1363,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
             {/* Sub-step 2: Confirm auto-filled data */}
             {listingSubStep === 2 && (
-              <div className="fingen-flow-substep-card p-3 sm:p-5 space-y-3 sm:space-y-4 animate-fade-in">
+              <div className="fingen-flow-substep-card p-3 sm:p-5 space-y-3 sm:space-y-4">
                 <div className="flex items-center justify-between gap-3">
                   <p className="fingen-flow-field-label">Dados do veículo</p>
                   <span className="fingen-flow-badge-accent text-[11px]">Verifique</span>
@@ -1354,6 +1385,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                    <div>
                      <label htmlFor="vehicle-year" className="listing-flow-field-label">Ano de fabricação</label>
                      <input id="vehicle-year" className="fingen-flow-input listing-flow-input-field text-sm mt-1" value={form.year} onChange={(e) => handleInput('year', e.target.value)} />
+                   </div>
+                   <div>
+                     <label htmlFor="vehicle-year-model" className="listing-flow-field-label">Ano/modelo</label>
+                     <input id="vehicle-year-model" className="fingen-flow-input listing-flow-input-field text-sm mt-1" value={form.yearModel} onChange={(e) => handleInput('yearModel', e.target.value)} />
                    </div>
                    <div>
                      <label htmlFor="vehicle-color" className="listing-flow-field-label">Cor</label>
@@ -1399,7 +1434,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         )}
 
         {currentStep === 2 && (
-          <div className="space-y-8 animate-fade-in">
+          <div className="space-y-8">
             <div>
               <h2 ref={stepHeadingRef} tabIndex={-1} className="tfp-section-title outline-none">Dados essenciais</h2>
               <p className="tfp-section-sub">
@@ -1416,7 +1451,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                  <p className="sm:col-span-2 text-xs text-[#767676]">Você pode preencher manualmente os dados que não vierem na consulta da placa.</p>
                </div>
              )}
-            <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1">
+            <div className="lf-card lf-fields-grid">
 
               <div>
                 <label htmlFor="listing-price" className="listing-flow-field-label">Preço pedido (R$)</label>
@@ -1479,79 +1514,62 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             </div>
 
             {fipeLoading ? (
-              <div className="fingen-flow-fipe-comparison-dark rounded-[24px] p-5" style={{ background: '#1A1A1A', color: '#FFFFFF' }} role="status" aria-live="polite">
-                <div className="flex items-center gap-3">
-                  <Loader2 className="h-5 w-5 animate-spin" style={{ color: '#D4F576' }} />
+              <div className="lf-fipe-card" role="status" aria-live="polite">
+                <div className="lf-fipe-loading">
+                  <Loader2 className="h-5 w-5 animate-spin" style={{ color: 'var(--lf-accent)' }} />
                   <div>
                     <p className="font-semibold">Consultando a FIPE</p>
-                    <p className="mt-1 text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>Estamos buscando a referência mais recente para este veículo.</p>
+                    <p className="mt-1 text-xs" style={{ color: 'rgba(255,255,255,.65)' }}>Buscando a referência mais recente para este veículo.</p>
                   </div>
                 </div>
               </div>
             ) : fipeResult ? (
-              <div className="fingen-flow-fipe-comparison-dark listing-fipe-comparison rounded-[24px] p-5 max-[330px]:p-4" style={{ background: '#1A1A1A', color: '#FFFFFF' }}>
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="space-y-1">
-                    <p className="fingen-flow-fipe-dark-label max-[330px]:text-[11px]" style={{ color: '#D4F576' }}>
-                      Comparativo FIPE
-                    </p>
-                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <p className="fingen-flow-fipe-dark-value max-[330px]:text-[30px]" style={{ color: '#FFFFFF' }}>
-                        {fipeResult.price}
-                      </p>
-                      <span className="text-[14px] font-medium max-[330px]:text-[12px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                        Tabela FIPE
-                      </span>
-                    </div>
+              <div className="lf-fipe-card">
+                <div className="lf-fipe-top">
+                  <div>
+                    <span className="lf-fipe-label">Tabela FIPE</span>
+                    <p className="lf-fipe-price">{fipeResult.price}</p>
                   </div>
-                  <span className={`rounded-full px-3 py-1.5 text-[11px] font-semibold tracking-wide ${fipeComparisonStatusClass}`}>
-                    {fipeComparisonStatusLabel}
-                  </span>
+                  <span className={`lf-fipe-status is-${comparison.status}`}>{fipeComparisonStatusLabel}</span>
                 </div>
 
-                <div className="mt-5 grid gap-3">
-                  <div className="fingen-flow-fipe-dark-stat">
-                    <p className="fingen-flow-fipe-dark-stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>Preço anunciado</p>
-                    <p className="fingen-flow-fipe-dark-stat-value max-[330px]:text-[20px]" style={{ color: '#FFFFFF' }}>
-                      {hasAskingPrice ? formatBRL(priceNumber) : 'Informe acima'}
-                    </p>
+                <div className="lf-fipe-grid">
+                  <div className="lf-fipe-stat">
+                    <span>Preço anunciado</span>
+                    <strong>{hasAskingPrice ? formatBRL(priceNumber) : 'Informe acima'}</strong>
                   </div>
+                  <div className="lf-fipe-stat">
+                    <span>Diferença</span>
+                    <strong>{fipeDiffValueLabel ?? 'Preencha o preço'}</strong>
+                  </div>
+                  <div className="lf-fipe-stat">
+                    <span>Percentual</span>
+                    <strong>{fipeDiffPercentLabel ?? '—'}</strong>
+                  </div>
+                </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="fingen-flow-fipe-dark-stat">
-                      <p className="fingen-flow-fipe-dark-stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>Diferença</p>
-                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[17px]" style={{ color: '#D4F576' }}>
-                        {fipeDiffValueLabel ?? 'Preencha o preço'}
-                      </p>
-                    </div>
-                    <div className="fingen-flow-fipe-dark-stat">
-                      <p className="fingen-flow-fipe-dark-stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>Percentual</p>
-                      <p className="fingen-flow-fipe-dark-stat-diff max-[330px]:text-[17px]" style={{ color: '#D4F576' }}>
-                        {fipeDiffPercentLabel ?? '—'}
-                      </p>
-                    </div>
+                <div className="lf-fipe-track">
+                  <div className="lf-fipe-track-bar">
+                    <motion.div
+                      className="lf-fipe-track-fill"
+                      initial={false}
+                      animate={{ width: fipeProgressWidth }}
+                      transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 32 }}
+                    />
                   </div>
-
-                  <div className="fingen-flow-fipe-dark-track">
-                    <div className="flex items-center justify-between gap-4 text-[12px] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                      <span>Abaixo da FIPE</span>
-                      <span>Acima da FIPE</span>
-                    </div>
-                    <div className="mt-3 fingen-flow-fipe-progress-bar">
-                      <div className="fingen-flow-fipe-progress-fill" style={{ width: fipeProgressWidth }} />
-                    </div>
-                    <p className="mt-3 fingen-flow-fipe-dark-ref" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                      {fipeResult.referenceMonth
-                        ? `Referência ${fipeResult.referenceMonth} • Atualizado pela FIPE.`
-                        : 'Atualizado pela FIPE.'}
-                    </p>
+                  <div className="lf-fipe-track-labels">
+                    <span>Abaixo da FIPE</span>
+                    <span>Acima da FIPE</span>
                   </div>
+                  <p className="lf-fipe-ref">
+                    {fipeResult.referenceMonth ? `Referência ${fipeResult.referenceMonth} • Atualizado pela FIPE.` : 'Atualizado pela FIPE.'}
+                  </p>
                 </div>
               </div>
             ) : (
-              <div className="rounded-2xl border border-[#E5E5E5] bg-[#FAFAFA] p-4" role="status">
-                <p className="text-sm font-semibold text-[#333]">Não encontramos a referência FIPE</p>
-                <p className="mt-1 text-xs text-[#767676]">Confira marca, modelo, ano e versão. Você pode continuar sem a FIPE e publicar com o preço informado.</p>
+              <div className="lf-fipe-empty" role="status">
+                <strong>Não encontramos a referência FIPE</strong>
+                <p>Confira marca, modelo, ano e versão. Você pode continuar sem a FIPE e publicar com o preço informado.</p>
               </div>
             )}
 
@@ -1573,7 +1591,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
 
             <label
-              className={`fingen-flow-upload-area p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px] focus-within:ring-2 focus-within:ring-[#16855C] focus-within:ring-offset-2 ${isDraggingImages ? 'border-[#16855C] bg-[#16855C]/5 scale-[1.01]' : ''}${fieldErrors.images ? ' listing-upload-invalid' : ''}`}
+              className={`fingen-flow-upload-area p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px] focus-within:ring-2 focus-within:ring-[#16855C] focus-within:ring-offset-2 ${isDraggingImages ? 'is-dragging' : ''}${fieldErrors.images ? ' listing-upload-invalid' : ''}`}
               onDragEnter={(event) => {
                 event.preventDefault()
                 setIsDraggingImages(true)
@@ -1618,9 +1636,9 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             )}
 
             {images.length > 0 && (
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-8 max-[330px]:grid-cols-1 max-[330px]:gap-4">
+              <div className="lf-photo-grid">
                 {images.map((image, index) => (
-                  <div key={image.previewUrl} className="fingen-flow-substep-card p-3 hover:shadow-md transition-shadow max-[330px]:p-2.5">
+                  <div key={image.previewUrl} className="lf-photo-card">
                     {/* Object URLs are generated locally for instant previews before upload. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={image.previewUrl} alt={`Preview ${index + 1}`} width={1920} height={1080} className="aspect-video w-full rounded-xl object-cover" />
@@ -1644,42 +1662,82 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         )}
 
         {currentStep === 3 && (
-          <div className="animate-fade-in">
-            {/* Header */}
-            <div className="mb-10">
-              <p className="tfp-section-label">Confirmação</p>
+          <div className="lf-review">
+            <div className="lf-step-head">
               <h2 ref={stepHeadingRef} tabIndex={-1} className="tfp-section-title outline-none">
                 Confira os dados do seu veículo
               </h2>
-              <p className="tfp-section-sub">
-                Revise as informações abaixo antes de continuar.
-              </p>
+              <p className="tfp-section-sub">Revise a prévia e os dados antes de publicar.</p>
             </div>
 
-            {/* Quality Score — clean, no card */}
-            <div className="mb-10">
-              <div className="flex items-baseline gap-3 mb-3">
-                <span className="text-[40px] sm:text-[48px] font-black text-[#111] leading-none tracking-[-0.03em]">{qualityScore}</span>
-                <span className="text-lg font-medium text-[#999]">/100</span>
+            <div className="lf-review-hero">
+              <div className="lf-review-media">
+                {images[0] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={images[0].previewUrl} alt={`Foto principal de ${form.brand} ${form.model}`} />
+                ) : (
+                  <div className="lf-review-placeholder"><Car size={36} strokeWidth={1.5} aria-hidden="true" /></div>
+                )}
               </div>
-              <div className="h-1.5 bg-[#EAEAEA] rounded-full overflow-hidden mb-3">
-                <div className="h-full bg-[#111] rounded-full transition-all duration-700" style={{ width: `${qualityScore}%` }} />
+              <div className="lf-review-copy">
+                <span className="lf-review-eyebrow">{form.brand || 'Marca'} · {form.yearModel || 'Ano'}</span>
+                <h3 className="lf-review-title">{form.model || 'Modelo'}{form.version ? ` ${form.version}` : ''}</h3>
+                <p className="lf-review-price">{form.price ? formatBRL(parseMoneyInputToNumber(form.price)) : 'Preço a definir'}</p>
+                <div className="lf-review-chips">
+                  <span><Calendar size={11} aria-hidden="true" /> {form.year || '—'}/{form.yearModel || '—'}</span>
+                  <span><Gauge size={11} aria-hidden="true" /> {form.mileage ? `${Number(form.mileage).toLocaleString('pt-BR')} km` : 'Km não informada'}</span>
+                  <span><MapPin size={11} aria-hidden="true" /> {form.city || 'Cidade'}{form.state ? `/${form.state}` : ''}</span>
+                </div>
+                <div className="lf-review-fipe">
+                  <span>Tabela FIPE</span>
+                  <strong>{fipeResult?.price || 'Sem referência'}</strong>
+                </div>
               </div>
-              <p className="text-sm text-[#666]">{qualityLabel}</p>
-              {missingRequiredLabels.length > 0 && (
-                <p className="mt-2 text-sm font-medium text-[#DC2626]">
-                  Faltam: {missingRequiredLabels.join(', ')}
-                </p>
-              )}
             </div>
 
-            {/* Divider */}
-            <div className="h-px bg-[#EAEAEA] mb-10" />
+            <div className="lf-review-grid">
+              <div className="lf-card lf-review-score">
+                <div className="lf-score-head">
+                  <h3 className="lf-card-title">Qualidade do anúncio</h3>
+                  <p className="lf-score-value">{qualityScore}<small>/100</small></p>
+                </div>
+                <div className="lf-score-bar">
+                  <motion.span
+                    initial={{ width: 0 }}
+                    animate={{ width: `${qualityScore}%` }}
+                    transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 120, damping: 24 }}
+                  />
+                </div>
+                <p className="lf-score-label">{qualityLabel}</p>
+                {missingRequiredLabels.length > 0 && (
+                  <p className="lf-score-missing">Faltam: {missingRequiredLabels.join(', ')}</p>
+                )}
+              </div>
 
-            {/* Vehicle Info — no card, clean rows */}
-            <div className="mb-10">
-              <h3 className="text-sm font-semibold text-[#111] mb-6 uppercase tracking-[0.08em]">Informações</h3>
-              <div className="space-y-5">
+              <div className="lf-card lf-review-specs">
+                <h3 className="lf-card-title">Ficha técnica</h3>
+                <div className="lf-specs-grid">
+                  {[
+                    { label: 'Motor', value: form.engine || technical.engine },
+                    { label: 'Potência', value: technical.horsepower },
+                    { label: 'Torque', value: technical.torque },
+                    { label: 'Combustível', value: technical.fuel },
+                    { label: 'Câmbio', value: technical.transmission },
+                    { label: 'Consumo', value: technical.consumption },
+                    { label: 'Categoria', value: technical.category },
+                  ].map((item) => (
+                    <div key={item.label} className="lf-spec-item">
+                      <span>{item.label}</span>
+                      <strong>{item.value}</strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="lf-card lf-review-info">
+              <h3 className="lf-card-title">Informações do anúncio</h3>
+              <div className="lf-info-list">
                 {[
                   { label: 'Final da placa', value: normalizePlateFinal(form.plateFinal) || 'Não informado' },
                   { label: 'Veículo', value: `${form.brand} ${form.model} ${form.version}` },
@@ -1691,71 +1749,41 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                   { label: 'Cidade/UF', value: `${form.city || '-'}${form.state ? `/${form.state}` : ''}` },
                   { label: 'Fotos', value: `${images.length} de ${LISTING_MAX_IMAGES}` },
                 ].map((item) => (
-                  <div key={item.label} className="flex items-center justify-between py-2 border-b border-[#F0F0F0]">
-                    <span className="text-sm text-[#999]">{item.label}</span>
-                    <span className="text-sm font-semibold text-[#111] text-right">{item.value}</span>
+                  <div key={item.label} className="lf-info-row">
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
                   </div>
                 ))}
               </div>
               {form.description.trim() && (
-                <div className="mt-6">
-                  <span className="text-sm text-[#999] block mb-2">Descrição</span>
-                  <div className="text-sm text-[#333] leading-relaxed">
-                    {parseDescription(form.description).map((paragraph, index) => (
-                      <p key={index} className="mb-2 last:mb-0">
-                        {paragraph.lines.map((line, lineIndex) => (
-                          <span key={lineIndex}>
-                            {line}
-                            {lineIndex < paragraph.lines.length - 1 ? <br /> : null}
-                          </span>
-                        ))}
-                      </p>
-                    ))}
-                  </div>
+                <div className="lf-description">
+                  <span className="lf-card-sub">Descrição</span>
+                  {parseDescription(form.description).map((paragraph, index) => (
+                    <p key={index}>
+                      {paragraph.lines.map((line, lineIndex) => (
+                        <span key={lineIndex}>
+                          {line}
+                          {lineIndex < paragraph.lines.length - 1 ? <br /> : null}
+                        </span>
+                      ))}
+                    </p>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Divider */}
-            <div className="h-px bg-[#EAEAEA] mb-10" />
-
-            {/* Technical Specs — minimal grid */}
-            <div className="mb-10">
-              <div className="flex items-center gap-2 mb-6">
-                <span className="text-[11px] font-bold uppercase tracking-wider bg-[#111] text-white px-2 py-0.5 rounded">Sugerido</span>
-                <h3 className="text-sm font-semibold text-[#111] uppercase tracking-[0.08em]">Ficha técnica</h3>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-5">
-                {[
-                  { label: 'Motor', value: form.engine || technical.engine },
-                  { label: 'Potência', value: technical.horsepower },
-                  { label: 'Torque', value: technical.torque },
-                  { label: 'Combustível', value: technical.fuel },
-                  { label: 'Câmbio', value: technical.transmission },
-                  { label: 'Consumo', value: technical.consumption },
-                  { label: 'Categoria', value: technical.category },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <span className="text-xs text-[#999] block mb-1">{item.label}</span>
-                    <span className="text-sm font-semibold text-[#111]">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Security note */}
-            <div className="flex items-center gap-2 text-xs text-[#999] mb-8">
-              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-              </svg>
+            <div className="lf-security-note">
+              <ShieldCheck size={15} aria-hidden="true" />
               <span>Contato protegido via chat seguro da plataforma.</span>
             </div>
 
             {!isAuthenticated ? (
-              <div className="fingen-flow-substep-card p-4 sm:p-6 space-y-4 mt-10">
-                <div className="space-y-1">
-                  <p className="fingen-flow-field-label text-base">Crie sua conta para publicar</p>
-                  <p className="text-[13px] text-[#767676]">Seu rascunho fica salvo. Entre ou crie sua conta somente agora, antes de publicar.</p>
+              <div className="lf-card lf-account-card">
+                <div className="lf-account-head">
+                  <div>
+                    <h3 className="lf-account-title">Crie sua conta para publicar</h3>
+                    <p className="lf-account-sub">Seu rascunho fica salvo. Entre ou crie sua conta somente agora, antes de publicar.</p>
+                  </div>
                 </div>
 
                 {accountEmailExists ? (
@@ -1872,39 +1900,37 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             ) : null}
           </div>
         )}
-        </FadeContent>
+            </motion.div>
+          </AnimatePresence>
 
-        {imageUploadProgress && currentStep === 3 ? (
-          <div className="hidden sm:block">
-            <ImageUploadStatus progress={imageUploadProgress} />
-          </div>
-        ) : null}
+          {imageUploadProgress && currentStep === 3 ? (
+            <div className="hidden sm:block">
+              <ImageUploadStatus progress={imageUploadProgress} />
+            </div>
+          ) : null}
 
-        {error ? (
-          <div className="listing-form-error rounded-2xl p-5" role="alert">
-            <p className="listing-form-error-copy text-sm font-bold">{error}</p>
-            {validationDetails.length > 0 ? (
-              <ul className="listing-form-error-details mt-3 space-y-1.5 text-xs font-medium bg-white/60 p-4 rounded-xl">
-                {validationDetails.map((detail) => (
-                  <li key={detail} className="flex items-start gap-2">
-                    <span className="listing-form-error-bullet mt-0.5">•</span>
-                    {detail}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-        ) : null}
+          {error ? (
+            <div className="listing-form-error" role="alert">
+              <p className="listing-form-error-copy">{error}</p>
+              {validationDetails.length > 0 ? (
+                <ul className="listing-form-error-details">
+                  {validationDetails.map((detail) => (
+                    <li key={detail} className="flex items-start gap-2">
+                      <span className="listing-form-error-bullet mt-0.5">•</span>
+                      {detail}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
 
-        {success ? (
-          <div className="rounded-2xl p-5 text-center bg-[#F0FDF4] border border-[#BBF7D0]" role="status">
-            <p className="text-base font-bold text-[#16A34A]">{success}</p>
-          </div>
-        ) : null}
+          {success ? (
+            <div className="lf-success" role="status">{success}</div>
+          ) : null}
 
-        <div className="mt-12 pt-8 border-t border-[#EAEAEA]">
-          <div className="flex flex-col-reverse justify-between gap-4 sm:flex-row">
-            {currentStep > 1 ? (
+          {currentStep > 1 ? (
+            <div className="lf-form-footer">
               <button
                 type="button"
                 onClick={prevStep}
@@ -1914,13 +1940,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                 <ArrowLeft className="h-4 w-4" />
                 Voltar
               </button>
-            ) : (
-              <div />
-            )}
 
-            {currentStep === 1 ? (
-              <div />
-            ) : (
               <button
                 type="button"
                 onClick={currentStep === 3 ? handleSubmit : nextStep}
@@ -1941,39 +1961,65 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                   </>
                 )}
               </button>
-            )}
-          </div>
+            </div>
+          ) : null}
         </div>
-
-        {currentStep >= 2 ? (
-          <div className="fixed inset-x-0 bottom-0 z-30 p-4 pb-[max(16px,env(safe-area-inset-bottom))] sm:hidden bg-gradient-to-t from-white via-white to-transparent">
-            {currentStep === 3 && imageUploadProgress ? (
-              <div className="mb-3">
-                <ImageUploadStatus progress={imageUploadProgress} />
-              </div>
-            ) : null}
-            <button
-              type="button"
-              disabled={saving || fipeLoading}
-              onClick={currentStep === 3 ? handleSubmit : nextStep}
-              className="tfp-btn-primary w-full justify-center"
-            >
-              {currentStep === 2 ? (
-                <>Próxima etapa <ArrowRight className="h-4 w-4" /></>
-              ) : saving ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  {imageUploadProgress ? 'Enviando fotos...' : 'Preparando publicação...'}
-                </>
-              ) : (
-                !isAuthenticated ? 'Criar conta e publicar' : 'Publicar anúncio'
-              )}
-            </button>
-          </div>
-        ) : null}
       </div>
 
+      <aside className="lf-rail" aria-label="Prévia do anúncio">
+        <ListingLivePreview
+          brand={form.brand}
+          model={form.model}
+          version={form.version}
+          year={form.year}
+          yearModel={form.yearModel}
+          price={form.price}
+          mileage={form.mileage}
+          transmission={form.transmission || resolvedTransmissionValue}
+          fuel={form.fuel || resolvedFuelValue}
+          city={form.city}
+          state={form.state}
+          imageUrl={images[0]?.previewUrl || null}
+          fipePrice={fipeResult?.price || null}
+          fipePercent={comparison.diffPercent !== null ? Math.round(comparison.diffPercent) : null}
+        />
+        <div className="lf-rail-note">
+          <strong>Publicação gratuita</strong>
+          <p>Até 5 anúncios ativos por conta e 10 fotos por anúncio.</p>
+          <ul className="lf-rail-list">
+            <li><Check size={13} aria-hidden="true" /> Sem taxa para publicar</li>
+            <li><MessageCircle size={13} aria-hidden="true" /> Contato pelo chat interno</li>
+            <li><Camera size={13} aria-hidden="true" /> Você pode editar depois</li>
+          </ul>
+        </div>
+      </aside>
 
+      {currentStep >= 2 ? (
+        <div className="lf-mobile-cta fixed inset-x-0 bottom-0 z-30 p-4 pb-[max(16px,env(safe-area-inset-bottom))] sm:hidden">
+          {currentStep === 3 && imageUploadProgress ? (
+            <div className="mb-3">
+              <ImageUploadStatus progress={imageUploadProgress} />
+            </div>
+          ) : null}
+          <button
+            type="button"
+            disabled={saving || fipeLoading}
+            onClick={currentStep === 3 ? handleSubmit : nextStep}
+            className="tfp-btn-primary w-full justify-center"
+          >
+            {currentStep === 2 ? (
+              <>Próxima etapa <ArrowRight className="h-4 w-4" /></>
+            ) : saving ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {imageUploadProgress ? 'Enviando fotos...' : 'Preparando publicação...'}
+              </>
+            ) : (
+              !isAuthenticated ? 'Criar conta e publicar' : 'Publicar anúncio'
+            )}
+          </button>
+        </div>
+      ) : null}
     </div>
   )
 }

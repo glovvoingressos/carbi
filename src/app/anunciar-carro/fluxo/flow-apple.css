@@ -1,0 +1,1658 @@
+/* ═══════════════════════════════════════════════════════════════
+   Fluxo de anúncio de carro — sistema visual "mesa de criação"
+   Superfícies sólidas, materiais translúcidos só no chrome,
+   raios grandes, springs e resposta no pointer-down.
+   Escopo: .lf-apple (não afeta o fluxo de caminhão).
+   ═══════════════════════════════════════════════════════════════ */
+
+.lf-apple {
+  --lf-bg: #f2f2ed;
+  --lf-surface: #ffffff;
+  --lf-surface-soft: #fafaf7;
+  --lf-ink: #111110;
+  --lf-ink-2: #3d3d39;
+  --lf-muted: #6b6b64;
+  --lf-line: rgba(17, 17, 16, 0.08);
+  --lf-line-strong: rgba(17, 17, 16, 0.15);
+  --lf-accent: #d4f576;
+  --lf-accent-strong: #c3ea55;
+  --lf-accent-ink: #151513;
+  --lf-iris: #5a47d1;
+  --lf-lavender: #c9b8ff;
+  --lf-mint: #39e09b;
+  --lf-coral: #ff6b52;
+  --lf-danger: #c2412f;
+  --lf-radius-xl: 32px;
+  --lf-radius-lg: 24px;
+  --lf-radius-md: 18px;
+  --lf-radius-sm: 14px;
+  --lf-shadow-card: 0 1px 2px rgba(17, 17, 16, 0.04), 0 28px 70px -40px rgba(17, 17, 16, 0.3);
+  --lf-shadow-float: 0 2px 6px rgba(17, 17, 16, 0.05), 0 20px 46px -28px rgba(17, 17, 16, 0.28);
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  background: var(--lf-bg);
+  color: var(--lf-ink);
+  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.lf-apple ::selection {
+  background: var(--lf-accent);
+  color: var(--lf-accent-ink);
+}
+
+.lf-apple :focus-visible {
+  outline: 3px solid rgba(90, 71, 209, 0.35);
+  outline-offset: 2px;
+}
+
+/* ── Ambiente ──────────────────────────────────────────────── */
+.lf-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(58% 46% at 10% -4%, rgba(212, 245, 118, 0.5), transparent 62%),
+    radial-gradient(42% 38% at 92% 2%, rgba(201, 184, 255, 0.38), transparent 68%),
+    radial-gradient(54% 44% at 52% 108%, rgba(57, 224, 155, 0.16), transparent 72%),
+    linear-gradient(180deg, #f7f7f2 0%, #f0f0ea 100%);
+}
+
+.lf-ambient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+/* ── Top bar (material translúcido) ────────────────────────── */
+.lf-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(247, 247, 242, 0.78);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  backdrop-filter: blur(22px) saturate(1.5);
+  border-bottom: 1px solid var(--lf-line);
+}
+
+.lf-topbar-inner {
+  width: min(100% - 48px, 1180px);
+  margin: 0 auto;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lf-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--lf-line);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--lf-ink);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  transition: transform 140ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+.lf-back:hover {
+  background: #fff;
+  border-color: var(--lf-line-strong);
+}
+
+.lf-back:active {
+  transform: scale(0.97);
+}
+
+.lf-back-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--lf-surface-soft);
+}
+
+.lf-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.lf-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--lf-accent);
+  color: var(--lf-accent-ink);
+  font-family: var(--hh-font), sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.lf-brand-name {
+  font-family: var(--hh-font), sans-serif;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.lf-brand-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--lf-line-strong);
+}
+
+.lf-brand-context {
+  color: var(--lf-muted);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lf-topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lf-secure {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(57, 224, 155, 0.12);
+  color: #136b4b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.lf-help {
+  color: var(--lf-ink-2);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 999px;
+  transition: background-color 160ms ease;
+}
+
+.lf-help:hover {
+  background: rgba(17, 17, 16, 0.05);
+}
+
+/* ── Estrutura ─────────────────────────────────────────────── */
+.lf-main {
+  width: min(100% - 48px, 1180px);
+  margin: 0 auto;
+  padding: clamp(30px, 5vw, 58px) 0 110px;
+}
+
+.lf-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: clamp(26px, 4vw, 42px);
+}
+
+.lf-intro-copy h1 {
+  margin: 0;
+  max-width: 13ch;
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(44px, 6.4vw, 76px);
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.lf-intro-copy p {
+  margin: 14px 0 0;
+  max-width: 46ch;
+  color: var(--lf-muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.lf-intro-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+.lf-intro-chips span {
+  padding: 8px 12px;
+  border: 1px solid var(--lf-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--lf-ink-2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* ── Layout do formulário ──────────────────────────────────── */
+.lf-form-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 336px;
+  gap: 28px;
+  align-items: start;
+}
+
+.lf-form-column {
+  min-width: 0;
+}
+
+.lf-form-card {
+  position: relative;
+  padding: clamp(20px, 3.2vw, 36px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: var(--lf-radius-xl);
+  background: var(--lf-surface);
+  box-shadow: var(--lf-shadow-card);
+}
+
+.lf-form-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  border-radius: var(--lf-radius-xl) var(--lf-radius-xl) 0 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), transparent);
+  pointer-events: none;
+}
+
+.lf-step {
+  min-height: 0;
+}
+
+.lf-step-head {
+  margin-bottom: 24px;
+}
+
+.lf-apple .tfp-section-title {
+  margin: 0;
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(36px, 5vw, 54px);
+  font-weight: 600;
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  color: var(--lf-ink);
+  text-wrap: balance;
+}
+
+.lf-apple .tfp-section-sub {
+  max-width: 54ch;
+  margin: 10px 0 0;
+  color: var(--lf-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.lf-apple .tfp-section-label {
+  display: none;
+}
+
+/* ── Stepper ───────────────────────────────────────────────── */
+.lf-apple .listing-stepper {
+  margin: 0 0 16px;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.lf-apple .listing-stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.lf-apple .listing-stepper-node {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.lf-apple .listing-stepper-button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--lf-muted);
+  text-align: left;
+  transition: background-color 160ms ease, color 160ms ease, transform 120ms ease;
+}
+
+.lf-apple .listing-stepper-button:not(:disabled):hover {
+  background: rgba(17, 17, 16, 0.04);
+}
+
+.lf-apple .listing-stepper-button:active {
+  transform: scale(0.98);
+}
+
+.lf-apple .listing-stepper-marker {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 999px;
+  background: #efefe9;
+  color: var(--lf-muted);
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px var(--lf-line);
+  transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.lf-apple .listing-stepper-button.is-active .listing-stepper-marker {
+  background: var(--lf-accent);
+  color: var(--lf-accent-ink);
+  box-shadow: 0 0 0 4px rgba(212, 245, 118, 0.28);
+}
+
+.lf-apple .listing-stepper-button.is-complete .listing-stepper-marker {
+  background: var(--lf-ink);
+  color: #fff;
+  box-shadow: none;
+}
+
+.lf-apple .listing-stepper-copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.lf-apple .listing-stepper-copy strong {
+  color: var(--lf-muted);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.lf-apple .listing-stepper-copy small {
+  display: none;
+}
+
+.lf-apple .listing-stepper-button.is-active .listing-stepper-copy strong,
+.lf-apple .listing-stepper-button.is-complete .listing-stepper-copy strong {
+  color: var(--lf-ink);
+}
+
+.lf-apple .listing-stepper-connector {
+  flex: 1;
+  height: 1px;
+  margin: 0 4px;
+  background: var(--lf-line);
+  overflow: hidden;
+}
+
+.lf-apple .listing-stepper-connector > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--lf-ink);
+  transform-origin: left center;
+}
+
+/* ── Campos ────────────────────────────────────────────────── */
+.lf-apple .listing-flow-field-label,
+.lf-apple .fingen-flow-field-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--lf-ink-2);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.015em;
+}
+
+.lf-apple .fingen-flow-input,
+.lf-apple .listing-flow-input-field {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 16px;
+  border: 1px solid var(--lf-line-strong);
+  border-radius: var(--lf-radius-sm);
+  background: var(--lf-surface-soft);
+  color: var(--lf-ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, transform 120ms ease;
+}
+
+.lf-apple .fingen-flow-input::placeholder,
+.lf-apple .listing-flow-input-field::placeholder {
+  color: #989890;
+  opacity: 1;
+}
+
+.lf-apple .fingen-flow-input:hover,
+.lf-apple .listing-flow-input-field:hover {
+  border-color: rgba(17, 17, 16, 0.24);
+  background: #fff;
+}
+
+.lf-apple .fingen-flow-input:focus,
+.lf-apple .listing-flow-input-field:focus {
+  outline: none;
+  border-color: var(--lf-ink);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(212, 245, 118, 0.42);
+}
+
+.lf-apple .fingen-flow-input:active,
+.lf-apple .listing-flow-input-field:active {
+  transform: scale(0.998);
+}
+
+.lf-apple select.fingen-flow-input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b6b64' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  cursor: pointer;
+}
+
+.lf-apple textarea.fingen-flow-input {
+  min-height: 168px;
+  padding: 14px 16px;
+  line-height: 1.6;
+  resize: vertical;
+  background-image: none;
+}
+
+.lf-apple .listing-field-error {
+  margin-top: 6px;
+  color: var(--lf-danger);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+/* ── Cards e seções ────────────────────────────────────────── */
+.lf-apple .fingen-flow-substep-card,
+.lf-apple .lf-card {
+  padding: clamp(18px, 3vw, 24px);
+  border: 1px solid var(--lf-line);
+  border-radius: var(--lf-radius-lg);
+  background: var(--lf-surface-soft);
+  box-shadow: none;
+}
+
+.lf-apple .lf-card-title {
+  margin: 0;
+  color: var(--lf-ink);
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.lf-apple .lf-card-sub {
+  margin: 4px 0 0;
+  color: var(--lf-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.lf-apple .lf-fields-card {
+  background: var(--lf-surface);
+  border-color: var(--lf-line);
+}
+
+.lf-apple .lf-plate-section {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.lf-apple .tfp-section-title:focus,
+.lf-apple .tfp-section-title:focus-visible {
+  outline: none;
+}
+
+.lf-apple .lf-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.lf-apple .lf-fields-grid > .lf-field-full {
+  grid-column: 1 / -1;
+}
+
+/* ── Botões ────────────────────────────────────────────────── */
+.lf-apple .fingen-flow-btn-primary,
+.lf-apple .tfp-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 54px;
+  padding: 0 26px;
+  border: 1px solid rgba(17, 17, 16, 0.08);
+  border-radius: 999px;
+  background: var(--lf-accent);
+  color: var(--lf-accent-ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  box-shadow: 0 1px 2px rgba(17, 17, 16, 0.06), 0 12px 26px -16px rgba(17, 17, 16, 0.42);
+  transition: transform 130ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.lf-apple .fingen-flow-btn-primary:hover,
+.lf-apple .tfp-btn-primary:hover {
+  background: var(--lf-accent-strong);
+  box-shadow: 0 2px 4px rgba(17, 17, 16, 0.08), 0 16px 30px -16px rgba(17, 17, 16, 0.45);
+}
+
+.lf-apple .fingen-flow-btn-primary:active,
+.lf-apple .tfp-btn-primary:active {
+  transform: scale(0.975);
+  box-shadow: 0 1px 2px rgba(17, 17, 16, 0.08);
+}
+
+.lf-apple .fingen-flow-btn-primary:disabled,
+.lf-apple .tfp-btn-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+}
+
+/* O fluxo base pinta o botão de "Próxima etapa" de preto; mantemos o accent
+   chartreuse em todas as ações primárias para uma hierarquia única. */
+.lf-apple.listing-flow-app .tfp-btn-primary.listing-next-step-button:not(.listing-final-submit-button),
+.lf-apple.listing-flow-app .tfp-btn-primary.listing-final-submit-button {
+  background: var(--lf-accent);
+  color: var(--lf-accent-ink);
+  box-shadow: 0 1px 2px rgba(17, 17, 16, 0.06), 0 12px 26px -16px rgba(17, 17, 16, 0.42);
+}
+
+.lf-apple.listing-flow-app .tfp-btn-primary.listing-next-step-button:not(.listing-final-submit-button):hover,
+.lf-apple.listing-flow-app .tfp-btn-primary.listing-final-submit-button:hover {
+  background: var(--lf-accent-strong);
+  color: var(--lf-accent-ink);
+}
+
+.lf-apple .tfp-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 54px;
+  padding: 0 22px;
+  border: 1px solid var(--lf-line-strong);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--lf-ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  transition: transform 130ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+.lf-apple .tfp-btn-secondary:hover {
+  background: var(--lf-surface-soft);
+  border-color: rgba(17, 17, 16, 0.26);
+}
+
+.lf-apple .tfp-btn-secondary:active {
+  transform: scale(0.975);
+}
+
+.lf-apple .lf-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--lf-line);
+}
+
+/* ── Badges ────────────────────────────────────────────────── */
+.lf-apple .fingen-flow-badge-accent {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(212, 245, 118, 0.55);
+  color: #3c421f;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.lf-apple .fingen-flow-badge-outline {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border: 1px solid var(--lf-line-strong);
+  border-radius: 999px;
+  color: var(--lf-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ── Upload ────────────────────────────────────────────────── */
+.lf-apple .fingen-flow-upload-area {
+  border: 1.5px dashed rgba(17, 17, 16, 0.2);
+  border-radius: var(--lf-radius-lg);
+  background: linear-gradient(180deg, #fbfbf8 0%, #f5f5f0 100%);
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+.lf-apple .fingen-flow-upload-area:hover {
+  border-color: var(--lf-ink);
+  background: #fff;
+}
+
+.lf-apple .fingen-flow-upload-area:active {
+  transform: scale(0.996);
+}
+
+.lf-apple .fingen-flow-upload-area.is-dragging {
+  border-color: var(--lf-ink);
+  background: rgba(212, 245, 118, 0.14);
+  transform: scale(1.006);
+}
+
+.lf-apple .fingen-flow-upload-icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 19px;
+  background: var(--lf-accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ── Fotos ─────────────────────────────────────────────────── */
+.lf-apple .lf-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.lf-apple .lf-photo-card {
+  padding: 10px;
+  border: 1px solid var(--lf-line);
+  border-radius: var(--lf-radius-md);
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(17, 17, 16, 0.03);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.lf-apple .lf-photo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--lf-shadow-float);
+}
+
+.lf-apple .lf-photo-card img {
+  border-radius: 13px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.lf-apple .lf-photo-card button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--lf-line);
+  border-radius: 999px;
+  background: var(--lf-surface-soft);
+  color: var(--lf-ink-2);
+  transition: transform 120ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.lf-apple .lf-photo-card button:hover {
+  background: #fff;
+  color: var(--lf-ink);
+}
+
+.lf-apple .lf-photo-card button:active {
+  transform: scale(0.94);
+}
+
+/* ── FIPE ──────────────────────────────────────────────────── */
+.lf-apple .lf-fipe-card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(20px, 3vw, 28px);
+  border-radius: var(--lf-radius-lg);
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(212, 245, 118, 0.16), transparent 55%),
+    #151513;
+  color: #fff;
+  box-shadow: 0 24px 54px -30px rgba(17, 17, 16, 0.6);
+}
+
+.lf-apple .lf-fipe-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.lf-apple .lf-fipe-label {
+  display: block;
+  color: var(--lf-accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lf-apple .lf-fipe-price {
+  margin: 6px 0 0;
+  color: #fff;
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(34px, 5vw, 46px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.lf-apple .lf-fipe-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.lf-apple .lf-fipe-status.is-below {
+  background: rgba(57, 224, 155, 0.16);
+  color: #8ff0c7;
+}
+
+.lf-apple .lf-fipe-status.is-near {
+  background: rgba(212, 245, 118, 0.16);
+  color: var(--lf-accent);
+}
+
+.lf-apple .lf-fipe-status.is-above {
+  background: rgba(255, 107, 82, 0.18);
+  color: #ffb4a6;
+}
+
+.lf-apple .lf-fipe-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.lf-apple .lf-fipe-stat {
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.lf-apple .lf-fipe-stat span {
+  display: block;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lf-apple .lf-fipe-stat strong {
+  display: block;
+  margin-top: 5px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.lf-apple .lf-fipe-track {
+  margin-top: 18px;
+}
+
+.lf-apple .lf-fipe-track-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.lf-apple .lf-fipe-track-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--lf-accent);
+}
+
+.lf-apple .lf-fipe-track-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.lf-apple .lf-fipe-ref {
+  margin: 14px 0 0;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 11px;
+}
+
+.lf-apple .lf-fipe-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lf-apple .lf-fipe-empty {
+  padding: 18px;
+  border: 1px solid var(--lf-line);
+  border-radius: var(--lf-radius-md);
+  background: var(--lf-surface-soft);
+}
+
+.lf-apple .lf-fipe-empty strong {
+  display: block;
+  color: var(--lf-ink);
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.lf-apple .lf-fipe-empty p {
+  margin: 4px 0 0;
+  color: var(--lf-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ── Revisão ───────────────────────────────────────────────── */
+.lf-apple .lf-review-hero {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 20px;
+  padding: 14px;
+  border-radius: var(--lf-radius-lg);
+  background: #151513;
+  color: #fff;
+  box-shadow: 0 24px 54px -32px rgba(17, 17, 16, 0.6);
+}
+
+.lf-apple .lf-review-media {
+  position: relative;
+  min-height: 220px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #2a2a25, #1b1b18);
+}
+
+.lf-apple .lf-review-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lf-apple .lf-review-placeholder {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  min-height: 220px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.lf-apple .lf-review-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px 12px 12px 0;
+}
+
+.lf-apple .lf-review-eyebrow {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lf-apple .lf-review-title {
+  margin: 6px 0 0;
+  color: #fff;
+  font-family: var(--hh-font), sans-serif;
+  font-size: clamp(30px, 4vw, 40px);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+
+.lf-apple .lf-review-price {
+  margin: 12px 0 0;
+  color: var(--lf-accent);
+  font-size: clamp(26px, 3.6vw, 34px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.lf-apple .lf-review-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.lf-apple .lf-review-chips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.lf-apple .lf-review-fipe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 11px;
+}
+
+.lf-apple .lf-review-fipe strong {
+  color: var(--lf-accent);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.lf-apple .lf-review-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 14px;
+  margin-top: 14px;
+  align-items: start;
+}
+
+.lf-apple .lf-review-score .lf-score-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lf-apple .lf-score-value {
+  color: var(--lf-ink);
+  font-family: var(--hh-font), sans-serif;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.lf-apple .lf-score-value small {
+  color: var(--lf-muted);
+  font-family: var(--font-sans), sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lf-apple .lf-score-bar {
+  height: 7px;
+  margin-top: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e8e8e2;
+}
+
+.lf-apple .lf-score-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--lf-accent), var(--lf-accent-strong));
+}
+
+.lf-apple .lf-score-label {
+  margin: 10px 0 0;
+  color: var(--lf-muted);
+  font-size: 12px;
+}
+
+.lf-apple .lf-score-missing {
+  margin: 8px 0 0;
+  color: var(--lf-danger);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.lf-apple .lf-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  margin-top: 14px;
+}
+
+.lf-apple .lf-spec-item span {
+  display: block;
+  color: var(--lf-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lf-apple .lf-spec-item strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--lf-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lf-apple .lf-info-list {
+  display: grid;
+  gap: 0;
+  margin-top: 14px;
+}
+
+.lf-apple .lf-info-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--lf-line);
+}
+
+.lf-apple .lf-info-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.lf-apple .lf-info-row span {
+  color: var(--lf-muted);
+  font-size: 12px;
+}
+
+.lf-apple .lf-info-row strong {
+  color: var(--lf-ink);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.lf-apple .lf-description {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--lf-line);
+  color: var(--lf-ink-2);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.lf-apple .lf-description p {
+  margin: 0 0 8px;
+}
+
+.lf-apple .lf-description p:last-child {
+  margin-bottom: 0;
+}
+
+.lf-apple .lf-security-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: var(--lf-radius-md);
+  background: rgba(57, 224, 155, 0.1);
+  color: #136b4b;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.lf-apple .lf-account-card {
+  margin-top: 14px;
+  background: var(--lf-surface);
+}
+
+.lf-apple .lf-account-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.lf-apple .lf-account-title {
+  margin: 0;
+  color: var(--lf-ink);
+  font-family: var(--hh-font), sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.lf-apple .lf-account-sub {
+  margin: 6px 0 0;
+  color: var(--lf-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ── Erros / sucesso ───────────────────────────────────────── */
+.lf-apple .listing-form-error {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid rgba(194, 65, 47, 0.18);
+  border-radius: var(--lf-radius-md);
+  background: #fff6f3;
+  color: #8f2f20;
+}
+
+.lf-apple .listing-form-error-copy {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lf-apple .listing-form-error-details {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.lf-apple .lf-success {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(19, 107, 75, 0.18);
+  border-radius: var(--lf-radius-md);
+  background: rgba(57, 224, 155, 0.12);
+  color: #136b4b;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ── Rail / prévia ─────────────────────────────────────────── */
+.lf-rail {
+  position: sticky;
+  top: 88px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lf-preview {
+  overflow: hidden;
+  border: 1px solid var(--lf-line);
+  border-radius: var(--lf-radius-lg);
+  background: var(--lf-surface);
+  box-shadow: var(--lf-shadow-float);
+}
+
+.lf-preview-media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background:
+    radial-gradient(80% 70% at 50% 20%, rgba(212, 245, 118, 0.42), transparent 70%),
+    linear-gradient(135deg, #e8e8e1, #f6f6f1);
+}
+
+.lf-preview-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lf-preview-placeholder {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  color: rgba(17, 17, 16, 0.35);
+}
+
+.lf-preview-placeholder strong {
+  color: rgba(17, 17, 16, 0.45);
+  font-family: var(--hh-font), sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.lf-preview-live {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--lf-ink);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.lf-preview-live::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--lf-mint);
+  box-shadow: 0 0 0 3px rgba(57, 224, 155, 0.18);
+}
+
+.lf-preview-body {
+  padding: 18px;
+}
+
+.lf-preview-eyebrow {
+  color: var(--lf-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lf-preview-title {
+  margin: 5px 0 0;
+  color: var(--lf-ink);
+  font-family: var(--hh-font), sans-serif;
+  font-size: 27px;
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+}
+
+.lf-preview-price {
+  margin: 12px 0 0;
+  color: var(--lf-ink);
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.lf-preview-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.lf-preview-chips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #f3f3ee;
+  color: var(--lf-ink-2);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.lf-preview-fipe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--lf-line);
+  color: var(--lf-muted);
+  font-size: 11px;
+}
+
+.lf-preview-fipe strong {
+  color: var(--lf-ink);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.lf-rail-note {
+  padding: 16px;
+  border: 1px solid var(--lf-line);
+  border-radius: var(--lf-radius-md);
+  background: rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.lf-rail-note strong {
+  display: block;
+  color: var(--lf-ink);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.lf-rail-note p {
+  margin: 4px 0 0;
+  color: var(--lf-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.lf-rail-list {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lf-rail-list li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--lf-ink-2);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.lf-rail-list svg {
+  color: #136b4b;
+  flex: 0 0 auto;
+}
+
+/* ── CTA mobile ────────────────────────────────────────────── */
+.lf-apple .lf-mobile-cta {
+  background: rgba(247, 247, 242, 0.82);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  border-top: 1px solid var(--lf-line);
+}
+
+/* ── PlateInput (escopo do fluxo) ──────────────────────────── */
+.lf-apple .plate-input > div:first-child h4 {
+  color: var(--lf-ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.lf-apple .plate-input > div:first-child > div:first-child {
+  background: rgba(212, 245, 118, 0.5);
+}
+
+.lf-apple .plate-input > div:first-child svg {
+  color: var(--lf-accent-ink);
+}
+
+.lf-apple .plate-input > div:nth-child(2) {
+  padding: 16px;
+  border: 1px solid var(--lf-line);
+  border-radius: var(--lf-radius-md);
+  background: var(--lf-surface);
+  box-shadow: none;
+}
+
+.lf-apple .plate-input #listing-plate {
+  min-height: 54px;
+  border: 1px solid var(--lf-line-strong);
+  border-radius: var(--lf-radius-sm);
+  background: var(--lf-surface-soft);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 16px;
+  letter-spacing: 0.12em;
+}
+
+.lf-apple .plate-input #listing-plate:focus {
+  border-color: var(--lf-ink);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(212, 245, 118, 0.42);
+}
+
+.lf-apple .plate-input button[type="button"] {
+  min-height: 54px;
+  border-radius: var(--lf-radius-sm);
+  background: var(--lf-ink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 750;
+  transition: transform 120ms ease, background-color 160ms ease;
+}
+
+.lf-apple .plate-input button[type="button"]:hover {
+  background: #2b2b27;
+}
+
+.lf-apple .plate-input button[type="button"]:active {
+  transform: scale(0.97);
+}
+
+.lf-apple .plate-input button[type="button"]:disabled {
+  background: #e8e8e2;
+  color: #8b8b84;
+}
+
+.lf-apple .plate-input .bg-amber-50 {
+  border-color: rgba(212, 245, 118, 0.7);
+  background: rgba(212, 245, 118, 0.22);
+  color: #4b4b23;
+}
+
+.lf-apple .plate-input .bg-amber-50 svg {
+  color: #6b6b23;
+}
+
+.lf-apple .plate-input .bg-emerald-50 {
+  background: rgba(57, 224, 155, 0.1);
+}
+
+/* ── Responsivo ────────────────────────────────────────────── */
+@media (max-width: 1020px) {
+  .lf-form-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lf-rail {
+    display: none;
+  }
+
+  .lf-form-card {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  .lf-apple .listing-stepper {
+    max-width: 780px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .lf-topbar-inner,
+  .lf-main {
+    width: min(100% - 28px, 1180px);
+  }
+
+  .lf-topbar-inner {
+    min-height: 58px;
+    gap: 10px;
+  }
+
+  .lf-brand-context,
+  .lf-brand-sep,
+  .lf-secure,
+  .lf-help {
+    display: none;
+  }
+
+  .lf-brand-name {
+    font-size: 19px;
+  }
+
+  .lf-back {
+    padding-right: 10px;
+  }
+
+  .lf-main {
+    padding-top: 24px;
+    padding-bottom: 96px;
+  }
+
+  .lf-intro {
+    display: block;
+    margin-bottom: 22px;
+  }
+
+  .lf-intro-copy h1 {
+    font-size: clamp(40px, 12vw, 56px);
+    max-width: 12ch;
+  }
+
+  .lf-intro-copy p {
+    font-size: 14px;
+    max-width: 38ch;
+  }
+
+  .lf-intro-chips {
+    justify-content: flex-start;
+    margin-top: 14px;
+    padding-bottom: 0;
+  }
+
+  .lf-form-card {
+    padding: 18px;
+    border-radius: 26px;
+  }
+
+  .lf-apple .listing-stepper-copy {
+    display: none;
+  }
+
+  .lf-apple .listing-stepper-button {
+    padding: 6px;
+    gap: 0;
+  }
+
+  .lf-apple .listing-stepper-connector {
+    margin: 0 2px;
+  }
+
+  .lf-apple .lf-fields-grid,
+  .lf-apple .lf-review-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lf-apple .lf-review-hero {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 10px;
+  }
+
+  .lf-apple .lf-review-media,
+  .lf-apple .lf-review-placeholder {
+    min-height: 190px;
+  }
+
+  .lf-apple .lf-review-copy {
+    padding: 8px 8px 10px;
+  }
+
+  .lf-apple .lf-fipe-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lf-apple .lf-photo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lf-apple .lf-form-footer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  /* No celular a ação principal vive na barra fixa; o rodapé fica só com Voltar. */
+  .lf-apple .lf-form-footer .tfp-btn-primary {
+    display: none;
+  }
+
+  .lf-apple .lf-form-footer > div:empty {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .lf-apple .lf-photo-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lf-apple .lf-review-chips span:nth-child(3) {
+    display: none;
+  }
+}
+
+/* ── Movimento reduzido ────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .lf-apple *,
+  .lf-apple *::before,
+  .lf-apple *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .lf-apple .fingen-flow-btn-primary:active,
+  .lf-apple .tfp-btn-primary:active,
+  .lf-apple .tfp-btn-secondary:active,
+  .lf-apple .lf-photo-card:hover,
+  .lf-apple .lf-back:active {
+    transform: none;
+  }
+}

@@ -101,7 +101,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="plate-input space-y-3">
       <div className="flex items-center gap-2">
         <div className="w-7 h-7 rounded-full bg-[#16855C]/10 flex items-center justify-center shrink-0">
           <Sparkles className="w-3.5 h-3.5 text-[#16855C]" />
