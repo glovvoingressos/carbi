@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ShieldCheck } from 'lucide-react'
-import { heroFont } from '@/components/home/home-font'
 import '@/app/anunciar-carro/fluxo/flow-apple.css'
 
 type CarListingFlowShellProps = {
@@ -10,19 +9,17 @@ type CarListingFlowShellProps = {
   title?: string
   subtitle?: string
   backHref?: string
-  chips?: string[]
 }
 
 export default function CarListingFlowShell({
   children,
   context = 'Anunciar carro',
-  title = 'Seu anúncio, do seu jeito.',
-  subtitle = 'Preencha os dados, veja a prévia ao vivo e publique em poucos minutos.',
+  title = 'Anuncie seu carro',
+  subtitle = 'Preencha os detalhes e publique em poucos minutos.',
   backHref = '/carros-a-venda',
-  chips = ['Grátis para publicar', 'Até 10 fotos', 'Chat interno'],
 }: CarListingFlowShellProps) {
   return (
-    <div className={`lf-apple listing-flow-app ${heroFont.variable}`}>
+    <div className="lf-apple listing-flow-app">
       <div className="lf-ambient" aria-hidden="true" />
 
       <header className="lf-topbar">
@@ -47,15 +44,10 @@ export default function CarListingFlowShell({
       </header>
 
       <main className="lf-main">
-        <div className="lf-intro">
-          <div className="lf-intro-copy">
-            <h1>{title}</h1>
-            <p>{subtitle}</p>
-          </div>
-          <div className="lf-intro-chips" aria-label="Vantagens do anúncio">
-            {chips.map((chip) => <span key={chip}>{chip}</span>)}
-          </div>
-        </div>
+        <header className="lf-intro">
+          <h1>{title}</h1>
+          <p>{subtitle}</p>
+        </header>
 
         {children}
       </main>

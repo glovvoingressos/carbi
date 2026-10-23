@@ -119,7 +119,7 @@ function ImageUploadStatus({ progress }: { progress: ImageUploadProgress }) {
         aria-valuenow={percent}
         aria-valuetext={message}
       >
-        <div className="h-full rounded-full bg-[#16855C] transition-[width] duration-300" style={{ width: `${percent}%` }} />
+        <div className="h-full rounded-full bg-[#0071e3] transition-[width] duration-300" style={{ width: `${percent}%` }} />
       </div>
     </div>
   )
@@ -737,14 +737,6 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       : comparison.status === 'near'
       ? 'Na média da FIPE'
       : 'Sem referência'
-  const fipeComparisonStatusClass =
-    !fipeResult || !hasAskingPrice
-      ? 'bg-white/10 text-white/70 border border-white/15'
-      : comparison.status === 'below'
-      ? 'bg-[#D4F576]/20 text-[#D4F576] border border-[#D4F576]/30'
-      : comparison.status === 'above'
-      ? 'bg-[#FF6B52]/20 text-[#FF6B52] border border-[#FF6B52]/30'
-      : 'bg-[#D4F576]/15 text-[#D4F576] border border-[#D4F576]/25'
   const fipeProgressWidth =
     !fipeResult || !hasAskingPrice
       ? '50%'
@@ -1443,7 +1435,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             </div>
             
              {form.vehicle_type === 'truck' && (
-               <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1 rounded-2xl border border-[#D4F576]/40 bg-[#D4F576]/10 p-4">
+               <div className="grid gap-3 sm:grid-cols-2 max-[330px]:grid-cols-1 rounded-2xl border border-[#0071e3]/20 bg-[#0071e3]/5 p-4">
                  <p className="sm:col-span-2 text-sm font-semibold text-[#1A1A1A]">Dados do caminhão</p>
                  {([['truck_type', 'Tipo de caminhão'], ['load_capacity', 'Capacidade de carga (kg)'], ['axles', 'Eixos'], ['truck_body_type', 'Carroceria'], ['cabin_type', 'Cabine'], ['pbt', 'PBT (kg)'], ['cmt', 'CMT (kg)'], ['truck_category', 'Categoria']] as const).map(([field, label]) => (
                    <input key={field} className="fingen-flow-input" placeholder={label} value={form[field]} onChange={(e) => handleInput(field, e.target.value)} aria-label={label} />
@@ -1591,7 +1583,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
 
             <label
-              className={`fingen-flow-upload-area p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#4F4A3E] transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px] focus-within:ring-2 focus-within:ring-[#16855C] focus-within:ring-offset-2 ${isDraggingImages ? 'is-dragging' : ''}${fieldErrors.images ? ' listing-upload-invalid' : ''}`}
+              className={`fingen-flow-upload-area p-8 flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-3 text-sm font-medium text-[#424245] transition-all group max-[330px]:p-5 max-[330px]:min-h-[140px] focus-within:ring-2 focus-within:ring-[#0071e3] focus-within:ring-offset-2 ${isDraggingImages ? 'is-dragging' : ''}${fieldErrors.images ? ' listing-upload-invalid' : ''}`}
               onDragEnter={(event) => {
                 event.preventDefault()
                 setIsDraggingImages(true)

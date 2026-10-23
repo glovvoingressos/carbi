@@ -103,8 +103,8 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
   return (
     <div className="plate-input space-y-3">
       <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-full bg-[#16855C]/10 flex items-center justify-center shrink-0">
-          <Sparkles className="w-3.5 h-3.5 text-[#16855C]" />
+        <div className="w-7 h-7 rounded-full bg-[#0071e3]/10 flex items-center justify-center shrink-0">
+          <Sparkles className="w-3.5 h-3.5 text-[#0071e3]" />
         </div>
         <div>
           <h4 className="text-xs font-semibold text-[#1A1A1A]">Preencher pela placa</h4>
@@ -112,9 +112,9 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 p-4">
-        <div className="flex items-center gap-2 mb-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200">
-          <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-          <p className="text-xs text-amber-700" style={{ fontSize: '12px' }}>A placa é usada apenas para preencher os dados do veículo. Ela <strong>não será publicada</strong> no anúncio.</p>
+        <div className="flex items-center gap-2 mb-3 p-2.5 rounded-lg bg-[#f5f5f7] border border-[#e5e5ea]">
+          <AlertCircle className="w-3.5 h-3.5 text-[#6e6e73] shrink-0" />
+          <p className="text-xs text-[#424245]" style={{ fontSize: '12px' }}>A placa é usada apenas para preencher os dados do veículo. Ela <strong>não será publicada</strong> no anúncio.</p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch gap-3">
@@ -133,7 +133,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
               placeholder="ABC1D23"
               maxLength={7}
               disabled={loading}
-              className="w-full h-10 pl-16 pr-4 rounded-xl bg-gray-50 border border-gray-200 text-sm font-mono font-semibold tracking-wider text-[#1A1A1A] placeholder:text-gray-300 focus:outline-none focus:border-[#16855C] focus:ring-2 focus:ring-[#16855C]/10 transition-all uppercase"
+              className="w-full h-10 pl-16 pr-4 rounded-xl bg-white border border-[#d2d2d7] text-sm font-mono font-semibold tracking-wider text-[#1d1d1f] placeholder:text-[#a1a1a6] focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/15 transition-all uppercase"
             />
           </div>
 
@@ -141,7 +141,7 @@ export default function PlateInput({ onPlateFound }: PlateInputProps) {
             type="button"
             onClick={handleLookup}
             disabled={loading || plate.length < 7}
-            className="flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#00A36A] px-5 text-xs font-semibold text-[#0A0A0A] transition-colors hover:bg-[#008E5D] disabled:cursor-not-allowed disabled:bg-[#DDE9E4] disabled:text-[#557066]"
+            className="flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#0071e3] px-5 text-xs font-semibold text-white transition-colors hover:bg-[#0077ed] disabled:cursor-not-allowed disabled:bg-[#f5f5f7] disabled:text-[#8e8e93]"
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" /> : <Search className="w-3.5 h-3.5" aria-hidden="true" />}
             {loading ? 'Consultando…' : 'Buscar'}

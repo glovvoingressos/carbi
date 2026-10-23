@@ -6,34 +6,35 @@
    ═══════════════════════════════════════════════════════════════ */
 
 .lf-apple {
-  --lf-bg: #f2f2ed;
+  --lf-bg: #f5f5f7;
   --lf-surface: #ffffff;
-  --lf-surface-soft: #fafaf7;
-  --lf-ink: #111110;
-  --lf-ink-2: #3d3d39;
-  --lf-muted: #6b6b64;
-  --lf-line: rgba(17, 17, 16, 0.08);
-  --lf-line-strong: rgba(17, 17, 16, 0.15);
-  --lf-accent: #d4f576;
-  --lf-accent-strong: #c3ea55;
-  --lf-accent-ink: #151513;
-  --lf-iris: #5a47d1;
-  --lf-lavender: #c9b8ff;
-  --lf-mint: #39e09b;
-  --lf-coral: #ff6b52;
-  --lf-danger: #c2412f;
-  --lf-radius-xl: 32px;
-  --lf-radius-lg: 24px;
-  --lf-radius-md: 18px;
-  --lf-radius-sm: 14px;
-  --lf-shadow-card: 0 1px 2px rgba(17, 17, 16, 0.04), 0 28px 70px -40px rgba(17, 17, 16, 0.3);
-  --lf-shadow-float: 0 2px 6px rgba(17, 17, 16, 0.05), 0 20px 46px -28px rgba(17, 17, 16, 0.28);
+  --lf-surface-soft: #f5f5f7;
+  --lf-ink: #1d1d1f;
+  --lf-ink-2: #424245;
+  --lf-muted: #6e6e73;
+  --lf-line: rgba(0, 0, 0, 0.08);
+  --lf-line-strong: rgba(0, 0, 0, 0.16);
+  --lf-accent: #0071e3;
+  --lf-accent-strong: #0077ed;
+  --lf-accent-ink: #ffffff;
+  --lf-iris: #0071e3;
+  --lf-lavender: #e8e8ed;
+  --lf-mint: #30d158;
+  --lf-coral: #ff9f0a;
+  --lf-danger: #ff453a;
+  --lf-radius-xl: 28px;
+  --lf-radius-lg: 22px;
+  --lf-radius-md: 16px;
+  --lf-radius-sm: 12px;
+  --lf-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  --lf-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 24px 70px -40px rgba(0, 0, 0, 0.26);
+  --lf-shadow-float: 0 2px 8px rgba(0, 0, 0, 0.04), 0 18px 40px -28px rgba(0, 0, 0, 0.22);
   position: relative;
   isolation: isolate;
   min-height: 100dvh;
   background: var(--lf-bg);
   color: var(--lf-ink);
-  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--lf-font);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -44,7 +45,7 @@
 }
 
 .lf-apple :focus-visible {
-  outline: 3px solid rgba(90, 71, 209, 0.35);
+  outline: 3px solid rgba(0, 113, 227, 0.35);
   outline-offset: 2px;
 }
 
@@ -55,10 +56,10 @@
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(58% 46% at 10% -4%, rgba(212, 245, 118, 0.5), transparent 62%),
-    radial-gradient(42% 38% at 92% 2%, rgba(201, 184, 255, 0.38), transparent 68%),
-    radial-gradient(54% 44% at 52% 108%, rgba(57, 224, 155, 0.16), transparent 72%),
-    linear-gradient(180deg, #f7f7f2 0%, #f0f0ea 100%);
+    radial-gradient(58% 46% at 8% -6%, rgba(0, 113, 227, 0.16), transparent 62%),
+    radial-gradient(42% 38% at 92% 0%, rgba(255, 159, 10, 0.08), transparent 68%),
+    radial-gradient(54% 44% at 52% 108%, rgba(0, 113, 227, 0.06), transparent 72%),
+    linear-gradient(180deg, #f7f7f9 0%, #f1f1f4 100%);
 }
 
 .lf-ambient::after {
@@ -74,7 +75,7 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(247, 247, 242, 0.78);
+  background: rgba(245, 245, 247, 0.78);
   -webkit-backdrop-filter: blur(22px) saturate(1.5);
   backdrop-filter: blur(22px) saturate(1.5);
   border-bottom: 1px solid var(--lf-line);
@@ -136,9 +137,9 @@
   width: 32px;
   height: 32px;
   border-radius: 10px;
-  background: var(--lf-accent);
-  color: var(--lf-accent-ink);
-  font-family: var(--hh-font), sans-serif;
+  background: var(--lf-ink);
+  color: #ffffff;
+  font-family: var(--lf-font);
   font-size: 20px;
   font-weight: 700;
   line-height: 1;
@@ -146,10 +147,10 @@
 }
 
 .lf-brand-name {
-  font-family: var(--hh-font), sans-serif;
-  font-size: 21px;
+  font-family: var(--lf-font);
+  font-size: 17px;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .lf-brand-sep {
@@ -178,11 +179,23 @@
   gap: 6px;
   padding: 7px 11px;
   border-radius: 999px;
-  background: rgba(57, 224, 155, 0.12);
-  color: #136b4b;
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--lf-ink-2);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.01em;
+}
+
+.lf-secure svg {
+  color: #30d158;
+}
+
+.lf-apple .lf-security-note svg {
+  color: var(--lf-accent);
+}
+
+.lf-apple .fingen-flow-upload-icon svg {
+  color: var(--lf-accent);
 }
 
 .lf-help {
@@ -207,29 +220,26 @@
 }
 
 .lf-intro {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 32px;
-  margin-bottom: clamp(26px, 4vw, 42px);
+  max-width: 720px;
+  margin-bottom: clamp(24px, 3vw, 34px);
 }
 
-.lf-intro-copy h1 {
+.lf-intro h1 {
   margin: 0;
-  max-width: 13ch;
-  font-family: var(--hh-font), sans-serif;
-  font-size: clamp(44px, 6.4vw, 76px);
+  max-width: 20ch;
+  font-family: var(--lf-font);
+  font-size: clamp(30px, 4vw, 42px);
   font-weight: 600;
-  line-height: 0.92;
-  letter-spacing: -0.025em;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
   text-wrap: balance;
 }
 
-.lf-intro-copy p {
-  margin: 14px 0 0;
-  max-width: 46ch;
+.lf-intro p {
+  margin: 8px 0 0;
+  max-width: 52ch;
   color: var(--lf-muted);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.55;
 }
 
@@ -295,11 +305,11 @@
 
 .lf-apple .tfp-section-title {
   margin: 0;
-  font-family: var(--hh-font), sans-serif;
-  font-size: clamp(36px, 5vw, 54px);
+  font-family: var(--lf-font);
+  font-size: clamp(26px, 3.4vw, 36px);
   font-weight: 600;
-  line-height: 0.96;
-  letter-spacing: -0.02em;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
   color: var(--lf-ink);
   text-wrap: balance;
 }
@@ -376,7 +386,7 @@
 .lf-apple .listing-stepper-button.is-active .listing-stepper-marker {
   background: var(--lf-accent);
   color: var(--lf-accent-ink);
-  box-shadow: 0 0 0 4px rgba(212, 245, 118, 0.28);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.16);
 }
 
 .lf-apple .listing-stepper-button.is-complete .listing-stepper-marker {
@@ -442,9 +452,9 @@
   padding: 0 16px;
   border: 1px solid var(--lf-line-strong);
   border-radius: var(--lf-radius-sm);
-  background: var(--lf-surface-soft);
+  background: #ffffff;
   color: var(--lf-ink);
-  font-family: inherit;
+  font-family: var(--lf-font);
   font-size: 15px;
   font-weight: 500;
   line-height: 1.3;
@@ -467,9 +477,9 @@
 .lf-apple .fingen-flow-input:focus,
 .lf-apple .listing-flow-input-field:focus {
   outline: none;
-  border-color: var(--lf-ink);
+  border-color: var(--lf-accent);
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(212, 245, 118, 0.42);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.16);
 }
 
 .lf-apple .fingen-flow-input:active,
@@ -563,10 +573,10 @@
   min-height: 54px;
   padding: 0 26px;
   border: 1px solid rgba(17, 17, 16, 0.08);
-  border-radius: 999px;
+  border-radius: 14px;
   background: var(--lf-accent);
   color: var(--lf-accent-ink);
-  font-family: inherit;
+  font-family: var(--lf-font);
   font-size: 15px;
   font-weight: 750;
   letter-spacing: -0.01em;
@@ -599,8 +609,8 @@
 .lf-apple.listing-flow-app .tfp-btn-primary.listing-next-step-button:not(.listing-final-submit-button),
 .lf-apple.listing-flow-app .tfp-btn-primary.listing-final-submit-button {
   background: var(--lf-accent);
-  color: var(--lf-accent-ink);
-  box-shadow: 0 1px 2px rgba(17, 17, 16, 0.06), 0 12px 26px -16px rgba(17, 17, 16, 0.42);
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 12px 26px -16px rgba(0, 0, 0, 0.32);
 }
 
 .lf-apple.listing-flow-app .tfp-btn-primary.listing-next-step-button:not(.listing-final-submit-button):hover,
@@ -617,10 +627,10 @@
   min-height: 54px;
   padding: 0 22px;
   border: 1px solid var(--lf-line-strong);
-  border-radius: 999px;
-  background: #fff;
+  border-radius: 14px;
+  background: var(--lf-surface-soft);
   color: var(--lf-ink);
-  font-family: inherit;
+  font-family: var(--lf-font);
   font-size: 14px;
   font-weight: 700;
   transition: transform 130ms ease, background-color 180ms ease, border-color 180ms ease;
@@ -651,8 +661,8 @@
   align-items: center;
   padding: 5px 10px;
   border-radius: 999px;
-  background: rgba(212, 245, 118, 0.55);
-  color: #3c421f;
+  background: rgba(0, 113, 227, 0.1);
+  color: #0071e3;
   font-size: 11px;
   font-weight: 750;
 }
@@ -672,7 +682,7 @@
 .lf-apple .fingen-flow-upload-area {
   border: 1.5px dashed rgba(17, 17, 16, 0.2);
   border-radius: var(--lf-radius-lg);
-  background: linear-gradient(180deg, #fbfbf8 0%, #f5f5f0 100%);
+  background: #f5f5f7;
   transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
 }
 
@@ -687,7 +697,7 @@
 
 .lf-apple .fingen-flow-upload-area.is-dragging {
   border-color: var(--lf-ink);
-  background: rgba(212, 245, 118, 0.14);
+  background: rgba(0, 113, 227, 0.08);
   transform: scale(1.006);
 }
 
@@ -696,8 +706,9 @@
   place-items: center;
   width: 58px;
   height: 58px;
-  border-radius: 19px;
-  background: var(--lf-accent);
+  border-radius: 18px;
+  background: #e8f0fe;
+  color: #0071e3;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
@@ -757,8 +768,8 @@
   padding: clamp(20px, 3vw, 28px);
   border-radius: var(--lf-radius-lg);
   background:
-    radial-gradient(120% 90% at 100% 0%, rgba(212, 245, 118, 0.16), transparent 55%),
-    #151513;
+    radial-gradient(120% 90% at 100% 0%, rgba(0, 113, 227, 0.2), transparent 55%),
+    #1c1c1e;
   color: #fff;
   box-shadow: 0 24px 54px -30px rgba(17, 17, 16, 0.6);
 }
@@ -782,8 +793,8 @@
 .lf-apple .lf-fipe-price {
   margin: 6px 0 0;
   color: #fff;
-  font-family: var(--hh-font), sans-serif;
-  font-size: clamp(34px, 5vw, 46px);
+  font-family: var(--lf-font);
+  font-size: clamp(30px, 4vw, 38px);
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -801,18 +812,18 @@
 }
 
 .lf-apple .lf-fipe-status.is-below {
-  background: rgba(57, 224, 155, 0.16);
-  color: #8ff0c7;
+  background: rgba(48, 209, 88, 0.16);
+  color: #30d158;
 }
 
 .lf-apple .lf-fipe-status.is-near {
-  background: rgba(212, 245, 118, 0.16);
-  color: var(--lf-accent);
+  background: rgba(10, 132, 255, 0.16);
+  color: #0a84ff;
 }
 
 .lf-apple .lf-fipe-status.is-above {
-  background: rgba(255, 107, 82, 0.18);
-  color: #ffb4a6;
+  background: rgba(255, 159, 10, 0.18);
+  color: #ff9f0a;
 }
 
 .lf-apple .lf-fipe-grid {
@@ -913,9 +924,9 @@
   gap: 20px;
   padding: 14px;
   border-radius: var(--lf-radius-lg);
-  background: #151513;
+  background: #1c1c1e;
   color: #fff;
-  box-shadow: 0 24px 54px -32px rgba(17, 17, 16, 0.6);
+  box-shadow: 0 24px 54px -32px rgba(0, 0, 0, 0.55);
 }
 
 .lf-apple .lf-review-media {
@@ -923,7 +934,7 @@
   min-height: 220px;
   overflow: hidden;
   border-radius: 18px;
-  background: linear-gradient(135deg, #2a2a25, #1b1b18);
+  background: linear-gradient(135deg, #2c2c2e, #1c1c1e);
 }
 
 .lf-apple .lf-review-media img {
@@ -958,8 +969,8 @@
 .lf-apple .lf-review-title {
   margin: 6px 0 0;
   color: #fff;
-  font-family: var(--hh-font), sans-serif;
-  font-size: clamp(30px, 4vw, 40px);
+  font-family: var(--lf-font);
+  font-size: clamp(24px, 3vw, 32px);
   font-weight: 600;
   line-height: 0.98;
   letter-spacing: -0.02em;
@@ -967,8 +978,8 @@
 
 .lf-apple .lf-review-price {
   margin: 12px 0 0;
-  color: var(--lf-accent);
-  font-size: clamp(26px, 3.6vw, 34px);
+  color: #ffffff;
+  font-size: clamp(24px, 3.2vw, 30px);
   font-weight: 800;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -1006,7 +1017,7 @@
 }
 
 .lf-apple .lf-review-fipe strong {
-  color: var(--lf-accent);
+  color: #0a84ff;
   font-size: 13px;
   font-weight: 750;
 }
@@ -1028,8 +1039,8 @@
 
 .lf-apple .lf-score-value {
   color: var(--lf-ink);
-  font-family: var(--hh-font), sans-serif;
-  font-size: 34px;
+  font-family: var(--lf-font);
+  font-size: 30px;
   font-weight: 600;
   line-height: 1;
 }
@@ -1053,7 +1064,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--lf-accent), var(--lf-accent-strong));
+  background: linear-gradient(90deg, #0071e3, #0a84ff);
 }
 
 .lf-apple .lf-score-label {
@@ -1149,8 +1160,8 @@
   margin-top: 14px;
   padding: 14px 16px;
   border-radius: var(--lf-radius-md);
-  background: rgba(57, 224, 155, 0.1);
-  color: #136b4b;
+  background: #f5f5f7;
+  color: #424245;
   font-size: 12px;
   font-weight: 600;
   line-height: 1.5;
@@ -1172,8 +1183,8 @@
 .lf-apple .lf-account-title {
   margin: 0;
   color: var(--lf-ink);
-  font-family: var(--hh-font), sans-serif;
-  font-size: 28px;
+  font-family: var(--lf-font);
+  font-size: 24px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.01em;
@@ -1213,7 +1224,7 @@
   padding: 14px 16px;
   border: 1px solid rgba(19, 107, 75, 0.18);
   border-radius: var(--lf-radius-md);
-  background: rgba(57, 224, 155, 0.12);
+  background: rgba(48, 209, 88, 0.12);
   color: #136b4b;
   font-size: 13px;
   font-weight: 700;
@@ -1244,8 +1255,8 @@
   aspect-ratio: 4 / 3;
   overflow: hidden;
   background:
-    radial-gradient(80% 70% at 50% 20%, rgba(212, 245, 118, 0.42), transparent 70%),
-    linear-gradient(135deg, #e8e8e1, #f6f6f1);
+    radial-gradient(80% 70% at 50% 20%, rgba(0, 113, 227, 0.14), transparent 70%),
+    linear-gradient(135deg, #e9e9ee, #f7f7f9);
 }
 
 .lf-preview-media img {
@@ -1262,9 +1273,9 @@
 }
 
 .lf-preview-placeholder strong {
-  color: rgba(17, 17, 16, 0.45);
-  font-family: var(--hh-font), sans-serif;
-  font-size: 22px;
+  color: rgba(0, 0, 0, 0.4);
+  font-family: var(--lf-font);
+  font-size: 17px;
   font-weight: 600;
 }
 
@@ -1292,7 +1303,7 @@
   height: 6px;
   border-radius: 999px;
   background: var(--lf-mint);
-  box-shadow: 0 0 0 3px rgba(57, 224, 155, 0.18);
+  box-shadow: 0 0 0 3px rgba(48, 209, 88, 0.18);
 }
 
 .lf-preview-body {
@@ -1310,8 +1321,8 @@
 .lf-preview-title {
   margin: 5px 0 0;
   color: var(--lf-ink);
-  font-family: var(--hh-font), sans-serif;
-  font-size: 27px;
+  font-family: var(--lf-font);
+  font-size: 22px;
   font-weight: 600;
   line-height: 0.98;
   letter-spacing: -0.01em;
@@ -1410,7 +1421,7 @@
 
 /* ── CTA mobile ────────────────────────────────────────────── */
 .lf-apple .lf-mobile-cta {
-  background: rgba(247, 247, 242, 0.82);
+  background: rgba(245, 245, 247, 0.82);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
   backdrop-filter: blur(20px) saturate(1.4);
   border-top: 1px solid var(--lf-line);
@@ -1424,11 +1435,11 @@
 }
 
 .lf-apple .plate-input > div:first-child > div:first-child {
-  background: rgba(212, 245, 118, 0.5);
+  background: rgba(0, 113, 227, 0.1);
 }
 
 .lf-apple .plate-input > div:first-child svg {
-  color: var(--lf-accent-ink);
+  color: var(--lf-accent);
 }
 
 .lf-apple .plate-input > div:nth-child(2) {
@@ -1443,22 +1454,22 @@
   min-height: 54px;
   border: 1px solid var(--lf-line-strong);
   border-radius: var(--lf-radius-sm);
-  background: var(--lf-surface-soft);
-  font-family: var(--font-mono), ui-monospace, monospace;
+  background: #fff;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 16px;
   letter-spacing: 0.12em;
 }
 
 .lf-apple .plate-input #listing-plate:focus {
-  border-color: var(--lf-ink);
+  border-color: var(--lf-accent);
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(212, 245, 118, 0.42);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.16);
 }
 
 .lf-apple .plate-input button[type="button"] {
   min-height: 54px;
   border-radius: var(--lf-radius-sm);
-  background: var(--lf-ink);
+  background: var(--lf-accent);
   color: #fff;
   font-size: 12px;
   font-weight: 750;
@@ -1466,7 +1477,7 @@
 }
 
 .lf-apple .plate-input button[type="button"]:hover {
-  background: #2b2b27;
+  background: #0077ed;
 }
 
 .lf-apple .plate-input button[type="button"]:active {
@@ -1474,22 +1485,27 @@
 }
 
 .lf-apple .plate-input button[type="button"]:disabled {
-  background: #e8e8e2;
-  color: #8b8b84;
+  background: #f5f5f7;
+  color: #8e8e93;
 }
 
 .lf-apple .plate-input .bg-amber-50 {
-  border-color: rgba(212, 245, 118, 0.7);
-  background: rgba(212, 245, 118, 0.22);
-  color: #4b4b23;
+  border-color: #e5e5ea;
+  background: #f5f5f7;
+  color: #424245;
+}
+
+.lf-apple .plate-input .bg-amber-50 p,
+.lf-apple .plate-input .bg-amber-50 strong {
+  color: #424245;
 }
 
 .lf-apple .plate-input .bg-amber-50 svg {
-  color: #6b6b23;
+  color: #6e6e73;
 }
 
 .lf-apple .plate-input .bg-emerald-50 {
-  background: rgba(57, 224, 155, 0.1);
+  background: rgba(48, 209, 88, 0.1);
 }
 
 /* ── Responsivo ────────────────────────────────────────────── */
@@ -1546,24 +1562,16 @@
   }
 
   .lf-intro {
-    display: block;
     margin-bottom: 22px;
   }
 
-  .lf-intro-copy h1 {
-    font-size: clamp(40px, 12vw, 56px);
-    max-width: 12ch;
+  .lf-intro h1 {
+    font-size: clamp(28px, 9vw, 36px);
   }
 
-  .lf-intro-copy p {
+  .lf-intro p {
     font-size: 14px;
     max-width: 38ch;
-  }
-
-  .lf-intro-chips {
-    justify-content: flex-start;
-    margin-top: 14px;
-    padding-bottom: 0;
   }
 
   .lf-form-card {
