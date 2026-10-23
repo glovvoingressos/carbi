@@ -327,6 +327,9 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
   const [catalogCars, setCatalogCars] = useState<CatalogCar[]>([])
   const [technical, setTechnical] = useState<TechnicalSnapshot>(EMPTY_TECHNICAL)
   const plateFipeLookupRef = useRef(false)
+  // Placa completa fica só em memória até o envio; o anúncio público recebe
+  // apenas o último caractere e a placa completa vai para o cofre privado.
+  const privatePlateRef = useRef('')
 
   const [sessionReady, setSessionReady] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -431,6 +434,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
     }
 
     const applyData = (data: PlacaApiResponse) => {
+      privatePlateRef.current = data.placa || plate
       setForm((prev) => ({
         ...prev,
         brand: data.marca,
@@ -948,6 +952,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
 
   const startManualVehicleEntry = () => {
     clearPlateLookup()
+    privatePlateRef.current = ''
     setManualVehicleMode(true)
     setError(null)
   }
@@ -1080,6 +1085,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
           engine: resolvedEngine,
           horsepower: Number.isFinite(resolvedHorsepower) ? resolvedHorsepower : null,
           plate_final: normalizePlateFinal(form.plateFinal),
+          plate: privatePlateRef.current || null,
           doors: form.doors ? Number(form.doors) : null,
           vin: form.vin ? form.vin.trim().toUpperCase() : null,
           ...(form.vehicle_type === 'truck' ? {
@@ -1277,6 +1283,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
                   <>
                     <PlateInput onPlateFound={(data: PlateFormData) => {
                       setManualVehicleMode(false)
+                      privatePlateRef.current = data.plate || ''
                       handleInput('brand', data.brand)
                       handleInput('model', data.model)
                       handleInput('year', String(data.year))

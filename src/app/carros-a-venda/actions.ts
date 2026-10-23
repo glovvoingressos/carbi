@@ -10,7 +10,7 @@ export async function getFilteredListings(input: ListingsPageInput) {
 export async function getModelsByBrands(brands: string[]) {
   if (brands.length === 0) return []
   const { data } = await getSupabaseServerClient()
-    .from('vehicle_listings')
+    .from('vehicle_listings_public')
     .select('model')
     .in('brand', brands)
     .eq('status', 'active')

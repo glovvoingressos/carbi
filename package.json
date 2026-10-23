@@ -19,7 +19,8 @@
     "audit:catalog:tech": "node scripts/audit-catalog-tech.mjs",
     "sync:hf:fipex:catalog": "node scripts/sync-hf-fipex-catalog.mjs",
     "sync:autodev:catalog": "node scripts/sync-autodev-catalog.mjs",
-    "reclassify:trucks": "node --experimental-strip-types scripts/reclassify-truck-listings.mjs"
+    "reclassify:trucks": "node --experimental-strip-types scripts/reclassify-truck-listings.mjs",
+    "secure:legacy-plates": "node --experimental-strip-types scripts/secure-legacy-plates.mjs"
   },
   "keywords": [],
   "author": "",

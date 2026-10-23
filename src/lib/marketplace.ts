@@ -19,6 +19,46 @@ export function normalizePlateFinal(value: string | null | undefined): string | 
   return normalized ? normalized.slice(-1) : null
 }
 
+const SENSITIVE_STRUCTURED_KEYS = new Set([
+  'placa',
+  'plate',
+  'placa_final',
+  'plate_final',
+  'renavam',
+  'cpf',
+  'cnpj',
+  'cpf_cnpj',
+  'cpfcnpj',
+  'cpfcnpjproprietario',
+  'nomeproprietario',
+  'nome_proprietario',
+  'proprietario',
+  'documento',
+  'document',
+])
+
+function sanitizeStructuredValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sanitizeStructuredValue)
+  if (!value || typeof value !== 'object') return value
+
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .filter(([key]) => !SENSITIVE_STRUCTURED_KEYS.has(key.toLowerCase()))
+      .map(([key, item]) => [key, sanitizeStructuredValue(item)]),
+  )
+}
+
+/**
+ * Remove dados pessoais/identificadores que nunca devem ir para
+ * `structured_data`/`technical_data` (ex.: placa completa vinda da consulta).
+ */
+export function sanitizeListingStructuredData(value: unknown): Record<string, unknown> {
+  const sanitized = sanitizeStructuredValue(value)
+  return sanitized && typeof sanitized === 'object' && !Array.isArray(sanitized)
+    ? sanitized as Record<string, unknown>
+    : {}
+}
+
 export interface PlateFipeLookupInput {
   brand: string
   model: string
@@ -83,6 +123,8 @@ export interface ListingFormPayload {
   engine?: string
   horsepower?: number | null
   plate_final?: string
+  /** Placa completa: usada apenas para o cofre privado, nunca publicada. */
+  plate?: string | null
   doors?: number | null
   vin?: string | null
   fipe_brand_code?: string

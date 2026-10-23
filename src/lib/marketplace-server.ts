@@ -830,7 +830,7 @@ export async function getListingVehicleId(listingId: string): Promise<string | n
 
   const supabase = getSupabaseServerClient()
   const { data, error } = await supabase
-    .from('vehicle_listings')
+    .from('vehicle_listings_public')
     .select('vehicle_id')
     .eq('id', listingId)
     .maybeSingle()
@@ -877,7 +877,7 @@ export async function getSellerInfo(sellerUserId: string): Promise<{
   const profileAvatarUrl = profileRow?.avatar_url || null
 
   const listingsResult = await serverClient
-    .from('vehicle_listings')
+    .from('vehicle_listings_public')
     .select('id, status, created_at')
     .eq('user_id', sellerUserId)
 
@@ -930,12 +930,12 @@ export async function getFilterOptions() {
     { data: bodyTypesData },
     { data: optionalItemsData }
   ] = await Promise.all([
-    supabase.from('vehicle_listings').select('brand').eq('status', 'active'),
-    supabase.from('vehicle_listings').select('fuel').eq('status', 'active'),
-    supabase.from('vehicle_listings').select('transmission').eq('status', 'active'),
-    supabase.from('vehicle_listings').select('color').eq('status', 'active'),
-    supabase.from('vehicle_listings').select('body_type').eq('status', 'active'),
-    supabase.from('vehicle_listings').select('optional_items').eq('status', 'active')
+    supabase.from('vehicle_listings_public').select('brand').eq('status', 'active'),
+    supabase.from('vehicle_listings_public').select('fuel').eq('status', 'active'),
+    supabase.from('vehicle_listings_public').select('transmission').eq('status', 'active'),
+    supabase.from('vehicle_listings_public').select('color').eq('status', 'active'),
+    supabase.from('vehicle_listings_public').select('body_type').eq('status', 'active'),
+    supabase.from('vehicle_listings_public').select('optional_items').eq('status', 'active')
   ])
 
   const distinct = (arr: any[], key: string) => [...new Set(arr?.map(i => i[key]).filter(Boolean))].sort()

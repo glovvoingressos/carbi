@@ -391,6 +391,7 @@ export default function TruckListingForm() {
       engine: null,
       horsepower: null,
       plate_final: plateFinal,
+      plate: plate.trim() || null,
       doors: null,
       vin: null,
       truck_type: form.truckType,

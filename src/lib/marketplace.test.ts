@@ -6,6 +6,7 @@ import {
   getListingImageRejection,
   normalizePlateFinal,
   resolveListingFipeSnapshot,
+  sanitizeListingStructuredData,
 } from './marketplace'
 
 describe('marketplace listing helpers', () => {
@@ -59,6 +60,28 @@ describe('marketplace listing helpers', () => {
     expect(getListingPriceReview(1_600_000, null)).toBeNull()
     expect(getListingPriceReview('invalid', 100_000)).toBeNull()
     expect(getListingPriceReview(10_000, 100_000)?.direction).toBe('below')
+  })
+})
+
+describe('sanitizeListingStructuredData', () => {
+  it('remove placa e dados pessoais antes de gravar o anúncio', () => {
+    expect(sanitizeListingStructuredData({
+      source: 'web_form',
+      placa: 'ABC1D23',
+      renavam: '123456789',
+      cpfCnpjProprietario: '00000000000',
+      nomeProprietario: 'Fulano',
+      nested: { plate: 'ABC1D23', chassi: '9BW...' },
+    })).toEqual({
+      source: 'web_form',
+      nested: { chassi: '9BW...' },
+    })
+  })
+
+  it('mantém dados técnicos permitidos e lida com valores inválidos', () => {
+    expect(sanitizeListingStructuredData({ chassis: '9BWZZZ', pbt: 23000 })).toEqual({ chassis: '9BWZZZ', pbt: 23000 })
+    expect(sanitizeListingStructuredData(null)).toEqual({})
+    expect(sanitizeListingStructuredData(['ABC1D23'])).toEqual({})
   })
 })
 

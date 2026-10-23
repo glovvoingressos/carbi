@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
-import { ListingFormPayload, normalizePlateFinal, normalizeTruckPayload, getListingPriceReview, resolveListingFipeSnapshot, validateListingPayload } from '@/lib/marketplace'
+import { ListingFormPayload, normalizePlateFinal, normalizeTruckPayload, getListingPriceReview, resolveListingFipeSnapshot, sanitizeListingStructuredData, validateListingPayload } from '@/lib/marketplace'
 import { getFipePrice } from '@/lib/fipe-api'
 import { queryPublicListings } from '@/lib/marketplace-server'
 import { isTruckListing } from '@/lib/truck-classification'
+import { normalizePlate } from '@/lib/plate-crypto'
+import { savePrivateVehiclePlate } from '@/lib/vehicle-private-plates'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingCreatedEmail, sendAdminNewListingEmail } from '@/lib/email'
 import {
@@ -63,6 +65,9 @@ export async function POST(req: NextRequest) {
     if (payload.vehicle_type !== 'truck' && isTruckListing(payload)) {
       payload = { ...payload, vehicle_type: 'truck', body_type: 'Caminhão' }
     }
+    // A placa completa só vai para o cofre privado. No anúncio público fica
+    // apenas o último caractere (plate_final).
+    const privatePlate = normalizePlate(payload.plate)
     const validationErrors = validateListingPayload(payload)
 
     if (validationErrors.length > 0) {
@@ -130,7 +135,9 @@ export async function POST(req: NextRequest) {
       fipe_year_code: payload.fipe_year_code || null,
       fipe_reference_month: fipeReferenceMonth,
       fipe_price: fipePrice,
-      technical_data: (truckPayload.structured_data as Record<string, unknown> | undefined) || payload.structured_data || {},
+      technical_data: sanitizeListingStructuredData(
+        (truckPayload.structured_data as Record<string, unknown> | undefined) || payload.structured_data,
+      ),
     }
 
     const { data: vehicle, error: vehicleError } = await supabase
@@ -164,7 +171,7 @@ export async function POST(req: NextRequest) {
       optional_items: payload.optional_items || [],
       engine: payload.engine?.trim() || null,
       horsepower: payload.horsepower || null,
-      plate_final: normalizePlateFinal(payload.plate_final),
+      plate_final: privatePlate ? privatePlate.slice(-1) : normalizePlateFinal(payload.plate_final),
       doors: payload.doors || null,
       vin: payload.vin?.trim().toUpperCase() || null,
       fipe_brand_code: payload.fipe_brand_code || null,
@@ -172,8 +179,10 @@ export async function POST(req: NextRequest) {
       fipe_year_code: payload.fipe_year_code || null,
       fipe_reference_month: fipeReferenceMonth,
       fipe_price: fipePrice,
-      structured_data: payload.structured_data || {},
       ...truckPayload,
+      structured_data: sanitizeListingStructuredData(
+        (truckPayload.structured_data as Record<string, unknown> | undefined) || payload.structured_data,
+      ),
       status: priceReview ? 'paused' : 'active',
     }
 
@@ -186,6 +195,16 @@ export async function POST(req: NextRequest) {
     if (error) {
       await supabase.from('vehicles').delete().eq('id', vehicle.id)
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    // Cofre privado: a placa completa não aparece em nenhum campo público.
+    if (privatePlate) {
+      await savePrivateVehiclePlate({
+        vehicleId: vehicle.id,
+        listingId: data.id,
+        userId: auth.userId,
+        plate: privatePlate,
+      })
     }
 
     // Processamento síncrono para enviar confirmação de anúncio criado por e-mail

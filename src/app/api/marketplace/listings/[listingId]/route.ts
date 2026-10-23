@@ -3,8 +3,10 @@ import { getAuthContext } from '@/lib/auth-server'
 import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase-server'
 import { runAutoDevSync } from '@/lib/integrations/autoDev/service'
 import { sendListingDeletedEmail, sendListingStatusChangedEmail } from '@/lib/email'
-import { buildListingRollbackPayload, getListingPriceReview, normalizePlateFinal, parseFipePriceToNumber, resolveTruckPatch } from '@/lib/marketplace'
+import { buildListingRollbackPayload, getListingPriceReview, normalizePlateFinal, parseFipePriceToNumber, resolveTruckPatch, sanitizeListingStructuredData } from '@/lib/marketplace'
 import { getFipePrice } from '@/lib/fipe-api'
+import { normalizePlate } from '@/lib/plate-crypto'
+import { savePrivateVehiclePlate } from '@/lib/vehicle-private-plates'
 import type { TruckCategory } from '@/lib/trucks'
 import {
   normalizeBodyType,
@@ -35,6 +37,8 @@ type ListingPatchPayload = {
   engine?: string
   horsepower?: number
   plate_final?: string
+  /** Placa completa: usada apenas para o cofre privado. */
+  plate?: string | null
   doors?: number
   vehicle_type?: 'car' | 'truck'
   truck_type?: string | null
@@ -120,7 +124,9 @@ export async function PATCH(
       if (!Number.isInteger(body.horsepower) || body.horsepower < 0) return NextResponse.json({ error: 'Potência inválida.' }, { status: 400 })
       updates.horsepower = body.horsepower
     }
-    if (typeof body.plate_final === 'string') updates.plate_final = normalizePlateFinal(body.plate_final)
+    const privatePlate = normalizePlate(body.plate)
+    if (privatePlate) updates.plate_final = privatePlate.slice(-1)
+    else if (typeof body.plate_final === 'string') updates.plate_final = normalizePlateFinal(body.plate_final)
     if (typeof body.doors === 'number') {
       if (!Number.isInteger(body.doors) || body.doors < 1 || body.doors > 20) return NextResponse.json({ error: 'Portas inválidas.' }, { status: 400 })
       updates.doors = body.doors
@@ -197,6 +203,10 @@ export async function PATCH(
       }
     }
 
+    if ('structured_data' in updates) {
+      updates.structured_data = sanitizeListingStructuredData(updates.structured_data)
+    }
+
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'Nenhum campo válido para atualizar.' }, { status: 400 })
     }
@@ -211,6 +221,15 @@ export async function PATCH(
     if (error) {
       console.error('Falha ao atualizar anúncio', { listingId, error: error.message })
       return NextResponse.json({ error: 'Falha ao atualizar o anúncio.' }, { status: 500 })
+    }
+
+    if (privatePlate && listing.vehicle_id) {
+      await savePrivateVehiclePlate({
+        vehicleId: listing.vehicle_id,
+        listingId,
+        userId: auth.userId,
+        plate: privatePlate,
+      })
     }
 
     if (listing.vehicle_id) {
