@@ -107,22 +107,21 @@ describe('HomeListings', () => {
     expect(replace).toHaveBeenCalledWith('/?ordem=price_asc', { scroll: false })
   })
 
-  it('reveals six more loaded cards at a time until the full list is visible', () => {
-    const listings = Array.from({ length: 13 }, (_, index) => makeListing({
+  it('mostra 12 anúncios de início e revela mais 6 por vez até o fim', () => {
+    const listings = Array.from({ length: 19 }, (_, index) => makeListing({
       id: `listing-${index}`,
       slug: `listing-${index}`,
     }))
 
     render(<HomeListings listings={listings} />)
 
-    expect(screen.getAllByTestId('home-listing-card')).toHaveLength(6)
-    expect(screen.queryByText('Mostrando 6 de 12 anúncios')).toBeNull()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Mostrar mais anúncios' }))
     expect(screen.getAllByTestId('home-listing-card')).toHaveLength(12)
 
     fireEvent.click(screen.getByRole('button', { name: 'Mostrar mais anúncios' }))
-    expect(screen.getAllByTestId('home-listing-card')).toHaveLength(13)
+    expect(screen.getAllByTestId('home-listing-card')).toHaveLength(18)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mostrar mais anúncios' }))
+    expect(screen.getAllByTestId('home-listing-card')).toHaveLength(19)
     expect(screen.queryByRole('button', { name: 'Mostrar mais anúncios' })).toBeNull()
   })
 })

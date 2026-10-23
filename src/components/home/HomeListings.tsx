@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import {
@@ -28,7 +28,7 @@ import { heroFont } from './home-font'
 
 export type HomeListingSort = 'price_desc' | 'price_asc' | 'year_desc' | 'year_asc' | 'recent'
 
-const INITIAL_VISIBLE_LISTINGS = 6
+const INITIAL_VISIBLE_LISTINGS = 12
 const REVEAL_STEP = 6
 
 const SORT_OPTIONS: Array<{ value: HomeListingSort; label: string }> = [
@@ -84,10 +84,29 @@ export default function HomeListings({ listings, fetchError = false }: HomeListi
   const searchParams = useSearchParams()
   const [sort, setSort] = useState<HomeListingSort>(() => parseSort(searchParams.get('ordem')))
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_LISTINGS)
+  const loadMoreRef = useRef<HTMLDivElement | null>(null)
 
   const sortedListings = useMemo(() => sortHomeListings(listings, sort), [listings, sort])
   const visibleListings = sortedListings.slice(0, visibleCount)
   const selectedSortLabel = SORT_OPTIONS.find((option) => option.value === sort)?.label ?? 'Mais recente'
+
+  // Expande a lista sozinho conforme o visitante rola a página.
+  useEffect(() => {
+    const node = loadMoreRef.current
+    if (!node || visibleCount >= sortedListings.length) return
+    if (typeof IntersectionObserver === 'undefined') return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return
+        setVisibleCount((current) => Math.min(current + REVEAL_STEP, sortedListings.length))
+      },
+      { rootMargin: '600px 0px' },
+    )
+
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [visibleCount, sortedListings.length])
 
   function handleSortChange(value: string | null) {
     const nextSort = parseSort(value)
@@ -250,7 +269,8 @@ export default function HomeListings({ listings, fetchError = false }: HomeListi
       </div>
 
       {visibleCount < sortedListings.length ? (
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <div ref={loadMoreRef} className="h-px w-full" aria-hidden="true" />
           <button
             type="button"
             className="cb-btn cb-btn-dark cb-btn-arrow touch-manipulation"
