@@ -1645,6 +1645,638 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   v3 — sistema preto, cinza e branco (referência: painel Carbi)
+   Fundo cinza claro, hero escuro com pílulas, stepper em pílula,
+   cards brancos/cinza com raio grande e botões pretos.
+   ═══════════════════════════════════════════════════════════════ */
+
+.lf-apple {
+  --lf-bg: #f4f4f6;
+  --lf-surface: #ffffff;
+  --lf-surface-soft: #f4f4f6;
+  --lf-ink: #18181b;
+  --lf-ink-2: #3f3f46;
+  --lf-muted: #71717a;
+  --lf-line: #e4e4e7;
+  --lf-line-strong: #d4d4d8;
+  --lf-accent: #18181b;
+  --lf-accent-strong: #27272a;
+  --lf-accent-ink: #ffffff;
+  --lf-danger: #b42318;
+  --lf-radius-xl: 32px;
+  --lf-radius-lg: 24px;
+  --lf-radius-md: 18px;
+  --lf-radius-sm: 16px;
+  --lf-shadow-card: none;
+  --lf-shadow-float: 0 1px 2px rgba(0, 0, 0, 0.04);
+  background: var(--lf-bg);
+  color: var(--lf-ink);
+}
+
+.lf-apple :focus-visible {
+  outline: 3px solid rgba(24, 24, 27, 0.25);
+}
+
+.lf-apple .lf-ambient {
+  background: #f4f4f6;
+}
+
+.lf-apple .lf-ambient::after {
+  display: none;
+}
+
+.lf-apple .lf-main {
+  padding-top: clamp(16px, 2.6vw, 28px);
+}
+
+/* Hero escuro */
+.lf-apple .lf-hero {
+  padding: clamp(22px, 3vw, 32px);
+  margin-bottom: 14px;
+  border-radius: 32px;
+  background: #18181b;
+  color: #ffffff;
+  box-shadow: 0 24px 60px -40px rgba(0, 0, 0, 0.5);
+}
+
+.lf-apple .lf-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.lf-apple .lf-hero-context {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+}
+
+.lf-apple .lf-hero h1 {
+  margin: 10px 0 0;
+  max-width: none;
+  color: #ffffff;
+  font-family: var(--lf-font);
+  font-size: clamp(34px, 4.6vw, 52px);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+}
+
+.lf-apple .lf-hero-sub {
+  margin: 12px 0 0;
+  max-width: 52ch;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.lf-apple .lf-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.lf-apple .lf-hero-divider {
+  height: 1px;
+  margin: 22px 0 18px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.lf-apple .lf-hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Pílulas */
+.lf-apple .lf-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-family: var(--lf-font);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 120ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+.lf-apple .lf-pill:active {
+  transform: scale(0.97);
+}
+
+.lf-apple .lf-pill-white {
+  background: #ffffff;
+  color: #18181b;
+}
+
+.lf-apple .lf-pill-white:hover {
+  background: #f4f4f6;
+}
+
+.lf-apple .lf-pill-outline {
+  background: transparent;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.lf-apple .lf-pill-outline:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.lf-apple .lf-pill-static {
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+  cursor: default;
+}
+
+.lf-apple .lf-pill-static:active {
+  transform: none;
+}
+
+/* Stepper em pílula */
+.lf-apple .listing-stepper-pill {
+  margin: 0 0 14px;
+  padding: 6px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 30px -26px rgba(0, 0, 0, 0.3);
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-row {
+  gap: 4px;
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-node {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-button {
+  width: 100%;
+  min-height: 44px;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: transparent;
+  color: #71717a;
+  transition: background-color 180ms ease, color 180ms ease, transform 120ms ease;
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-button:not(:disabled):hover {
+  background: #f4f4f6;
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-button:active {
+  transform: scale(0.98);
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-button.is-active,
+.lf-apple .listing-stepper-pill .listing-stepper-button.is-active:hover {
+  background: #18181b;
+  color: #ffffff;
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-button.is-complete {
+  color: #18181b;
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-copy strong {
+  color: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-button.is-active .listing-stepper-copy strong,
+.lf-apple .listing-stepper-pill .listing-stepper-button.is-active.listing-stepper-button .listing-stepper-copy strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-button.is-complete .listing-stepper-copy strong {
+  color: #18181b;
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-connector {
+  display: none;
+}
+
+/* Card principal do formulário */
+.lf-apple .lf-form-card {
+  padding: clamp(22px, 3.2vw, 36px);
+  border: 0;
+  border-radius: 32px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.lf-apple .lf-form-card::before {
+  display: none;
+}
+
+.lf-apple .lf-card-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+  color: #71717a;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.lf-apple .lf-step-head .tfp-section-title {
+  font-size: clamp(28px, 3.4vw, 38px);
+  letter-spacing: -0.04em;
+}
+
+/* Cards e tiles cinza */
+.lf-apple .fingen-flow-substep-card,
+.lf-apple .lf-card,
+.lf-apple .lf-fields-card {
+  border: 0;
+  border-radius: 24px;
+  background: #f4f4f6;
+  box-shadow: none;
+}
+
+.lf-apple .lf-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lf-apple .lf-tile-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #18181b;
+}
+
+.lf-apple .lf-card-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Campos */
+.lf-apple .fingen-flow-input,
+.lf-apple .listing-flow-input-field {
+  min-height: 54px;
+  border: 1px solid #e4e4e7;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #18181b;
+  box-shadow: none;
+}
+
+.lf-apple .fingen-flow-input::placeholder,
+.lf-apple .listing-flow-input-field::placeholder {
+  color: #a1a1aa;
+}
+
+.lf-apple .fingen-flow-input:hover,
+.lf-apple .listing-flow-input-field:hover {
+  border-color: #d4d4d8;
+  background: #ffffff;
+}
+
+.lf-apple .fingen-flow-input:focus,
+.lf-apple .listing-flow-input-field:focus {
+  border-color: #18181b;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(24, 24, 27, 0.08);
+}
+
+.lf-apple .listing-flow-field-label,
+.lf-apple .fingen-flow-field-label {
+  color: #3f3f46;
+}
+
+/* Botões */
+.lf-apple.listing-flow-app .tfp-btn-primary,
+.lf-apple.listing-flow-app .fingen-flow-btn-primary {
+  min-height: 52px;
+  border: 0;
+  border-radius: 999px;
+  background: #18181b;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.lf-apple.listing-flow-app .tfp-btn-primary:hover,
+.lf-apple.listing-flow-app .fingen-flow-btn-primary:hover {
+  background: #27272a;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.lf-apple.listing-flow-app .tfp-btn-primary.listing-next-step-button:not(.listing-final-submit-button),
+.lf-apple.listing-flow-app .tfp-btn-primary.listing-final-submit-button {
+  background: #18181b;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.lf-apple.listing-flow-app .tfp-btn-primary.listing-next-step-button:not(.listing-final-submit-button):hover,
+.lf-apple.listing-flow-app .tfp-btn-primary.listing-final-submit-button:hover {
+  background: #27272a;
+  color: #ffffff;
+}
+
+.lf-apple.listing-flow-app .tfp-btn-secondary {
+  min-height: 52px;
+  border: 1px solid #e4e4e7;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #18181b;
+  box-shadow: none;
+}
+
+.lf-apple.listing-flow-app .tfp-btn-secondary:hover {
+  background: #f4f4f6;
+  border-color: #d4d4d8;
+}
+
+.lf-apple .lf-form-footer {
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f2;
+}
+
+/* Upload */
+.lf-apple .fingen-flow-upload-area {
+  border: 1.5px dashed #d4d4d8;
+  border-radius: 24px;
+  background: #ffffff;
+}
+
+.lf-apple .fingen-flow-upload-area:hover {
+  border-color: #18181b;
+  background: #ffffff;
+}
+
+.lf-apple .fingen-flow-upload-area.is-dragging {
+  border-color: #18181b;
+  background: #f4f4f6;
+}
+
+.lf-apple .fingen-flow-upload-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: #18181b;
+  color: #ffffff;
+}
+
+.lf-apple .fingen-flow-upload-icon svg {
+  color: #ffffff;
+}
+
+/* Fotos */
+.lf-apple .lf-photo-card {
+  border: 0;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.lf-apple .lf-photo-card img {
+  border-radius: 14px;
+}
+
+.lf-apple .lf-photo-card button {
+  border: 0;
+  background: #f4f4f6;
+  color: #3f3f46;
+}
+
+.lf-apple .lf-photo-card button:hover {
+  background: #e4e4e7;
+  color: #18181b;
+}
+
+/* FIPE em preto */
+.lf-apple .lf-fipe-card {
+  border-radius: 28px;
+  background: #18181b;
+  color: #ffffff;
+  box-shadow: 0 24px 54px -34px rgba(0, 0, 0, 0.55);
+}
+
+.lf-apple .lf-fipe-label {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.lf-apple .lf-fipe-status {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.lf-apple .lf-fipe-status.is-below,
+.lf-apple .lf-fipe-status.is-near {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.lf-apple .lf-fipe-status.is-above {
+  background: rgba(255, 159, 10, 0.2);
+  color: #ffd08a;
+}
+
+.lf-apple .lf-fipe-stat {
+  border: 0;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.lf-apple .lf-fipe-track-bar {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.lf-apple .lf-fipe-track-fill {
+  background: #ffffff;
+}
+
+.lf-apple .lf-fipe-empty {
+  border: 0;
+  background: #f4f4f6;
+}
+
+/* Revisão */
+.lf-apple .lf-review-hero {
+  border-radius: 28px;
+  background: #18181b;
+  box-shadow: 0 24px 54px -36px rgba(0, 0, 0, 0.55);
+}
+
+.lf-apple .lf-review-media {
+  border-radius: 20px;
+  background: #27272a;
+}
+
+.lf-apple .lf-review-chips span {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.lf-apple .lf-review-fipe strong {
+  color: #ffffff;
+}
+
+.lf-apple .lf-score-bar {
+  background: #e4e4e7;
+}
+
+.lf-apple .lf-score-bar > span {
+  background: #18181b;
+}
+
+.lf-apple .lf-security-note {
+  border-radius: 20px;
+  background: #ffffff;
+  color: #3f3f46;
+}
+
+.lf-apple .lf-security-note svg {
+  color: #18181b;
+}
+
+.lf-apple .lf-account-card {
+  background: #f4f4f6;
+}
+
+/* Plate */
+.lf-apple .plate-input > div:nth-child(2) {
+  border: 0;
+  border-radius: 24px;
+  background: #ffffff;
+}
+
+.lf-apple .plate-input #listing-plate {
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.lf-apple .plate-input #listing-plate:focus {
+  border-color: #18181b;
+  box-shadow: 0 0 0 4px rgba(24, 24, 27, 0.08);
+}
+
+.lf-apple .plate-input > div:first-child > div:first-child {
+  background: #ffffff;
+}
+
+.lf-apple .plate-input > div:first-child svg {
+  color: #18181b;
+}
+
+.lf-apple .plate-input button[type="button"] {
+  border-radius: 999px;
+  background: #18181b;
+  color: #ffffff;
+}
+
+.lf-apple .plate-input button[type="button"]:hover {
+  background: #27272a;
+}
+
+.lf-apple .plate-input button[type="button"]:disabled {
+  background: #e4e4e7;
+  color: #a1a1aa;
+}
+
+/* Preview ao vivo */
+.lf-apple .lf-preview {
+  border: 0;
+  border-radius: 32px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.lf-apple .lf-preview-media {
+  background: #f4f4f6;
+}
+
+.lf-apple .lf-preview-chips span {
+  background: #f4f4f6;
+}
+
+.lf-apple .lf-rail-note {
+  border: 0;
+  border-radius: 24px;
+  background: #ffffff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.lf-apple .lf-mobile-cta {
+  background: rgba(244, 244, 246, 0.9);
+}
+
+/* Responsivo v3 */
+@media (max-width: 720px) {
+  .lf-apple .lf-main {
+    padding-top: 14px;
+    padding-bottom: 110px;
+  }
+
+  .lf-apple .lf-hero {
+    padding: 22px;
+    border-radius: 28px;
+  }
+
+  .lf-apple .lf-hero-top {
+    flex-direction: column;
+  }
+
+  .lf-apple .lf-hero-actions {
+    justify-content: flex-start;
+  }
+
+  .lf-apple .lf-hero h1 {
+    font-size: 34px;
+  }
+
+  .lf-apple .lf-form-card {
+    padding: 18px;
+    border-radius: 28px;
+  }
+
+  .lf-apple .listing-stepper-pill .listing-stepper-button {
+    gap: 6px;
+    padding: 0 10px;
+  }
+
+  .lf-apple .listing-stepper-pill .listing-stepper-copy {
+    display: none;
+  }
+
+  .lf-apple .listing-stepper-pill .listing-stepper-button.is-active .listing-stepper-copy {
+    display: grid;
+  }
+}
+
 /* ── Movimento reduzido ────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .lf-apple *,

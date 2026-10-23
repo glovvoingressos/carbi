@@ -15,6 +15,7 @@ import {
   Calendar,
   Camera,
   Car,
+  ClipboardCheck,
   Gauge,
   MapPin,
   MessageCircle,
@@ -1231,7 +1232,7 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
       aria-busy={saving || fipeLoading}
     >
       <div className="lf-form-column">
-        <ListingStepper currentStep={currentStep} onStepChange={(step) => {
+        <ListingStepper variant="pill" currentStep={currentStep} onStepChange={(step) => {
           if (step < currentStep) {
             setError(null)
             setValidationDetails([])
@@ -1242,6 +1243,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
         }} />
 
         <div className="lf-form-card">
+          <div className="lf-card-caption">
+            <span>Anúncio · {currentStep === 1 ? 'Veículo' : currentStep === 2 ? 'Preço e fotos' : 'Revisão'}</span>
+            <span>{String(currentStep).padStart(2, '0')} / 03</span>
+          </div>
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={`${currentStep}-${listingSubStep}`}
@@ -1690,7 +1695,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             <div className="lf-review-grid">
               <div className="lf-card lf-review-score">
                 <div className="lf-score-head">
-                  <h3 className="lf-card-title">Qualidade do anúncio</h3>
+                  <div className="lf-card-title-row">
+                    <span className="lf-tile-icon" aria-hidden="true"><Gauge size={16} /></span>
+                    <h3 className="lf-card-title">Qualidade do anúncio</h3>
+                  </div>
                   <p className="lf-score-value">{qualityScore}<small>/100</small></p>
                 </div>
                 <div className="lf-score-bar">
@@ -1707,7 +1715,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
               </div>
 
               <div className="lf-card lf-review-specs">
-                <h3 className="lf-card-title">Ficha técnica</h3>
+                <div className="lf-card-title-row">
+                  <span className="lf-tile-icon" aria-hidden="true"><Car size={16} /></span>
+                  <h3 className="lf-card-title">Ficha técnica</h3>
+                </div>
                 <div className="lf-specs-grid">
                   {[
                     { label: 'Motor', value: form.engine || technical.engine },
@@ -1728,7 +1739,10 @@ export default function ListingForm({ vehicleType = 'car' }: { vehicleType?: 'ca
             </div>
 
             <div className="lf-card lf-review-info">
-              <h3 className="lf-card-title">Informações do anúncio</h3>
+              <div className="lf-card-title-row">
+                <span className="lf-tile-icon" aria-hidden="true"><ClipboardCheck size={16} /></span>
+                <h3 className="lf-card-title">Informações do anúncio</h3>
+              </div>
               <div className="lf-info-list">
                 {[
                   { label: 'Final da placa', value: normalizePlateFinal(form.plateFinal) || 'Não informado' },
