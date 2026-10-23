@@ -18,7 +18,7 @@ interface ListingStepperProps {
   onStepChange: (step: number) => void
   /** Acrescenta a 4ª etapa (conta), usada quando o usuário não está logado. */
   showAccountStep?: boolean
-  /** `pill`: barra arredondada com ícones e pílula preta na etapa atual. */
+  /** `pill`: barra arredondada com ícones e pílula deslizante na etapa atual. */
   variant?: 'default' | 'pill'
 }
 
@@ -52,15 +52,26 @@ export default function ListingStepper({
                 onClick={() => onStepChange(step.id)}
               >
                 {isPill ? (
-                  <motion.span
-                    className="listing-stepper-icon"
-                    initial={false}
-                    animate={{ scale: isActive ? 1 : 0.94 }}
-                    transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 26 }}
-                    aria-hidden="true"
-                  >
-                    {isComplete ? <Check size={16} strokeWidth={2.5} /> : <Icon size={16} strokeWidth={1.8} />}
-                  </motion.span>
+                  <>
+                    {/* Pílula compartilhada: desliza entre etapas com spring amortecido (sem bounce). */}
+                    {isActive ? (
+                      <motion.span
+                        layoutId="listing-stepper-indicator"
+                        className="listing-stepper-indicator"
+                        aria-hidden="true"
+                        transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 42, mass: 0.9 }}
+                      />
+                    ) : null}
+                    <motion.span
+                      className="listing-stepper-icon"
+                      initial={false}
+                      animate={{ scale: isActive ? 1 : 0.94 }}
+                      transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 26 }}
+                      aria-hidden="true"
+                    >
+                      {isComplete ? <Check size={16} strokeWidth={2.5} /> : <Icon size={16} strokeWidth={1.8} />}
+                    </motion.span>
+                  </>
                 ) : (
                   <motion.span
                     className="listing-stepper-marker"

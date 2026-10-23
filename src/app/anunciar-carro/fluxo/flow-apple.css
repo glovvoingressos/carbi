@@ -1842,10 +1842,23 @@
   transform: scale(0.98);
 }
 
+.lf-apple .listing-stepper-pill .listing-stepper-button {
+  position: relative;
+  isolation: isolate;
+}
+
 .lf-apple .listing-stepper-pill .listing-stepper-button.is-active,
 .lf-apple .listing-stepper-pill .listing-stepper-button.is-active:hover {
-  background: #18181b;
+  background: transparent;
   color: #ffffff;
+}
+
+.lf-apple .listing-stepper-pill .listing-stepper-indicator {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 999px;
+  background: #18181b;
 }
 
 .lf-apple .listing-stepper-pill .listing-stepper-button.is-complete {
@@ -2303,6 +2316,70 @@
 
   .lf-apple .listing-stepper-pill .listing-stepper-button.is-active .listing-stepper-copy {
     display: grid;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   v4 — refinamento (apple-design)
+   Tracking por tamanho, leading inverso ao corpo, pressionar
+   com resposta imediata e fallback para transparência reduzida.
+   ═══════════════════════════════════════════════════════════════ */
+
+.lf-apple {
+  font-optical-sizing: auto;
+}
+
+/* Títulos grandes: tracking negativo; textos pequenos: tracking positivo */
+.lf-apple .lf-hero h1 {
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+}
+
+.lf-apple .lf-step-head .tfp-section-title {
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.lf-apple .lf-card-title {
+  letter-spacing: -0.012em;
+}
+
+.lf-apple .lf-card-caption,
+.lf-apple .lf-review-eyebrow,
+.lf-apple .lf-preview-eyebrow,
+.lf-apple .lf-spec-item span,
+.lf-apple .lf-hero-context {
+  letter-spacing: 0.02em;
+}
+
+.lf-apple .lf-hero-sub,
+.lf-apple .lf-step-head .tfp-section-sub,
+.lf-apple .lf-score-label,
+.lf-apple .lf-description {
+  line-height: 1.55;
+}
+
+.lf-apple .listing-flow-field-label,
+.lf-apple .fingen-flow-field-label {
+  letter-spacing: 0.005em;
+}
+
+/* Pressionar: resposta no pointer-down, sem esperar o clique */
+.lf-apple .listing-stepper-pill .listing-stepper-button:active,
+.lf-apple .fingen-flow-upload-area:active,
+.lf-apple .lf-photo-card button:active,
+.lf-apple .lf-pill:active {
+  transform: scale(0.97);
+}
+
+/* Transparência reduzida: superfícies translúcidas viram sólidas */
+@media (prefers-reduced-transparency: reduce) {
+  .lf-apple .lf-mobile-cta,
+  .lf-apple .lf-rail-note,
+  .lf-apple .lf-intro-chips span {
+    background: #f4f4f6;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 
